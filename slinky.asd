@@ -33,5 +33,9 @@
                                (:file "special")
                                (:file "class")
                                (:file "main")))
+                 (:module "server"
+                  :serial t
+                  :components ((:file "package")
+                               (:file "main")))
                  (:file "package")
                  (:file "core")))))

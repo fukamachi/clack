@@ -7,17 +7,15 @@
 |#
 
 #|
-  Slinky top-level package.
+  Slinky server package.
 
   Author: Eitarow Fukamachi (fukamachi_e@ariel-networks.com)
 |#
 
 (in-package :cl-user)
 
-(defpackage slinky
-  (:documentation "Slinky top-level package.")
-  (:use :cl
-        :slinky.application
-        :slinky.server)
-  (:export :start
-           :defapp))
+(defpackage slinky.server
+  (:documentation "Slinky server package.")
+  (:use :cl :hunchentoot)
+  (:shadow :start) ; Conflict with Hunchentoot.
+  (:export :start))

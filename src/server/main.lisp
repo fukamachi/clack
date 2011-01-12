@@ -7,17 +7,13 @@
 |#
 
 #|
-  Slinky top-level package.
+  Functions about Slinky Web server.
 
   Author: Eitarow Fukamachi (fukamachi_e@ariel-networks.com)
 |#
 
-(in-package :cl-user)
+(in-package :slinky.server)
 
-(defpackage slinky
-  (:documentation "Slinky top-level package.")
-  (:use :cl
-        :slinky.application
-        :slinky.server)
-  (:export :start
-           :defapp))
+(defun start (&key (port 8080))
+  "Start Hunchentoot server."
+  (hunchentoot:start (make-instance 'hunchentoot:acceptor :port port)))
