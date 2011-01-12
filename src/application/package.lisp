@@ -7,13 +7,15 @@
 |#
 
 #|
-  Slinky core functions.
+  Slinky Application package.
 
   Author: Eitarow Fukamachi (fukamachi_e@ariel-networks.com)
 |#
 
-(in-package :slinky)
+(in-package :cl-user)
 
-(defun start (&key (port 8080))
-  "Start Hunchentoot server."
-  (hunchentoot:start (make-instance 'hunchentoot:acceptor :port port)))
+(defpackage slinky.application
+  (:documentation "Slinky Application package.")
+  (:use :cl)
+  (:export :defapp
+           :<application>))
