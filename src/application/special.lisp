@@ -14,6 +14,9 @@
 
 (in-package :slinky.application)
 
+(defvar *application* nil
+  "Current application instance. This will be used in other package.")
+
 (defvar *applications* nil
   "Collections of Slinky applications have defined.")
 

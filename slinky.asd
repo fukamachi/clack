@@ -25,24 +25,29 @@
   :license "LLGPL"
   :depends-on (:hunchentoot :clsql :cl-markup :cl-locale)
   :components ((:module "src"
-                :serial t
                 :components
-                ((:module "application"
+                ((:module "action"
                   :serial t
                   :components ((:file "package")
                                (:file "special")
                                (:file "class")
                                (:file "main")))
-                 (:module "action"
+                 (:module "application"
+                  :depends-on ("action")
                   :serial t
                   :components ((:file "package")
                                (:file "special")
                                (:file "class")
                                (:file "main")))
                  (:module "server"
+                  :depends-on ("action" "application")
                   :serial t
                   :components ((:file "package")
                                (:file "dispatcher")
                                (:file "main")))
-                 (:file "package")
-                 (:file "core")))))
+                 (:module "base"
+                  :pathname ""
+                  :depends-on ("action" "application" "server")
+                  :serial t
+                  :components ((:file "package")
+                               (:file "core")))))))

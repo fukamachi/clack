@@ -20,12 +20,14 @@
                   (action-dir *default-action-dir*)
                   (model-dir *default-model-dir*))
   "Define a Slinky application and regist it to `*applications*'."
-  `(pushnew (make-instance '<application>
-               :routing ',routing
-               :name ,name
-               :root-dir ,root-dir
-               :view-dir ,view-dir
-               :action-dir ,action-dir
-               :model-dir ,model-dir)
-            *applications*
-            :key #'get-name))
+  (with-gensyms (app)
+    `(let ((,app (make-instance '<application>
+                    :name ,name
+                    :root-dir ,root-dir
+                    :view-dir ,view-dir
+                    :action-dir ,action-dir
+                    :model-dir ,model-dir)))
+       (initialize ,app)
+       (pushnew ,app
+                *applications*
+                :key #'get-name))))
