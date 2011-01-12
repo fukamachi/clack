@@ -19,3 +19,12 @@
       (params-list :initarg :params-list :initform '())
       (body :initarg :body :initform (lambda () "Null action.")))
   (:documentation "Class of Slinky action."))
+
+(defmethod invoke ((action <action>) request)
+  "Invoke action with got `request'."
+  (let ((param-fn (if (eq :GET (request-method request))
+                      #'get-parameter
+                      #'post-parameter)))
+    (apply (slot-value action 'body)
+           (mapcar #'(lambda (name) (funcall param-fn name request))
+                   (slot-value action 'params-list)))))

@@ -24,3 +24,6 @@
                          ,@body)))
             *actions*
             :key #'get-name))
+
+(defmacro find-action (name)
+  (find name *actions* :key #'get-name :test #'eq))

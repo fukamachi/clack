@@ -19,6 +19,8 @@
   (:documentation "Slinky action package.")
   (:use :cl)
   (:export :defaction
+           :find-action
+           :invoke
            :<action>
            :*action*
            :*actions*))
