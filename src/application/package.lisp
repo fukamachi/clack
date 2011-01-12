@@ -18,4 +18,5 @@
   (:documentation "Slinky Application package.")
   (:use :cl)
   (:export :defapp
+           :get-action-name
            :<application>))

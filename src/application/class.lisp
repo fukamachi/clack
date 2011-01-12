@@ -16,8 +16,14 @@
 
 (defclass <application> ()
   ((name :initarg :name :accessor :get-name)
+   (routing :initarg :routing)
    (root-dir :initarg :root-dir)
    (view-dir :initarg :view-dir :initform *default-view-dir*)
    (action-dir :initarg :action-dir :initform *default-action-dir*)
    (model-dir :initarg :model-dir :initform *default-model-dir*))
   (:documentation "Class of Slinky application."))
+
+(defmethod get-action-name ((app <application>) uri)
+  (loop :for (uri-rule action-name) :in (slot-value app 'routing)
+        :if (string= uri-rule uri)
+          :return action-name))

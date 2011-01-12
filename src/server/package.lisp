@@ -18,4 +18,5 @@
   (:documentation "Slinky server package.")
   (:use :cl :hunchentoot)
   (:shadow :start) ; Conflict with Hunchentoot.
-  (:export :start))
+  (:export :start
+           :create-slinky-dispatcher))

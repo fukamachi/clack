@@ -16,5 +16,6 @@
 
 (defclass <action> ()
      ((name :initarg :name :accessor :get-name)
-      (params-list :initarg :params-list :initform '()))
+      (params-list :initarg :params-list :initform '())
+      (body :initarg :body :initform (lambda () "Null action.")))
   (:documentation "Class of Slinky action."))

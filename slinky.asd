@@ -42,6 +42,7 @@
                  (:module "server"
                   :serial t
                   :components ((:file "package")
+                               (:file "dispatcher")
                                (:file "main")))
                  (:file "package")
                  (:file "core")))))

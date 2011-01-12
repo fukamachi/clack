@@ -14,13 +14,14 @@
 
 (in-package :slinky.application)
 
-(defmacro defapp (name &key
+(defmacro defapp (name routing &key
                   root-dir
                   (view-dir *default-view-dir*)
                   (action-dir *default-action-dir*)
                   (model-dir *default-model-dir*))
   "Define a Slinky application and regist it to `*applications*'."
   `(pushnew (make-instance '<application>
+               :routing ',routing
                :name ,name
                :root-dir ,root-dir
                :view-dir ,view-dir
