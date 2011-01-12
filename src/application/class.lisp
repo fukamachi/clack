@@ -29,7 +29,9 @@ The function takes HTTP Request method and URI string."
   (loop :with hash = (make-hash-table :test 'equal)
         :for (uri-rule action-name method) :in routing
         ;; TODO: about `method' is nil or cons.
-        :do (push (lambda (uri) (and (string= uri-rule uri) action-name))
+        ;; FIXME: this routing function calls `find-action' each requests.
+        :do (push (lambda (uri) (when (string= uri-rule uri)
+                              (invoke (find-action action-name))))
                   (gethash method hash))
         :finally
         (return (lambda (method uri) (funcall (gethash method hash) uri)))))
