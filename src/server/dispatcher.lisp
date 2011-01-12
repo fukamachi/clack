@@ -19,12 +19,5 @@
 (defun create-slinky-dispatcher (app)
   "Return a dispatcher of Hunchentoot. Takes a object `<application>'."
   (lambda (request)
-    (let ((action (find
-                   (get-action app (hunchentoot:request-uri request))
-                   slinky.action:*actions*
-                   :key #'get-name
-                   :test #'eq)))
-      ;; TODO: think POST method.
-      (apply (slot-value action 'body)
-             (mapcar (lambda (name) (get-parameter name request))
-                     (slot-value action 'params-list))))))
+    (funcall (route app)
+             (hunchentoot:request-uri request))))
