@@ -20,3 +20,10 @@
       :name ',name
       :middleware ',middleware-list
       :root-dir ,root-dir))
+
+(defun find-app (name &key (test #'eq))
+  "Find an application with the given name and return the instance."
+  (find name
+        (instance-collection (find-class '<slinky-application>))
+        :test test
+        :key #'get-name))
