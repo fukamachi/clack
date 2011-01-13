@@ -20,4 +20,12 @@
   (:export :run
            :call :build
            :<middleware>
-           :<environment>))
+           :<environment>
+           :<response>
+           :status
+           :headers
+           :header
+           :body
+           :content-type
+           :content-length
+           :content-encoding))
