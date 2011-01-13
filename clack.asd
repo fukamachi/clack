@@ -34,6 +34,6 @@
                   ((:module "hunchentoot"
                     :serial t
                     :components ((:file "package")
-                                 (:file "handler")))))
+                                 (:file "main")))))
                  (:file "package")
                  (:file "main")))))
