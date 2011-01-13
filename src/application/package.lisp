@@ -19,7 +19,4 @@
   (:use :cl :slinky.core)
   (:export :route
            :<slinky-application>
-           :*application*
-           :*default-view-dir*
-           :*default-action-dir*
-           :*default-model-dir*))
+           :*application*))

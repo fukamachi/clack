@@ -7,12 +7,12 @@
 |#
 
 #|
-  Special variables for Slinky Application package.
+  Special variables for Slinky Middleware.
 
   Author: Eitarow Fukamachi (fukamachi_e@ariel-networks.com)
 |#
 
-(in-package :slinky.application)
+(in-package :slinky.middleware)
 
-(defvar *application* nil
-  "Current application instance. This will be used in other package.")
+(defvar *middlewares* nil
+  "Collection of defined middlewares.")

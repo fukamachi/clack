@@ -23,7 +23,7 @@
   :version "1.0"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
-  :depends-on (:closer-mop :hunchentoot :alexandria)
+  :depends-on (:closer-mop :cl-fad :hunchentoot :alexandria)
   :components ((:module "src"
                 :serial t
                 :components
@@ -31,6 +31,15 @@
                   :serial t
                   :components ((:file "package")
                                (:file "class")))
+                 (:module "middleware"
+                  :serial t
+                  :components ((:file "package")
+                               (:file "special")
+                               (:file "class")
+                               (:module "route"
+                                :serial t
+                                :components ((:file "package")
+                                             (:file "class")))))
                  (:module "action"
                   :serial t
                   :components ((:file "package")

@@ -7,12 +7,12 @@
 |#
 
 #|
-  Special variables for Slinky Application package.
+  Slinky middleware for routing request package.
 
   Author: Eitarow Fukamachi (fukamachi_e@ariel-networks.com)
 |#
 
-(in-package :slinky.application)
+(in-package :cl-user)
 
-(defvar *application* nil
-  "Current application instance. This will be used in other package.")
+(defpackage slinky.middleware.route
+  (:use :cl :slinky.middleware))
