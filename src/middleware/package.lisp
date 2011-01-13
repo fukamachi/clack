@@ -7,17 +7,15 @@
 |#
 
 #|
-  Clack package.
+  Clack Middleware package.
 
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
 (in-package :cl-user)
 
-(defpackage clack
-  (:documentation "Clack top-level package.")
-  (:use :cl :hunchentoot :clack.middleware)
-  (:export :run
-           :call :build
-           :<middleware>
-           :<environment>))
+(defpackage clack.middleware
+  (:use :cl :clack)
+  (:export :<middleware>
+           :call
+           :build))

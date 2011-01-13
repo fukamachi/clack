@@ -35,5 +35,9 @@
                     :serial t
                     :components ((:file "package")
                                  (:file "main")))))
+                 (:module "middleware"
+                  :serial t
+                  :components ((:file "package")
+                               (:file "class")))
                  (:file "package")
                  (:file "main")))))
