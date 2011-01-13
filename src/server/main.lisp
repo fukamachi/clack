@@ -14,6 +14,7 @@
 
 (in-package :slinky.server)
 
-(defun start (application &key (port 8080))
+(defun start (app &key (port 8080))
   "Start Hunchentoot server."
+  (push (create-slinky-dispatcher app) hunchentoot:*dispatch-table*)
   (hunchentoot:start (make-instance 'hunchentoot:acceptor :port port)))

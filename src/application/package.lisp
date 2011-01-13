@@ -19,4 +19,5 @@
   (:use :cl :slinky.core)
   (:export :route
            :<slinky-application>
-           :*application*))
+           :*application*
+           :dispatch))

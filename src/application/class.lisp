@@ -23,5 +23,9 @@
 
 (defmethod initialize-instance ((app <slinky-application>) &rest initargs)
   ;; TODO: add builtin middlewares.
-  ;; TODO: initialize all middleware.
+  ;; TODO: `make-instance' all middleware.
+  )
+
+(defmethod dispatch ((app <slinky-application>) request)
+  ;; TODO: invoke `*middlewares*'
   )
