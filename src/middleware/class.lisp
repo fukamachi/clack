@@ -17,7 +17,7 @@
 (defclass <middleware> () ()
   (:documentation "Class for Clack Middleware."))
 
-(defmethod call ((mw <middleware>) (env <environment>))
+(defmethod call ((mw <middleware>) env)
   "Invoke this Middleware.")
 
 (defmethod build ((mw <middleware>) app) app)

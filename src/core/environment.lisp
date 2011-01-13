@@ -12,7 +12,7 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(in-package :clack)
+(in-package :clack.core)
 
 (defclass <environment> ()
      ((request-method :initarg :request-method :accessor request-method)
