@@ -27,5 +27,13 @@
   :components ((:module "src"
                 :serial t
                 :components
-		((:file "package")
+                ((:file "environment")
+                 (:module "handler"
+                  :serial t
+                  :components
+                  ((:module "hunchentoot"
+                    :serial t
+                    :components ((:file "package")
+                                 (:file "handler")))))
+                 (:file "package")
                  (:file "main")))))

@@ -7,15 +7,13 @@
 |#
 
 #|
-  Clack package.
+  Hunchentoot handler package.
 
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
 (in-package :cl-user)
 
-(defpackage clack
-  (:documentation "Clack top-level package.")
+(defpackage clack.handler.hunchentoot
   (:use :cl :hunchentoot)
-  (:export :run
-           :<environment>))
+  (:export :call :run))

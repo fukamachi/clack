@@ -14,10 +14,6 @@
 
 (in-package :clack)
 
-(defun run (app &key debug (port 8080))
-  "Start Hunchentoot server."
-  (when debug
-    (setf hunchentoot:*show-lisp-errors-p* t)
-    (setf hunchentoot:*show-lisp-backtraces-p* t))
-  (push app hunchentoot:*dispatch-table*)
-  (hunchentoot:start (make-instance 'hunchentoot:acceptor :port port)))
+(defun run (app &rest params &allow-other-keys)
+  "Start server."
+  (apply #'clack.handler.hunchentoot:run app params))
