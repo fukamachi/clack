@@ -35,11 +35,7 @@
                   :serial t
                   :components ((:file "package")
                                (:file "special")
-                               (:file "class")
-                               (:module "route"
-                                :serial t
-                                :components ((:file "package")
-                                             (:file "class")))))
+                               (:file "class")))
                  (:module "action"
                   :serial t
                   :components ((:file "package")
