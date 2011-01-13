@@ -26,5 +26,5 @@
 (defmethod allocate-instance ((class <collect-metaclass>) &key)
   "Put a new instance into `instance-collection'."
   (let ((instance (call-next-method)))
-    (push instance (slot-value class 'instance-collection))
+    (push instance (instance-collection class))
     instance))
