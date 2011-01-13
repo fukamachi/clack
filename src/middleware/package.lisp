@@ -17,4 +17,6 @@
 (defpackage slinky.middleware
   (:use :cl)
   (:export :<slinky-middleware>
-           :*middlewares*))
+           :*middlewares*
+           :before
+           :after))

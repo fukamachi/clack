@@ -21,6 +21,5 @@
   "Collect new instance of middleware into `*middlewares*'."
   (push mw *middlewares*))
 
-(defmethod before (request) request)
-(defmethod after (request) request)
-(defmethod around (request) request)
+(defmethod before ((mw <slinky-middleware>) request) request)
+(defmethod after ((mw <slinky-middleware>) response) response)

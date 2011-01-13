@@ -17,5 +17,4 @@
 (defpackage slinky.server
   (:documentation "Slinky server package.")
   (:use :cl :hunchentoot :slinky.application)
-  (:shadow :start) ; Conflict with Hunchentoot.
-  (:export :start))
+  (:export :run))

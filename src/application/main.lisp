@@ -14,11 +14,12 @@
 
 (in-package :slinky.application)
 
-(defmacro defapp (name middleware-list &key root-dir)
+(defmacro defapp (name main-handler &key middleware root-dir)
   "Synonym of `(make-instance :name 'name ..)'."
   `(make-instance '<slinky-application>
       :name ',name
-      :middleware ',middleware-list
+      :main ,main-handler
+      :middleware ',middleware
       :root-dir ,root-dir))
 
 (defun find-app (name &key (test #'eq))

@@ -16,9 +16,9 @@
 
 (defpackage slinky.application
   (:documentation "Slinky Application package.")
-  (:use :cl :slinky.core)
+  (:use :cl :slinky.core :slinky.middleware)
   (:export :defapp
            :<slinky-application>
            :*application*
-           :dispatch
+           :call
            :find-app))

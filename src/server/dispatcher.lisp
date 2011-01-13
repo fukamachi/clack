@@ -18,4 +18,4 @@
 
 (defun create-slinky-dispatcher (app)
   "Return a dispatcher of Hunchentoot. Takes a object `<slinky-application>'."
-  (lambda (request) (dispatch app request)))
+  (lambda (request) (call app request)))

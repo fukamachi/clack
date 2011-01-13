@@ -16,16 +16,26 @@
 
 (defclass <slinky-application> ()
   ((name :initarg :name :accessor get-name)
-   (middleware :initarg :middleware :initform '())
+   (main :initarg :main
+         :initform (lambda (request)
+                     (declare (ignore request))
+                     "Nil action")
+         :accessor get-main)
+   (middleware :initarg :middleware :initform '() :accessor get-middleware)
    (root-dir :initarg :root-dir))
   (:metaclass <collect-metaclass>)
   (:documentation "Class of Slinky application."))
 
 (defmethod initialize-instance :after ((app <slinky-application>) &rest initargs)
-  ;; TODO: add builtin middlewares.
-  ;; TODO: `make-instance' all middleware.
-  )
+  (mapcar #'make-instance (get-middleware app)))
 
-(defmethod dispatch ((app <slinky-application>) request)
-  ;; TODO: invoke `*middlewares*'
-  )
+(defmethod call ((app <slinky-application>) request)
+  "Returns a handler function."
+  (setf request
+        (reduce #'before *middlewares*
+                :initial-value request
+                :from-end t))
+  (lambda ()
+    (reduce #'after (reverse *middlewares*)
+            :initial-value (funcall (get-main app) request)
+            :from-end t)))

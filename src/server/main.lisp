@@ -14,7 +14,7 @@
 
 (in-package :slinky.server)
 
-(defun start (app &key debug (port 8080))
+(defun run (app &key debug (port 8080))
   "Start Hunchentoot server."
   (when debug
     (setf hunchentoot:*show-lisp-errors-p* t)
