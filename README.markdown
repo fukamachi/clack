@@ -29,7 +29,7 @@ Now access [http://localhost:8080/](http://localhost:8080/) and Clack show you "
     (defclass <simple-middleware> (<middleware>) ())
     (defmethod call ((mw <simple-middleware>) env)
       '(200 (:content-type "text/plain") ("Hello, Clack Middleware!")))
-    (defmethod build ((mw <middleware>) app)
+    (defmethod wrap ((mw <middleware>) app &rest args)
       (lambda (env)
         (let ((res (funcall app env)))
           (reverse (cons (call mw env) (cdr (reverse res)))))))

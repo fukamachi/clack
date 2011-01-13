@@ -20,12 +20,12 @@
 (defmethod call ((mw <middleware>) env)
   "Invoke this Middleware.")
 
-(defgeneric build (middleware app-or-middleware)
+(defgeneric wrap (middleware app-or-middleware &rest args)
   (:documentation
    "Compose this and given application or middleware instance into one function.
 The function takes `<environment>'. Default behavior returns given application.
 This should be overrided by subclasses."))
 
-(defmethod build ((mw <middleware>) app) app)
-(defmethod build ((mw1 <middleware>) (mw2 <middleware>))
+(defmethod wrap ((mw <middleware>) app &rest args) app)
+(defmethod wrap ((mw1 <middleware>) (mw2 <middleware>) &rest args)
   (lambda (env) (call mw2 env)))
