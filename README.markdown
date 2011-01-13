@@ -6,15 +6,15 @@ Now works on Hunchentoot only.
 
 ## Usage
 
-    (defpackage simple-blog
+    (defpackage simple-app
       (:use :cl :clack))
     
-    (in-package :simple-blog)
+    (in-package :simple-app)
     
-    (defapp blog
+    (defvar app
       (lambda (env) "Hello, Clack!"))
     
-    (run blog)
+    (run app)
 
 Now access [http://localhost:8080/](http://localhost:8080/) and Clack show you "Hello, Clack!".
 

@@ -7,7 +7,7 @@
 |#
 
 #|
-  Clack top-level package.
+  Clack package.
 
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
@@ -16,9 +16,5 @@
 
 (defpackage clack
   (:documentation "Clack top-level package.")
-  (:use :cl
-        :clack.middleware
-        :clack.server)
-  (:export :run
-           :call
-           :<middleware>))
+  (:use :cl :hunchentoot)
+  (:export :run))

@@ -7,12 +7,12 @@
 |#
 
 #|
-  Functions about Clack Web server.
+  Functions of Clack Web server.
 
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(in-package :clack.server)
+(in-package :clack)
 
 (defun run (app &key debug (port 8080))
   "Start Hunchentoot server."
