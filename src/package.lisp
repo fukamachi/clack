@@ -19,5 +19,5 @@
   (:use :cl
         :slinky.application
         :slinky.server)
-  (:export :start
+  (:export :run
            :defapp))
