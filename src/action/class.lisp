@@ -14,17 +14,19 @@
 
 (in-package :slinky.action)
 
-(defclass <action> ()
+(defclass <slinky-action> ()
      ((name :initarg :name :accessor :get-name)
-      (params-list :initarg :params-list :initform '())
+      (lambda-list :initarg :lambda-list :initform '())
       (body :initarg :body :initform (lambda () "Null action.")))
+  (:metaclass <collect-metaclass>)
   (:documentation "Class of Slinky action."))
 
-(defmethod invoke ((action <action>) request)
-  "Invoke action with got `request'."
+(defmethod invoke ((action <slinky-action>) request)
+  "Invoke action with got `request' context."
   (let ((param-fn (if (eq :GET (request-method request))
                       #'get-parameter
-                      #'post-parameter)))
+                      #'post-parameter))
+        (*action* action))
     (apply (slot-value action 'body)
            (mapcar #'(lambda (name) (funcall param-fn name request))
-                   (slot-value action 'params-list)))))
+                   (slot-value action 'lambda-list)))))

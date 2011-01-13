@@ -17,9 +17,6 @@
 (defvar *application* nil
   "Current application instance. This will be used in other package.")
 
-(defvar *applications* nil
-  "Collections of Slinky applications have defined.")
-
 (defvar *default-view-dir* "view"
   "Pathname of 'view' directory. It is for putting template files into.
 Default is 'view'.")

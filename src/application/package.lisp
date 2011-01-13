@@ -16,10 +16,9 @@
 
 (defpackage slinky.application
   (:documentation "Slinky Application package.")
-  (:use :cl :alexandria)
-  (:export :defapp
-           :route
-           :<application>
+  (:use :cl :slinky.core)
+  (:export :route
+           :<slinky-application>
            :*application*
            :*default-view-dir*
            :*default-action-dir*

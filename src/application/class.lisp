@@ -14,13 +14,14 @@
 
 (in-package :slinky.application)
 
-(defclass <application> ()
+(defclass <slinky-application> ()
   ((name :initarg :name :accessor :get-name)
    (route :accessor :route)
    (root-dir :initarg :root-dir)
    (view-dir :initarg :view-dir :initform *default-view-dir*)
    (action-dir :initarg :action-dir :initform *default-action-dir*)
    (model-dir :initarg :model-dir :initform *default-model-dir*))
+  (:metaclass <collect-metaclass>)
   (:documentation "Class of Slinky application."))
 
 (defun make-routing (routing)
@@ -36,6 +37,6 @@ The function takes HTTP Request method and URI string."
         :finally
         (return (lambda (method uri) (funcall (gethash method hash) uri)))))
 
-(defmethod initialize ((app <application>) (routing (cons)))
+(defmethod initialize-instance ((app <slinky-application>) &rest initargs)
   ;; TODO: ...load controller, view and i18n files...
-  (setf (route app) (make-routing routing)))
+  (setf (route app) (make-routing (assoc :route initargs))))

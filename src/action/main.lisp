@@ -14,16 +14,7 @@
 
 (in-package :slinky.action)
 
-(defmacro defaction (name query-params-list &body body)
-  "Define a Slinky action and regist it to `*actions*'."
-  `(pushnew (make-instance '<action>
-               :name ,name
-               :params-list ,query-params-list
-               :body (lambda (,@query-params-list)
-                       (let ((*action* ,name))
-                         ,@body)))
-            *actions*
-            :key #'get-name))
-
-(defmacro find-action (name)
-  (find name *actions* :key #'get-name :test #'eq))
+(defmacro find-action (name &key (test #'eq))
+  "Find `<slinky-action>' by it's name and return the instance."
+  (find name (instance-collection (find-class '<slinky-action>))
+        :key #'get-name :test test))

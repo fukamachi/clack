@@ -7,9 +7,14 @@
 |#
 
 #|
-  Functions about Slinky Application.
+  Slinky core package.
 
   Author: Eitarow Fukamachi (fukamachi_e@ariel-networks.com)
 |#
 
-(in-package :slinky.application)
+(in-package :cl-user)
+
+(defpackage slinky.core
+  (:use :cl)
+  (:export :instance-collection
+           :<collect-metaclass>))

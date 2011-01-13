@@ -23,31 +23,33 @@
   :version "1.0"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
-  :depends-on (:hunchentoot :clsql :cl-markup :cl-locale)
+  :depends-on (:closer-mop :hunchentoot :alexandria)
   :components ((:module "src"
+                :serial t
                 :components
-                ((:module "action"
+                ((:module "core"
+                  :serial t
+                  :components ((:file "package")
+                               (:file "class")))
+                 (:module "action"
                   :serial t
                   :components ((:file "package")
                                (:file "special")
                                (:file "class")
                                (:file "main")))
                  (:module "application"
-                  :depends-on ("action")
                   :serial t
                   :components ((:file "package")
                                (:file "special")
                                (:file "class")
                                (:file "main")))
                  (:module "server"
-                  :depends-on ("action" "application")
                   :serial t
                   :components ((:file "package")
                                (:file "dispatcher")
                                (:file "main")))
                  (:module "base"
                   :pathname ""
-                  :depends-on ("action" "application" "server")
                   :serial t
                   :components ((:file "package")
                                (:file "core")))))))

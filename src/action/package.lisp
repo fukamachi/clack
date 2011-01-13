@@ -17,10 +17,8 @@
 
 (defpackage slinky.action
   (:documentation "Slinky action package.")
-  (:use :cl)
-  (:export :defaction
-           :find-action
+  (:use :cl :slinky.core)
+  (:export :find-action
            :invoke
-           :<action>
-           :*action*
-           :*actions*))
+           :<slinky-action>
+           :*action*))

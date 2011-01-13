@@ -15,7 +15,4 @@
 (in-package :slinky.action)
 
 (defvar *action* nil
-  "Current action name.")
-
-(defvar *actions* nil
-  "Collections of Slinky action.")
+  "Current action instance.")
