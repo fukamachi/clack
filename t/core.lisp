@@ -1,1 +1,1 @@
-(in-package :slinky-test)
+(in-package :clack-test)

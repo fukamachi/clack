@@ -1,28 +1,26 @@
-# Slinky - Web Application Environment for Common Lisp
+# Clack - Web server Interface for Common Lisp
 
-Slinky is a Web Application Environment for Common Lisp inspired by Rack and WSGI.
+Clack is a Web server Interface for Common Lisp inspired by Python's WSGI and Ruby's Rack.
 
 Now works on Hunchentoot only.
 
 ## Usage
 
     (defpackage simple-blog
-      (:use :cl :slinky))
+      (:use :cl :clack))
     
     (in-package :simple-blog)
     
     (defapp blog
-      (lambda (req) "Hello, Slinky!"))
+      (lambda (env) "Hello, Clack!"))
     
     (run blog)
 
-Now access [http://localhost:8080/](http://localhost:8080/) and Slinky show you "Hello, Slinky!".
+Now access [http://localhost:8080/](http://localhost:8080/) and Clack show you "Hello, Clack!".
 
 ## Dependency
 
 * Hunchentoot
-* Closer MOP
-* Alexandria
 
 ## License
 

@@ -1,24 +1,24 @@
 #|
-  This file is a part of Slinky package.
-  URL: http://github.com/fukamachi/slinky
+  This file is a part of Clack package.
+  URL: http://github.com/fukamachi/clack
   Copyright (c) 2011 Eitarow Fukamachi <e.arrows@gmail.com>
 
-  Slinky is freely distributable under the LLGPL License.
+  Clack is freely distributable under the LLGPL License.
 |#
 
 #|
-  Class of Slinky Middleware.
+  Class of Clack Middleware.
 
-  Author: Eitarow Fukamachi (fukamachi_e@ariel-networks.com)
+  Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(in-package :slinky.middleware)
+(in-package :clack.middleware)
 
-(defclass <slinky-middleware> () ()
+(defclass <middleware> () ()
   (:documentation "Base class of Slinky Middleware."))
 
-(defmethod initialize-instance :after ((mw <slinky-middleware>) &rest initargs)
+(defmethod initialize-instance :after ((mw <middleware>) &rest initargs)
   "Collect new instance of middleware into `*middlewares*'."
   (push mw *middlewares*))
 
-(defmethod call ((mw <slinky-middleware>) env))
+(defmethod call ((mw <middleware>) env))

@@ -1,4 +1,4 @@
 (in-package :cl-user)
 
-(defpackage slinky-test
-  (:use :cl :slinky :cl-test-more))
+(defpackage clack-test
+  (:use :cl :clack :cl-test-more))

@@ -1,24 +1,24 @@
 #|
-  This file is a part of Slinky package.
-  URL: http://github.com/fukamachi/slinky
+  This file is a part of Clack package.
+  URL: http://github.com/fukamachi/clack
   Copyright (c) 2011 Eitarow Fukamachi <e.arrows@gmail.com>
 
-  Slinky is freely distributable under the LLGPL License.
+  Clack is freely distributable under the LLGPL License.
 |#
 
 #|
-  Slinky top-level package.
+  Clack top-level package.
 
-  Author: Eitarow Fukamachi (fukamachi_e@ariel-networks.com)
+  Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
 (in-package :cl-user)
 
-(defpackage slinky
-  (:documentation "Slinky top-level package.")
+(defpackage clack
+  (:documentation "Clack top-level package.")
   (:use :cl
-        :slinky.middleware
-        :slinky.server)
+        :clack.middleware
+        :clack.server)
   (:export :run
            :call
-           :<slinky-middleware>))
+           :<middleware>))
