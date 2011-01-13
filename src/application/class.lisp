@@ -15,15 +15,13 @@
 (in-package :slinky.application)
 
 (defclass <slinky-application> ()
-  ((name :initarg :name :accessor get-name)
-   (main :initarg :main
+  ((main :initarg :main
          :initform (lambda (request)
                      (declare (ignore request))
                      "Nil action")
          :accessor get-main)
    (middleware :initarg :middleware :initform '() :accessor get-middleware)
    (root-dir :initarg :root-dir))
-  (:metaclass <collect-metaclass>)
   (:documentation "Class of Slinky application."))
 
 (defmethod initialize-instance :after ((app <slinky-application>) &rest initargs)

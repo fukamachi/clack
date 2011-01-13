@@ -20,5 +20,4 @@
   (:export :defapp
            :<slinky-application>
            :*application*
-           :call
-           :find-app))
+           :call))

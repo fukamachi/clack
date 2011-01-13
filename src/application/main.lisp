@@ -16,15 +16,8 @@
 
 (defmacro defapp (name main-handler &key middleware root-dir)
   "Synonym of `(make-instance :name 'name ..)'."
-  `(make-instance '<slinky-application>
-      :name ',name
-      :main ,main-handler
-      :middleware ',middleware
-      :root-dir ,root-dir))
-
-(defun find-app (name &key (test #'eq))
-  "Find an application with the given name and return the instance."
-  (find name
-        (instance-collection (find-class '<slinky-application>))
-        :test test
-        :key #'get-name))
+  `(setf (symbol-value ',name)
+         (make-instance '<slinky-application>
+            :main ,main-handler
+            :middleware ',middleware
+            :root-dir ,root-dir)))
