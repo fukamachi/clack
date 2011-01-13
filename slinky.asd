@@ -23,7 +23,7 @@
   :version "1.0"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
-  :depends-on (:closer-mop :cl-fad :hunchentoot :alexandria)
+  :depends-on (:closer-mop :hunchentoot :alexandria)
   :components ((:module "src"
                 :serial t
                 :components

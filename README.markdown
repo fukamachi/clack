@@ -1,8 +1,16 @@
-# Slinky - Web Application Framework for Common Lisp
+# Slinky - Web Application Environment for Common Lisp
 
-Slinky is yet another Web Application Framework for Common Lisp based on Hunchentoot.
+Slinky is a Web Application Environment for Common Lisp inspired by Rack and WSGI.
+
+Now works on Hunchentoot only.
 
 ## Usage
+
+## Dependency
+
+* Hunchentoot
+* Closer MOP
+* Alexandria
 
 ## License
 
