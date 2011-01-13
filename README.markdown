@@ -18,6 +18,25 @@ Now works on Hunchentoot only.
 
 Now access [http://localhost:8080/](http://localhost:8080/) and Clack show you "Hello, Clack!".
 
+## Middleware
+
+    (defpackage simple-app
+      (:use :cl :clack))
+    
+    (in-package :simple-app)
+    
+    (defclass <simple-middleware> (<middleware>) ())
+    (defmethod call ((mw <simple-middleware>) env)
+      "Hello, Clack Middleware!")
+    (defmethod build ((mw <middleware>) app)
+      (lambda (env)
+        (format nil "Application: ~A~%Middleware: ~A"
+                (funcall app) (call mw env))))
+    
+    (defvar mw (make-instance '<simple-middleware>))
+    
+    (run (build mw app))
+
 ## Dependency
 
 * Hunchentoot
