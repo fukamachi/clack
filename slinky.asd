@@ -27,21 +27,11 @@
   :components ((:module "src"
                 :serial t
                 :components
-                ((:module "core"
-                  :serial t
-                  :components ((:file "package")
-                               (:file "class")))
-                 (:module "middleware"
+                ((:module "middleware"
                   :serial t
                   :components ((:file "package")
                                (:file "special")
                                (:file "class")))
-                 (:module "action"
-                  :serial t
-                  :components ((:file "package")
-                               (:file "special")
-                               (:file "class")
-                               (:file "main")))
                  (:module "application"
                   :serial t
                   :components ((:file "package")
@@ -56,5 +46,4 @@
                  (:module "base"
                   :pathname ""
                   :serial t
-                  :components ((:file "package")
-                               (:file "core")))))))
+                  :components ((:file "package")))))))
