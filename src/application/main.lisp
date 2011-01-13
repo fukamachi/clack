@@ -13,3 +13,10 @@
 |#
 
 (in-package :slinky.application)
+
+(defmacro defapp (name middleware-list &key root-dir)
+  "Synonym of `(make-instance :name 'name ..)'."
+  `(make-instance '<slinky-application>
+      :name ',name
+      :middleware ',middleware-list
+      :root-dir ,root-dir))

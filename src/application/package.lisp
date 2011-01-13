@@ -17,7 +17,7 @@
 (defpackage slinky.application
   (:documentation "Slinky Application package.")
   (:use :cl :slinky.core)
-  (:export :route
+  (:export :defapp
            :<slinky-application>
            :*application*
            :dispatch))

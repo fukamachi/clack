@@ -15,13 +15,13 @@
 (in-package :slinky.application)
 
 (defclass <slinky-application> ()
-  ((name :initarg :name :accessor :get-name)
-   (middleware :initarg middleware :initform '())
+  ((name :initarg :name :accessor get-name)
+   (middleware :initarg :middleware :initform '())
    (root-dir :initarg :root-dir))
   (:metaclass <collect-metaclass>)
   (:documentation "Class of Slinky application."))
 
-(defmethod initialize-instance ((app <slinky-application>) &rest initargs)
+(defmethod initialize-instance :after ((app <slinky-application>) &rest initargs)
   ;; TODO: add builtin middlewares.
   ;; TODO: `make-instance' all middleware.
   )

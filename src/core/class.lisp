@@ -15,13 +15,8 @@
 (in-package :slinky.core)
 
 (defclass <collect-metaclass> (standard-class)
-     ((instance-collection :initform '()))
+     ((instance-collection :initform '() :accessor instance-collection))
   (:documentation "Metaclass to collect instances  automatically."))
-
-;; NOTE: Is this able to put into defclass as :accessor?
-(defmethod instance-collection ((class <collect-metaclass>))
-  "Get `instance-collection' of class."
-  (slot-value class 'instance-collection))
 
 #-(or clisp allegro)
 (defmethod c2mop:validate-superclass ((class <collect-metaclass>)
