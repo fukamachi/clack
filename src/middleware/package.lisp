@@ -18,5 +18,4 @@
   (:use :cl)
   (:export :<slinky-middleware>
            :*middlewares*
-           :before
-           :after))
+           :call))

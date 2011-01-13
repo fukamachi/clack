@@ -19,5 +19,5 @@
   (when debug
     (setf hunchentoot:*show-lisp-errors-p* t)
     (setf hunchentoot:*show-lisp-backtraces-p* t))
-  (push (create-slinky-dispatcher app) hunchentoot:*dispatch-table*)
+  (push app hunchentoot:*dispatch-table*)
   (hunchentoot:start (make-instance 'hunchentoot:acceptor :port port)))

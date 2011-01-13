@@ -23,7 +23,7 @@
   :version "1.0"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
-  :depends-on (:closer-mop :hunchentoot :alexandria)
+  :depends-on (:hunchentoot)
   :components ((:module "src"
                 :serial t
                 :components
@@ -32,16 +32,9 @@
                   :components ((:file "package")
                                (:file "special")
                                (:file "class")))
-                 (:module "application"
-                  :serial t
-                  :components ((:file "package")
-                               (:file "special")
-                               (:file "class")
-                               (:file "main")))
                  (:module "server"
                   :serial t
                   :components ((:file "package")
-                               (:file "dispatcher")
                                (:file "main")))
                  (:module "base"
                   :pathname ""

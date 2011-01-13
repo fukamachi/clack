@@ -16,5 +16,5 @@
 
 (defpackage slinky.server
   (:documentation "Slinky server package.")
-  (:use :cl :hunchentoot :slinky.application)
+  (:use :cl :hunchentoot)
   (:export :run))

@@ -17,7 +17,8 @@
 (defpackage slinky
   (:documentation "Slinky top-level package.")
   (:use :cl
-        :slinky.application
+        :slinky.middleware
         :slinky.server)
   (:export :run
-           :defapp))
+           :call
+           :<slinky-middleware>))
