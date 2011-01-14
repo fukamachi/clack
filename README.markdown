@@ -35,7 +35,7 @@ Write.
     (defmethod call ((self <simple-middleware>) req)
       `(200 (:content-type "text/html")
         ,(cons "Hello, Clack Middleware!<br />"
-               (nth 2 (funcall (app self) req)))))
+               (nth 2 (call (app self) req)))))
 
 Use.
 
