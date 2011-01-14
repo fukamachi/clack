@@ -1,6 +1,6 @@
-# Clack - Web server Interface for Common Lisp
+# Clack - Web Application Environment for Common Lisp
 
-Clack is a Web server Interface for Common Lisp inspired by Python's WSGI and Ruby's Rack.
+Clack is a Web Application Environment for Common Lisp inspired by Python's WSGI and Ruby's Rack. Your awesome framework should base on this.
 
 Now works on Hunchentoot only.
 
@@ -18,6 +18,8 @@ Now works on Hunchentoot only.
     (run app)
 
 Now access [http://localhost:8080/](http://localhost:8080/) and Clack show you "Hello, Clack!".
+
+## Application
 
 ## Middleware
 
@@ -53,9 +55,14 @@ And you should get following response in time.
     Hello, Clack Middleware!
     Hello, Clack!
 
+## Handler
+
 ## Dependency
 
 * Hunchentoot
+* CL-PPCRE
+* Alexandria
+* SPLIT-SEQUENCE
 
 ## License
 
