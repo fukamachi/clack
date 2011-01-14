@@ -23,7 +23,7 @@
 (defmethod call ((self <clack-middleware-static>) req)
   (let* ((path-info (getf req :path-info))
          (path (member-if
-                (lambda (url) (ppcre:scan url path-info))
+                (lambda (url) (= 0 (ppcre:scan url path-info)))
                 (urls self))))
     (if path
         (call (make-instance '<clack-app-file>
