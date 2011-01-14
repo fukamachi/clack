@@ -12,7 +12,7 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(in-package :clack.middleware)
+(in-package :clack)
 
 (defclass <middleware> () ()
   (:documentation "Class for Clack Middleware."))

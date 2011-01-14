@@ -16,9 +16,9 @@
 
 (defpackage clack
   (:documentation "Clack top-level package.")
-  (:use :cl :hunchentoot :clack.middleware)
+  (:use :cl :hunchentoot)
   (:export :run
-           :call :build
+           :call :wrap :builder
            :<middleware>
            :<environment>
            :<response>
