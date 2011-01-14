@@ -7,21 +7,26 @@
 |#
 
 #|
-  Clack Middleware to serve static files.
+  Clack.Middleware.Static.
+  Middleware to serve static files.
 
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
 (in-package :clack.middleware.static)
 
-(defclass <clack-static> (<middleware>)
+(defclass <clack-middleware-static> (<middleware>)
      ((urls :initarg :urls :accessor urls)
       (root :initarg :root :accessor root))
   (:documentation "Clack Middleware to intercept requests for static files."))
 
-(defmethod call ((self <clack-static>) req)
-  (let ((path (getf req :path-info)))
-    (if (some (lambda (url) (ppcre:scan url path)) (urls self))
-        nil ;; serve static file
-           ;; locate, detect MIMETYPE, and..
-        (funcall (app self) req))))
+(defmethod call ((self <clack-middleware-static>) req)
+  (let* ((path-info (getf req :path-info))
+         (path (member-if
+                (lambda (url) (ppcre:scan url path-info))
+                (urls self))))
+    (if path
+        (call (make-instance '<clack-app-file>
+                 :root (root self))
+              (merge-plist `(:path-info ,path) req))
+        (call (app self) req))))

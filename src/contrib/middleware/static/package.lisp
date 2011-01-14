@@ -7,7 +7,8 @@
 |#
 
 #|
-  Clack Middleware to serve static files.
+  Clack.Middleware.Static.
+  Middleware to serve static files.
 
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
@@ -15,4 +16,7 @@
 (in-package :cl-user)
 
 (defpackage clack.middleware.static
-  (:use :cl :clack :cl-ppcre))
+  (:use :cl :cl-ppcre
+        :clack :clack.util
+        :clack.app.file)
+  (:export :<clack-middleware-static>))
