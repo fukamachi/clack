@@ -27,3 +27,7 @@
                          :else :collect `(make-instance ',arg)))
            :initial-value ,(car (last app-or-middleware))
            :from-end t))
+
+(defmethod call ((app function) req)
+  "Functions should be called like Middleware."
+  (funcall app req))
