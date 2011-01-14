@@ -21,10 +21,12 @@ Now access [http://localhost:8080/](http://localhost:8080/) and Clack show you "
 
 ## Middleware
 
-    (defpackage simple-app
+Write.
+
+    (defpackage clack.middleware.example
       (:use :cl :clack))
     
-    (in-package :simple-app)
+    (in-package :clack.middleware.example)
     
     (defclass <simple-middleware> (<middleware>) ())
     (defmethod call ((mw <simple-middleware>) req)
@@ -33,10 +35,19 @@ Now access [http://localhost:8080/](http://localhost:8080/) and Clack show you "
       (lambda (req)
         (let ((res (funcall app req)))
           (reverse (cons (call mw req) (cdr (reverse res)))))))
+
+Use.
+
+    (defpackage simple-app
+      (:use :cl :clack :clack.middleware.example))
     
-    (defvar mw (make-instance '<simple-middleware>))
+    (in-package :simple-app)
     
-    (run (build mw app))
+    (defvar app
+      (lambda (req)
+        '(200 (:content-type "text/plain") ("Hello, Clack!"))))
+    
+    (run (builder '<simple-middleware> app))
 
 ## Dependency
 
