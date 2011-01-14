@@ -21,14 +21,6 @@
       (body :initarg :body :accessor body))
   (:documentation "Wrapper class for Clack response."))
 
-(defun merge-plist (p1 p2)
-  "Convert given two plists into one plist."
-  (loop :with notfound = '#:notfound
-        :for (indicator value) on p1 by #'cddr
-        :when (eq (getf p2 indicator notfound) notfound)
-        :do (push value p2)
-            (push indicator p2)))
-
 (defmethod header ((res <response>) key)
   "Get the header value of given key."
   (cadr (assoc key (headers res))))

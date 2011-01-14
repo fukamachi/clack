@@ -30,7 +30,12 @@
   :components ((:module "src"
                 :serial t
                 :components
-                ((:module "core"
+                ((:module "util"
+                  :serial t
+                  :components
+                  ((:file "package")
+                   (:file "main")))
+                 (:module "core"
                   :serial t
                   :components
                   ((:file "package")
