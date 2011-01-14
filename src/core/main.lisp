@@ -23,7 +23,7 @@
   `(reduce #'wrap
            (list ,@(loop :for arg in (butlast app-or-middleware)
                          :if (consp arg)
-                           :collect `(make-instance ,@arg)
-                         :else :collect `(make-instance ,arg)))
+                           :collect `(make-instance ',(car arg) ,@(cdr arg))
+                         :else :collect `(make-instance ',arg)))
            :initial-value ,(car (last app-or-middleware))
            :from-end t))
