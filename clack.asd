@@ -27,10 +27,8 @@
   :components ((:module "src"
                 :serial t
                 :components
-                ((:module "core"
-                  :serial t
-                  :components ((:file "package")
-                               (:file "environment")))
+                ((:file "package")
+                 (:file "environment")
                  (:module "handler"
                   :serial t
                   :components
@@ -38,6 +36,5 @@
                     :serial t
                     :components ((:file "package")
                                  (:file "main")))))
-                 (:file "package")
                  (:file "middleware")
                  (:file "main")))))
