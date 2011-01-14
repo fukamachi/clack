@@ -31,7 +31,8 @@
                   :serial t
                   :components
                   ((:file "package")
-                   (:file "environment")
+                   (:file "request")
+                   (:file "response")
                    (:module "handler"
                     :serial t
                     :components
