@@ -15,5 +15,5 @@
 (in-package :cl-user)
 
 (defpackage clack.handler.hunchentoot
-  (:use :cl :hunchentoot)
+  (:use :cl :hunchentoot :split-sequence)
   (:export :run))

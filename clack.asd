@@ -23,7 +23,7 @@
   :version "1.0"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
-  :depends-on (:hunchentoot :alexandria)
+  :depends-on (:hunchentoot :alexandria :split-sequence)
   :components ((:module "src"
                 :serial t
                 :components
