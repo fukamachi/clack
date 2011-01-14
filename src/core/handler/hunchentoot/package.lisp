@@ -16,4 +16,4 @@
 
 (defpackage clack.handler.hunchentoot
   (:use :cl :hunchentoot)
-  (:export :call :run))
+  (:export :run))
