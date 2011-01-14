@@ -34,8 +34,11 @@
                 :server-protocol (server-protocol* raw-req)
                 :request raw-req)))
     (destructuring-bind (status header body) (funcall app req)
-      ;; FIXME: Hunchentoot 'reply'
-;      (setf (content-type* raw-req) (getf header :content-type))
-;      (setf (content-length* raw-req) (getf header :content-length))
+      (let ((content-type (getf header :content-type)))
+        (when content-type
+          (setf (content-type*) content-type)))
+      (let ((content-length (getf header :content-length)))
+        (when content-length
+          (setf (content-length*) content-length)))
       (with-output-to-string (s)
         (dolist (str body) (princ str s))))))
