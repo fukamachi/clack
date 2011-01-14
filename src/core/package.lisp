@@ -16,7 +16,7 @@
 
 (defpackage clack
   (:documentation "Clack top-level package.")
-  (:use :cl :hunchentoot)
+  (:use :cl :hunchentoot :alexandria)
   (:export :run
            :call :wrap :builder
            :<middleware>

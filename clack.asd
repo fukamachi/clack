@@ -23,7 +23,7 @@
   :version "1.0"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
-  :depends-on (:hunchentoot)
+  :depends-on (:hunchentoot :alexandria)
   :components ((:module "src"
                 :serial t
                 :components
