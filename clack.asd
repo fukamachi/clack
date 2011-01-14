@@ -23,7 +23,10 @@
   :version "1.0"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
-  :depends-on (:hunchentoot :alexandria :split-sequence)
+  :depends-on (:hunchentoot
+               :alexandria
+               :split-sequence
+               :cl-ppcre)
   :components ((:module "src"
                 :serial t
                 :components
@@ -43,4 +46,12 @@
                    (:file "middleware")
                    (:file "main")))
                  (:module "contrib"
-                  :depends-on ("core"))))))
+                  :depends-on ("core")
+                  :components
+                  ((:module "middleware"
+                    :components
+                    ((:module "static"
+                      :serial t
+                      :components
+                      ((:file "package")
+                       (:file "main")))))))))))
