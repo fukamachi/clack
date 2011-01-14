@@ -18,7 +18,7 @@
   (:documentation "Clack top-level package.")
   (:use :cl :hunchentoot :alexandria)
   (:export :run
-           :call :wrap :builder
+           :call :wrap :builder :app
            :<middleware>
            :<request>
            :<response>
