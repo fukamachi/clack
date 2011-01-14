@@ -14,18 +14,15 @@
 
 (in-package :clack)
 
-(defclass <middleware> () ()
+(defclass <middleware> ()
+     ((app :initarg :app :reader app))
   (:documentation "Class for Clack Middleware."))
 
 (defmethod call ((mw <middleware>) req)
-  "Invoke this Middleware.")
+  "Invoke this Middleware. Designed to override in subclasses.")
 
-(defgeneric wrap (middleware app-or-middleware &rest args)
-  (:documentation
-   "Compose this and given application or middleware instance into one function.
-The function takes `<request>'. Default behavior returns given application.
-This should be overrided by subclasses."))
-
-(defmethod wrap ((mw <middleware>) app &rest args) app)
-(defmethod wrap ((mw1 <middleware>) (mw2 <middleware>) &rest args)
-  (lambda (req) (call mw2 req)))
+(defmethod wrap ((mw <middleware>) app-or-middleware)
+  "Compose this and given application or middleware instance into one function.
+The function takes request plist."
+  (setf (slot-value mw 'app) app-or-middleware)
+  (lambda (req) (call mw req)))
