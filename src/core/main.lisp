@@ -14,7 +14,7 @@
 
 (in-package :clack)
 
-(defun run (app &rest params &key)
+(defun run (app &rest params)
   "Start server."
   (apply #'clack.handler.hunchentoot:run app params))
 
