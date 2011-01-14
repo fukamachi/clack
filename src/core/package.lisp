@@ -20,7 +20,7 @@
   (:export :run
            :call :wrap :builder
            :<middleware>
-           :<environment>
+           :<request>
            :<response>
            :status
            :headers

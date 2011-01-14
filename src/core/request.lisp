@@ -7,14 +7,14 @@
 |#
 
 #|
-  Clack environment to pass to Application or Middlewares.
+  Clack Request to pass to Application or Middlewares.
 
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
 (in-package :clack)
 
-(defclass <environment> ()
+(defclass <request> ()
      ((request-method :initarg :request-method :accessor request-method)
       (script-name :initarg :script-name :accessor script-name)
       (path-info :initarg :path-info :accessor path-info)
@@ -24,4 +24,4 @@
       (server-port :initarg :server-port :accessor server-port)
       (server-protocol :initarg :server-protocol :accessor server-protocol)
       (%request :initarg :request))
-  (:documentation "Clack environment class to pass to Application or Middlewares."))
+  (:documentation "Clack Request class to pass to Application or Middlewares."))

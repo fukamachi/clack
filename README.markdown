@@ -12,7 +12,7 @@ Now works on Hunchentoot only.
     (in-package :simple-app)
     
     (defvar app
-      (lambda (env)
+      (lambda (req)
         '(200 (:content-type "text/plain") ("Hello, Clack!"))))
     
     (run app)
@@ -27,12 +27,12 @@ Now access [http://localhost:8080/](http://localhost:8080/) and Clack show you "
     (in-package :simple-app)
     
     (defclass <simple-middleware> (<middleware>) ())
-    (defmethod call ((mw <simple-middleware>) env)
+    (defmethod call ((mw <simple-middleware>) req)
       '(200 (:content-type "text/plain") ("Hello, Clack Middleware!")))
     (defmethod wrap ((mw <middleware>) app &rest args)
-      (lambda (env)
-        (let ((res (funcall app env)))
-          (reverse (cons (call mw env) (cdr (reverse res)))))))
+      (lambda (req)
+        (let ((res (funcall app req)))
+          (reverse (cons (call mw req) (cdr (reverse res)))))))
     
     (defvar mw (make-instance '<simple-middleware>))
     
