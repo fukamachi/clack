@@ -18,9 +18,8 @@
      ((app :initarg :app :reader app))
   (:documentation "Class for Clack Middleware."))
 
-(defgeneric call ((mw <middleware>) req)
-  (:documentation "Invoke this Middleware. This shoulb be override
-in subclasses."))
+(defmethod call ((mw <middleware>) req)
+  "Invoke this Middleware. This shoulb be override in subclasses.")
 
 (defmethod wrap ((mw <middleware>) app-or-middleware)
   "Compose this and given application or middleware instance into one function.
