@@ -26,6 +26,8 @@
   :depends-on (:hunchentoot
                :alexandria
                :split-sequence
+               :local-time
+               :cl-fad
                :cl-ppcre)
   :components ((:module "src"
                 :serial t
@@ -48,12 +50,21 @@
                       :serial t
                       :components ((:file "package")
                                    (:file "main")))))
+                   (:file "component")
                    (:file "middleware")
                    (:file "main")))
                  (:module "contrib"
                   :depends-on ("core")
+                  :serial t
                   :components
-                  ((:module "middleware"
+                  ((:module "app"
+                    :components
+                    ((:module "file"
+                      :serial t
+                      :components
+                      ((:file "package")
+                       (:file "main")))))
+                   (:module "middleware"
                     :components
                     ((:module "static"
                       :serial t
