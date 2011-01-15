@@ -32,4 +32,4 @@
         (call (make-instance '<clack-app-file>
                  :file path
                  :root (root this)) req)
-        (call (app this) req))))
+        (call-next this req))))

@@ -21,6 +21,10 @@
 (defmethod call ((this <middleware>) req)
   "Invoke this Middleware. This shoulb be override in subclasses.")
 
+(defmethod call-next ((this <middleware>) req)
+  "Call next middleware or application."
+  (call (app this) req))
+
 (defmethod wrap ((this <middleware>) app-or-middleware)
   "Compose this and given application or middleware instance into one function.
 The function takes request plist."
