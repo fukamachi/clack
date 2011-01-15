@@ -63,12 +63,7 @@ Request instance into just a plist before pass to Clack application."
   (when debug
     (setf *show-lisp-errors-p* t)
     (setf *show-lisp-backtraces-p* t))
-  (push (lambda (req) (lambda () (call req app))) *dispatch-table*)
+  (push (lambda (req) (lambda () (handle-response (funcall app req)))) *dispatch-table*)
   (start (make-instance 'acceptor
             :port port
             :request-dispatcher 'clack-request-dispatcher)))
-
-(defun call (req app)
-  "This function called on each request and returns a string to response
-to a browser."
-  (handle-response (funcall app req)))

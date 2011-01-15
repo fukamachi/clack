@@ -20,16 +20,16 @@
       (root :initarg :root :accessor root))
   (:documentation "Clack Middleware to intercept requests for static files."))
 
-(defmethod call ((self <clack-middleware-static>) req)
+(defmethod call ((this <clack-middleware-static>) req)
   (let* ((request-uri (getf req :request-uri))
          (path (car
                 (member-if
                  (lambda (url)
                    (string= (concatenate 'string "/" (namestring url))
                             request-uri))
-                 (urls self)))))
+                 (urls this)))))
     (if path
         (call (make-instance '<clack-app-file>
                  :file path
-                 :root (root self)) req)
-        (call (app self) req))))
+                 :root (root this)) req)
+        (call (app this) req))))

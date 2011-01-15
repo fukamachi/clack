@@ -21,9 +21,9 @@
       (body :initarg :body :accessor body))
   (:documentation "Wrapper class for Clack response."))
 
-(defmethod header ((res <response>) key)
+(defmethod header ((this <response>) key)
   "Get the header value of given key."
-  (cadr (assoc key (headers res))))
+  (cadr (assoc key (headers this))))
 
 (defmacro define-header-method (name)
   (with-gensyms (res val val-supplied-p)

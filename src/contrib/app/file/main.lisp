@@ -21,11 +21,11 @@
       (encoding :initarg :encoding :initform "utf-8" :accessor encoding))
   (:documentation "Clack Application to serve static files."))
 
-(defmethod call ((self <clack-app-file>) req)
-  (let ((file (locate-file (file self) (root self))))
-    (if (consp file)
+(defmethod call ((this <clack-app-file>) req)
+  (let ((file (locate-file (file this) (root this))))
+    (if (consp file) ;; some error case
         file
-        (serve-file file (encoding self)))))
+        (serve-file file (encoding this)))))
 
 (defparameter return-403
               '(403 (:content-type "text/plain"
