@@ -16,7 +16,5 @@
 (in-package :cl-user)
 
 (defpackage clack.middleware.static
-  (:use :cl :cl-ppcre
-        :clack :clack.util
-        :clack.app.file)
+  (:use :cl :clack :clack.app.file)
   (:export :<clack-middleware-static>))

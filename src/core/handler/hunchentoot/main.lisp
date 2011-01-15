@@ -30,24 +30,24 @@ before pass to Clack application."
      :server-protocol (server-protocol* req)
      :%request req)))
 
-(defun response->string (res)
+(defun handle-response (res)
   "Convert Response from Clack application into a string
 before pass to Hunchentoot."
   (destructuring-bind (status header body) res
-    (setf (return-code*) status)
-    (let ((content-type (getf header :content-type)))
-      (when content-type
-        (setf (content-type*) content-type)))
-    (let ((content-length (getf header :content-length)))
-      (when content-length
-        (setf (content-length*) content-length)))
-    (with-output-to-string (stream)
-      (typecase body
-        (cons (dolist (s body)
-                (princ s stream)))
-        (stream (with-open-stream (s body)
-                  (princ s stream)))
-        (t (princ body stream))))))
+    (if (typep body 'pathname)
+        (hunchentoot:handle-static-file body)
+        (progn
+          (setf (return-code*) status)
+          (let ((content-type (getf header :content-type)))
+            (when content-type
+              (setf (content-type*) content-type)))
+          (let ((content-length (getf header :content-length)))
+            (when content-length
+              (setf (content-length*) content-length)))
+          (if (consp body)
+              (with-output-to-string (s)
+                (dolist (el body) (princ el s)))
+              body)))))
 
 (defun clack-request-dispatcher (request)
   "Hunchentoot request dispatcher for Clack. Most of this is same as
@@ -71,4 +71,4 @@ Request instance into just a plist before pass to Clack application."
 (defun call (req app)
   "This function called on each request and returns a string to response
 to a browser."
-  (response->string (funcall app req)))
+  (handle-response (funcall app req)))

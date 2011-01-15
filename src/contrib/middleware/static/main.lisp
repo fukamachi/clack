@@ -21,12 +21,15 @@
   (:documentation "Clack Middleware to intercept requests for static files."))
 
 (defmethod call ((self <clack-middleware-static>) req)
-  (let* ((path-info (getf req :path-info))
-         (path (member-if
-                (lambda (url) (= 0 (ppcre:scan url path-info)))
-                (urls self))))
+  (let* ((request-uri (getf req :request-uri))
+         (path (car
+                (member-if
+                 (lambda (url)
+                   (string= (concatenate 'string "/" (namestring url))
+                            request-uri))
+                 (urls self)))))
     (if path
         (call (make-instance '<clack-app-file>
-                 :root (root self))
-              (merge-plist `(:path-info ,path) req))
+                 :file path
+                 :root (root self)) req)
         (call (app self) req))))
