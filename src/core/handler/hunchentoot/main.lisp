@@ -34,14 +34,20 @@ before pass to Clack application."
   "Convert Response from Clack application into a string
 before pass to Hunchentoot."
   (destructuring-bind (status header body) res
+    (setf (return-code*) status)
     (let ((content-type (getf header :content-type)))
       (when content-type
         (setf (content-type*) content-type)))
     (let ((content-length (getf header :content-length)))
       (when content-length
         (setf (content-length*) content-length)))
-    (with-output-to-string (s)
-      (dolist (str body) (princ str s)))))
+    (with-output-to-string (stream)
+      (typecase body
+        (cons (dolist (s body)
+                (princ s stream)))
+        (stream (with-open-stream (s body)
+                  (princ s stream)))
+        (t (princ body stream))))))
 
 (defun clack-request-dispatcher (request)
   "Hunchentoot request dispatcher for Clack. Most of this is same as
