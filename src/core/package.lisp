@@ -20,13 +20,7 @@
         :clack.util)
   (:export :run
            :call :wrap :builder :app
+           :<component>
            :<middleware>
            :<request>
-           :<response>
-           :status
-           :headers
-           :header
-           :body
-           :content-type
-           :content-length
-           :content-encoding))
+           :<response>))
