@@ -25,7 +25,7 @@ Now access [http://localhost:8080/](http://localhost:8080/) and Clack show you "
 
 ### Use Middleware
 
-* clack.middleware.static
+#### clack.middleware.static
 
     (defpackage simple-app
       (:use :cl :clack :clack.middleware.static))
@@ -52,10 +52,10 @@ Now access [http://localhost:8080/](http://localhost:8080/) and Clack show you "
     (in-package :clack.middleware.example)
     
     (defclass <simple-middleware> (<middleware>) ())
-    (defmethod call ((self <simple-middleware>) req)
+    (defmethod call ((this <simple-middleware>) req)
       `(200 (:content-type "text/html")
         ,(cons "Hello, Clack Middleware!<br />"
-               (nth 2 (call (app self) req)))))
+               (nth 2 (call-next this req)))))
 
     (defpackage simple-app
       (:use :cl :clack :clack.middleware.example))
