@@ -23,7 +23,27 @@ Now access [http://localhost:8080/](http://localhost:8080/) and Clack show you "
 
 ## Middleware
 
-Write.
+### Use Middleware
+
+* clack.middleware.static
+
+    (defpackage simple-app
+      (:use :cl :clack :clack.middleware.static))
+    
+    (in-package :simple-app)
+    
+    (defvar app
+      (lambda (req)
+        '(200 (:content-type "text/plain") ("Hello, Clack!"))))
+    
+    (run
+     (builder
+      (<clack-middleware-static>
+       :urls '(#p"favicon.ico" #p"404.html")
+       :root #p"/public/")
+      app))
+
+### How to write Middleware?
 
     (defpackage clack.middleware.example
       (:use :cl :clack)
@@ -36,8 +56,6 @@ Write.
       `(200 (:content-type "text/html")
         ,(cons "Hello, Clack Middleware!<br />"
                (nth 2 (call (app self) req)))))
-
-Use.
 
     (defpackage simple-app
       (:use :cl :clack :clack.middleware.example))
