@@ -67,31 +67,33 @@ This is called on each request."
 
 (defun handle-response (res)
   "Function for managing response. Take response and output it to `ml:*modlisp-socket*'."
-  (destructuring-bind (status header body) res
-    (ml:write-header-line "Status" (write-to-string status))
-    (when (getf header :content-length)
-      (setf header (nconc '(:keep-socket "1"
-                            :connection "Keep-Alive") header)))
+  (bind ((keep-alive-p (getf header :content-length))
+         ((status header body) res))
+    (setf (getf header :status) (write-to-string status))
+    (when keep-alive-p
+      (setf (getf header :keep-socket) "1"
+            (getf header :connection) "Keep-Alive"))
+
     (doplist (key val header)
       (ml:write-header-line (string-capitalize key) val))
-    (write-string "end" ml:*modlisp-socket*)
-    (write-char #\NewLine ml:*modlisp-socket*)
+    (write-line "end" ml:*modlisp-socket*)
+
     (prog1
-      (cond
-        ((typep body 'pathname)
+      (etypecase body
+        (pathname
          (with-open-file (file body
-                               :direction :input
-                               :element-type 'octet
-                               :if-does-not-exist nil)
+                          :direction :input
+                          :element-type 'octet
+                          :if-does-not-exist nil)
            (loop with buf = (make-array 1024 :element-type 'octet)
                  for pos = (read-sequence buf file)
                  until (zerop pos)
                  do (write-sequence buf ml:*modlisp-socket* :end pos)
                     (finish-output ml:*modlisp-socket*))))
-        ((consp body)
-         (dolist (s body) (write-string s ml:*modlisp-socket*)))
-        (t (princ s ml:*modlisp-socket*)))
-      (if (getf header :content-length)
+        (cons
+         (dolist (s body) (write-line s ml:*modlisp-socket*))))
+
+      (if keep-alive-p
           (force-output ml:*modlisp-socket*)
           (finish-output ml:*modlisp-socket*))
-      (setf ml:*close-modlisp-socket* (not (getf header :content-length))))))
+      (setf ml:*close-modlisp-socket* (not keep-alive-p)))))
