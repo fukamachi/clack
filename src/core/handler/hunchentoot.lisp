@@ -81,10 +81,16 @@ before pass to Clack application."
      :request-method (request-method* req)
      :script-name (script-name* req)
      :path-info ""
-     :request-uri (request-uri* req)
      :query-string (or (query-string* req) "")
      :server-name server-name
      :server-port server-port
+     :request-uri (request-uri* req)
      :server-protocol (server-protocol* req)
-     :cookies (alist-plist (cookies-in* req))
+     :http-user-agent (user-agent req)
+     :http-remote-addr (remote-addr* req)
+     :http-remote-port (remote-port* req)
+     :http-referer (referer req)
+     :http-host (host req)
+     :http-cookies (alist-plist (cookies-in* req))
+     :http-server :hunchentoot
      :%request req)))

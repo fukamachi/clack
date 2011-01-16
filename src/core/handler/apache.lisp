@@ -42,11 +42,26 @@ This is called on each request."
      :request-method (ml:header-value command :method)
      :script-name (ml:header-value command :script-filename)
      :path-info ""
-     :request-uri (subseq url 0 pos)
      :query-string (subseq url (1+ pos))
      :server-name server-name
      :server-port server-port
+     :request-uri (subseq url 0 pos)
      :server-protocol (ml:header-value command :server-protocol)
+     :http-user-agent (ml:header-value command :user-agent)
+     :http-remote-addr (ml:header-value command :remote-ip-addr)
+     :http-remote-port (ml:header-value command :remote-ip-port)
+     :http-referer (ml:header-value command :referer)
+     :http-host (ml:header-value command :host)
+     ;; FIXME: :cookie returns string.
+     :http-cookies (ml:header-value command :cookie)
+     :http-server :modlisp
+     :http-modlisp-version (ml:header-value command :modlisp-version)
+     :http-modlisp-major-version (ml:header-value command :modlisp-major-version)
+     :http-connection (ml:header-value command :connection)
+     :http-accept (ml:header-value command :accept)
+     :http-accept-language (ml:header-value command :accept-language)
+     :http-accept-encoding (ml:header-value command :accept-encoding)
+     :http-accept-charset (ml:header-value command :accept-charset)
      :%request command)))
 
 (defun handle-response (res)

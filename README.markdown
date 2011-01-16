@@ -84,12 +84,31 @@ And you should get following response in time.
 
 ## Handler
 
+## Request
+
+* :request-method
+* :script-name
+* :path-info
+* :query-string
+* :server-name
+* :server-port
+* :request-uri
+* :server-protocol
+* :http-server
+* :%request
+* :http-*
+
 ## Dependency
 
-* Hunchentoot
 * CL-PPCRE
+* CL-FAD
+* local-time
 * Alexandria
 * SPLIT-SEQUENCE
+* Anaphora
+* metabang-bind
+* Hunchentoot
+* modlisp
 
 ## License
 
