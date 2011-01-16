@@ -12,6 +12,12 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
+(in-package :cl-user)
+
+(defpackage clack.handler.apache
+  (:use :cl :modlisp :split-sequence :clack.util)
+  (:export :run))
+
 (in-package :clack.handler.apache)
 
 (defun run (app &key debug (port 3000))

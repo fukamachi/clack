@@ -13,6 +13,12 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
+(in-package :cl-user)
+
+(defpackage clack.app.file
+  (:use :cl :cl-fad :local-time :clack)
+  (:export :<clack-app-file>))
+
 (in-package :clack.app.file)
 
 (defclass <clack-app-file> (<component>)

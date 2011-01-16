@@ -12,6 +12,12 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
+(in-package :cl-user)
+
+(defpackage clack.handler.hunchentoot
+  (:use :cl :hunchentoot :split-sequence :alexandria)
+  (:export :run))
+
 (in-package :clack.handler.hunchentoot)
 
 (defun run (app &key debug (port 8080))

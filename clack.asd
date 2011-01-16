@@ -47,14 +47,8 @@
                    (:module "handler"
                     :serial t
                     :components
-                    ((:module "hunchentoot"
-                      :serial t
-                      :components ((:file "package")
-                                   (:file "main")))
-                     (:module "apache"
-                      :serial t
-                      :components ((:file "package")
-                                   (:file "main")))))
+                    ((:file "hunchentoot")
+                     (:file "apache")))
                    (:file "component")
                    (:file "middleware")
                    (:file "main")))
@@ -64,15 +58,7 @@
                   :components
                   ((:module "app"
                     :components
-                    ((:module "file"
-                      :serial t
-                      :components
-                      ((:file "package")
-                       (:file "main")))))
+                    ((:file "file")))
                    (:module "middleware"
                     :components
-                    ((:module "static"
-                      :serial t
-                      :components
-                      ((:file "package")
-                       (:file "main")))))))))))
+                    ((:file "static")))))))))

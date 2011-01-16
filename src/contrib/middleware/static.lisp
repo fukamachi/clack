@@ -13,6 +13,12 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
+(in-package :cl-user)
+
+(defpackage clack.middleware.static
+  (:use :cl :clack :clack.app.file)
+  (:export :<clack-middleware-static>))
+
 (in-package :clack.middleware.static)
 
 (defclass <clack-middleware-static> (<middleware>)
