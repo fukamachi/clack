@@ -15,7 +15,9 @@
 (in-package :cl-user)
 
 (defpackage clack.handler.apache
-  (:use :cl :modlisp :split-sequence :clack.util)
+  (:use :cl
+        :modlisp
+        :split-sequence)
   (:export :run))
 
 (in-package :clack.handler.apache)
@@ -50,10 +52,10 @@ This is called on each request."
   "Function for managing response. Take response and output it to `ml:*modlisp-socket*'."
   (destructuring-bind (status header body) res
     (setf header
-          (merge-plist `(:status ,(write-to-string status)) header))
+          (nconc `(:status ,(write-to-string status)) header))
     (when (getf header :content-length)
-      (setf header (merge-plist '(:keep-socket "1"
-                                  :connection "Keep-Alive") header)))
+      (setf header (nconc '(:keep-socket "1"
+                            :connection "Keep-Alive") header)))
     (loop for (key val) on header by #'cddr
           do (ml:write-header-line (string-capitalize key) val))
     (write-string "end" ml:*modlisp-socket*)

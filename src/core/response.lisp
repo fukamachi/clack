@@ -25,6 +25,17 @@
   "Get the header value of given key."
   (cadr (assoc key (headers this))))
 
+(defun merge-plist (p1 p2)
+  "Merge two plist and return one plist. If both plist have same key,
+p2 will be selected."
+  (loop with notfound = '#:notfound
+        for (indicator value) on p1 by #'cddr
+        when (eq (getf p2 indicator notfound) notfound)
+          do (progn
+               (push value p2)
+               (push indicator p2)))
+  p2)
+
 (defmacro define-header-method (name)
   (with-gensyms (res val val-supplied-p)
     (let ((name-key (intern (symbol-name name) :keyword)))

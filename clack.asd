@@ -23,22 +23,22 @@
   :version "1.0"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
-  :depends-on (:hunchentoot
+  :depends-on (;; Utility
                :alexandria
+               :metabang-bind
+               :anaphora
                :split-sequence
-               :local-time
-               :cl-fad
+               ;; Server
+               :hunchentoot
+               :modlisp
+               ;; for Other purpose
                :cl-ppcre
-               :modlisp)
+               :cl-fad
+               :local-time)
   :components ((:module "src"
                 :serial t
                 :components
-                ((:module "util"
-                  :serial t
-                  :components
-                  ((:file "package")
-                   (:file "main")))
-                 (:module "core"
+                ((:module "core"
                   :serial t
                   :components
                   ((:file "package")

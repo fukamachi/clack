@@ -15,7 +15,10 @@
 (in-package :cl-user)
 
 (defpackage clack.handler.hunchentoot
-  (:use :cl :hunchentoot :split-sequence :alexandria)
+  (:use :cl
+        :hunchentoot
+        :split-sequence
+        :alexandria)
   (:export :run))
 
 (in-package :clack.handler.hunchentoot)
@@ -84,5 +87,5 @@ before pass to Clack application."
      :server-name server-name
      :server-port server-port
      :server-protocol (server-protocol* req)
-     :cookies (alexandria:alist-plist (cookies-in* req))
+     :cookies (alist-plist (cookies-in* req))
      :%request req)))
