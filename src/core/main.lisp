@@ -14,10 +14,6 @@
 
 (in-package :clack)
 
-(defun run (app &rest params)
-  "Start server."
-  (apply #'clack.handler.hunchentoot:run app params))
-
 (defmacro builder (&rest app-or-middleware)
   "Wrap Clack application with middlewares and return it as one function."
   `(reduce #'wrap

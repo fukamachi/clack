@@ -18,8 +18,8 @@
   (:documentation "Clack top-level package.")
   (:use :cl :hunchentoot :alexandria
         :clack.util)
-  (:export :run
-           :call :wrap :builder :app
+  (:export :call :call-next
+           :wrap :builder :app
            :<component>
            :<middleware>
            :<request>
