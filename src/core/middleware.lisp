@@ -29,4 +29,4 @@
   "Compose this and given application or middleware instance into one function.
 The function takes request plist."
   (setf (slot-value this 'app) app-or-middleware)
-  (lambda (req) (call this req)))
+  #'(lambda (req) (call this req)))

@@ -25,7 +25,8 @@
   (when debug
     (setf *show-lisp-errors-p* t)
     (setf *show-lisp-backtraces-p* t))
-  (push (lambda (req) (lambda () (handle-response (funcall app req)))) *dispatch-table*)
+  (push #'(lambda (req)
+            #'(lambda () (handle-response (funcall app req)))) *dispatch-table*)
   (start (make-instance 'acceptor
             :port port
             :request-dispatcher 'clack-request-dispatcher)))

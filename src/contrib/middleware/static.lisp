@@ -30,9 +30,9 @@
   (let* ((request-uri (getf req :request-uri))
          (path (car
                 (member-if
-                 (lambda (url)
-                   (string= (concatenate 'string "/" (namestring url))
-                            request-uri))
+                 #'(lambda (url)
+                     (string= (concatenate 'string "/" (namestring url))
+                              request-uri))
                  (urls this)))))
     (if path
         (call (make-instance '<clack-app-file>

@@ -24,4 +24,4 @@ and Clack Application."))
 
 (defmethod make-app ((comp <component>))
   "Create a function to call this component."
-  (lambda (req) (call comp req)))
+  #'(lambda (req) (call comp req)))
