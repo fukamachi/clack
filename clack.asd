@@ -28,7 +28,8 @@
                :split-sequence
                :local-time
                :cl-fad
-               :cl-ppcre)
+               :cl-ppcre
+               :modlisp)
   :components ((:module "src"
                 :serial t
                 :components
@@ -47,6 +48,10 @@
                     :serial t
                     :components
                     ((:module "hunchentoot"
+                      :serial t
+                      :components ((:file "package")
+                                   (:file "main")))
+                     (:module "apache"
                       :serial t
                       :components ((:file "package")
                                    (:file "main")))))
