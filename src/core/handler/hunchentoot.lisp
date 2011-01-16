@@ -35,10 +35,10 @@
   "Hunchentoot request dispatcher for Clack. Most of this is same as
 list-request-dispatcher, default one in Hunchentoot, except for convert
 Request instance into just a plist before pass to Clack application."
-  (loop :for dispatcher :in *dispatch-table*
-        :for action = (funcall dispatcher (request->plist request))
-        :when action :return (funcall action)
-        :finally (setf (return-code *reply*) +http-not-found+)))
+  (loop for dispatcher in *dispatch-table*
+        for action = (funcall dispatcher (request->plist request))
+        when action :return (funcall action)
+        finally (setf (return-code *reply*) +http-not-found+)))
 
 (defun handle-response (res)
   "Convert Response from Clack application into a string

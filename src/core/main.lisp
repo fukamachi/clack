@@ -17,10 +17,10 @@
 (defmacro builder (&rest app-or-middleware)
   "Wrap Clack application with middlewares and return it as one function."
   `(reduce #'wrap
-           (list ,@(loop :for arg in (butlast app-or-middleware)
-                         :if (consp arg)
-                           :collect `(make-instance ',(car arg) ,@(cdr arg))
-                         :else :collect `(make-instance ',arg)))
+           (list ,@(loop for arg in (butlast app-or-middleware)
+                         if (consp arg)
+                           collect `(make-instance ',(car arg) ,@(cdr arg))
+                         else collect `(make-instance ',arg)))
            :initial-value ,(car (last app-or-middleware))
            :from-end t))
 

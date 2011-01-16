@@ -54,8 +54,8 @@ This is called on each request."
     (when (getf header :content-length)
       (setf header (merge-plist '(:keep-socket "1"
                                   :connection "Keep-Alive") header)))
-    (loop :for (key val) :on header :by #'cddr
-          :do (ml:write-header-line (string-capitalize key) val))
+    (loop for (key val) on header by #'cddr
+          do (ml:write-header-line (string-capitalize key) val))
     (write-string "end" ml:*modlisp-socket*)
     (write-char #\NewLine ml:*modlisp-socket*)
     (prog1
