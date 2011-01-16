@@ -17,6 +17,7 @@
 (defpackage clack.handler.apache
   (:use :cl
         :modlisp
+        :alexandria
         :split-sequence
         :metabang-bind)
   (:export :run))
@@ -67,13 +68,12 @@ This is called on each request."
 (defun handle-response (res)
   "Function for managing response. Take response and output it to `ml:*modlisp-socket*'."
   (destructuring-bind (status header body) res
-    (setf header
-          (nconc `(:status ,(write-to-string status)) header))
+    (ml:write-header-line "Status" (write-to-string status))
     (when (getf header :content-length)
       (setf header (nconc '(:keep-socket "1"
                             :connection "Keep-Alive") header)))
-    (loop for (key val) on header by #'cddr
-          do (ml:write-header-line (string-capitalize key) val))
+    (doplist (key val header)
+      (ml:write-header-line (string-capitalize key) val))
     (write-string "end" ml:*modlisp-socket*)
     (write-char #\NewLine ml:*modlisp-socket*)
     (prog1
