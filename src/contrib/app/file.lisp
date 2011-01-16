@@ -16,7 +16,12 @@
 (in-package :cl-user)
 
 (defpackage clack.app.file
-  (:use :cl :cl-fad :local-time :clack)
+  (:use :cl
+        :cl-ppcre
+        :cl-fad
+        :local-time
+        :clack
+        :anaphora)
   (:export :<clack-app-file>))
 
 (in-package :clack.app.file)
@@ -58,8 +63,8 @@
       (t file))))
 
 (defun text-file-p (content-type)
-  (let ((pos (ppcre:scan "^text" content-type)))
-    (and pos (= pos 0))))
+  (aand (scan "^text" content-type)
+        (= it 0)))
 
 (defun serve-file (file encoding)
   (let ((content-type (or  "application/octet-stream")) ;FIXME

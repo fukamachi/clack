@@ -17,7 +17,8 @@
 (defpackage clack.handler.apache
   (:use :cl
         :modlisp
-        :split-sequence)
+        :split-sequence
+        :metabang-bind)
   (:export :run))
 
 (in-package :clack.handler.apache)
@@ -33,20 +34,20 @@ This is called on each request."
   (handle-response (funcall app (command->plist command))))
 
 (defun command->plist (command)
-  (let* ((url (ml:header-value command :url))
-         (pos (position #\? url)))
-    (destructuring-bind (server-name server-port)
-        (split-sequence #\: (ml:header-value command :host))
-      (list
-       :request-method (ml:header-value command :method)
-       :script-name (ml:header-value command :script-filename)
-       :path-info ""
-       :request-uri (subseq url 0 pos)
-       :query-string (subseq url (1+ pos))
-       :server-name server-name
-       :server-port server-port
-       :server-protocol (ml:header-value command :server-protocol)
-       :%request command))))
+  (bind ((url (ml:header-value command :url))
+         (pos (position #\? url))
+         ((server-name server-port)
+          (split-sequence #\: (ml:header-value command :host))))
+    (list
+     :request-method (ml:header-value command :method)
+     :script-name (ml:header-value command :script-filename)
+     :path-info ""
+     :request-uri (subseq url 0 pos)
+     :query-string (subseq url (1+ pos))
+     :server-name server-name
+     :server-port server-port
+     :server-protocol (ml:header-value command :server-protocol)
+     :%request command)))
 
 (defun handle-response (res)
   "Function for managing response. Take response and output it to `ml:*modlisp-socket*'."

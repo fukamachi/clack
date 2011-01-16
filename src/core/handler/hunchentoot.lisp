@@ -18,7 +18,8 @@
   (:use :cl
         :hunchentoot
         :split-sequence
-        :alexandria)
+        :alexandria
+        :anaphora)
   (:export :run))
 
 (in-package :clack.handler.hunchentoot)
@@ -51,12 +52,10 @@ before pass to Hunchentoot."
         (hunchentoot:handle-static-file body)
         (progn
           (setf (return-code*) status)
-          (let ((content-type (getf header :content-type)))
-            (when content-type
-              (setf (content-type*) content-type)))
-          (let ((content-length (getf header :content-length)))
-            (when content-length
-              (setf (content-length*) content-length)))
+          (awhen (getf header :content-type)
+            (setf (content-type*) it))
+          (awhen (getf header :content-length)
+            (setf (content-length*) it))
           (if (consp body)
               (with-output-to-string (s)
                 (dolist (el body) (princ el s)))
