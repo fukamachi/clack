@@ -2,12 +2,10 @@
 
 Clack is a Web Application Environment for Common Lisp inspired by Python's WSGI and Ruby's Rack. Your awesome framework should base on this.
 
-Now works on Hunchentoot only.
-
 ## Usage
 
     (defpackage simple-app
-      (:use :cl :clack))
+      (:use :cl :clack :clack.handler.hunchentoot))
     
     (in-package :simple-app)
     
@@ -19,6 +17,11 @@ Now works on Hunchentoot only.
 
 Now access [http://localhost:8080/](http://localhost:8080/) and Clack show you "Hello, Clack!".
 
+## Handler
+
+* clack.handler.hunchentoot
+* clack.handler.apache
+
 ## Application
 
 ## Middleware
@@ -28,7 +31,10 @@ Now access [http://localhost:8080/](http://localhost:8080/) and Clack show you "
 #### clack.middleware.static
 
     (defpackage simple-app
-      (:use :cl :clack :clack.middleware.static))
+      (:use :cl
+            :clack
+            :clack.handler.hunchentoot
+            :clack.middleware.static))
     
     (in-package :simple-app)
     
@@ -58,7 +64,10 @@ Now access [http://localhost:8080/](http://localhost:8080/) and Clack show you "
                (nth 2 (call-next this req)))))
 
     (defpackage simple-app
-      (:use :cl :clack :clack.middleware.example))
+      (:use :cl
+            :clack
+            :clack.handler.hunchentoot
+            :clack.middleware.example))
     
     (in-package :simple-app)
     
