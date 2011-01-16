@@ -67,19 +67,20 @@
         (= it 0)))
 
 (defun serve-file (file encoding)
-  (let ((content-type (or  "application/octet-stream")) ;FIXME
+  (let ((content-type (or "application/octet-stream")) ;FIXME: implement `mime-type'.
         (univ-time (or (file-write-date file) (get-universal-time))))
     (when (text-file-p content-type)
       (setf content-type
-            (concatenate 'string
-                         content-type "; charset=" encoding "utf-8")))
+            (format nil "~A ;charset=~A"
+                    content-type encoding)))
     (with-open-file (stream file
-                            :direction :input
-                            ;:element-type 'octet
-                            :if-does-not-exist nil)
-    `(200 (:content-type ,content-type
-           :content-length ,(file-length stream)
-           :last-modified ,(format-timestring nil
-                                              (universal-to-timestamp univ-time)
-                                              :format +rfc-1123-format+))
-          ,file))))
+                     :direction :input
+                     :if-does-not-exist nil)
+      `(200
+        (:content-type ,content-type
+         :content-length ,(file-length stream)
+         :last-modified ,(format-timestring
+                          nil
+                          (universal-to-timestamp univ-time)
+                          :format +rfc-1123-format+))
+        ,file))))

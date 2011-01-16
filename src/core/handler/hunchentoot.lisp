@@ -47,19 +47,18 @@ Request instance into just a plist before pass to Clack application."
 (defun handle-response (res)
   "Convert Response from Clack application into a string
 before pass to Hunchentoot."
-  (destructuring-bind (status header body) res
-    (if (typep body 'pathname)
-        (hunchentoot:handle-static-file body)
-        (progn
-          (setf (return-code*) status)
-          (awhen (getf header :content-type)
-            (setf (content-type*) it))
-          (awhen (getf header :content-length)
-            (setf (content-length*) it))
-          (if (consp body)
-              (with-output-to-string (s)
-                (dolist (el body) (princ el s)))
-              body)))))
+  (destructuring-bind (status headers body) res
+    (etypecase body
+      (pathname
+       (hunchentoot:handle-static-file body))
+      (cons
+       (setf (return-code*) status)
+       (awhen (getf headers :content-type)
+         (setf (content-type*) it))
+       (awhen (getf headers :content-length)
+         (setf (content-length*) it))
+       (with-output-to-string (s)
+         (dolist (el body) (write-line el s)))))))
 
 (defun cookie->plist (cookie)
   "Convert Hunchentoot's cookie class into just a plist."

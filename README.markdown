@@ -98,6 +98,14 @@ And you should get following response in time.
 * :%request
 * :http-*
 
+## Response
+
+    (status headers body)
+
+* status (integer)
+* headers (plist)
+* body (cons or pathname)
+
 ## Dependency
 
 * CL-PPCRE

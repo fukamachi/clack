@@ -68,13 +68,13 @@ This is called on each request."
 (defun handle-response (res)
   "Function for managing response. Take response and output it to `ml:*modlisp-socket*'."
   (bind ((keep-alive-p (getf header :content-length))
-         ((status header body) res))
-    (setf (getf header :status) (write-to-string status))
+         ((status headers body) res))
+    (setf (getf headers :status) (write-to-string status))
     (when keep-alive-p
-      (setf (getf header :keep-socket) "1"
-            (getf header :connection) "Keep-Alive"))
+      (setf (getf headers :keep-socket) "1"
+            (getf headers :connection) "Keep-Alive"))
 
-    (doplist (key val header)
+    (doplist (key val headers)
       (ml:write-header-line (string-capitalize key) val))
     (write-line "end" ml:*modlisp-socket*)
 
@@ -91,7 +91,7 @@ This is called on each request."
                  do (write-sequence buf ml:*modlisp-socket* :end pos)
                     (finish-output ml:*modlisp-socket*))))
         (cons
-         (dolist (s body) (write-line s ml:*modlisp-socket*))))
+         (dolist (el body) (write-line el ml:*modlisp-socket*))))
 
       (if keep-alive-p
           (force-output ml:*modlisp-socket*)
