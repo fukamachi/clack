@@ -46,7 +46,7 @@ Applications must return a response as a list containing three values.
 
 * Status (Required, Integer): An HTTP status code. This must be an integer greater than or equal to 100, and should be an HTTP status code as documented in RFC 2616.
 * Headers (Required, Property List): An HTTP headers. This must be a property list of key/value pairs.
-* Body (Optional, List or Pathname): The response body. This is either a list or a pathname. If it is a list of strings, Handler should output it with #\NewLine for each elements. The body can instead be a pathname for serving static files.
+* Body (Required, List or Pathname): The response body. This is either a list or a pathname. If it is a list of strings, Handler should output it with #\NewLine for each elements. The body can instead be a pathname for serving static files.
 
 ## Handler
 
@@ -61,7 +61,9 @@ If you hope them to run on other server (such as tpd2), you can write a handler 
 
 ## Middleware
 
-### Use Middleware
+Middleware is one of the Clack Component. It takes another Application and runs it.
+
+### Bundle Middleware
 
 #### clack.middleware.static
 
@@ -85,6 +87,8 @@ If you hope them to run on other server (such as tpd2), you can write a handler 
       app))
 
 ### How to write Middleware?
+
+All you have to do is to inherit from clack:<middleware> and then implement the callback <code>call</code> method (or <code>make-app</code> method that would return a function) to do the actual work. You can use <code>call-next</code> to call the original (wrapped) application.
 
     (defpackage clack.middleware.example
       (:use :cl :clack)
@@ -116,16 +120,6 @@ And you should get following response in time.
 
     Hello, Clack Middleware!
     Hello, Clack!
-
-## Handler
-
-## Response
-
-    (status headers body)
-
-* status (integer)
-* headers (plist)
-* body (cons or pathname)
 
 ## Dependency
 
