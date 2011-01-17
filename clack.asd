@@ -58,7 +58,8 @@
                   :components
                   ((:module "app"
                     :components
-                    ((:file "file")))
+                    ((:file "file")
+                     (:file "route")))
                    (:module "middleware"
                     :components
                     ((:file "static")))))))))
