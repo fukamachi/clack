@@ -90,7 +90,7 @@ This is called on each request."
                  until (zerop pos)
                  do (write-sequence buf ml:*modlisp-socket* :end pos)
                     (finish-output ml:*modlisp-socket*))))
-        (cons
+        (list
          (dolist (el body) (write-line el ml:*modlisp-socket*))))
 
       (if keep-alive-p

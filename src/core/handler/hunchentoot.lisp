@@ -51,7 +51,7 @@ before pass to Hunchentoot."
     (etypecase body
       (pathname
        (hunchentoot:handle-static-file body))
-      (cons
+      (list
        (setf (return-code*) status)
        (awhen (getf headers :content-type)
          (setf (content-type*) it))
