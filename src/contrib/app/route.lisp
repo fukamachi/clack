@@ -28,12 +28,14 @@
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun compile-path (path)
     (let* (names
-           (regex (regex-replace-all ":([^/]+)" path
-                                     (lambda (name &rest _)
-                                       (declare (ignore _))
-                                       (push (string-upcase (subseq name 1)) names)
-                                       "(?:[^/]+)")
-                                     :simple-calls t)))
+           (regex (format nil "^~A$"
+                          (regex-replace-all "\\\\:([^/]+)"
+                                             (quote-meta-chars path)
+                                             (lambda (name &rest _)
+                                               (declare (ignore _))
+                                               (push (string-upcase (subseq name 2)) names)
+                                               "([^/]+)")
+                                             :simple-calls t))))
       (list regex names))))
 
 (defmacro defroutes (name &body routes &aux otherwise)
@@ -55,8 +57,8 @@
                                      (declare (ignorable ,regs))
                                      (if ,matched
                                          ,(if symbols
-                                              `(destructuring-bind ,smbols ,regs
-                                                 (declare (ignorable ,@regs))
+                                              `(destructuring-bind ,symbols (coerce ,regs 'list)
+                                                 (declare (ignorable ,@symbols))
                                                  (call ,form ,req))
                                               `(call ,form ,req))))))
              ,(if otherwise
