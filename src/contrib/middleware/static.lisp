@@ -16,26 +16,32 @@
 (in-package :cl-user)
 
 (defpackage clack.middleware.static
-  (:use :cl :clack :clack.app.file)
+  (:use :cl :cl-ppcre :anaphora :clack :clack.app.file)
   (:export :<clack-middleware-static>))
 
 (in-package :clack.middleware.static)
 
 (defclass <clack-middleware-static> (<middleware>)
-     ((urls :initarg :urls :accessor urls)
-      (root :initarg :root :accessor root))
+     ((path :initarg :path :initform "" :accessor static-path)
+      (root :initarg :root :accessor static-root))
   (:documentation "Clack Middleware to intercept requests for static files."))
 
 (defmethod call ((this <clack-middleware-static>) req)
-  (let* ((request-uri (getf req :request-uri))
-         (path (car
-                (member-if
-                 #'(lambda (url)
-                     (string= (concatenate 'string "/" (namestring url))
-                              request-uri))
-                 (urls this)))))
+  (let* ((path-info (getf req :path-info))
+         (path (static-path this)))
     (if path
-        (call (make-instance '<clack-app-file>
-                 :file path
-                 :root (root this)) req)
+        (etypecase path
+          (string
+           (if (ppcre:scan path path-info)
+               (call (make-instance '<clack-app-file>
+                        :file path-info
+                        :root (static-root this))
+                     req)
+               (call-next this req)))
+          (function
+           (aif (funcall path path-info)
+                (call (make-instance '<clack-app-file>
+                         :file it
+                         :root (static-root this)))
+                (call-next this req))))
         (call-next this req))))

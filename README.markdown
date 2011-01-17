@@ -80,7 +80,7 @@ If you hope them to run on other server (such as tpd2), you can write a handler 
     (run
      (builder
       (<clack-middleware-static>
-       :urls '(#p"favicon.ico" #p"404.html")
+       :path "/static"
        :root #p"/public/")
       app))
 
