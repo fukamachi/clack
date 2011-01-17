@@ -27,3 +27,19 @@
 (defmethod call ((app function) req)
   "Functions should be called like Middleware."
   (funcall app req))
+
+(defun clackup (filepath &key (server :hunchentoot) port)
+  "Load given file and run it as a Clack Application."
+  (let ((pkg (intern (string-upcase (pathname-name filepath)) :keyword))
+        (handler (intern (format nil "CLACK.HANDLER.~:@(~A~)" server) :keyword)))
+    (eval `(progn
+             (defpackage ,pkg (:use :cl :clack ,handler))
+             (in-package ,pkg)))
+    (let ((run (intern "RUN" (find-package handler)))
+          (app (intern "APP" (find-package pkg))))
+      (eval
+       `(progn
+          ,(read-from-string (alexandria:read-file-into-string filepath))
+          ,(if port
+               `(,run ,app :port ,port)
+               `(,run ,app)))))))

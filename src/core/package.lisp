@@ -19,6 +19,7 @@
   (:use :cl :alexandria)
   (:export :call :call-next
            :wrap :builder :app
+           :clackup
            :<component>
            :<middleware>
            :<request>
