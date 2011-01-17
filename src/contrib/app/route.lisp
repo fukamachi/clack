@@ -29,14 +29,14 @@
   (defun compile-path (path)
     (let* (names
            (regex (format nil "^~A$"
-                          (regex-replace-all "\\\\:([^/]+)"
+                          (regex-replace-all "\\\\:([\\w-]+)"
                                              (quote-meta-chars path)
                                              (lambda (name &rest _)
                                                (declare (ignore _))
                                                (push (string-upcase (subseq name 2)) names)
-                                               "([^/]+)")
+                                               "(.+?)")
                                              :simple-calls t))))
-      (list regex names))))
+      (list regex (nreverse names)))))
 
 (defmacro defroutes (name &body routes &aux otherwise)
   (let ((last (last routes)))
@@ -63,4 +63,4 @@
                                               `(call ,form ,req))))))
              ,(if otherwise
                   `(call ,(cadr otherwise) ,req)
-                  '(list 404 nil (list ""))))))))
+                  '(list 404 nil nil)))))))
