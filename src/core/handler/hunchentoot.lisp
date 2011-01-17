@@ -78,8 +78,8 @@ before pass to Clack application."
       (split-sequence #\: (host req) :from-end t)
     (list
      :request-method (request-method* req)
-     :script-name (script-name* req)
-     :path-info ""
+     :script-name ""
+     :path-info (script-name* req)
      :query-string (or (query-string* req) "")
      :server-name server-name
      :server-port server-port

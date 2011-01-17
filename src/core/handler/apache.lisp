@@ -41,12 +41,12 @@ This is called on each request."
           (split-sequence #\: (ml:header-value command :host))))
     (list
      :request-method (ml:header-value command :method)
-     :script-name (ml:header-value command :script-filename)
-     :path-info ""
-     :query-string (subseq url (1+ pos))
+     :script-name ""
+     :path-info (subseq url 0 pos)
+     :query-string (ml:header-value command :url-params)
      :server-name server-name
      :server-port server-port
-     :request-uri (subseq url 0 pos)
+     :request-uri url
      :server-protocol (ml:header-value command :server-protocol)
      :http-user-agent (ml:header-value command :user-agent)
      :http-remote-addr (ml:header-value command :remote-ip-addr)
