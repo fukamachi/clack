@@ -5,7 +5,8 @@ Clack is a Web Application Environment for Common Lisp inspired by Python's WSGI
 ## Usage
 
     (defpackage simple-app
-      (:use :cl :clack :clack.handler.hunchentoot))
+      (:use :cl
+            :clack.handler.hunchentoot))
     
     (in-package :simple-app)
     
@@ -69,7 +70,7 @@ Middleware is one of the Clack Component. It takes another Application and runs 
 
     (defpackage simple-app
       (:use :cl
-            :clack
+            :clack.builder
             :clack.handler.hunchentoot
             :clack.middleware.static))
     
@@ -91,7 +92,7 @@ Middleware is one of the Clack Component. It takes another Application and runs 
 All you have to do is to inherit from clack:<middleware> and then implement the callback <code>call</code> method (or <code>make-app</code> method that would return a function) to do the actual work. You can use <code>call-next</code> to call the original (wrapped) application.
 
     (defpackage clack.middleware.example
-      (:use :cl :clack)
+      (:use :cl :clack.middleware)
       (:export :<simple-middleware>))
     
     (in-package :clack.middleware.example)
@@ -104,7 +105,7 @@ All you have to do is to inherit from clack:<middleware> and then implement the 
 
     (defpackage simple-app
       (:use :cl
-            :clack
+            :clack.builder
             :clack.handler.hunchentoot
             :clack.middleware.example))
     
