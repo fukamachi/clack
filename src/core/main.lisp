@@ -28,7 +28,7 @@
                   :initial-value ,(car (last app-or-middleware))
                   :from-end t)))
     `(if *lazy-load*
-         `(lambda (,req) (funcall (eval ',form) ,req))
+         (lambda (,req) (funcall (eval ',form) ,req))
          ,form)))
 
 (defmethod call ((app function) req)
