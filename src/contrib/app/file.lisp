@@ -84,13 +84,13 @@
 
 ;; Ported from Hunchentoot 1.1.1.
 ;; Only these function and variables, in this file, under BSD-style license.
-(defconstant +day-names+
-  #("Mon" "Tue" "Wed" "Thu" "Fri" "Sat" "Sun")
+(defparameter +day-names+
+              #("Mon" "Tue" "Wed" "Thu" "Fri" "Sat" "Sun")
   "The three-character names of the seven days of the week - needed
 for cookie date format.")
 
-(defconstant +month-names+
-  #("Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec")
+(defparameter +month-names+
+              #("Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec")
   "The three-character names of the twelve months - needed for cookie
 date format.")
 
