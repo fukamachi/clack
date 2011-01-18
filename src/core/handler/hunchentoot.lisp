@@ -26,8 +26,14 @@
 
 (in-package :clack.handler.hunchentoot)
 
+(defun initialize ()
+  (setf *hunchentoot-default-external-format*
+        (flex:make-external-format :utf-8 :eol-style :lf)
+        *default-content-type* "text/html; charset=utf-8"))
+
 (defun run (app &key debug (port 8080))
   "Start Hunchentoot server."
+  (initialize)
   (when debug
     (setf *show-lisp-errors-p* t)
     (setf *show-lisp-backtraces-p* t))
