@@ -20,7 +20,7 @@
         :alexandria
         :split-sequence
         :metabang-bind)
-  (:export :run))
+  (:export :run :stop))
 
 (in-package :clack.handler.apache)
 
@@ -28,6 +28,9 @@
   (ml:modlisp-start :port port
                     :processor 'clack-request-dispatcher
                     :processor-args (list app)))
+
+(defun stop (server)
+  (ml:modlisp-stop server))
 
 (defun clack-request-dispatcher (command app)
   "Apache(mod_lisp) request dispatcher for Clack. Process modlisp command alist.

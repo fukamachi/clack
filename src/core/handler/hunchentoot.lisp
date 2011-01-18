@@ -20,7 +20,8 @@
         :split-sequence
         :alexandria
         :anaphora)
-  (:export :run))
+  (:shadow :stop)
+  (:export :run :stop))
 
 (in-package :clack.handler.hunchentoot)
 
@@ -29,11 +30,15 @@
   (when debug
     (setf *show-lisp-errors-p* t)
     (setf *show-lisp-backtraces-p* t))
-  (push #'(lambda (req)
-            #'(lambda () (handle-response (funcall app req)))) *dispatch-table*)
+  (setf *dispatch-table*
+        (list #'(lambda (req)
+                  #'(lambda () (handle-response (funcall app req))))))
   (start (make-instance 'acceptor
             :port port
             :request-dispatcher 'clack-request-dispatcher)))
+
+(defun stop (acceptor)
+  (hunchentoot:stop acceptor))
 
 (defun clack-request-dispatcher (request)
   "Hunchentoot request dispatcher for Clack. Most of this is same as
