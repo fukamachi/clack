@@ -38,6 +38,8 @@
             :request-dispatcher 'clack-request-dispatcher)))
 
 (defun stop (acceptor)
+  "Stop Hunchentoot server.
+If no acceptor given, try to stop `*acceptor*' by default."
   (hunchentoot:stop acceptor))
 
 (defun clack-request-dispatcher (request)

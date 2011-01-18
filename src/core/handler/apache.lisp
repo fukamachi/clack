@@ -25,11 +25,14 @@
 (in-package :clack.handler.apache)
 
 (defun run (app &key debug (port 3000))
+  "Start talking to mod_lisp process."
   (ml:modlisp-start :port port
                     :processor 'clack-request-dispatcher
                     :processor-args (list app)))
 
 (defun stop (server)
+  "Close socket to talk with mod_lisp.
+If no server given, try to stop `*server*' by default."
   (ml:modlisp-stop server))
 
 (defun clack-request-dispatcher (command app)
