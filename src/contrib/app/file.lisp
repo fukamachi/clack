@@ -20,7 +20,7 @@
         :cl-ppcre
         :cl-fad
         :local-time
-        :clack
+        :clack.component
         :anaphora)
   (:export :<clack-app-file>))
 

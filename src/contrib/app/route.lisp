@@ -18,7 +18,7 @@
 
 (defpackage clack.app.route
   (:use :cl
-        :clack
+        :clack.component
         :alexandria
         :cl-ppcre)
   (:export :defroutes))

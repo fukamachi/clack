@@ -40,23 +40,18 @@
                 :serial t
                 :components
                 ((:module "core"
-                  :serial t
                   :components
-                  ((:file "package")
-                   (:file "request")
-                   (:file "response")
+                  ((:file "component")
+                   (:file "builder" :depends-on ("component"))
+                   (:file "middleware" :depends-on ("component"))
                    (:module "handler"
-                    :serial t
+                    :depends-on ("component")
                     :components
                     ((:file "hunchentoot")
                      #+(or allegro cmu lispworks sbcl)
-                     (:file "apache")))
-                   (:file "component")
-                   (:file "middleware")
-                   (:file "main")))
+                     (:file "apache")))))
                  (:module "contrib"
                   :depends-on ("core")
-                  :serial t
                   :components
                   ((:module "app"
                     :components

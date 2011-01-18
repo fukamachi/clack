@@ -16,7 +16,11 @@
 (in-package :cl-user)
 
 (defpackage clack.middleware.static
-  (:use :cl :cl-ppcre :anaphora :clack :clack.app.file)
+  (:use :cl
+        :cl-ppcre
+        :anaphora
+        :clack.middleware
+        :clack.app.file)
   (:export :<clack-middleware-static>))
 
 (in-package :clack.middleware.static)

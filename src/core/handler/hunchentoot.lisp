@@ -16,7 +16,7 @@
 
 (defpackage clack.handler.hunchentoot
   (:use :cl
-        :clack
+        :clack.component
         :hunchentoot
         :split-sequence
         :alexandria
@@ -33,7 +33,7 @@
     (setf *show-lisp-backtraces-p* t))
   (setf *dispatch-table*
         (list #'(lambda (req)
-                  #'(lambda () (handle-response (clack:call app req))))))
+                  #'(lambda () (handle-response (call app req))))))
   (start (make-instance 'acceptor
             :port port
             :request-dispatcher 'clack-request-dispatcher)))
