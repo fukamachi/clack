@@ -34,8 +34,7 @@
                :modlisp
                ;; for Other purpose
                :cl-ppcre
-               :cl-fad
-               :local-time)
+               :cl-fad)
   :components ((:module "src"
                 :serial t
                 :components

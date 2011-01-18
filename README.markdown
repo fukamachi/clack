@@ -126,7 +126,6 @@ And you should get following response in time.
 
 * CL-PPCRE
 * CL-FAD
-* local-time
 * Alexandria
 * SPLIT-SEQUENCE
 * Anaphora

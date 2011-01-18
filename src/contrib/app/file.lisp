@@ -19,7 +19,6 @@
   (:use :cl
         :cl-ppcre
         :cl-fad
-        :local-time
         :clack.component
         :anaphora)
   (:export :<clack-app-file>))
@@ -80,8 +79,31 @@
       `(200
         (:content-type ,content-type
          :content-length ,(file-length stream)
-         :last-modified ,(format-timestring
-                          nil
-                          (universal-to-timestamp univ-time)
-                          :format +rfc-1123-format+))
+         :last-modified ,(rfc-1123-date univ-time)
         ,file))))
+
+;; Ported from Hunchentoot 1.1.1.
+;; Only these function and variables, in this file, under BSD-style license.
+(defconstant +day-names+
+  #("Mon" "Tue" "Wed" "Thu" "Fri" "Sat" "Sun")
+  "The three-character names of the seven days of the week - needed
+for cookie date format.")
+
+(defconstant +month-names+
+  #("Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec")
+  "The three-character names of the twelve months - needed for cookie
+date format.")
+
+(defun rfc-1123-date (&optional (time (get-universal-time)))
+  "Generates a time string according to RFC 1123.  Default is current time."
+  (multiple-value-bind
+        (second minute hour date month year day-of-week)
+      (decode-universal-time time 0)
+    (format nil "~A, ~2,'0d ~A ~4d ~2,'0d:~2,'0d:~2,'0d GMT"
+            (svref +day-names+ day-of-week)
+            date
+            (svref +month-names+ (1- month))
+            year
+            hour
+            minute
+            second)))
