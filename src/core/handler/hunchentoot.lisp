@@ -40,7 +40,7 @@
   (setf *dispatch-table*
         (list #'(lambda (req)
                   #'(lambda () (handle-response (call app req))))))
-  (start (make-instance 'acceptor
+  (start (make-instance '<debuggable-acceptor>
             :port port
             :request-dispatcher 'clack-request-dispatcher)))
 
@@ -107,3 +107,30 @@ before pass to Clack application."
      :http-cookies (alist-plist (cookies-in* req))
      :http-server :hunchentoot
      :%request req)))
+
+;; for Debug
+
+;;; Acceptor that provides debugging from the REPL
+;;; Based on an email by Andreas Fruchs:
+;;; http://common-lisp.net/pipermail/tbnl-devel/2009-April/004688.html
+(defclass <debuggable-acceptor> (acceptor)
+     ()
+  (:documentation "An acceptor that handles errors by invoking the
+  debugger."))
+
+(defmethod process-connection ((*acceptor* <debuggable-acceptor>) (socket t))
+  (declare (ignore socket))
+  ;; Invoke the debugger on any errors except for SB-SYS:IO-TIMEOUT.
+  ;; HTTP browsers usually leave the connection open for futher requests,
+  ;; and Hunchentoot respects this but sets a timeout so that old connections
+  ;; are cleaned up.
+  (let ((*debugging-p* t))
+    (handler-case (call-next-method)
+      #+sbcl (sb-sys:io-timeout (condition) (values nil condition))
+      (error (condition) (invoke-debugger condition)))))
+
+(defmethod acceptor-request-dispatcher ((*acceptor* <debuggable-acceptor>))
+  (let ((dispatcher (call-next-method)))
+    (lambda (request)
+      (handler-bind ((error #'invoke-debugger))
+        (funcall dispatcher request)))))
