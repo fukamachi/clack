@@ -79,7 +79,7 @@
       `(200
         (:content-type ,content-type
          :content-length ,(file-length stream)
-         :last-modified ,(rfc-1123-date univ-time)
+         :last-modified ,(rfc-1123-date univ-time))
         ,file))))
 
 ;; Ported from Hunchentoot 1.1.1.
