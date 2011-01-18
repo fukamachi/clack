@@ -31,6 +31,10 @@
 (defmethod call ((this <middleware>) req)
   "Invoke this Middleware. This shoulb be override in subclasses.")
 
+(defmethod call ((app function) req)
+  "Functions should be called like Component."
+  (funcall app req))
+
 (defmethod call-next ((this <middleware>) req)
   "Call next middleware or application."
   (call (app this) req))

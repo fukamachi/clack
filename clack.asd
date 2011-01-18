@@ -41,8 +41,8 @@
                 ((:module "core"
                   :components
                   ((:file "component")
-                   (:file "builder" :depends-on ("component"))
                    (:file "middleware" :depends-on ("component"))
+                   (:file "builder" :depends-on ("middleware"))
                    (:module "handler"
                     :depends-on ("component")
                     :components

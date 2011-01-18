@@ -12,10 +12,11 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(in-package :cl)
+(in-package :cl-user)
 
 (defpackage clack.builder
-  (:use :cl :clack.component)
+  (:use :cl
+        :clack.middleware)
   (:export :builder
            :builder-lazy))
 
@@ -23,7 +24,7 @@
 
 (defun %builder (&rest app-or-middleware)
   "Wrap Clack application with middlewares and return it as one function."
-  `(reduce #'wrap
+  `(reduce #'clack.middleware:wrap
            (list ,@(loop for arg in (butlast app-or-middleware)
                          if (consp arg)
                            collect `(make-instance ',(car arg) ,@(cdr arg))
@@ -38,4 +39,4 @@
 (defmacro builder-lazy (&rest app-or-middleware)
   "Some Middleware and Applications reduce into one function. This evals given Components in each HTTP request time."
   (let ((req (gensym "REQ")))
-    `(lambda (,req) (call (eval ',(apply #'%builder app-or-middleware))))))
+    `(lambda (,req) (call (eval ',(apply #'%builder app-or-middleware)) ,req))))
