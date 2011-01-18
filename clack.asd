@@ -30,6 +30,7 @@
                :split-sequence
                ;; Server
                :hunchentoot
+               #+(or allegro cmu lispworks sbcl)
                :modlisp
                ;; for Other purpose
                :cl-ppcre
@@ -48,6 +49,7 @@
                     :serial t
                     :components
                     ((:file "hunchentoot")
+                     #+(or allegro cmu lispworks sbcl)
                      (:file "apache")))
                    (:file "component")
                    (:file "middleware")
