@@ -15,7 +15,9 @@
 (in-package :cl)
 
 (defpackage clack.builder
-  (:use :cl :clack.component))
+  (:use :cl :clack.component)
+  (:export :builder
+           :builder-lazy))
 
 (in-package :clack.builder)
 
