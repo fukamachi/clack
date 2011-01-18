@@ -27,13 +27,14 @@
 (in-package :clack.app.file)
 
 (defclass <clack-app-file> (<component>)
-     ((file :initarg :file :accessor file)
-      (root :initarg :root :initform "./" :accessor root)
+     ((file :initarg :file :initform nil :accessor file)
+      (root :initarg :root :initform #p"./" :accessor root)
       (encoding :initarg :encoding :initform "utf-8" :accessor encoding))
   (:documentation "Clack Application to serve static files."))
 
 (defmethod call ((this <clack-app-file>) req)
-  (let ((file (locate-file (file this) (root this))))
+  (let ((file (locate-file (or (file this) (getf req :path-info))
+                           (root this))))
     (if (consp file) ;; some error case
         file
         (serve-file file (encoding this)))))

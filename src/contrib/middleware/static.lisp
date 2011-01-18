@@ -22,8 +22,9 @@
 (in-package :clack.middleware.static)
 
 (defclass <clack-middleware-static> (<middleware>)
-     ((path :initarg :path :initform "" :accessor static-path)
-      (root :initarg :root :accessor static-root))
+     ((path :initarg :path :accessor static-path
+            :documentation "Required. Regex string.")
+      (root :initarg :root :initform #p"./" :accessor static-root))
   (:documentation "Clack Middleware to intercept requests for static files."))
 
 (defmethod call ((this <clack-middleware-static>) req)
@@ -34,14 +35,16 @@
           (string
            (if (ppcre:scan path path-info)
                (call (make-instance '<clack-app-file>
-                        :file path-info
                         :root (static-root this))
                      req)
                (call-next this req)))
           (function
            (aif (funcall path path-info)
-                (call (make-instance '<clack-app-file>
-                         :file it
-                         :root (static-root this)))
+                (progn
+                  ;; rewrite :PATH-INFO
+                  (setf (getf req :path-info) it)
+                  (call (make-instance '<clack-app-file>
+                           :root (static-root this))
+                        req))
                 (call-next this req))))
         (call-next this req))))
