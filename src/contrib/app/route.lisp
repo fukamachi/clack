@@ -26,41 +26,44 @@
 (in-package :clack.app.route)
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (defun compile-path (path)
-    (let* (names
-           (regex (format nil "^~A$"
-                          (regex-replace-all "\\\\:([\\w-]+)"
-                                             (quote-meta-chars path)
-                                             (lambda (name &rest _)
-                                               (declare (ignore _))
-                                               (push (string-upcase (subseq name 2)) names)
-                                               "(.+?)")
-                                             :simple-calls t))))
+  (defun compile-path (path &aux names)
+    (let* ((quoted (format nil "^~A$" (quote-meta-chars path)))
+           (regex (regex-replace-all
+                   "\\\\:([\\w-]+)"
+                   quoted
+                   (lambda (name &rest _)
+                     (declare (ignore _))
+                     (push (string-upcase (subseq name 2)) names)
+                     "(.+?)")
+                   :simple-calls t)))
       (list regex (nreverse names)))))
 
-(defmacro defroutes (name &body routes &aux otherwise)
-  (let ((last (last routes)))
-    (if (member (car last) '(t otherwise))
-        (setf routes (butlast routes)
-              otherwise last)))
-  (with-gensyms (req request-method request-path matched regs)
-    `(defun ,name (,req)
-       (let ((,request-method (getf ,req :request-method))
-             (,request-path (getf ,req :path-info)))
-         (declare (ignorable ,request-method ,request-path))
-         (or ,@(loop for (method path form) in routes
-                     for (regex names) = (compile-path path)
-                     for symbols = (mapcar (lambda (name) (intern name *package*)) names)
-                     collect `(and (string= ,request-method ',method)
-                                   (multiple-value-bind (,matched ,regs)
-                                       (scan-to-strings ,regex ,request-path)
-                                     (declare (ignorable ,regs))
-                                     (if ,matched
-                                         ,(if symbols
-                                              `(destructuring-bind ,symbols (coerce ,regs 'list)
-                                                 (declare (ignorable ,@symbols))
-                                                 (call ,form ,req))
-                                              `(call ,form ,req))))))
-             ,(if otherwise
-                  `(call ,(cadr otherwise) ,req)
-                  '(list 404 nil nil)))))))
+(defmacro defroutes (name &body routes)
+  (let ((params (intern "ROUTE-PARAMS" *package*))
+        (otherwise (last routes)))
+    (if (member (car otherwise) '(t otherwise))
+        (setf routes (butlast routes))
+        (setf otherwise nil))
+    (with-gensyms (req request-method request-path matched regs)
+      `(defun ,name (,req)
+         (let ((,request-method (getf ,req :request-method))
+               (,request-path (getf ,req :path-info)))
+           (declare (ignorable ,request-method ,request-path))
+           (or ,@(loop for (method path form) in routes
+                       for (regex names) = (compile-path path)
+                       for symbols = (mapcar (lambda (name) (intern name *package*)) names)
+                       collect `(and (string= ,request-method ',method)
+                                     (multiple-value-bind (,matched ,regs)
+                                         (scan-to-strings ,regex ,request-path)
+                                       (declare (ignorable ,regs))
+                                       (if ,matched
+                                           (let ((,params (coerce ,regs 'list)))
+                                             (declare (ignorable ,params))
+                                             ,(if symbols
+                                                  `(destructuring-bind ,symbols ,params
+                                                     (declare (ignorable ,@symbols))
+                                                     (call ,form ,req))
+                                                  `(call ,form ,req)))))))
+               ,(if otherwise
+                    `(call ,(cadr otherwise) ,req)
+                    '(list 404 nil nil))))))))
