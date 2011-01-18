@@ -23,4 +23,5 @@
            :<component>
            :<middleware>
            :<request>
-           :<response>))
+           :<response>
+           :*lazy-load*))
