@@ -16,6 +16,7 @@
 
 (defpackage clack.handler.apache
   (:use :cl
+        :clack
         :modlisp
         :alexandria
         :split-sequence
@@ -38,7 +39,7 @@ If no server given, try to stop `*server*' by default."
 (defun clack-request-dispatcher (command app)
   "Apache(mod_lisp) request dispatcher for Clack. Process modlisp command alist.
 This is called on each request."
-  (handle-response (funcall app (command->plist command))))
+  (handle-response (clack:call app (command->plist command))))
 
 (defun command->plist (command)
   (bind ((url (ml:header-value command :url))
