@@ -26,23 +26,22 @@
 (in-package :clack.app.route)
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (defun compile-path (path)
-    (let* (names
-           (regex (format nil "^~A$"
-                          (regex-replace-all "\\\\:([^/]+)"
-                                             (quote-meta-chars path)
-                                             (lambda (name &rest _)
-                                               (declare (ignore _))
-                                               (push (string-upcase (subseq name 2)) names)
-                                               "([^/]+)")
-                                             :simple-calls t))))
-      (list regex names))))
+  (defun compile-path (path &aux names)
+    (let* ((quoted (format nil "^~A$" (quote-meta-chars path)))
+           (regex (regex-replace-all
+                   "\\\\:([\\w-]+)"
+                   quoted
+                   (lambda (name &rest _)
+                     (declare (ignore _))
+                     (push (string-upcase (subseq name 2)) names)
+                     "(.+?)")
+                   :simple-calls t)))
+      (list regex (nreverse names)))))
 
-(defmacro defroutes (name &body routes &aux otherwise)
-  (let ((last (last routes)))
-    (if (member (car last) '(t otherwise))
-        (setf routes (butlast routes)
-              otherwise last)))
+(defmacro defroutes (name &body routes &aux (otherwise (last routes)))
+  (if (member (car otherwise) '(t otherwise))
+      (setf routes (butlast routes))
+      (setf otherwise nil))
   (with-gensyms (req request-method request-path matched regs)
     `(defun ,name (,req)
        (let ((,request-method (getf ,req :request-method))
@@ -63,4 +62,4 @@
                                               `(call ,form ,req))))))
              ,(if otherwise
                   `(call ,(cadr otherwise) ,req)
-                  '(list 404 nil (list ""))))))))
+                  '(list 404 nil nil)))))))
