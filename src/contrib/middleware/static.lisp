@@ -27,8 +27,7 @@
 (in-package :clack.middleware.static)
 
 (defclass <clack-middleware-static> (<middleware>)
-     ((path :initarg :path :accessor static-path
-            :documentation "Required. Regex string.")
+     ((path :initarg :path :accessor static-path)
       (root :initarg :root :initform #p"./" :accessor static-root))
   (:documentation "Clack Middleware to intercept requests for static files."))
 
@@ -59,3 +58,67 @@
                    req))
                 (call-next this req))))
         (call-next this req))))
+
+#|
+=markdown
+
+# NAME
+
+clack.middleware.static - Middleware for serving static files.
+
+# SYNOPSIS
+
+    (run
+      (builder
+       (<clack-middleware-static>
+        :path "/public/"
+        :root #p"/static-files/")
+       app))
+
+# DESCRIPTION
+
+This is a Clack Middleware component for serving static files.
+
+## Slots
+
+* path (Required, String or Function)
+
+<code>path</code> specifies the prefix of URL or a callback to match with requests to serve static files for.
+
+Notice. Don't forget to add slush "/" to the end.
+
+* root (Optional, Pathname)
+
+<code>root</code> specifies the root directory to serve static files from.
+
+## Example
+
+Following example code would serve */public/foo.jpg* from */static-files/foo.jpg*.
+
+    (run
+      (builder
+       (<clack-middleware-static>
+        :path "/public/"
+        :root #p"/static-files/")
+       app))
+
+You can set any function that returns mapped filename, for <code>:path</code>. Above example is able to be rewritten as following code.
+
+    (run
+      (builder
+       (<clack-middleware-static>
+        :path (lambda (path) (and (ppcre:scan path "^/public/")
+                              (subseq path 7)))
+        :root #p"/static-files/")
+       app))
+
+# AUTHOR
+
+* Eitarow Fukamachi
+
+# COPYRIGHT AND LICENSE
+
+Copyright 2011 (c) Eitarow Fukamachi  
+Licensed under the LLGPL License.
+
+|#
