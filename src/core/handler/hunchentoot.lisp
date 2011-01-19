@@ -96,7 +96,7 @@ before pass to Clack application."
      :path-info (script-name* req)
      :query-string (or (query-string* req) "")
      :server-name server-name
-     :server-port server-port
+     :server-port (parse-integer server-port :junk-allowed t)
      :request-uri (request-uri* req)
      :server-protocol (server-protocol* req)
      :http-user-agent (user-agent req)
