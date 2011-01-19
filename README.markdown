@@ -38,7 +38,7 @@ Example: http://localhost:4242/sns/member?id=3
      :server-port 4242
      :request-uri "/sns/member?id=3"
      :server-protocol :HTTP/1.1
-     :HTTP-USER-AGENT "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-US) AppleWebKit/534.16 (KHTML, like Gecko) Chrome/10.0.643.0 Safari/534.16"
+     :http-user-agent "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-US) ..."
      :http-remote-addr "127.0.0.1"
      :http-remote-port 26077
      :http-referer nil
