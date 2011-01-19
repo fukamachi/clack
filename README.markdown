@@ -133,7 +133,18 @@ And you should get following response in time.
 * Hunchentoot
 * modlisp
 
+## Author
+
+* Eitarow Fukamachi
+
+## Copyright
+
+Copyright (c) 2011 Eitarow Fukamachi
+
+## Contributors
+
+* Tomohiro Matsuyama
+
 ## License
 
-Copyright (c) 2011 Eitarow Fukamachi  
 Licensed under the LLGPL License.
