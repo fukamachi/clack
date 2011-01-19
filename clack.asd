@@ -15,7 +15,7 @@
 (in-package :cl-user)
 
 (defpackage clack-asd
-  (:use :asdf))
+  (:use :cl :asdf))
 
 (in-package :clack-asd)
 
@@ -60,3 +60,7 @@
                    (:module "middleware"
                     :components
                     ((:file "static")))))))))
+
+;; Run unit tests.
+(defmethod asdf:perform :after ((op load-op) (c (eql (find-system :clack))))
+  (asdf:oos 'asdf:load-op :clack-test))
