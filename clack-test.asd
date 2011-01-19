@@ -21,7 +21,9 @@
 
 (defsystem clack-test
   :depends-on (:clack :cl-test-more)
-  :components ((:module "t"
-                        :serial t
-                        :components ((:file "package")
-                                     (:file "core")))))
+  :components
+  ((:module "t"
+    :components
+    ((:file "component")
+     (:file "middleware")
+     (:file "builder")))))
