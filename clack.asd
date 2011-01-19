@@ -51,6 +51,7 @@
                      (:file "apache")))))
                  (:module "contrib"
                   :depends-on ("core")
+                  :serial t
                   :components
                   ((:module "app"
                     :components
