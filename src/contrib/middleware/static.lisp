@@ -38,17 +38,19 @@
         (etypecase path
           (string
            (if (ppcre:scan path path-info)
-               (call (make-instance '<clack-app-file>
-                        :root (static-root this))
-                     req)
+               (clack.component:call
+                (make-instance '<clack-app-file>
+                   :root (static-root this))
+                req)
                (call-next this req)))
           (function
            (aif (funcall path path-info)
                 (progn
                   ;; rewrite :PATH-INFO
                   (setf (getf req :path-info) it)
-                  (call (make-instance '<clack-app-file>
-                           :root (static-root this))
-                        req))
+                  (clack.component:call
+                   (make-instance '<clack-app-file>
+                      :root (static-root this))
+                   req))
                 (call-next this req))))
         (call-next this req))))
