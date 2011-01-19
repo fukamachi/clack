@@ -17,6 +17,7 @@
 
 (defpackage clack.middleware.static
   (:use :cl
+        :alexandria
         :cl-ppcre
         :anaphora
         :clack.middleware
@@ -37,10 +38,14 @@
     (if path
         (etypecase path
           (string
-           (if (ppcre:scan path path-info)
-               (call (make-instance '<clack-app-file>
-                        :root (static-root this))
-                     req)
+           (if (starts-with-subseq path path-info)
+               (progn
+                 ;; rewrite :PATH-INFO
+                 (setf (getf req :path-info)
+                       (subseq path-info (1- (length path))))
+                 (call (make-instance '<clack-app-file>
+                          :root (static-root this))
+                       req))
                (call-next this req)))
           (function
            (aif (funcall path path-info)
