@@ -43,17 +43,19 @@
                  ;; rewrite :PATH-INFO
                  (setf (getf req :path-info)
                        (subseq path-info (1- (length path))))
-                 (call (make-instance '<clack-app-file>
-                          :root (static-root this))
-                       req))
+                 (clack.component:call
+                  (make-instance '<clack-app-file>
+                     :root (static-root this))
+                  req))
                (call-next this req)))
           (function
            (aif (funcall path path-info)
                 (progn
                   ;; rewrite :PATH-INFO
                   (setf (getf req :path-info) it)
-                  (call (make-instance '<clack-app-file>
-                           :root (static-root this))
-                        req))
+                  (clack.component:call
+                   (make-instance '<clack-app-file>
+                      :root (static-root this))
+                   req))
                 (call-next this req))))
         (call-next this req))))

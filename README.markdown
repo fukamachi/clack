@@ -28,6 +28,25 @@ Clack Application is a lambda. It takes exactly one argument, the "Request", and
 
 ### The Request
 
+Example: http://localhost:4242/sns/member?id=3
+
+    (:request-method :GET
+     :script-name ""
+     :path-info "/sns/member"
+     :query-string "id=3"
+     :server-name "localhost"
+     :server-port 4242
+     :request-uri "/sns/member?id=3"
+     :server-protocol :HTTP/1.1
+     :http-user-agent "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-US) ..."
+     :http-remote-addr "127.0.0.1"
+     :http-remote-port 26077
+     :http-referer nil
+     :http-host "localhost:4242"
+     :http-cookies nil
+     :http-server :hunchentoot
+     :%request #<request {11A02249}>)
+
 The Request is a list containing at least the following keys and corresponding values.
 
 * <code>:request-method</code> (Required, Keyword): The HTTP request method, must be one of <code>:GET</code>, <code>:HEAD</code>, <code>:OPTIONS</code>, <code>:PUT</code>, <code>:POST</code>, or <code>:DELETE</code>.
@@ -41,7 +60,13 @@ The Request is a list containing at least the following keys and corresponding v
 * <code>:http-server</code> (Required, Keyword): The name of Clack Handler, such as <code>:hunchentoot</code>.
 * Other <code>:http-*</code> keys: These keys correspond to the client-supplied HTTP request headers. The presence or absence of these keys should correspond to the presence or absence of the appropriate HTTP header in the request.
 
-### Response
+### The Response
+
+Example:
+
+    (200
+     (:content-type "text/html")
+     ("<b>Hello, Lispers!</b>"))
 
 Applications must return a response as a list containing three values.
 
@@ -133,7 +158,18 @@ And you should get following response in time.
 * Hunchentoot
 * modlisp
 
+## Author
+
+* Eitarow Fukamachi
+
+## Copyright
+
+Copyright (c) 2011 Eitarow Fukamachi
+
+## Contributors
+
+* Tomohiro Matsuyama
+
 ## License
 
-Copyright (c) 2011 Eitarow Fukamachi  
 Licensed under the LLGPL License.

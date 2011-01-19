@@ -52,7 +52,7 @@ This is called on each request."
      :path-info (subseq url 0 pos)
      :query-string (ml:header-value command :url-params)
      :server-name server-name
-     :server-port server-port
+     :server-port (parse-integer server-port :junk-allowed t)
      :request-uri url
      :server-protocol (ml:header-value command :server-protocol)
      :http-user-agent (ml:header-value command :user-agent)
