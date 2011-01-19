@@ -27,8 +27,8 @@
   (:documentation "Base Class for Clack Component shared between <middleware>
 and Clack Application."))
 
-(defmethod call ((comp <component>) req)
-  "Invoke component. Designed to override in subclasses.")
+(defgeneric call (comp req)
+  (:documentation "Invoke component. Designed to override in subclasses."))
 
 (defmethod call ((app function) req)
   "Functions should be called like Component."

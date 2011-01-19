@@ -28,8 +28,8 @@
      ((app :initarg :app :reader app))
   (:documentation "Class for Clack Middleware."))
 
-(defmethod call ((this <middleware>) req)
-  "Invoke this Middleware. This shoulb be override in subclasses.")
+(defgeneric call (mw req)
+  (:documentation "Invoke this Middleware. This shoulb be override in subclasses."))
 
 (defmethod call ((app function) req)
   "Functions should be called like Component."
