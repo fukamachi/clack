@@ -20,7 +20,9 @@
 (in-package :clack-test-asd)
 
 (defsystem clack-test
-  :depends-on (:clack :cl-test-more)
+  :depends-on (:clack
+               :cl-test-more
+               :drakma)
   :components
   ((:module "t"
     :components
@@ -28,4 +30,5 @@
       :components
       ((:file "component")
        (:file "middleware")
-       (:file "builder")))))))
+       (:file "builder")
+       (:file "handler/hunchentoot")))))))
