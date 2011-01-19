@@ -24,6 +24,8 @@
   :components
   ((:module "t"
     :components
-    ((:file "component")
-     (:file "middleware")
-     (:file "builder")))))
+    ((:module "core"
+      :components
+      ((:file "component")
+       (:file "middleware")
+       (:file "builder")))))))
