@@ -16,6 +16,7 @@
 
 (defpackage clack.test.suite
   (:use :cl
+        :anaphora
         :drakma
         :cl-test-more)
   (:export :run-server-tests))
@@ -41,7 +42,7 @@ you would call like this: `(run-server-tests :foo)'."
     (apply #'test test))
   (finalize))
 
-(defun test (fn app &optional desc)
+(defun test (desc fn app)
   "Test each registed tests."
   (let ((acceptor (funcall (intern "RUN" *handler-package*)
                            app :port 4242 :debug t)))
@@ -51,17 +52,33 @@ you would call like this: `(run-server-tests :foo)'."
 
 (defmacro deftest (desc fn app)
   "Regist a test. Note that `desc' should be a string."
-  `(push (list ,fn ,app ,desc) *tests*))
+  (let ((test (gensym "TEST")))
+    `(let ((,test (list ,desc ,fn ,app)))
+       (sif (member ,desc *tests*
+                    :key #'car
+                    :test #'string=)
+            (rplaca it ,test)
+            (push ,test *tests*)))))
 
 ;; Tests
 
-(deftest "normal"
+(deftest "SCRIPT-NAME"
+  (lambda ()
+    (is (http-request "http://localhost:4242/") nil))
+  (lambda (req)
+    `(200
+      (:content-type "text/plain")
+      (,(getf req :script-name)))))
+
+(deftest "GET"
   (lambda ()
     (multiple-value-bind (body status headers)
-        (http-request "http://localhost:4242/")
-      (is body (format nil "ok~%"))))
+        (http-request "http://localhost:4242/?name=fukamachi")
+      (is status 200)
+      (is (cdr (assoc :content-type headers))
+          "text/plain")
+      (is body "Hello, name=fukamachi")))
   (lambda (req)
-    (declare (ignore req))
-    '(200
+    `(200
       (:content-type "text/plain")
-      ("ok"))))
+      (,(format nil "Hello, ~A" (getf req :query-string))))))
