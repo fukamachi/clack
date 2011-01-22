@@ -51,25 +51,19 @@ This is called on each request."
      :script-name ""
      :path-info (subseq url 0 pos)
      :query-string (ml:header-value command :url-params)
+     :raw-body (ml:header-value command :posted-content)
      :server-name server-name
      :server-port (parse-integer server-port :junk-allowed t)
-     :request-uri url
      :server-protocol (ml:header-value command :server-protocol)
+     :request-uri url
+     :remote-addr (ml:header-value command :remote-ip-addr)
+     :remote-port (ml:header-value command :remote-ip-port)
      :http-user-agent (ml:header-value command :user-agent)
-     :http-remote-addr (ml:header-value command :remote-ip-addr)
-     :http-remote-port (ml:header-value command :remote-ip-port)
      :http-referer (ml:header-value command :referer)
      :http-host (ml:header-value command :host)
-     ;; FIXME: :cookie returns string.
+     ;; NOTE: :cookie returns string.
      :http-cookies (ml:header-value command :cookie)
      :http-server :modlisp
-     :http-modlisp-version (ml:header-value command :modlisp-version)
-     :http-modlisp-major-version (ml:header-value command :modlisp-major-version)
-     :http-connection (ml:header-value command :connection)
-     :http-accept (ml:header-value command :accept)
-     :http-accept-language (ml:header-value command :accept-language)
-     :http-accept-encoding (ml:header-value command :accept-encoding)
-     :http-accept-charset (ml:header-value command :accept-charset)
      :%request command)))
 
 (defun handle-response (res)

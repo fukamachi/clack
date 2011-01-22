@@ -102,7 +102,9 @@ before pass to Clack application."
      :url-schema :http
      :http-user-agent (user-agent req)
      :http-referer (referer req)
+     :http-host (host req)
      ;; NOTE: Is this convert keys into keywords?
+     ;;   First, is it should be plist, not string?
      :http-cookie (alist-plist (cookies-in* req))
      :remote-addr (remote-addr* req)
      :remote-port (remote-port* req)
