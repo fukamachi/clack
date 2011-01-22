@@ -34,7 +34,9 @@
                :modlisp
                ;; for Other purpose
                :cl-ppcre
-               :cl-fad)
+               :cl-fad
+               :cl-test-more
+               :drakma)
   :components ((:module "src"
                 :serial t
                 :components
@@ -48,7 +50,8 @@
                     :components
                     ((:file "hunchentoot")
                      #+(or allegro cmu lispworks sbcl)
-                     (:file "apache")))))
+                     (:file "apache")))
+                   (:file "test/suite")))
                  (:module "contrib"
                   :depends-on ("core")
                   :serial t
