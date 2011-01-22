@@ -55,10 +55,16 @@ The Request is a list containing at least the following keys and corresponding v
 * <code>:query-string</code> (Optional, String): The portion of the request URL that follows the <code>?</code>, if any. This key may be empty, but must always be present, even if empty.
 * <code>:server-name</code> (Required, String): The resolved server name, or the server IP address.
 * <code>:server-port</code> (Required, Integer): The port on which the request is being handled.
+* <code>:server-protocol</code> (Required, Keyword): The version of the protocol the client used to send the request. Typically this will be something like <code>:HTTP/1.0</code> or <code>:HTTP/1.1</code>.
 * <code>:request-uri</code> (Required, String): The request URI. Must start with "/".
 * <code>:server-protocol</code> (Required, Keyword)
+* <code>:raw-body</code> (Optional, Stream)
+* <code>:http-user-agent</code> (Optional, String)
+* <code>:http-referer</code> (Optional, String)
+* <code>:remote-addr</code> (Required, String)
+* <code>:remote-port</code> (Required, Integer)
+
 * <code>:http-server</code> (Required, Keyword): The name of Clack Handler, such as <code>:hunchentoot</code>.
-* Other <code>:http-*</code> keys: These keys correspond to the client-supplied HTTP request headers. The presence or absence of these keys should correspond to the presence or absence of the appropriate HTTP header in the request.
 
 ### The Response
 

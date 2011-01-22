@@ -94,17 +94,29 @@ before pass to Clack application."
      :request-method (request-method* req)
      :script-name ""
      :path-info (script-name* req)
-     :query-string (or (query-string* req) "")
      :server-name server-name
      :server-port (parse-integer server-port :junk-allowed t)
-     :request-uri (request-uri* req)
      :server-protocol (server-protocol* req)
+     :request-uri (request-uri* req)
+     ;; FIXME: This handler cannot connect with SSL now.
+     :url-schema :http
      :http-user-agent (user-agent req)
-     :http-remote-addr (remote-addr* req)
-     :http-remote-port (remote-port* req)
      :http-referer (referer req)
-     :http-host (host req)
-     :http-cookies (alist-plist (cookies-in* req))
+     ;; NOTE: Is this convert keys into keywords?
+     :http-cookie (alist-plist (cookies-in* req))
+     :remote-addr (remote-addr* req)
+     :remote-port (remote-port* req)
+
+     ;; Request params
+     :query-string (or (query-string* req) "")
+     :raw-body (raw-post-data :request req :want-stream t)
+     :query-parameters (loop for (k . v) in (get-parameters* req)
+                             append (list (intern (string-upcase k) :keyword) v))
+     :body-parameters (loop for (k . v) in (post-parameters* req)
+                            append (list (intern (string-upcase k) :keyword) v))
+     ;; FIXME
+     :uploads nil
+
      :http-server :hunchentoot
      :%request req)))
 
