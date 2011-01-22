@@ -92,7 +92,8 @@ This is called on each request."
                  do (write-sequence buf ml:*modlisp-socket* :end pos)
                     (finish-output ml:*modlisp-socket*))))
         (list
-         (dolist (el body) (write-line el ml:*modlisp-socket*))))
+         (format ml:*modlisp-socket*
+                 "~{~A~^~%~}" body)))
 
       (if keep-alive-p
           (force-output ml:*modlisp-socket*)

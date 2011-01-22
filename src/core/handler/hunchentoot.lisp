@@ -72,7 +72,7 @@ before pass to Hunchentoot."
        (awhen (getf headers :content-length)
          (setf (content-length*) it))
        (with-output-to-string (s)
-         (dolist (el body) (write-line el s)))))))
+         (format s "~{~A~^~%~}" body))))))
 
 (defun cookie->plist (cookie)
   "Convert Hunchentoot's cookie class into just a plist."
