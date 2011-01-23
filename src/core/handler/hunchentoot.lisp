@@ -88,37 +88,32 @@ before pass to Hunchentoot."
 before pass to Clack application."
   (destructuring-bind (server-name server-port)
       (split-sequence #\: (host req) :from-end t)
-    (list
-     :request-method (request-method* req)
-     :script-name ""
-     :path-info (script-name* req)
-     :server-name server-name
-     :server-port (parse-integer server-port :junk-allowed t)
-     :server-protocol (server-protocol* req)
-     :request-uri (request-uri* req)
-     ;; FIXME: This handler cannot connect with SSL now.
-     :url-schema :http
-     :http-user-agent (user-agent req)
-     :http-referer (referer req)
-     :http-host (host req)
-     ;; NOTE: Is this convert keys into keywords?
-     ;;   First, is it should be plist, not string?
-     :http-cookie (alist-plist (cookies-in* req))
-     :remote-addr (remote-addr* req)
-     :remote-port (remote-port* req)
+    (append
+     (list
+      :request-method (request-method* req)
+      :script-name ""
+      :path-info (script-name* req)
+      :server-name server-name
+      :server-port (parse-integer server-port :junk-allowed t)
+      :server-protocol (server-protocol* req)
+      :request-uri (request-uri* req)
+      ;; FIXME: This handler cannot connect with SSL now.
+      :url-scheme :http
+      :remote-addr (remote-addr* req)
+      :remote-port (remote-port* req)
+      ;; Request params
+      :query-string (or (query-string* req) "")
+      :raw-body (raw-post-data :request req :want-stream t)
+      :content-length (awhen (header-in* :content-length req)
+                        (parse-integer it :junk-allowed t))
+      :content-type (header-in* :content-type req)
+      ;; FIXME
+      :uploads nil
+      :clack-handler :hunchentoot)
 
-     ;; Request params
-     :query-string (or (query-string* req) "")
-     :raw-body (raw-post-data :request req :want-stream t)
-     :query-parameters (loop for (k . v) in (get-parameters* req)
-                             append (list (intern (string-upcase k) :keyword) v))
-     :body-parameters (loop for (k . v) in (post-parameters* req)
-                            append (list (intern (string-upcase k) :keyword) v))
-     ;; FIXME
-     :uploads nil
-
-     :http-server :hunchentoot
-     :%request req)))
+     (loop for (k . v) in (hunchentoot:headers-in* req)
+           unless (member k '(:request-method :script-name :path-info :server-name :server-port :server-protocol :request-uri :remote-addr :remote-port :query-string :content-length :content-type :accept :connection))
+             append (list (intern (concatenate 'string "HTTP-" (string-upcase k)) :keyword) v)))))
 
 ;; for Debug
 
