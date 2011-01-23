@@ -64,13 +64,11 @@ before pass to Hunchentoot."
   (destructuring-bind (status headers body) res
     (etypecase body
       (pathname
-       (hunchentoot:handle-static-file body))
+       (hunchentoot:handle-static-file body (getf headers :content-type)))
       (list
        (setf (return-code*) status)
-       (awhen (getf headers :content-type)
-         (setf (content-type*) it))
-       (awhen (getf headers :content-length)
-         (setf (content-length*) it))
+       (loop for (k v) on headers by #'cddr
+             do (setf (header-out (string-capitalize k)) v))
        (with-output-to-string (s)
          (format s "~{~A~^~%~}" body))))))
 
