@@ -20,7 +20,8 @@
         :hunchentoot
         :split-sequence
         :alexandria
-        :anaphora)
+        :anaphora
+        :flexi-streams)
   (:shadow :stop)
   (:export :run :stop))
 
@@ -35,11 +36,17 @@
   "Start Hunchentoot server."
   (initialize)
   (when debug
-    (setf *show-lisp-errors-p* t)
-    (setf *show-lisp-backtraces-p* t))
+    (setf *show-lisp-errors-p* t))
   (setf *dispatch-table*
-        (list #'(lambda (req)
-                  #'(lambda () (handle-response (call app req))))))
+        (list
+         #'(lambda (req)
+             #'(lambda ()
+                 (handle-response
+                  (aif (handler-case (call app req)
+                         (condition (error)
+                           (declare (ignore error)) nil))
+                       it
+                       '(500 nil nil)))))))
   (start (make-instance '<debuggable-acceptor>
             :port port
             :request-dispatcher 'clack-request-dispatcher)))
