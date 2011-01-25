@@ -99,7 +99,7 @@ before pass to Clack application."
      (list
       :request-method (request-method* req)
       :script-name ""
-      :path-info (script-name* req)
+      :path-info (url-decode (script-name* req))
       :server-name server-name
       :server-port (parse-integer server-port :junk-allowed t)
       :server-protocol (server-protocol* req)
