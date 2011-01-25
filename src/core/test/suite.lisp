@@ -407,7 +407,7 @@ you would call like this: `(run-server-tests :foo)'."
   (lambda ()
     (is (http-request "http://localhost:4242/"
                       :method :post
-                      :parameters '(("body" . nil)))
+                      :content "body")
         "body"))
   (lambda (req)
     `(200
