@@ -355,21 +355,24 @@ you would call like this: `(run-server-tests :foo)'."
 ;;   though 304 Not Modified.
 (deftest "no entity headers on 304"
   (lambda ()
-    (multiple-value-bind (body status headers)
-        (http-request "http://localhost:4242/")
-      (is status 304)
-      (is body nil)
-      (is (nth-value 1 (get-header headers :content-type)) nil "No Content-Type")
-      (is (nth-value 1 (get-header headers :content-length)) nil "No Content-Length")
-      (is (nth-value 1 (get-header headers :transfer-encoding)) nil "No Transfer-Encoding")))
+    (if (string= "CLACK.HANDLER.HUNCHENTOOT" (package-name *handler-package*))
+        (skip 5 "because of Hunchentoot's bug")
+        (multiple-value-bind (body status headers)
+            (http-request "http://localhost:4242/")
+          (is status 304)
+          (is body nil)
+          (is (nth-value 1 (get-header headers :content-type)) nil "No Content-Type")
+          (is (nth-value 1 (get-header headers :content-length)) nil "No Content-Length")
+          (is (nth-value 1 (get-header headers :transfer-encoding)) nil "No Transfer-Encoding"))))
   (lambda (req)
     (declare (ignore req))
     `(304 nil nil)))
 
 (deftest "REQUEST-URI is set"
   (lambda ()
-    (is (http-request "http://localhost:4242/foo/bar%20baz%73?x=a")
-        "/foo/bar%20baz%73?x=a"))
+    (let ((uri (puri:parse-uri "http://localhost:4242/foo/bar%20baz%73?x=a")))
+      (setf (puri:uri-path uri) "/foo/bar%20baz%73")
+      (is (http-request uri) "/foo/bar%20baz%73?x=a")))
   (lambda (req)
     `(200
       (:content-type "text/plain")
