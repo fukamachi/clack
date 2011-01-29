@@ -54,7 +54,9 @@ you would call like this: `(run-server-tests :foo)'."
 (defun run-test (handler-name desc)
   "Run only one test."
   (setf *handler-package* (handler-package handler-name))
-  (apply #'test (find desc *tests* :test #'string= :key #'car)))
+  (plan nil)
+  (apply #'test (find desc *tests* :test #'string= :key #'car))
+  (finalize))
 
 (defun test (desc fn app)
   "Test each registed tests."
