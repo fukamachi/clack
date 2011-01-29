@@ -38,12 +38,13 @@ Handler name is a keyword and doesn't include the clack.handler prefix.
 For example, if you have a handler `clack.handler.foo',
 you would call like this: `(run-server-tests :foo)'."
   (setq *drakma-default-external-format* :utf-8)
-  (setf *handler-package*
-        (find-package
-         (concatenate 'string "CLACK.HANDLER."
-                      (symbol-name handler-name))))
-  (plan (length *tests*))
-  (dolist (test *tests*)
+  (let ((pkg (concatenate 'string "CLACK.HANDLER."
+                          (symbol-name handler-name))))
+    (setf *handler-package*
+          (find-package pkg))
+    (unless *handler-package* (error "Handler package is not found. Forgot to load it?: ~A" pkg)))
+  (plan 71)
+  (dolist (test (reverse *tests*))
     (apply #'test test))
   (finalize))
 
@@ -438,7 +439,7 @@ you would call like this: `(run-server-tests :foo)'."
         (http-request "http://localhost:4242/")
       (is status 200)
       (is (get-header headers :x-authorization) nil)
-      (is body "")))
+      (is body nil :test #'eq)))
   (lambda (req)
     `(200
       (:content-type "text/plain"
