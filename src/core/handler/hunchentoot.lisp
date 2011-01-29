@@ -30,6 +30,7 @@
 (defun initialize ()
   (setf *hunchentoot-default-external-format*
         (flex:make-external-format :utf-8 :eol-style :lf)
+        *handle-http-errors-p* nil
         *default-content-type* "text/html; charset=utf-8"))
 
 (defun run (app &key debug (port 8080))
