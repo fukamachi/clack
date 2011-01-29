@@ -21,7 +21,7 @@
         :drakma
         :flexi-streams
         :cl-test-more)
-  (:export :run-server-tests))
+  (:export :run-server-tests :run-test))
 
 (in-package :clack.test.suite)
 
@@ -32,21 +32,29 @@
 (defvar *clack-pathname*
     (asdf:component-pathname (asdf:find-system :clack)))
 
+(defun handler-package (handler-name)
+  "Find Clack handler package."
+  (let ((pkg (concatenate 'string "CLACK.HANDLER."
+                          (symbol-name handler-name))))
+    (or (find-package pkg)
+        (error "Handler package is not found. Forgot to load it?: ~A" pkg))))
+
 (defun run-server-tests (handler-name)
   "Run tests for clack.handler.
 Handler name is a keyword and doesn't include the clack.handler prefix.
 For example, if you have a handler `clack.handler.foo',
 you would call like this: `(run-server-tests :foo)'."
   (setq *drakma-default-external-format* :utf-8)
-  (let ((pkg (concatenate 'string "CLACK.HANDLER."
-                          (symbol-name handler-name))))
-    (setf *handler-package*
-          (find-package pkg))
-    (unless *handler-package* (error "Handler package is not found. Forgot to load it?: ~A" pkg)))
+  (setf *handler-package* (handler-package handler-name))
   (plan 71)
   (dolist (test (reverse *tests*))
     (apply #'test test))
   (finalize))
+
+(defun run-test (handler-name desc)
+  "Run only one test."
+  (setf *handler-package* (handler-package handler-name))
+  (apply #'test (find desc *tests* :test #'string= :key #'car)))
 
 (defun test (desc fn app)
   "Test each registed tests."
