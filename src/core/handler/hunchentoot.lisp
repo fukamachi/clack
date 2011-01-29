@@ -76,7 +76,15 @@ before pass to Hunchentoot."
       (list
        (setf (return-code*) status)
        (loop for (k v) on headers by #'cddr
-             do (setf (header-out (string-capitalize k)) v))
+             with hash = (make-hash-table :test #'eq)
+             if (gethash k hash)
+               do (setf (gethash k hash)
+                        (format nil "~:[~;~:*~A, ~]~A" (gethash k hash) v))
+             else do (setf (gethash k hash) v)
+             finally
+             (loop for k being the hash-keys in hash
+                   using (hash-value v)
+                   do (setf (header-out k) v)))
        (with-output-to-string (s)
          (format s "~{~A~^~%~}" body))))))
 
