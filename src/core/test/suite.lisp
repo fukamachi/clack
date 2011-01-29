@@ -448,9 +448,11 @@ you would call like this: `(run-server-tests :foo)'."
 (deftest "handle Authorization header"
   (lambda ()
     (multiple-value-bind (body status headers)
-        (http-request "http://localhost:4242/")
+        (http-request "http://localhost:4242/"
+                      :additional-headers '(("Authorization" . "Basic XXXX")))
       (is status 200)
-      (is (get-header headers :x-authorization) t)
+      (is (get-header headers :x-authorization) "T"
+          :test #'equalp)
       (is body "Basic XXXX"))
     (multiple-value-bind (body status headers)
         (http-request "http://localhost:4242/")
