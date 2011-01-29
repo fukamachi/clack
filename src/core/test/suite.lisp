@@ -78,7 +78,8 @@ you would call like this: `(run-server-tests :foo)'."
             (push ,test *tests*)))))
 
 (defun get-header (headers key)
-  (cdr (assoc key headers)))
+  (let ((val (assoc key headers)))
+    (values (cdr val) (not (null val)))))
 
 (defun file-size (file)
   (with-open-file (in file :direction :input)
@@ -349,15 +350,18 @@ you would call like this: `(run-server-tests :foo)'."
        :x-cookie ,(not (null (getf req :cookie))))
       (,(getf req :http-cookie)))))
 
+;; NOTE: This may fail on Hunchentoot because it's bug.
+;;   Hunchentoot returns Content-Type and Content-Length headers
+;;   though 304 Not Modified.
 (deftest "no entity headers on 304"
   (lambda ()
     (multiple-value-bind (body status headers)
         (http-request "http://localhost:4242/")
       (is status 304)
       (is body nil)
-      (ok (not (get-header headers :content-type)) "No Content-Type")
-      (ok (not (get-header headers :content-length)) "No Content-Length")
-      (ok (not (get-header headers :transfer-encoding)) "No Transfer-Encoding")))
+      (is (nth-value 1 (get-header headers :content-type)) nil "No Content-Type")
+      (is (nth-value 1 (get-header headers :content-length)) nil "No Content-Length")
+      (is (nth-value 1 (get-header headers :transfer-encoding)) nil "No Transfer-Encoding")))
   (lambda (req)
     (declare (ignore req))
     `(304 nil nil)))
