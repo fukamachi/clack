@@ -22,7 +22,7 @@
         :flexi-streams
         :cl-test-more
         :clack.test)
-  (:export :run-server-tests :run-test))
+  (:export :run-server-tests))
 
 (in-package :clack.test.suite)
 
