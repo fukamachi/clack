@@ -51,7 +51,8 @@
                     ((:file "hunchentoot")
                      #+(or allegro cmu lispworks sbcl)
                      (:file "apache")))
-                   (:file "test/suite")))
+                   (:file "test")
+                   (:file "test/suite" :depends-on ("test"))))
                  (:module "contrib"
                   :depends-on ("core")
                   :serial t
