@@ -30,7 +30,7 @@
 (defvar *clack-test-port* 8080
   "HTTP port number of Handler.")
 
-(defun test-app (desc app client)
+(defun test-app (app client &optional desc)
   "Test Clack Application."
   (let* ((handler
           (or (find-package *clack-test-handler*)
@@ -44,5 +44,6 @@
       (funcall (intern "STOP" handler) acceptor))))
 
 (defmacro define-app-test (desc app client)
-  `(cl-test-more::deftest ,desc
-     (test-app nil ,app ,client)))
+  "Define tests for Clack Application. This just wrap `cl-test-more:deftest', so you can run this test by calling `(cl-test-more:run-test :foo)'."
+  `(deftest ,desc
+     (test-app ,app ,client)))
