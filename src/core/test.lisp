@@ -44,5 +44,5 @@
       (funcall (intern "STOP" handler) acceptor))))
 
 (defmacro define-app-test (desc app client)
-  `(cl-test-more::deftest ,(intern desc)
+  `(cl-test-more::deftest ,desc
      (test-app nil ,app ,client)))

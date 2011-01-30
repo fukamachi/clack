@@ -42,7 +42,7 @@ you would call like this: `(run-server-tests :foo)'."
   (if name
       (progn
         (plan nil)
-        (run-test (intern name)))
+        (run-test name))
       (progn
         (plan 71)
         (run-test-all))))
@@ -57,7 +57,7 @@ you would call like this: `(run-server-tests :foo)'."
 
 ;; Tests
 
-(define-app-test "SCRIPT-NAME"
+(define-app-test |SCRIPT-NAME|
   (lambda (req)
     `(200
       (:content-type "text/plain")
@@ -65,7 +65,7 @@ you would call like this: `(run-server-tests :foo)'."
   (lambda ()
     (is (http-request "http://localhost:4242/") nil)))
 
-(define-app-test "GET"
+(define-app-test |GET|
   (lambda (req)
     `(200
       (:content-type "text/plain")
@@ -78,7 +78,7 @@ you would call like this: `(run-server-tests :foo)'."
           "text/plain")
       (is body "Hello, name=fukamachi"))))
 
-(define-app-test "POST"
+(define-app-test |POST|
   (lambda (req)
     (let ((body (read-line (getf req :raw-body))))
       `(200
@@ -96,7 +96,7 @@ you would call like this: `(run-server-tests :foo)'."
       (is (get-header headers :client-content-type) "application/x-www-form-urlencoded")
       (is body "Hello, name=eitarow"))))
 
-(define-app-test "big POST"
+(define-app-test |big POST|
   (lambda (req)
     (let ((body
            (make-array (getf req :content-length) :element-type 'octet)))
@@ -122,7 +122,7 @@ you would call like this: `(run-server-tests :foo)'."
         (is (get-header headers :client-content-length) (format nil "~A" len))
         (is (length body) len)))))
 
-(define-app-test "url-scheme"
+(define-app-test |url-scheme|
   (lambda (req)
     `(200
       (:content-type "text/plain")
@@ -134,7 +134,7 @@ you would call like this: `(run-server-tests :foo)'."
       (is (get-header headers :content-type) "text/plain")
       (is body "HTTP"))))
 
-(define-app-test "return pathname"
+(define-app-test |return pathname|
   (lambda (req)
     (declare (ignore req))
     `(200
@@ -147,7 +147,7 @@ you would call like this: `(run-server-tests :foo)'."
         (is (get-header headers :content-type) "text/plain")
         (like body "This is a text for test."))))
 
-(define-app-test "binary file"
+(define-app-test |binary file|
   (lambda (req)
     (declare (ignore req))
     (let ((file (merge-pathnames #p"tmp/redhat.png" *clack-pathname*)))
@@ -162,7 +162,7 @@ you would call like this: `(run-server-tests :foo)'."
       (is (get-header headers :content-type) "image/png")
       (is (length body) 12155))))
 
-(define-app-test "bigger file"
+(define-app-test |bigger file|
   (lambda (req)
     (declare (ignore req))
     (let ((file (merge-pathnames #p"tmp/jellyfish.jpg" *clack-pathname*)))
@@ -177,7 +177,7 @@ you would call like this: `(run-server-tests :foo)'."
       (is (get-header headers :content-type) "image/jpeg")
       (is (length body) 139616))))
 
-(define-app-test "handle HTTP-Header"
+(define-app-test |handle HTTP-Header|
   (lambda (req)
     `(200
       (:content-type "text/plain")
@@ -190,7 +190,7 @@ you would call like this: `(run-server-tests :foo)'."
       (is (get-header headers :content-type) "text/plain")
       (is body "Bar"))))
 
-(define-app-test "handler HTTP-Cookie"
+(define-app-test |handler HTTP-Cookie|
   (lambda (req)
     `(200
       (:content-type "text/plain")
@@ -203,7 +203,7 @@ you would call like this: `(run-server-tests :foo)'."
       (is (get-header headers :content-type) "text/plain")
       (is body "foo"))))
 
-(define-app-test "validate req"
+(define-app-test |validate req|
   (lambda (req)
     `(200
       (:content-type "text/plain")
@@ -226,7 +226,7 @@ you would call like this: `(run-server-tests :foo)'."
                          "SERVER-NAME:localhost"
                          "SERVER-PORT:4242"))))))
 
-(define-app-test "% encoding in PATH-INFO"
+(define-app-test |% encoding in PATH-INFO|
   (lambda (req)
     `(200
       (:content-type "text/plain")
@@ -234,7 +234,7 @@ you would call like this: `(run-server-tests :foo)'."
   (lambda ()
     (is (http-request "http://localhost:4242/foo/bar%2cbaz") "/foo/bar,baz")))
 
-(define-app-test "% double encoding in PATH-INFO"
+(define-app-test |% double encoding in PATH-INFO|
   (lambda (req)
     `(200
       (:content-type "text/plain")
@@ -242,7 +242,7 @@ you would call like this: `(run-server-tests :foo)'."
   (lambda ()
     (is (http-request "http://localhost:4242/foo/bar%252cbaz") "/foo/bar%2cbaz")))
 
-(define-app-test "% encoding in PATH-INFO (outside of URI characters)"
+(define-app-test |% encoding in PATH-INFO (outside of URI characters)|
   (lambda (req)
     `(200
       (:content-type "text/plain")
@@ -252,7 +252,7 @@ you would call like this: `(run-server-tests :foo)'."
         (format nil "/foo~A"
                 (flex:octets-to-string #(#xE3 #x81 #x82) :external-format :utf-8)))))
 
-(define-app-test "SERVER-PROTOCOL is required"
+(define-app-test |SERVER-PROTOCOL is required|
   (lambda (req)
     `(200
       (:content-type "text/plain")
@@ -264,7 +264,7 @@ you would call like this: `(run-server-tests :foo)'."
       (is (get-header headers :content-type) "text/plain")
       (like body "^HTTP/1\\.[01]$"))))
 
-(define-app-test "SCRIPT-NAME should not be nil"
+(define-app-test |SCRIPT-NAME should not be nil|
   (lambda (req)
     `(200
       (:content-type "text/plain")
@@ -274,7 +274,7 @@ you would call like this: `(run-server-tests :foo)'."
         "T"
         :test #'equalp)))
 
-(define-app-test "Do not crash when the app dies"
+(define-app-test |Do not crash when the app dies|
   (lambda (req)
     (declare (ignore req))
     (error "Throwing an exception from app handler. Server shouldn't crash."))
@@ -282,7 +282,7 @@ you would call like this: `(run-server-tests :foo)'."
     (is (nth-value 1 (http-request "http://localhost:4242/"))
         500)))
 
-(define-app-test "multi headers (request)"
+(define-app-test |multi headers (request)|
   (lambda (req)
     `(200
       (:content-type "text/plain")
@@ -294,7 +294,7 @@ you would call like this: `(run-server-tests :foo)'."
                                          ("Foo" . "baz")))
      "^bar,\\s*baz$")))
 
-(define-app-test "multi headers (response)"
+(define-app-test |multi headers (response)|
   (lambda (req)
     (declare (ignore req))
     `(200
@@ -306,7 +306,7 @@ you would call like this: `(run-server-tests :foo)'."
     (let ((headers (nth-value 2 (http-request "http://localhost:4242/"))))
       (like (get-header headers :x-foo) "foo,\\s*bar,\\s*baz"))))
 
-(define-app-test "Do not set COOKIE"
+(define-app-test |Do not set COOKIE|
   (lambda (req)
     `(200
       (:content-type "text/plain"
@@ -323,7 +323,7 @@ you would call like this: `(run-server-tests :foo)'."
 ;; NOTE: This may fail on Hunchentoot because it's bug.
 ;;   Hunchentoot returns Content-Type and Content-Length headers
 ;;   though 304 Not Modified.
-(define-app-test "no entity headers on 304"
+(define-app-test |no entity headers on 304|
   (lambda (req)
     (declare (ignore req))
     `(304 nil nil))
@@ -338,7 +338,7 @@ you would call like this: `(run-server-tests :foo)'."
           (is (nth-value 1 (get-header headers :content-length)) nil "No Content-Length")
           (is (nth-value 1 (get-header headers :transfer-encoding)) nil "No Transfer-Encoding")))))
 
-(define-app-test "REQUEST-URI is set"
+(define-app-test |REQUEST-URI is set|
   (lambda (req)
     `(200
       (:content-type "text/plain")
@@ -348,7 +348,7 @@ you would call like this: `(run-server-tests :foo)'."
       (setf (puri:uri-path uri) "/foo/bar%20baz%73")
       (is (http-request uri) "/foo/bar%20baz%73?x=a"))))
 
-(define-app-test "a big header value > 128 bytes"
+(define-app-test |a big header value > 128 bytes|
   (lambda (req)
     `(200
       (:content-type "text/plain")
@@ -364,7 +364,7 @@ you would call like this: `(run-server-tests :foo)'."
         (is status 200)
         (is body chunk)))))
 
-(define-app-test "CRLF output"
+(define-app-test |CRLF output|
   (lambda (req)
     (declare (ignore req))
     `(200
@@ -379,7 +379,7 @@ you would call like this: `(run-server-tests :foo)'."
       (is body (format nil "Foo: Bar~A~A~A~AHello World"
                        #\Return #\NewLine #\Return #\NewLine)))))
 
-(define-app-test "test 404"
+(define-app-test |test 404|
   (lambda (req)
     (declare (ignore req))
     `(404
@@ -391,7 +391,7 @@ you would call like this: `(run-server-tests :foo)'."
       (is status 404)
       (is body "Not Found"))))
 
-(define-app-test "request -> input seekable"
+(define-app-test |request -> input seekable|
   (lambda (req)
     `(200
       (:content-type "text/plain")
@@ -402,7 +402,7 @@ you would call like this: `(run-server-tests :foo)'."
                       :content "body")
         "body")))
 
-(define-app-test "Content-Length 0 is not set Transfer-Encoding"
+(define-app-test |Content-Length 0 is not set Transfer-Encoding|
   (lambda (req)
     (declare (ignore req))
     `(200
@@ -415,7 +415,7 @@ you would call like this: `(run-server-tests :foo)'."
       (is (get-header headers :client-transfer-encoding) nil)
       (is body nil))))
 
-(define-app-test "handle Authorization header"
+(define-app-test |handle Authorization header|
   (lambda (req)
     `(200
       (:content-type "text/plain"
@@ -435,7 +435,7 @@ you would call like this: `(run-server-tests :foo)'."
       (is (get-header headers :x-authorization) nil)
       (is body nil :test #'eq))))
 
-(define-app-test "repeated slashes"
+(define-app-test |repeated slashes|
   (lambda (req)
     `(200
       (:content-type "text/plain")
