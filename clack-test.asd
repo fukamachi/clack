@@ -30,4 +30,8 @@
       :components
       ((:file "component")
        (:file "middleware")
-       (:file "builder")))))))
+       (:file "builder")))
+     (:module "contrib"
+      :components
+      ((:file "app/file")
+       (:file "middleware/static")))))))
