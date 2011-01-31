@@ -30,7 +30,8 @@
       :components
       ((:file "component")
        (:file "middleware")
-       (:file "builder")))
+       (:file "builder")
+       (:file "handler/hunchentoot")))
      (:module "contrib"
       :components
       ((:file "app/file")
