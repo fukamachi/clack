@@ -11,6 +11,8 @@
 
 (in-package :clack-test.middleware.static)
 
+(plan 8)
+
 (defvar *clack-pathname*
     (asdf:component-pathname (asdf:find-system :clack)))
 

@@ -10,6 +10,8 @@
 
 (in-package :clack-test.app.file)
 
+(plan 12)
+
 (defvar *clack-pathname*
     (asdf:component-pathname (asdf:find-system :clack)))
 
