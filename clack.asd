@@ -66,5 +66,7 @@
                     ((:file "static")))))))))
 
 ;; Run unit tests.
+#|
 (defmethod asdf:perform :after ((op load-op) (c (eql (find-system :clack))))
   (asdf:oos 'asdf:load-op :clack-test))
+|#
