@@ -20,7 +20,9 @@
         :cl-ppcre
         :cl-fad
         :clack.component
-        :anaphora)
+        :anaphora
+        :hunchentoot ;; for `mime-type'
+        )
   (:export :<clack-app-file>))
 
 (in-package :clack.app.file)
@@ -69,7 +71,8 @@
         (= it 0)))
 
 (defun serve-file (file encoding)
-  (let ((content-type (or "application/octet-stream")) ;FIXME: implement `mime-type'.
+  ;; FIXME: depending Hunchentoot.
+  (let ((content-type (or (hunchentoot:mime-type file) "application/octet-stream"))
         (univ-time (or (file-write-date file) (get-universal-time))))
     (when (text-file-p content-type)
       (setf content-type
