@@ -55,3 +55,58 @@
    (status res)
    (headers res)
    (body res)))
+
+#|
+=markdown
+
+# NAME
+
+clack.response - Provide easy accessing to Clack Request.
+
+# SYNOPSIS
+
+    (defvar res nil)
+    
+    (setf res (make-response 200))
+    (setf res (make-response 200 '(:content-type "text/html")))
+    (setf res (make-response 200 '(:content-type "text/html") '("aiueo")))
+    
+    ;; Access each fields
+    (status res)
+    ;;=> 200
+    (headers res)
+    ;;=> (:content-type "text/html")
+    (header res :content-type)
+    ;;=> "text/html"
+    (body res)
+    ;;=> ("aiueo")
+    
+    ;; Set to each fields
+    (setf (status res) 304)
+    (setf (header res :content-type) "text/plain")
+    (setf (body res) '("moved"))
+    (setf (body res) "moved") ;; string also allowed
+
+# DESCRIPTION
+
+clack.response allows you a way to create Clack response.
+
+## Functions
+
+* make-response
+* status
+* headers
+* header
+* body
+* finalize
+
+# AUTHOR
+
+* Eitarow Fukamachi
+
+# COPYRIGHT AND LICENSE
+
+Copyright 2011 (c) Eitarow Fukamachi  
+Licensed under the LLGPL License.
+
+|#
