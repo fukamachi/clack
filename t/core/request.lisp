@@ -30,4 +30,6 @@
                 #(230 183 177 231 148 186 232 139 177 229 164 170 233 131 142)
                 :external-format :utf-8)))
 
+(is-type (make-request '(:hoge "a")) '<request>)
+
 (finalize)

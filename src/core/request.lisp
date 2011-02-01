@@ -65,7 +65,7 @@
 
 (defun make-request (req)
   "Make a <request> instance from request plist."
-  (apply #'make-instance '<request> req))
+  (apply #'make-instance '<request> :allow-other-keys t req))
 
 ;(defmethod initialize-instance :after ((req <request>) &rest initargs))
 
