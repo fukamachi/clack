@@ -43,11 +43,12 @@
          #'(lambda (req)
              #'(lambda ()
                  (handle-response
-                  (aif (handler-case (call app req)
-                         (condition (error)
-                           (declare (ignore error)) nil))
-                       it
-                       '(500 nil nil)))))))
+                  (if debug (call app req)
+                      (aif (handler-case (call app req)
+                             (condition (error)
+                               (declare (ignore error)) nil))
+                           it
+                           '(500 nil nil))))))))
   (start (make-instance '<debuggable-acceptor>
             :port port
             :request-dispatcher 'clack-request-dispatcher)))

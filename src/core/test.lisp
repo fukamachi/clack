@@ -30,6 +30,8 @@
 (defvar *clack-test-port* 8080
   "HTTP port number of Handler.")
 
+(defvar *enable-debug-p* nil)
+
 (defun test-app (app client &optional desc)
   "Test Clack Application."
   (let* ((handler
@@ -37,7 +39,9 @@
               (error "Handler package is not found. Forgot to load it?: ~A"
                      *clack-test-handler*)))
          (acceptor (funcall (intern "RUN" handler)
-                            app :port *clack-test-port* :debug t)))
+                            app
+                            :port *clack-test-port*
+                            :debug *enable-debug-p*)))
     (when desc (diag desc))
     (unwind-protect
         (funcall client)
