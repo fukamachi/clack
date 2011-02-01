@@ -45,6 +45,7 @@
                   ((:file "component")
                    (:file "middleware" :depends-on ("component"))
                    (:file "builder" :depends-on ("middleware"))
+                   (:file "response")
                    (:file "request")
                    (:module "handler"
                     :depends-on ("component")
