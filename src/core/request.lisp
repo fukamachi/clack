@@ -37,6 +37,10 @@
            :content-length
            :content-type
            :clack-handler
+
+           :securep
+           :referer
+           :user-agent
            :body-parameters
            :query-parameters
            :body-parameter
@@ -53,7 +57,7 @@
       (server-port :initarg :server-port :initform nil :accessor server-port)
       (server-protocol :initarg :server-protocol :initform nil :accessor server-protocol)
       (request-uri :initarg :request-uri :initform nil :accessor request-uri)
-      (uri-scheme :initarg :url-scheme :initform nil :accessor uri-scheme)
+      (uri-scheme :initarg :uri-scheme :initform nil :accessor uri-scheme)
       (remote-addr :initarg :remote-addr :initform nil :accessor remote-addr)
       (remote-port :initarg :remote-port :initform nil :accessor remote-port)
       (query-string :initarg :query-string :initform nil :accessor query-string)
@@ -62,12 +66,23 @@
       (content-type :initarg :content-type :initform nil :accessor content-type)
       (clack-handler :initarg :clack-handler :initform nil :accessor clack-handler)
 
+      (http-referer :initarg :http-referer :initform nil)
+      (http-user-agent :initarg :http-user-agent :initform nil)
+
       (body-parameters :initform nil)
       (query-parameters :initform nil)))
 
 (defun make-request (req)
   "Make a <request> instance from request plist."
   (apply #'make-instance '<request> :allow-other-keys t req))
+
+(defmethod referer ((req <request>))
+  "Returns referer uri."
+  (slot-value req 'http-referer))
+
+(defmethod user-agent ((req <request>))
+  "Returns user agent of the client."
+  (slot-value req 'http-user-agent))
 
 (defmethod body-parameters ((req <request>))
   "Return POST parameters as a plist. Note the key is interned to keyword."
@@ -107,6 +122,11 @@
 
   (slot-value req 'query-parameters))
 
+(defmethod parameters ((req <request>))
+  "Returns request parameters containing (merged) GET and POST parameters."
+  (merge-plist (query-parameters req)
+               (body-parameters req)))
+
 (defmethod body-parameter ((req <request>) key)
   "Return a value in POST parameter corresponds to given `key'."
   (getf-all (body-parameters req) key))
@@ -114,6 +134,15 @@
 (defmethod query-parameter ((req <request>) key)
   "Return a value in GET parameter corresponds to given `key'."
   (getf-all (query-parameters req) key))
+
+(defun merge-plist (p1 p2)
+  (loop with notfound = '#:notfound
+        for (indicator value) on p1 by #'cddr
+        when (eq (getf p2 indicator notfound) notfound) 
+          do (progn
+               (push value p2)
+               (push indicator p2)))
+  p2)
 
 (defun getf-all (plist key)
   "This is a version of `getf' enabled to manage multiple keys. If the `plist' has two or more pairs that they have given `key' as a key, returns the values of each pairs as one list."
@@ -145,6 +174,9 @@
        (aand (nth-value 1 (ppcre:scan-to-strings
                            "charset=([^; ]+)" params))
              (aref it 0))))))
+
+(defmethod securep ((req <request>))
+  (eq (uri-scheme req) :https))
 
 #|
 =markdown
