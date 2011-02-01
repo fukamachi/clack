@@ -78,7 +78,12 @@
                ((:values type subtype charset)
                 (parse-content-type (content-type req)))
                (content-type (concatenate 'string type "/" subtype))
-               (external-format (flex:make-external-format (intern (string-upcase charset) :keyword) :eol-style :lf)))
+               (external-format
+                (flex:make-external-format
+                 (if charset
+                     (intern (string-upcase charset) :keyword)
+                     :utf-8)
+                 :eol-style :lf)))
           (cond
             ((string= content-type "application/x-www-form-urlencoded")
              (parameters->plist (read-line body)))
