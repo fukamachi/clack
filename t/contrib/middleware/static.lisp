@@ -16,6 +16,8 @@
 (defvar *clack-pathname*
     (asdf:component-pathname (asdf:find-system :clack)))
 
+(setf clack.test:*clack-test-port* 4242)
+
 (test-app
  (builder
   (<clack-middleware-static>
@@ -26,16 +28,16 @@
     `(200 (:content-type "text/plain") ("Happy Valentine!"))))
  (lambda ()
    (multiple-value-bind (body status headers)
-       (http-request "http://localhost:8080/public/jellyfish.jpg")
+       (http-request "http://localhost:4242/public/jellyfish.jpg")
      (is status 200)
      (is (cdr (assoc :content-type headers)) "image/jpeg")
      (is (length body) 139616))
    (multiple-value-bind (body status)
-       (http-request "http://localhost:8080/public/hoge.png")
+       (http-request "http://localhost:4242/public/hoge.png")
      (is status 404)
      (is body "not found"))
    (multiple-value-bind (body status headers)
-       (http-request "http://localhost:8080/")
+       (http-request "http://localhost:4242/")
      (is status 200)
      (is (cdr (assoc :content-type headers)) "text/plain")
      (is body "Happy Valentine!"))))
