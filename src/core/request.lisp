@@ -67,9 +67,8 @@
   "Make a <request> instance from request plist."
   (apply #'make-instance '<request> :allow-other-keys t req))
 
-;(defmethod initialize-instance :after ((req <request>) &rest initargs))
-
 (defmethod body-parameters ((req <request>))
+  "Return POST parameters as a plist. Note the key is interned to keyword."
   (awhen (slot-value req 'body-parameters)
     (return-from body-parameters it))
 
@@ -97,6 +96,7 @@
   (slot-value req 'body-parameters))
 
 (defmethod query-parameters ((req <request>))
+  "Returns GET parameters as a plist. Note the key is interned to keyword."
   (awhen (slot-value req 'query-parameters)
     (return-from query-parameters it))
 
@@ -106,6 +106,7 @@
   (slot-value req 'query-parameters))
 
 (defun parameters->plist (params)
+  "Convert parameters into plist. The `params' must be a string."
   (loop for kv in (ppcre:split "&" params)
         for (k v) = (ppcre:split "=" kv)
         append (list (intern k :keyword)
@@ -114,6 +115,7 @@
                      (or (ignore-errors (hunchentoot:url-decode v)) v))))
 
 (defun parse-content-type (content-type)
+  "Parse Content-Type from Request header."
   (register-groups-bind (type subtype params)
       ("^(.+?)/([^;]+);?(?:(.+)|$)" content-type)
     (values
@@ -123,3 +125,39 @@
        (aand (nth-value 1 (ppcre:scan-to-strings
                            "charset=([^; ]+)" params))
              (aref it 0))))))
+
+#|
+=markdown
+
+# NAME
+
+clack.request - Provide easy accessing to Clack Request.
+
+# SYNOPSIS
+
+    (defun app (req)
+      (let ((req (make-request req)))
+      `(200
+        (:content-type "text/plain")
+        ("Hello, " (getf (query-parameters req) :|name|)))))
+
+# DESCRIPTION
+
+clack.request provides a consistent API for request objects.
+
+## Functions
+
+* make-request
+* query-parameters
+* body-parameters
+
+# AUTHOR
+
+* Eitarow Fukamachi
+
+# COPYRIGHT AND LICENSE
+
+Copyright 2011 (c) Eitarow Fukamachi  
+Licensed under the LLGPL License.
+
+|#
