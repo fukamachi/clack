@@ -108,7 +108,10 @@
 (defun parameters->plist (params)
   (loop for kv in (ppcre:split "&" params)
         for (k v) = (ppcre:split "=" kv)
-        append (list (intern k :keyword) v)))
+        append (list (intern k :keyword)
+                     ;; FIXME: depends on Hunchentoot.
+                     ;;   and calls `ignore-errors'.
+                     (or (ignore-errors (hunchentoot:url-decode v)) v))))
 
 (defun parse-content-type (content-type)
   (register-groups-bind (type subtype params)
