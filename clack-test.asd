@@ -31,6 +31,7 @@
       ((:file "component")
        (:file "middleware")
        (:file "builder")
+       (:file "request")
        (:file "handler/hunchentoot")))
      (:module "contrib"
       :components
