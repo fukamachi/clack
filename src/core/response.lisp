@@ -22,7 +22,8 @@
            :status
            :headers
            :body
-           :header))
+           :header
+           :redirect))
 
 (in-package :clack.response)
 
@@ -48,6 +49,12 @@
 (defmethod (setf body) (value (res <response>))
   (setf (slot-value res 'body)
         (if (stringp value) (list value) value)))
+
+(defmethod redirect ((res <response>) url &optional (status 302))
+  "Set headers for redirecting to given url."
+  (setf (header res :location) url)
+  (setf (status res) status)
+  url)
 
 (defmethod finalize ((res <response>))
   "Return Clack response list."
