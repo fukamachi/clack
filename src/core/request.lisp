@@ -86,7 +86,7 @@
                  :eol-style :lf)))
           (cond
             ((string= content-type "application/x-www-form-urlencoded")
-             (parameters->plist (read-line body)))
+             (parameters->plist (read-line body nil "")))
             ((string= content-type "multipart/form-data")
              ;; FIXME: depends on Hunchentoot.
              (hunchentoot::parse-rfc2388-form-data
