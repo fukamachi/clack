@@ -22,16 +22,29 @@
 (plan 3)
 
 (is (content-type req)
-    "application/x-www-form-urlencoded; charset=utf-8")
+    "application/x-www-form-urlencoded; charset=utf-8"
+    "content-type")
 
 (is (query-parameters req)
-    '(:|ediweitz| "weitzedi" :|q| "C++"))
+    '(:|ediweitz| "weitzedi" :|q| "C++")
+    "query-parameters")
+
+(is (query-parameter req "q")
+    "C++"
+    "query-parameter (accessing each field)")
 
 (is (body-parameters req)
     `(:|name| ,(flex:octets-to-string
                 #(230 183 177 231 148 186 232 139 177 229 164 170 233 131 142)
-                :external-format :utf-8)))
+                :external-format :utf-8))
+    "body-parameters")
 
-(is-type (make-request '(:hoge "a")) '<request>)
+(is (body-parameter req "name")
+    (flex:octets-to-string
+     #(230 183 177 231 148 186 232 139 177 229 164 170 233 131 142)
+     :external-format :utf-8)
+    "body-parameter (accessing each field)")
+
+(is-type (make-request '(:hoge "a")) '<request> "<request> allow other keys")
 
 (finalize)

@@ -39,6 +39,8 @@
            :clack-handler
            :body-parameters
            :query-parameters
+           :body-parameter
+           :query-parameter
            ))
 
 (in-package :clack.request)
@@ -104,6 +106,24 @@
         (parameters->plist (query-string req)))
 
   (slot-value req 'query-parameters))
+
+(defmethod body-parameter ((req <request>) key)
+  "Return a value in POST parameter corresponds to given `key'."
+  (getf-all (body-parameters req) key))
+
+(defmethod query-parameter ((req <request>) key)
+  "Return a value in GET parameter corresponds to given `key'."
+  (getf-all (query-parameters req) key))
+
+(defun getf-all (plist key)
+  "This is a version of `getf' enabled to manage multiple keys. If the `plist' has two or more pairs that they have given `key' as a key, returns the values of each pairs as one list."
+  (loop with params = nil
+        for (k v) on plist by #'cddr
+        if (string= k key)
+          do (push v params)
+        finally (return (if (cdr params)
+                            (nreverse params)
+                            (car params)))))
 
 (defun parameters->plist (params)
   "Convert parameters into plist. The `params' must be a string."
