@@ -12,7 +12,7 @@
 
 (defvar res nil)
 
-(plan 10)
+(plan 14)
 
 (setq res (make-response 200))
 
@@ -37,7 +37,7 @@
 (diag "cookies")
 (is (cookies res) nil "cookies")
 (setf (cookies res "hoge") "a")
-(is (cookies res) '(:|hoge| "a") "cookies")
+(is (cookies res) '(:|hoge| (:value "a")) "cookies")
 (is (cookies res "hoge") "a" "cookie value")
 (is (getf (nth 1 (finalize res)) :set-cookie) "hoge=a" "finalize cookie")
 

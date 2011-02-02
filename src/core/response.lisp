@@ -57,11 +57,14 @@
 (defmethod cookies ((res <response>) &optional name)
   (let ((cookies (slot-value res 'cookies)))
     (if name
-        (getf cookies (normalize-key name))
+        (getf (getf cookies (normalize-key name)) :value)
         cookies)))
 
 (defmethod (setf cookies) (value (res <response>) name)
-  (setf (getf (slot-value res 'cookies) (normalize-key name)) value))
+  (setf (getf (slot-value res 'cookies) (normalize-key name))
+        (if (consp value)
+            value
+            `(:value ,value))))
 
 (defmethod redirect ((res <response>) url &optional (status 302))
   "Set headers for redirecting to given url."
@@ -88,7 +91,7 @@
   (format nil
           "~{~A=~A~^; ~}"
           (list (hunchentoot:url-encode (symbol-name k))
-                (hunchentoot:url-encode v))))
+                (hunchentoot:url-encode (getf v :value)))))
 
 (defun normalize-key (name)
   (etypecase name
