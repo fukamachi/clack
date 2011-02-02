@@ -16,12 +16,14 @@
 
 (defpackage clack.response
   (:use :cl
-        :alexandria)
+        :alexandria
+        :anaphora)
   (:export :<response>
            :make-response
            :finalize
            :status
            :headers
+           :push-header
            :body
            :cookies
            :redirect))
@@ -47,8 +49,14 @@
       (getf (headers res) (normalize-key name))
       (slot-value res 'headers)))
 
-(defmethod (setf headers) (value (res <response>) name)
-  (setf (getf (slot-value res 'headers) (normalize-key name)) value))
+(defmethod push-header ((res <response>) name value)
+  (setf (headers res)
+        (append (list name value) (headers res))))
+
+(defmethod (setf headers) (value (res <response>) &optional name)
+  (if name
+      (setf (getf (slot-value res 'headers) (normalize-key name)) value)
+      (setf (slot-value res 'headers) value)))
 
 (defmethod (setf body) (value (res <response>))
   (setf (slot-value res 'body)
@@ -82,16 +90,22 @@
 
 (defmethod finalize-cookies ((res <response>))
   (doplist (k v (cookies res))
-    (setf (headers res :set-cookie) (bake-cookie res k v))))
+    (push-header res :set-cookie (bake-cookie res k v))))
 
 (defmethod bake-cookie ((res <response>) k v)
   (unless v (return-from bake-cookie ""))
 
-  ;; TODO: domain, path, expires, secure, HttpOnly
-  (format nil
-          "~{~A=~A~^; ~}"
-          (list (hunchentoot:url-encode (symbol-name k))
-                (hunchentoot:url-encode (getf v :value)))))
+  (let ((cookie `((,(hunchentoot:url-encode (symbol-name k))
+                   ,(Hunchentoot:url-encode (getf v :value))))))
+    (awhen (getf v :domain) (push `("domain" ,it) cookie))
+    (awhen (getf v :path) (push `("path" ,it) cookie))
+    (awhen (getf v :expires) (push `("expires" ,it) cookie))
+    (awhen (getf v :secure) (push '("secure") cookie))
+    (awhen (getf v :httponly) (push '("HttpOnly") cookie))
+
+    (format nil
+            "~{~{~A~^=~}~^; ~}"
+            (nreverse cookie))))
 
 (defun normalize-key (name)
   (etypecase name

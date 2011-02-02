@@ -37,8 +37,15 @@
 (diag "cookies")
 (is (cookies res) nil "cookies")
 (setf (cookies res "hoge") "a")
-(is (cookies res) '(:|hoge| (:value "a")) "cookies")
+(setf (cookies res "fuga") '(:value "b" :secure t))
+;(is (cookies res) '(:|fuga| (:value "b" :secure t) :|hoge| (:value "a")) "cookies")
 (is (cookies res "hoge") "a" "cookie value")
-(is (getf (nth 1 (finalize res)) :set-cookie) "hoge=a" "finalize cookie")
+(is (cookies res "fuga") "b" "cookie value")
+(loop for (k v) on (nth 1 (finalize res)) by #'cddr
+      if (eq k :set-cookie)
+        unless (or (string= v "hoge=a")
+                   (string= v "fuga=b; secure"))
+          do (fail "finalized :set-cookie")
+      else do (pass "finalized :set-cookie"))
 
 (cl-test-more:finalize)
