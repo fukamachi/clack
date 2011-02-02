@@ -17,9 +17,9 @@
 (setq res (make-response 200))
 
 (is (headers res) nil "headers")
-(is (header res :content-type) nil "content-type")
-(setf (header res :content-type) "text/html")
-(is (header res :content-type) "text/html" "content-type 2")
+(is (headers res :content-type) nil "content-type")
+(setf (headers res :content-type) "text/html")
+(is (headers res :content-type) "text/html" "content-type 2")
 
 (is (body res) nil "body")
 (setf (body res) "aiueo")
@@ -29,9 +29,16 @@
 
 (diag "redirect")
 (redirect res "http://www.facebook.com/eitarow.fukamachi")
-(is (header res :content-type) "text/html" "content-type")
-(is (header res :location) "http://www.facebook.com/eitarow.fukamachi" "location")
+(is (headers res :content-type) "text/html" "content-type")
+(is (headers res :location) "http://www.facebook.com/eitarow.fukamachi" "location")
 (is (body res) '("aiueo") "body")
 (is (status res) 302 "status")
+
+(diag "cookies")
+(is (cookies res) nil "cookies")
+(setf (cookies res "hoge") "a")
+(is (cookies res) '(:|hoge| "a") "cookies")
+(is (cookies res "hoge") "a" "cookie value")
+(is (getf (nth 1 (finalize res)) :set-cookie) "hoge=a" "finalize cookie")
 
 (cl-test-more:finalize)
