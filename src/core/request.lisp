@@ -41,6 +41,8 @@
            :securep
            :referer
            :user-agent
+           :cookies
+           :cookie
            :body-parameters
            :query-parameters
            :body-parameter
@@ -68,6 +70,8 @@
 
       (http-referer :initarg :http-referer :initform nil)
       (http-user-agent :initarg :http-user-agent :initform nil)
+      (http-cookie :initarg :http-cookie :initform nil)
+      (cookies :initform nil)
 
       (body-parameters :initform nil)
       (query-parameters :initform nil)))
@@ -83,6 +87,19 @@
 (defmethod user-agent ((req <request>))
   "Returns user agent of the client."
   (slot-value req 'http-user-agent))
+
+(defmethod cookie ((req <request>) name)
+  (getf-all (cookies req) name))
+
+(defmethod cookies ((req <request>))
+  "Returns cookies as a string"
+  (awhen (slot-value req 'cookies)
+    (return-from cookies it))
+
+  (setf (slot-value req 'cookies)
+        (parameters->plist (slot-value req 'http-cookie)))
+
+  (slot-value req 'cookies))
 
 (defmethod body-parameters ((req <request>))
   "Return POST parameters as a plist. Note the key is interned to keyword."
