@@ -116,14 +116,14 @@ clack.response - Provide easy accessing to Clack Request.
     ;;=> 200
     (headers res)
     ;;=> (:content-type "text/html")
-    (header res :content-type)
+    (headers res :content-type)
     ;;=> "text/html"
     (body res)
     ;;=> ("aiueo")
     
     ;; Set to each fields
     (setf (status res) 304)
-    (setf (header res :content-type) "text/plain")
+    (setf (headers res :content-type) "text/plain")
     (setf (body res) '("moved"))
     (setf (body res) "moved") ;; string also allowed
 
