@@ -42,11 +42,9 @@
            :referer
            :user-agent
            :cookies
-           :cookie
            :body-parameters
            :query-parameters
-           :body-parameter
-           :query-parameter
+           :parameters
            ))
 
 (in-package :clack.request)
@@ -88,69 +86,63 @@
   "Returns user agent of the client."
   (slot-value req 'http-user-agent))
 
-(defmethod cookie ((req <request>) name)
-  (getf-all (cookies req) name))
+(defmethod cookies ((req <request>) &optional name)
+  "Returns cookies as a plist. If optional `name' is specified, returns the value corresponds to it."
+  (sunless (slot-value req 'cookies)
+    (setf it
+          (parameters->plist (slot-value req 'http-cookie))))
 
-(defmethod cookies ((req <request>))
-  "Returns cookies as a string"
-  (awhen (slot-value req 'cookies)
-    (return-from cookies it))
+  (let ((params (slot-value req 'cookies)))
+    (if name
+        (getf-all params name)
+        params)))
 
-  (setf (slot-value req 'cookies)
-        (parameters->plist (slot-value req 'http-cookie)))
+(defmethod body-parameters ((req <request>) &optional name)
+  "Return POST parameters as a plist. If optional `name' is specified, returns the value corresponds to it."
+  (sunless (slot-value req 'body-parameters)
+    (setf it
+          (bind ((body (raw-body req))
+                 ((:values type subtype charset)
+                  (parse-content-type (content-type req)))
+                 (content-type (concatenate 'string type "/" subtype))
+                 (external-format
+                  (flex:make-external-format
+                   (if charset
+                       (intern (string-upcase charset) :keyword)
+                       :utf-8)
+                   :eol-style :lf)))
+            (cond
+              ((string= content-type "application/x-www-form-urlencoded")
+               (parameters->plist (read-line body nil "")))
+              ((string= content-type "multipart/form-data")
+               ;; FIXME: depends on Hunchentoot.
+               (hunchentoot::parse-rfc2388-form-data
+                (flex:make-flexi-stream body)
+                content-type
+                external-format))))))
 
-  (slot-value req 'cookies))
+  (let ((params (slot-value req 'body-parameters)))
+    (if name
+        (getf-all params name)
+        params)))
 
-(defmethod body-parameters ((req <request>))
-  "Return POST parameters as a plist. Note the key is interned to keyword."
-  (awhen (slot-value req 'body-parameters)
-    (return-from body-parameters it))
+(defmethod query-parameters ((req <request>) &optional name)
+  "Returns GET parameters as a plist. If optional `name' is specified, returns the value corresponds to it."
+  (sunless (slot-value req 'query-parameters)
+    (setf it (parameters->plist (query-string req))))
 
-  (setf (slot-value req 'body-parameters)
-        (bind ((body (raw-body req))
-               ((:values type subtype charset)
-                (parse-content-type (content-type req)))
-               (content-type (concatenate 'string type "/" subtype))
-               (external-format
-                (flex:make-external-format
-                 (if charset
-                     (intern (string-upcase charset) :keyword)
-                     :utf-8)
-                 :eol-style :lf)))
-          (cond
-            ((string= content-type "application/x-www-form-urlencoded")
-             (parameters->plist (read-line body nil "")))
-            ((string= content-type "multipart/form-data")
-             ;; FIXME: depends on Hunchentoot.
-             (hunchentoot::parse-rfc2388-form-data
-              (flex:make-flexi-stream body)
-              content-type
-              external-format)))))
+  (let ((params (slot-value req 'query-parameters)))
+    (if name
+        (getf-all params name)
+        params)))
 
-  (slot-value req 'body-parameters))
-
-(defmethod query-parameters ((req <request>))
-  "Returns GET parameters as a plist. Note the key is interned to keyword."
-  (awhen (slot-value req 'query-parameters)
-    (return-from query-parameters it))
-
-  (setf (slot-value req 'query-parameters)
-        (parameters->plist (query-string req)))
-
-  (slot-value req 'query-parameters))
-
-(defmethod parameters ((req <request>))
-  "Returns request parameters containing (merged) GET and POST parameters."
-  (merge-plist (query-parameters req)
-               (body-parameters req)))
-
-(defmethod body-parameter ((req <request>) key)
-  "Return a value in POST parameter corresponds to given `key'."
-  (getf-all (body-parameters req) key))
-
-(defmethod query-parameter ((req <request>) key)
-  "Return a value in GET parameter corresponds to given `key'."
-  (getf-all (query-parameters req) key))
+(defmethod parameters ((req <request>) &optional name)
+  "Returns request parameters containing (merged) GET and POST parameters. If optional `name' is specified, returns the value corresponds to it."
+  (let ((params (merge-plist (query-parameter req)
+                             (body-parameter req))))
+    (if name
+        (getf-all params name)
+        params)))
 
 (defun merge-plist (p1 p2)
   (loop with notfound = '#:notfound
@@ -208,7 +200,7 @@ clack.request - Provide easy accessing to Clack Request.
       (let ((req (make-request req)))
       `(200
         (:content-type "text/plain")
-        ("Hello, " (getf (query-parameters req) :|name|)))))
+        ("Hello, " (query-parameters req "name)))))
 
 # DESCRIPTION
 
@@ -219,6 +211,8 @@ clack.request provides a consistent API for request objects.
 * make-request
 * query-parameters
 * body-parameters
+* parameters
+* cookies
 
 # AUTHOR
 

@@ -43,9 +43,9 @@
     '(:|ediweitz| "weitzedi" :|q| "C++")
     "query-parameters")
 
-(is (query-parameter req "q")
+(is (query-parameters req "q")
     "C++"
-    "query-parameter (accessing each field)")
+    "query-parameters (accessing each field)")
 
 (is (body-parameters req)
     `(:|name| ,(flex:octets-to-string
@@ -53,15 +53,15 @@
                 :external-format :utf-8))
     "body-parameters")
 
-(is (body-parameter req "name")
+(is (body-parameters req "name")
     (flex:octets-to-string
      #(230 183 177 231 148 186 232 139 177 229 164 170 233 131 142)
      :external-format :utf-8)
-    "body-parameter (accessing each field)")
+    "body-parameters (accessing each field)")
 
 (is-type (make-request '(:hoge "a")) '<request> "<request> allow other keys")
 
 (is (cookies req) '(:|hoge| "1" :|fuga| "2") "cookies")
-(is (cookie req "hoge") "1" "cookie")
+(is (cookies req "hoge") "1" "cookie value")
 
 (finalize)
