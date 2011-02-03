@@ -7,7 +7,7 @@
 |#
 
 #|
-  Provide easy accessing to Clack Request.
+  Portable HTTP Request object for Clack Request.
 
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
@@ -50,77 +50,96 @@
 (in-package :clack.request)
 
 (defclass <request> ()
-     ((request-method :initarg :request-method :initform nil :accessor request-method)
-      (script-name :initarg :script-name :initform nil :accessor script-name)
-      (path-info :initarg :path-info :initform nil :accessor path-info)
-      (server-name :initarg :server-name :initform nil :accessor server-name)
-      (server-port :initarg :server-port :initform nil :accessor server-port)
-      (server-protocol :initarg :server-protocol :initform nil :accessor server-protocol)
-      (request-uri :initarg :request-uri :initform nil :accessor request-uri)
-      (uri-scheme :initarg :uri-scheme :initform nil :accessor uri-scheme)
-      (remote-addr :initarg :remote-addr :initform nil :accessor remote-addr)
-      (remote-port :initarg :remote-port :initform nil :accessor remote-port)
-      (query-string :initarg :query-string :initform nil :accessor query-string)
-      (raw-body :initarg :raw-body :initform nil :accessor raw-body)
-      (content-length :initarg :content-length :initform nil :accessor content-length)
-      (content-type :initarg :content-type :initform nil :accessor content-type)
-      (clack-handler :initarg :clack-handler :initform nil :accessor clack-handler)
+     ((request-method :initarg :request-method :initform nil
+                      :reader request-method
+                      :documentation "The HTTP request method.
+This must be one of :GET, :HEAD, :OPTIONS, :PUT, :POST, or :DELETE.")
+      (script-name :initarg :script-name :initform nil :reader script-name
+                   :documentation "The initial portion of the request URL's path, corresponding to the application.
+This may be an empty string if the application corresponds to the server's root URI. If this key is not empty, it must start with a forward slash (/).")
+      (path-info :initarg :path-info :initform nil :reader path-info
+                 :documentation "The remainder of the request URL's path.
+This may be an empty string if the request URL targets the application root and does no have a trailing slash.")
+      (server-name :initarg :server-name :initform nil :reader server-name
+                   :documentation "The resolved server name, or the server IP address.")
+      (server-port :initarg :server-port :initform nil :reader server-port
+                   :documentation "The port on which the request is being handled.")
+      (server-protocol :initarg :server-protocol :initform nil
+                       :reader server-protocol
+                       :documentation "The version of the protocol the client used to send the request.
+Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
+      (request-uri :initarg :request-uri :initform nil :reader request-uri
+                   :documentation "The request URI. Must start with '/'.")
+      (uri-scheme :initarg :uri-scheme :initform nil :reader uri-scheme)
+      (remote-addr :initarg :remote-addr :initform nil :reader remote-addr)
+      (remote-port :initarg :remote-port :initform nil :reader remote-port)
+      (query-string :initarg :query-string :initform nil :reader query-string
+                    :documentation "The portion of the request URL that follows the '?', if any.")
+      (raw-body :initarg :raw-body :initform nil :reader raw-body)
+      (content-length :initarg :content-length :initform nil
+                      :reader content-length)
+      (content-type :initarg :content-type :initform nil :reader content-type)
+      (clack-handler :initarg :clack-handler :initform nil :reader clack-handler)
 
-      (http-referer :initarg :http-referer :initform nil)
-      (http-user-agent :initarg :http-user-agent :initform nil)
+      (http-referer :initarg :http-referer :initform nil :reader referer)
+      (http-user-agent :initarg :http-user-agent :initform nil :reader user-agent)
       (http-cookie :initarg :http-cookie :initform nil)
-      (cookies :initform nil)
 
       (body-parameters :initform nil)
-      (query-parameters :initform nil)))
+      (query-parameters :initform nil))
+  (:documentation "Portable HTTP Request object for Clack Request."))
 
+(defmethod initialize-instance :after ((this <request>) &rest initargs)
+  (declare (ignore initargs))
+
+  ;; cookies
+  (swhen (slot-value this 'http-cookie)
+    (setf it (parameters->plist it)))
+
+  ;; GET parameters
+  (setf (slot-value this 'query-parameters)
+        (parameters->plist (query-string this)))
+
+  ;; POST parameters
+  (setf (slot-value this 'body-parameters)
+        (bind ((body (raw-body this))
+               ((:values type subtype charset)
+                (parse-content-type (content-type this)))
+               (content-type (concatenate 'string type "/" subtype))
+               (external-format
+                (flex:make-external-format
+                 (if charset
+                     (intern (string-upcase charset) :keyword)
+                     :utf-8)
+                 :eol-style :lf)))
+          (cond
+            ((string= content-type "application/x-www-form-urlencoded")
+             (parameters->plist (read-line body nil "")))
+            ((string= content-type "multipart/form-data")
+             ;; FIXME: depends on Hunchentoot.
+             (hunchentoot::parse-rfc2388-form-data
+              (flex:make-flexi-stream body)
+              content-type
+              external-format))))))
+
+;; constructor
 (defun make-request (req)
-  "Make a <request> instance from request plist."
+  "A synonym for (make-instance '<request> ...).
+Make a <request> instance from request plist."
   (apply #'make-instance '<request> :allow-other-keys t req))
 
-(defmethod referer ((req <request>))
-  "Returns referer uri."
-  (slot-value req 'http-referer))
-
-(defmethod user-agent ((req <request>))
-  "Returns user agent of the client."
-  (slot-value req 'http-user-agent))
+(defmethod securep ((req <request>))
+  (eq (uri-scheme req) :https))
 
 (defmethod cookies ((req <request>) &optional name)
   "Returns cookies as a plist. If optional `name' is specified, returns the value corresponds to it."
-  (sunless (slot-value req 'cookies)
-    (setf it
-          (parameters->plist (slot-value req 'http-cookie))))
-
-  (let ((params (slot-value req 'cookies)))
+  (let ((params (slot-value req 'http-cookie)))
     (if name
         (getf-all params name)
         params)))
 
 (defmethod body-parameters ((req <request>) &optional name)
   "Return POST parameters as a plist. If optional `name' is specified, returns the value corresponds to it."
-  (sunless (slot-value req 'body-parameters)
-    (setf it
-          (bind ((body (raw-body req))
-                 ((:values type subtype charset)
-                  (parse-content-type (content-type req)))
-                 (content-type (concatenate 'string type "/" subtype))
-                 (external-format
-                  (flex:make-external-format
-                   (if charset
-                       (intern (string-upcase charset) :keyword)
-                       :utf-8)
-                   :eol-style :lf)))
-            (cond
-              ((string= content-type "application/x-www-form-urlencoded")
-               (parameters->plist (read-line body nil "")))
-              ((string= content-type "multipart/form-data")
-               ;; FIXME: depends on Hunchentoot.
-               (hunchentoot::parse-rfc2388-form-data
-                (flex:make-flexi-stream body)
-                content-type
-                external-format))))))
-
   (let ((params (slot-value req 'body-parameters)))
     (if name
         (getf-all params name)
@@ -128,9 +147,6 @@
 
 (defmethod query-parameters ((req <request>) &optional name)
   "Returns GET parameters as a plist. If optional `name' is specified, returns the value corresponds to it."
-  (sunless (slot-value req 'query-parameters)
-    (setf it (parameters->plist (query-string req))))
-
   (let ((params (slot-value req 'query-parameters)))
     (if name
         (getf-all params name)
@@ -138,31 +154,15 @@
 
 (defmethod parameters ((req <request>) &optional name)
   "Returns request parameters containing (merged) GET and POST parameters. If optional `name' is specified, returns the value corresponds to it."
-  (let ((params (merge-plist (query-parameter req)
-                             (body-parameter req))))
+  (let ((params (merge-plist (query-parameters req)
+                             (body-parameters req))))
     (if name
         (getf-all params name)
         params)))
 
-(defun merge-plist (p1 p2)
-  (loop with notfound = '#:notfound
-        for (indicator value) on p1 by #'cddr
-        when (eq (getf p2 indicator notfound) notfound) 
-          do (progn
-               (push value p2)
-               (push indicator p2)))
-  p2)
-
-(defun getf-all (plist key)
-  "This is a version of `getf' enabled to manage multiple keys. If the `plist' has two or more pairs that they have given `key' as a key, returns the values of each pairs as one list."
-  (loop with params = nil
-        for (k v) on plist by #'cddr
-        if (string= k key)
-          do (push v params)
-        finally (return (if (cdr params)
-                            (nreverse params)
-                            (car params)))))
-
+;;====================
+;; Private functions
+;;====================
 (defun parameters->plist (params)
   "Convert parameters into plist. The `params' must be a string."
   (loop for kv in (ppcre:split "&" params)
@@ -184,15 +184,35 @@
                            "charset=([^; ]+)" params))
              (aref it 0))))))
 
-(defmethod securep ((req <request>))
-  (eq (uri-scheme req) :https))
+;;====================
+;; Utilities
+;;====================
+(defun merge-plist (p1 p2)
+  "Merge two plist into one plist."
+  (loop with notfound = '#:notfound
+        for (indicator value) on p1 by #'cddr
+        when (eq (getf p2 indicator notfound) notfound) 
+          do (progn
+               (push value p2)
+               (push indicator p2)))
+  p2)
+
+(defun getf-all (plist key)
+  "This is a version of `getf' enabled to manage multiple keys. If the `plist' has two or more pairs that they have given `key' as a key, returns the values of each pairs as one list."
+  (loop with params = nil
+        for (k v) on plist by #'cddr
+        if (string= k key)
+          do (push v params)
+        finally (return (if (cdr params)
+                            (nreverse params)
+                            (car params)))))
 
 #|
 =markdown
 
 # NAME
 
-clack.request - Provide easy accessing to Clack Request.
+clack.request - Portable HTTP Request object for Clack Request.
 
 # SYNOPSIS
 
@@ -205,6 +225,8 @@ clack.request - Provide easy accessing to Clack Request.
 # DESCRIPTION
 
 clack.request provides a consistent API for request objects.
+
+## <request>
 
 ## Functions
 
