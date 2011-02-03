@@ -12,7 +12,7 @@
 
 (defvar res nil)
 
-(plan 14)
+(plan 15)
 
 (setq res (make-response 200))
 

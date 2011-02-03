@@ -34,45 +34,86 @@
      ((status :initarg :status :initform nil :accessor status)
       (headers :initarg :headers :initform nil)
       (body :initarg :body :initform nil :reader body)
-      (set-cookies :initform nil)))
+      (set-cookies :initform nil))
+  (:documentation "Portable HTTP Response object for Clack response."))
 
+(defmethod initialize-instance :after ((res <response>) &rest initargs)
+  (declare (ignore initargs))
+  (let ((body (body res)))
+    (when (stringp body)
+      (setf (slot-value res 'body) (list body)))))
+
+;; constructor
 (defun make-response (&optional status headers body)
-  "Create <response> instance."
+  "A synonym for (make-instance '<response> ...).
+Create a <response> instance."
   (make-instance '<response>
      :status status
      :headers headers
      :body body))
 
 (defmethod headers ((res <response>) &optional name)
-  "Get header value of given name."
+  "Get whole of headers or header value of given name.
+
+Example:
+  (headers res)
+  ;;=> (:content-type \"text/plain\")
+  (headers res :content-type)
+  ;;=> \"text/plain\"
+"
   (if name
       (getf (headers res) (normalize-key name))
       (slot-value res 'headers)))
 
-(defmethod push-header ((res <response>) name value)
-  (setf (headers res)
-        (append (list name value) (headers res))))
-
 (defmethod (setf headers) (value (res <response>) &optional name)
+  "Set headers.
+
+Example:
+  (setf (headers res) '(:content-type \"text/html\"))
+  (setf (headers res :content-type) \"text/html\")
+"
   (if name
       (setf (getf (slot-value res 'headers) (normalize-key name)) value)
       (setf (slot-value res 'headers) value)))
 
+(defmethod push-header ((res <response>) name value)
+  "Push the given header pair into response headers.
+Example: (push-header res :content-type \"text/html\")"
+  (setf (headers res)
+        (append (list name value) (headers res))))
+
 (defmethod (setf body) (value (res <response>))
+  "Set body with normalizing. body must be a list."
   (setf (slot-value res 'body)
-        (if (stringp value) (list value) value)))
+        (normalize-body value)))
 
 (defmethod set-cookies ((res <response>) &optional name)
+  "Get whole of set-cookies plist or the set-cookie value of given name.
+
+Example:
+  (set-cookies res)
+  ;;=> (:hoge \"1\")
+  (set-cookies res :hoge)
+  ;;=> \"1\"
+"
   (let ((cookies (slot-value res 'set-cookies)))
     (if name
         (getf (getf cookies (normalize-key name)) :value)
         cookies)))
 
-(defmethod (setf set-cookies) (value (res <response>) name)
-  (setf (getf (slot-value res 'set-cookies) (normalize-key name))
-        (if (consp value)
-            value
-            `(:value ,value))))
+(defmethod (setf set-cookies) (value (res <response>) &optional name)
+  "Set set-cookies.
+
+Example:
+  (setf (set-cookies res) '(:hoge \"1\"))
+  (setf (set-cookies res :hoge) \"1\")
+"
+  (if name
+      (setf (getf (slot-value res 'set-cookies) (normalize-key name))
+            (if (consp value)
+                value
+                `(:value ,value)))
+      (setf (slot-value res 'set-cookies) value)))
 
 (defmethod redirect ((res <response>) url &optional (status 302))
   "Set headers for redirecting to given url."
@@ -81,18 +122,23 @@
   url)
 
 (defmethod finalize ((res <response>))
-  "Return Clack response list."
+  "Return a Clack response list containing three values, status, headers and body."
   (finalize-cookies res)
   (list
    (status res)
    (headers res)
    (body res)))
 
+;;====================
+;; Private methods
+;;====================
 (defmethod finalize-cookies ((res <response>))
+  "Convert set-cookies into a header pair and push it into headers."
   (doplist (k v (set-cookies res))
     (push-header res :set-cookie (bake-cookie res k v))))
 
 (defmethod bake-cookie ((res <response>) k v)
+  "Create a string for Set-Cookie of the request header."
   (unless v (return-from bake-cookie ""))
 
   (let ((cookie `((,(hunchentoot:url-encode (symbol-name k))
@@ -107,7 +153,15 @@
             "~{~{~A~^=~}~^; ~}"
             (nreverse cookie))))
 
+;;====================
+;; Private functions
+;;====================
+(defun normalize-body (body)
+  "body must be a list."
+  (if (stringp body) (list body) body))
+
 (defun normalize-key (name)
+  "key must be a keyword."
   (etypecase name
     (string (intern name :keyword))
     (keyword name)
