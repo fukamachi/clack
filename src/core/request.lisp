@@ -41,7 +41,7 @@
            :securep
            :referer
            :user-agent
-           :http-cookie
+           :cookies
            :body-parameters
            :query-parameters
            :parameters
@@ -86,7 +86,7 @@
   "Returns user agent of the client."
   (slot-value req 'http-user-agent))
 
-(defmethod http-cookie ((req <request>) &optional name)
+(defmethod cookies ((req <request>) &optional name)
   "Returns cookies as a plist. If optional `name' is specified, returns the value corresponds to it."
   (sunless (slot-value req 'cookies)
     (setf it
@@ -212,7 +212,7 @@ clack.request provides a consistent API for request objects.
 * query-parameters
 * body-parameters
 * parameters
-* http-cookie
+* cookies
 
 # AUTHOR
 

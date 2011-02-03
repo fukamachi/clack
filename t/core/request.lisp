@@ -61,7 +61,7 @@
 
 (is-type (make-request '(:hoge "a")) '<request> "<request> allow other keys")
 
-(is (http-cookie req) '(:|hoge| "1" :|fuga| "2") "cookies")
-(is (http-cookie req "hoge") "1" "cookie value")
+(is (cookies req) '(:|hoge| "1" :|fuga| "2") "cookies")
+(is (cookies req "hoge") "1" "cookie value")
 
 (finalize)

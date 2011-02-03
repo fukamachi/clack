@@ -25,7 +25,7 @@
            :headers
            :push-header
            :body
-           :cookies
+           :set-cookies
            :redirect))
 
 (in-package :clack.response)
@@ -34,7 +34,7 @@
      ((status :initarg :status :initform nil :accessor status)
       (headers :initarg :headers :initform nil)
       (body :initarg :body :initform nil :reader body)
-      (cookies :initform nil)))
+      (set-cookies :initform nil)))
 
 (defun make-response (&optional status headers body)
   "Create <response> instance."
@@ -62,14 +62,14 @@
   (setf (slot-value res 'body)
         (if (stringp value) (list value) value)))
 
-(defmethod cookies ((res <response>) &optional name)
-  (let ((cookies (slot-value res 'cookies)))
+(defmethod set-cookies ((res <response>) &optional name)
+  (let ((cookies (slot-value res 'set-cookies)))
     (if name
         (getf (getf cookies (normalize-key name)) :value)
         cookies)))
 
-(defmethod (setf cookies) (value (res <response>) name)
-  (setf (getf (slot-value res 'cookies) (normalize-key name))
+(defmethod (setf set-cookies) (value (res <response>) name)
+  (setf (getf (slot-value res 'set-cookies) (normalize-key name))
         (if (consp value)
             value
             `(:value ,value))))
@@ -89,7 +89,7 @@
    (body res)))
 
 (defmethod finalize-cookies ((res <response>))
-  (doplist (k v (cookies res))
+  (doplist (k v (set-cookies res))
     (push-header res :set-cookie (bake-cookie res k v))))
 
 (defmethod bake-cookie ((res <response>) k v)
@@ -155,7 +155,7 @@ clack.response allows you a way to create Clack response.
 * headers
 * body
 * finalize
-* cookies
+* set-cookies
 * redirect
 
 # AUTHOR
