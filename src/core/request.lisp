@@ -113,8 +113,7 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
             ((string= content-type "application/x-www-form-urlencoded")
              (parameters->plist (read-line body nil "")))
             ((string= content-type "multipart/form-data")
-             ;; FIXME: depends on Hunchentoot.
-             (hunchentoot::parse-rfc2388-form-data
+             (clack.util.hunchentoot:parse-rfc2388-form-data
               (flex:make-flexi-stream body)
               content-type
               external-format))))))
@@ -165,9 +164,8 @@ Make a <request> instance from request plist."
   (loop for kv in (ppcre:split "&" params)
         for (k v) = (ppcre:split "=" kv)
         append (list (intern k :keyword)
-                     ;; FIXME: depends on Hunchentoot.
-                     ;;   and calls `ignore-errors'.
-                     (or (ignore-errors (hunchentoot:url-decode v)) v))))
+                     ;; KLUDGE: calls `ignore-errors'.
+                     (or (ignore-errors (clack.util.hunchentoot:url-decode v)) v))))
 
 (defun parse-content-type (content-type)
   "Parse Content-Type from Request header."

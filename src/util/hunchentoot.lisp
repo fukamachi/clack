@@ -18,9 +18,13 @@
 (in-package :cl-user)
 
 (defpackage clack.util.hunchentoot
-  (:use :cl)
+  (:use :cl
+        :flexi-streams
+        :rfc2388)
   (:export :format-rfc1123-timestring
-           :mime-type))
+           :parse-rfc2388-form-data
+           :mime-type
+           :url-decode))
 
 (in-package :clack.util.hunchentoot)
 
@@ -380,3 +384,79 @@ of file suffixes for the corresponding type.")
 \(as a string) corresponding to the suffix of the file denoted by
 PATHSPEC \(or NIL)."
   (gethash (pathname-type pathspec) *mime-type-hash*))
+
+(defun convert-hack (string external-format)
+  "The rfc2388 package is buggy in that it operates on a character
+stream and thus only accepts encodings which are 8 bit transparent.
+In order to support different encodings for parameter values
+submitted, we post process whatever string values the rfc2388 package
+has returned."
+  (flex:octets-to-string (map '(vector (unsigned-byte 8) *) 'char-code string)
+                         :external-format external-format))
+
+(defun parse-rfc2388-form-data (stream content-type-header external-format)
+  "Creates an alist of POST parameters from the stream STREAM which is
+supposed to be of content type 'multipart/form-data'."
+  (let* ((parsed-content-type-header (rfc2388:parse-header content-type-header :value))
+	 (boundary (or (cdr (rfc2388:find-parameter
+                             "BOUNDARY"
+                             (rfc2388:header-parameters parsed-content-type-header)))
+		       (return-from parse-rfc2388-form-data))))
+    (loop for part in (rfc2388:parse-mime stream boundary)
+          for headers = (rfc2388:mime-part-headers part)
+          for content-disposition-header = (rfc2388:find-content-disposition-header headers)
+          for name = (cdr (rfc2388:find-parameter
+                           "NAME"
+                           (rfc2388:header-parameters content-disposition-header)))
+          when name
+          collect (cons name
+                        (let ((contents (rfc2388:mime-part-contents part)))
+                          (if (pathnamep contents)
+                            (list contents
+                                  (rfc2388:get-file-name headers)
+                                  (rfc2388:content-type part :as-string t))
+                            (convert-hack contents external-format)))))))
+
+(defun url-decode (string &optional (external-format *hunchentoot-default-external-format*))
+  "Decodes a URL-encoded STRING which is assumed to be encoded using
+the external format EXTERNAL-FORMAT."
+  (when (zerop (length string))
+    (return-from url-decode ""))
+  (let ((vector (make-array (length string) :element-type 'octet :fill-pointer 0))
+        (i 0)
+        unicodep)
+    (loop
+      (unless (< i (length string))
+        (return))
+      (let ((char (aref string i)))
+       (labels ((decode-hex (length)
+                  (prog1
+                      (parse-integer string :start i :end (+ i length) :radix 16)
+                    (incf i length)))
+                (push-integer (integer)
+                  (vector-push integer vector))
+                (peek ()
+                  (aref string i))
+                (advance ()
+                  (setq char (peek))
+                  (incf i)))
+         (cond
+          ((char= #\% char)
+           (advance)
+           (cond
+            ((char= #\u (peek))
+             (unless unicodep
+               (setq unicodep t)
+               (upgrade-vector vector '(integer 0 65535)))
+             (advance)
+             (push-integer (decode-hex 4)))
+            (t
+             (push-integer (decode-hex 2)))))
+          (t
+           (push-integer (char-code (case char
+                                      ((#\+) #\Space)
+                                      (otherwise char))))
+           (advance))))))
+    (cond (unicodep
+           (upgrade-vector vector 'character :converter #'code-char))
+          (t (octets-to-string vector :external-format external-format)))))
