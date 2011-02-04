@@ -18,7 +18,8 @@
   (:export :test-app
            :define-app-test
            :*clack-test-handler*
-           :*clack-test-port*))
+           :*clack-test-port*
+           :*enable-debug-p*))
 
 (defvar *clack-test-handler* 'clack.handler.hunchentoot
   "Backend Handler to run tests on. String or Symbol are allowed.")
@@ -26,7 +27,7 @@
 (defvar *clack-test-port* 8080
   "HTTP port number of Handler.")
 
-(defvar *enable-debug-p* nil)
+(defvar *enable-debug-p* t)
 
 (defun test-app (app client &optional desc)
   "Test Clack Application."
