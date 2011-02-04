@@ -16,6 +16,7 @@
 
 (defpackage clack.request
   (:use :cl
+        :clack.util
         :cl-ppcre
         :flexi-streams
         :metabang-bind
@@ -183,29 +184,6 @@ Make a <request> instance from request plist."
        (aand (nth-value 1 (ppcre:scan-to-strings
                            "charset=([^; ]+)" params))
              (aref it 0))))))
-
-;;====================
-;; Utilities
-;;====================
-(defun merge-plist (p1 p2)
-  "Merge two plist into one plist."
-  (loop with notfound = '#:notfound
-        for (indicator value) on p1 by #'cddr
-        when (eq (getf p2 indicator notfound) notfound) 
-          do (progn
-               (push value p2)
-               (push indicator p2)))
-  p2)
-
-(defun getf-all (plist key)
-  "This is a version of `getf' enabled to manage multiple keys. If the `plist' has two or more pairs that they have given `key' as a key, returns the values of each pairs as one list."
-  (loop with params = nil
-        for (k v) on plist by #'cddr
-        if (string= k key)
-          do (push v params)
-        finally (return (if (cdr params)
-                            (nreverse params)
-                            (car params)))))
 
 #|
 =markdown

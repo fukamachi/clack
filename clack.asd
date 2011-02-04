@@ -40,7 +40,11 @@
   :components ((:module "src"
                 :serial t
                 :components
-                ((:module "core"
+                ((:module "util"
+                  :components
+                  ((:file "util")
+                   (:file "hunchentoot")))
+                 (:module "core"
                   :components
                   ((:file "component")
                    (:file "middleware" :depends-on ("component"))

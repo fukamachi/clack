@@ -16,6 +16,7 @@
 
 (defpackage clack.response
   (:use :cl
+        :clack.util
         :alexandria
         :anaphora)
   (:export :<response>
@@ -62,7 +63,7 @@ Example:
   ;;=> \"text/plain\"
 "
   (if name
-      (getf (headers res) (normalize-key name))
+      (getf* (headers res) name)
       (slot-value res 'headers)))
 
 (defmethod (setf headers) (value (res <response>) &optional name)
@@ -73,7 +74,7 @@ Example:
   (setf (headers res :content-type) \"text/html\")
 "
   (if name
-      (setf (getf (slot-value res 'headers) (normalize-key name)) value)
+      (setf (getf* (slot-value res 'headers) name) value)
       (setf (slot-value res 'headers) value)))
 
 (defmethod push-header ((res <response>) name value)
@@ -98,7 +99,7 @@ Example:
 "
   (let ((cookies (slot-value res 'set-cookies)))
     (if name
-        (getf (getf cookies (normalize-key name)) :value)
+        (getf (getf* cookies name) :value)
         cookies)))
 
 (defmethod (setf set-cookies) (value (res <response>) &optional name)
@@ -109,7 +110,7 @@ Example:
   (setf (set-cookies res :hoge) \"1\")
 "
   (if name
-      (setf (getf (slot-value res 'set-cookies) (normalize-key name))
+      (setf (getf* (slot-value res 'set-cookies) name)
             (if (consp value)
                 value
                 `(:value ,value)))
@@ -159,13 +160,6 @@ Example:
 (defun normalize-body (body)
   "body must be a list."
   (if (stringp body) (list body) body))
-
-(defun normalize-key (name)
-  "key must be a keyword."
-  (etypecase name
-    (string (intern name :keyword))
-    (keyword name)
-    (symbol (intern (symbol-name name) :keyword))))
 
 #|
 =markdown
