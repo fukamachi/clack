@@ -38,7 +38,7 @@ for cookie date format.")
   "The three-character names of the twelve months - needed for cookie
 date format.")
 
-(defun format-rfc-1123-timestring (&optional (time (get-universal-time)))
+(defun format-rfc1123-timestring (&optional (time (get-universal-time)))
   "Generates a time string according to RFC 1123.  Default is current time."
   (multiple-value-bind
         (second minute hour date month year day-of-week)

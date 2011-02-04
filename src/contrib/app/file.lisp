@@ -83,5 +83,5 @@
       `(200
         (:content-type ,content-type
          :content-length ,(file-length stream)
-         :last-modified ,(format-rfc-1123-timestring univ-time))
+         :last-modified ,(clack.util.hunchentoot:format-rfc1123-timestring univ-time))
         ,file))))
