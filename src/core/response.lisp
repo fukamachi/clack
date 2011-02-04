@@ -95,7 +95,7 @@ Example:
 "
   (let ((cookies (slot-value res 'set-cookies)))
     (if name
-        (getf (getf* cookies name) :value)
+        (getf* cookies name)
         cookies)))
 
 (defmethod (setf set-cookies) (value (res <response>) &optional name)

@@ -38,8 +38,8 @@
 (is (set-cookies res) nil "set-cookies")
 (setf (set-cookies res "hoge") "a")
 (setf (set-cookies res "fuga") '(:value "b" :secure t))
-(is (set-cookies res "hoge") "a" "set-cookie value")
-(is (set-cookies res "fuga") "b" "set-cookie value")
+(is (set-cookies res "hoge") '(:value "a") "set-cookie value")
+(is (set-cookies res "fuga") '(:value "b" :secure t) "set-cookie value")
 (loop for (k v) on (nth 1 (finalize res)) by #'cddr
       if (eq k :set-cookie)
         unless (or (string= v "hoge=a")
