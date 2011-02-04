@@ -417,8 +417,8 @@ supposed to be of content type 'multipart/form-data'."
                                   (rfc2388:content-type part :as-string t))
                             (convert-hack contents external-format)))))))
 
-(defvar *hunchentoot-default-external-format*
-    (make-external-format :latin1 :eol-style :lf)
+(defvar *default-external-format*
+    (make-external-format :utf-8 :eol-style :lf)
   "The external format used to compute the REQUEST object.")
 
 (defmacro upgrade-vector (vector new-type &key converter)
@@ -441,7 +441,7 @@ The macro also uses SETQ to store the new vector in VECTOR."
                                                `(aref ,vector i)))
                finally (return new-vector))))
 
-(defun url-decode (string &optional (external-format *hunchentoot-default-external-format*))
+(defun url-decode (string &optional (external-format *default-external-format*))
   "Decodes a URL-encoded STRING which is assumed to be encoded using
 the external format EXTERNAL-FORMAT."
   (when (zerop (length string))
