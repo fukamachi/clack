@@ -12,9 +12,7 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(in-package :cl-user)
-
-(defpackage clack.test.suite
+(clack.util:package clack.test.suite
   (:use :cl
         :asdf
         :anaphora
@@ -23,8 +21,6 @@
         :cl-test-more
         :clack.test)
   (:export :run-server-tests))
-
-(in-package :clack.test.suite)
 
 (defvar *clack-pathname*
     (asdf:component-pathname (asdf:find-system :clack)))

@@ -12,17 +12,13 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(in-package :cl)
-
-(defpackage clack.middleware
+(clack.util:package clack.middleware
   (:use :cl :clack.component)
   (:shadow :call)
   (:export :<middleware>
            :call
            :call-next
            :wrap))
-
-(in-package :clack.middleware)
 
 (defclass <middleware> (<component>)
      ((app :initarg :app :reader app))

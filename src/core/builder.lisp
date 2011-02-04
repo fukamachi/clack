@@ -12,15 +12,11 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(in-package :cl-user)
-
-(defpackage clack.builder
+(clack.util:package clack.builder
   (:use :cl
         :clack.middleware)
   (:export :builder
            :builder-lazy))
-
-(in-package :clack.builder)
 
 (defun %builder (&rest app-or-middleware)
   "Wrap Clack application with middlewares and return it as one function."

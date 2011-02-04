@@ -12,17 +12,13 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(in-package :cl-user)
-
-(defpackage :clack.test
+(clack.util:package :clack.test
   (:use :cl
         :cl-test-more)
   (:export :test-app
            :define-app-test
            :*clack-test-handler*
            :*clack-test-port*))
-
-(in-package :clack.test)
 
 (defvar *clack-test-handler* 'clack.handler.hunchentoot
   "Backend Handler to run tests on. String or Symbol are allowed.")

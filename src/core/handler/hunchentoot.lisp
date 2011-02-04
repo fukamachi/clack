@@ -12,9 +12,7 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(in-package :cl-user)
-
-(defpackage clack.handler.hunchentoot
+(clack.util:package clack.handler.hunchentoot
   (:use :cl
         :clack.component
         :hunchentoot
@@ -24,8 +22,6 @@
         :flexi-streams)
   (:shadow :stop)
   (:export :run :stop))
-
-(in-package :clack.handler.hunchentoot)
 
 (defun initialize ()
   (setf *hunchentoot-default-external-format*

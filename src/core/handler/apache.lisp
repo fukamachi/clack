@@ -12,9 +12,7 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(in-package :cl-user)
-
-(defpackage clack.handler.apache
+(clack.util:package clack.handler.apache
   (:use :cl
         :clack.component
         :modlisp
@@ -22,8 +20,6 @@
         :split-sequence
         :metabang-bind)
   (:export :run :stop))
-
-(in-package :clack.handler.apache)
 
 (defun run (app &key debug (port 3000))
   "Start talking to mod_lisp process."

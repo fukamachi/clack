@@ -12,9 +12,7 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(in-package :cl-user)
-
-(defpackage clack.request
+(clack.util:package clack.request
   (:use :cl
         :clack.util
         :cl-ppcre
@@ -47,8 +45,6 @@
            :query-parameters
            :parameters
            ))
-
-(in-package :clack.request)
 
 (defclass <request> ()
      ((request-method :initarg :request-method :initform nil

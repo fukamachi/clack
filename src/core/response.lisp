@@ -12,9 +12,7 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(in-package :cl-user)
-
-(defpackage clack.response
+(clack.util:package clack.response
   (:use :cl
         :clack.util
         :alexandria
@@ -28,8 +26,6 @@
            :body
            :set-cookies
            :redirect))
-
-(in-package :clack.response)
 
 (defclass <response> ()
      ((status :initarg :status :initform nil :accessor status)

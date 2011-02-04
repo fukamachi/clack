@@ -13,15 +13,11 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(in-package :cl-user)
-
-(defpackage clack.component
+(clack.util:package clack.component
   (:use :cl)
   (:export :<component>
            :call
            :make-app))
-
-(in-package :clack.component)
 
 (defclass <component> () ()
   (:documentation "Base Class for Clack Component shared between <middleware>
