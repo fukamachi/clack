@@ -12,7 +12,7 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(clack.util:package clack.test.suite
+(clack.util:namespace clack.test.suite
   (:use :cl
         :asdf
         :anaphora

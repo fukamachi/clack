@@ -12,7 +12,7 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(clack.util:package clack.handler.apache
+(clack.util:namespace clack.handler.apache
   (:use :cl
         :clack.component
         :modlisp

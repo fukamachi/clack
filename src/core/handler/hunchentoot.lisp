@@ -12,7 +12,7 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(clack.util:package clack.handler.hunchentoot
+(clack.util:namespace clack.handler.hunchentoot
   (:use :cl
         :clack.component
         :hunchentoot

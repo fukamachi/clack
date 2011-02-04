@@ -12,7 +12,7 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(clack.util:package :clack.test
+(clack.util:namespace :clack.test
   (:use :cl
         :cl-test-more)
   (:export :test-app

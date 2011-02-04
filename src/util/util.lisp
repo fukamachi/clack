@@ -16,14 +16,14 @@
 
 (defpackage clack.util
   (:use :cl)
-  (:export :package
+  (:export :namespace
            :getf*
            :getf-all
            :merge-plist))
 
 (in-package :clack.util)
 
-(defmacro package (name &rest body)
+(defmacro namespace (name &rest body)
   `(progn
      (in-package :cl-user)
      (defpackage ,(symbol-name name) ,@body)

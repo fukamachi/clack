@@ -12,7 +12,7 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(clack.util:package clack.builder
+(clack.util:namespace clack.builder
   (:use :cl
         :clack.middleware)
   (:export :builder

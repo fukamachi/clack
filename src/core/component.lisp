@@ -13,7 +13,7 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(clack.util:package clack.component
+(clack.util:namespace clack.component
   (:use :cl)
   (:export :<component>
            :call

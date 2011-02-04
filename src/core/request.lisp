@@ -12,7 +12,7 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(clack.util:package clack.request
+(clack.util:namespace clack.request
   (:use :cl
         :clack.util
         :cl-ppcre

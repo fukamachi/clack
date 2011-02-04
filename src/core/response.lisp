@@ -12,7 +12,7 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(clack.util:package clack.response
+(clack.util:namespace clack.response
   (:use :cl
         :clack.util
         :clack.util.hunchentoot
