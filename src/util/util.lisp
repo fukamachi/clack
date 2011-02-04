@@ -36,11 +36,8 @@
     (keyword name)
     (symbol (intern (symbol-name name) :keyword))))
 
-(defun getf* (plist key)
-  (getf plist (normalize-key key)))
-
-(defun (setf getf*) (value plist key)
-  (setf (getf plist (normalize-key key)) value))
+(defmacro getf* (place key)
+  `(getf ,place (normalize-key ,key)))
 
 (defun getf-all (plist key)
   "This is a version of `getf' enabled to manage multiple keys. If the `plist' has two or more pairs that they have given `key' as a key, returns the values of each pairs as one list."
