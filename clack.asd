@@ -36,6 +36,7 @@
                :cl-ppcre
                :cl-fad
                :cl-test-more
+               :ironclad
                :drakma)
   :components ((:module "src"
                 :serial t
@@ -63,13 +64,20 @@
                   :depends-on ("core")
                   :serial t
                   :components
-                  ((:module "app"
+                  ((:module "core/session"
+                    :serial t
+                    :components
+                    ((:file "state")
+                     (:file "state/cookie")
+                     (:file "store")))
+                   (:module "app"
                     :components
                     ((:file "file")
                      (:file "route")))
                    (:module "middleware"
                     :components
-                    ((:file "static")))))))))
+                    ((:file "static")
+                     (:file "session")))))))))
 
 ;; Run unit tests.
 #|
