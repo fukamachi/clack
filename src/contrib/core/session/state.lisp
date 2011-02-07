@@ -68,4 +68,5 @@
   (apply (sid-generator this) args))
 
 (defmethod finalize ((this <clack-session-state>) id res options)
-  (declare (ignore this id res options)))
+  (declare (ignore this id options))
+  res)
