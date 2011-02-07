@@ -37,4 +37,5 @@
      (:module "contrib"
       :components
       ((:file "app/file")
-       (:file "middleware/static")))))))
+       (:file "middleware/static")
+       (:file "middleware/session")))))))
