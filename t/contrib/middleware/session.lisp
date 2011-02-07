@@ -5,7 +5,9 @@
         :clack.test
         :clack.builder
         :clack.middleware.session
-        :drakma))
+        :clack.session.state.cookie
+        :drakma)
+  (:shadowing-import-from :cl-test-more :finalize))
 
 (plan nil)
 
@@ -13,7 +15,7 @@
 
 (test-app
  (builder
-  (<clack-middleware-session>)
+  (<clack-middleware-session> :state (make-instance '<clack-session-state-cookie>))
   (lambda (req)
     (sunless (gethash :counter (getf req :clack.session))
       (setf it 0))
