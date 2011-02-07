@@ -19,7 +19,8 @@
   (:export :namespace
            :getf*
            :getf-all
-           :merge-plist))
+           :merge-plist
+           :enable-duck-reader))
 
 (in-package :clack.util)
 
@@ -62,3 +63,27 @@
                (push value p2)
                (push indicator p2)))
   p2)
+
+(defun duck-function (fn obj)
+  (symbol-function (intern (symbol-name fn) (symbol-package (type-of obj)))))
+
+(defmacro duckcall (fn obj &body body)
+  `(funcall (duck-function ,fn ,obj) ,obj ,@body))
+
+(defmacro duckapply (fn obj &body body)
+  `(apply (duck-function ,fn ,obj) ,obj ,@body))
+
+(defun duck-reader (stream arg)
+  (declare (ignore arg))
+  (let ((args (gensym "ARGS"))
+        (fn (read-preserving-whitespace stream))
+        (obj (read-preserving-whitespace stream)))
+    `(lambda (&rest ,args) (duckapply ',fn ,obj ,args))))
+
+(defun %enable-duck-reader ()
+  (set-macro-character #\_ #'duck-reader)
+  (values))
+
+(defmacro enable-duck-reader ()
+  `(eval-when (:compile-toplevel :load-toplevel :execute)
+     (%enable-duck-reader)))
