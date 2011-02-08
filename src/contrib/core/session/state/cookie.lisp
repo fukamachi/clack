@@ -20,7 +20,7 @@
         :clack.request
         :clack.response
         :clack.session.state)
-  (:shadow :finalize :body)
+  (:shadow :body)
   (:export :<clack-session-state-cookie>
            :path
            :domain
@@ -29,7 +29,7 @@
            :httponly
            :session-id
            :expire-session-id
-           :finalize
+           :finalize-state
            :valid-sid-p
            :extract
            :generate))
@@ -41,7 +41,7 @@
       (secure :initarg :secure :initform nil :accessor secure)
       (httponly :initarg :httponly :initform nil :accessor httponly)))
 
-(defmethod merge-options ((this <clack-session-state>) options)
+(defmethod merge-options ((this <clack-session-state-cookie>) options)
   (setf options (remove-from-plist options :id))
   (merge-plist
    (list
@@ -52,20 +52,20 @@
     :expires (+ (get-universal-time) (expires this)))
    options))
 
-(defmethod expire-session-id ((this <clack-session-state>)
+(defmethod expire-session-id ((this <clack-session-state-cookie>)
                               id res &optional options)
   (setf (gethash :expires options) 0)
-  (finalize this id res options))
+  (finalize-state this id res options))
 
-(defmethod session-id ((this <clack-session-state>) req)
+(defmethod session-id ((this <clack-session-state-cookie>) req)
   (let ((r (make-request req)))
     (cookies r (session-key this))))
 
-(defmethod finalize ((this <clack-session-state>) id res options)
+(defmethod finalize-state ((this <clack-session-state-cookie>) id res options)
   (set-cookie this id res
               (merge-options this options)))
 
-(defmethod set-cookie ((this <clack-session-state>) id res options)
+(defmethod set-cookie ((this <clack-session-state-cookie>) id res options)
   (let ((r (apply #'make-response res)))
     (setf (set-cookies r (session-key this))
           (append `(:value ,id) options))

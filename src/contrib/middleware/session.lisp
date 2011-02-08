@@ -16,13 +16,10 @@
 (clack.util:namespace clack.middleware.session
   (:use :cl
         :alexandria
-        :clack.util
         :clack.middleware
         :clack.session.state
         :clack.session.store)
   (:export :<clack-middleware-session>))
-
-(enable-duck-reader)
 
 (defclass <clack-middleware-session> (<middleware>)
      ((state :initarg :state
@@ -45,13 +42,13 @@
       (finalize-session this req res))))
 
 (defmethod session ((this <clack-middleware-session>) req)
-  (let* ((id (@extract (state this) req))
-         (session (and id (@fetch (store this) id))))
+  (let* ((id (extract (state this) req))
+         (session (and id (fetch (store this) id))))
     (values (or id (generate-id this req))
             (or session (make-hash-table :test #'equal)))))
 
 (defmethod generate-id ((this <clack-middleware-session>) req)
-  (@generate (state this) req))
+  (generate (state this) req))
 
 (defmethod finalize-session ((this <clack-middleware-session>) req res)
   (let ((options (getf req :clack.session.options)))
@@ -66,20 +63,20 @@
         (options (getf req :clack.session.options)))
     (cond
       ((gethash :expire options)
-       (@remove-session (store this) (gethash :id session)))
+       (remove-session (store this) (gethash :id session)))
       ((gethash :change-id options)
-       (@remove-session (store this) (gethash :id session))
+       (remove-session (store this) (gethash :id session))
        (setf (gethash :id options) (generate-id this req))
-       (@store-session (store this) (gethash :id options) session))
+       (store-session (store this) (gethash :id options) session))
       (t
-       (@store-session (store this) (gethash :id options) session)))))
+       (store-session (store this) (gethash :id options) session)))))
 
 (defmethod expire-session ((this <clack-middleware-session>) id res req)
-  (@expire-session-id (state this)
+  (expire-session-id (state this)
                       id res
                       (hash-table-plist (getf req :clack.session.options))))
 
 (defmethod save-state ((this <clack-middleware-session>) id res req)
-  (@finalize (state this)
-     id res
-     (hash-table-plist (getf req :clack.session.options))))
+  (finalize-state (state this)
+                  id res
+                  (hash-table-plist (getf req :clack.session.options))))
