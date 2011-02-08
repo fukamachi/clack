@@ -275,9 +275,9 @@ you would call like this: `(run-server-tests :foo)'."
     (declare (ignore req))
     (error "Throwing an exception from app handler. Server shouldn't crash."))
   (lambda ()
-    (let ((*enable-debug-p* nil))
-      (is (nth-value 1 (http-request "http://localhost:4242/"))
-          500))))
+    (is (nth-value 1 (http-request "http://localhost:4242/"))
+        500))
+  nil)
 
 (define-app-test |multi headers (request)|
   (lambda (req)

@@ -44,7 +44,8 @@
         (funcall client)
       (funcall (intern "STOP" handler) acceptor))))
 
-(defmacro define-app-test (desc app client)
+(defmacro define-app-test (desc app client &optional (enable-debug-p *enable-debug-p*))
   "Define tests for Clack Application. This just wrap `cl-test-more:deftest', so you can run this test by calling `(cl-test-more:run-test :foo)'."
   `(deftest ,desc
-     (test-app ,app ,client)))
+       (let ((*enable-debug-p* ,enable-debug-p))
+         (test-app ,app ,client))))
