@@ -20,7 +20,8 @@
         :clack.request
         :clack.response
         :clack.session.state)
-  (:shadow :body :finalize)
+  (:shadow :body)
+  (:shadowing-import-from :clack.session.state :finalize)
   (:export :<clack-session-state-cookie>
            :path
            :domain
