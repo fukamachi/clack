@@ -22,6 +22,8 @@
   (:shadow :finalize :expire)
   (:export :<clack-middleware-session>))
 
+#.(rename-package :clack.session.state :clack.session.state '(state))
+
 (defclass <clack-middleware-session> (<middleware>)
      ((state :initarg :state
              :initform
@@ -73,13 +75,13 @@
        (store-session (store this) (gethash :id options) session)))))
 
 (defmethod expire ((this <clack-middleware-session>) id res req)
-  (clack.session.state:expire
+  (state:expire
    (state this)
    id res
    (hash-table-plist (getf req :clack.session.options))))
 
 (defmethod save-state ((this <clack-middleware-session>) id res req)
-  (clack.session.state:finalize
+  (state:finalize
    (state this)
    id res
    (hash-table-plist (getf req :clack.session.options))))
