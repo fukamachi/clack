@@ -45,13 +45,13 @@
       (finalize-session this req res))))
 
 (defmethod session ((this <clack-middleware-session>) req)
-  (let* ((id (_extract (state this) req))
-         (session (and id (_fetch (store this) id))))
+  (let* ((id (@extract (state this) req))
+         (session (and id (@fetch (store this) id))))
     (values (or id (generate-id this req))
             (or session (make-hash-table :test #'equal)))))
 
 (defmethod generate-id ((this <clack-middleware-session>) req)
-  (_generate (state this) req))
+  (@generate (state this) req))
 
 (defmethod finalize-session ((this <clack-middleware-session>) req res)
   (let ((options (getf req :clack.session.options)))
@@ -66,20 +66,20 @@
         (options (getf req :clack.session.options)))
     (cond
       ((gethash :expire options)
-       (_remove-session (store this) (gethash :id session)))
+       (@remove-session (store this) (gethash :id session)))
       ((gethash :change-id options)
-       (_remove-session (store this) (gethash :id session))
+       (@remove-session (store this) (gethash :id session))
        (setf (gethash :id options) (generate-id this req))
-       (_store-session (store this) (gethash :id options) session))
+       (@store-session (store this) (gethash :id options) session))
       (t
-       (_store-session (store this) (gethash :id options) session)))))
+       (@store-session (store this) (gethash :id options) session)))))
 
 (defmethod expire-session ((this <clack-middleware-session>) id res req)
-  (_expire-session-id (state this)
+  (@expire-session-id (state this)
                       id res
                       (hash-table-plist (getf req :clack.session.options))))
 
 (defmethod save-state ((this <clack-middleware-session>) id res req)
-  (_finalize (state this)
+  (@finalize (state this)
      id res
      (hash-table-plist (getf req :clack.session.options))))

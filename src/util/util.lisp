@@ -64,6 +64,10 @@
                (push indicator p2)))
   p2)
 
+;; Duck Typing
+
+(defvar *previous-readtables* nil)
+
 (defun duck-function (fn obj)
   (symbol-function (intern (symbol-name fn) (symbol-package (type-of obj)))))
 
@@ -81,9 +85,21 @@
     `(lambda (&rest ,args) (duckapply ',fn ,obj ,args))))
 
 (defun %enable-duck-reader ()
-  (set-macro-character #\_ #'duck-reader)
+  (push *readtable* *previous-readtables*)
+  (setq *readtable* (copy-readtable))
+  (set-macro-character #\@ #'duck-reader)
   (values))
+
+(defun %disable-duck-reader ()
+  (setq *readtable*
+        (if *previous-readtables*
+            (pop *previous-readtables*)
+            (copy-readtable nil))))
 
 (defmacro enable-duck-reader ()
   `(eval-when (:compile-toplevel :load-toplevel :execute)
      (%enable-duck-reader)))
+
+(defmacro disable-duck-reader ()
+  `(eval-when (:compile-toplevel :load-toplevel :execute)
+     (%disable-duck-reader)))
