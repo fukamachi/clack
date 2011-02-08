@@ -25,10 +25,10 @@
            :sid-validator
            :session-id
            :valid-session-p
-           :extract
-           :generate
-           :finalize-state
-           :expire-session-id))
+           :extract-id
+           :generate-id
+           :finalize
+           :expire))
 
 (defclass <clack-session-state> ()
      ((session-key :initarg :session-key :initform :clack.session
@@ -49,8 +49,8 @@
                        (not (null (scan "\\A[0-9a-f]{40}\\Z" sid))))
                      :accessor sid-validator)))
 
-(defmethod expire-session-id ((this <clack-session-state>)
-                              id res &optional options)
+(defmethod expire ((this <clack-session-state>)
+                   id res &optional options)
   (declare (ignore this id res options)))
 
 (defmethod session-id ((this <clack-session-state>) req)
@@ -59,14 +59,14 @@
 (defmethod valid-sid-p ((this <clack-session-state>) id)
   (funcall (sid-validator this) id))
 
-(defmethod extract ((this <clack-session-state>) req)
+(defmethod extract-id ((this <clack-session-state>) req)
   (aand (session-id this req)
         (valid-sid-p this it)
         it))
 
-(defmethod generate ((this <clack-session-state>) &rest args)
+(defmethod generate-id ((this <clack-session-state>) &rest args)
   (apply (sid-generator this) args))
 
-(defmethod finalize-state ((this <clack-session-state>) id res options)
+(defmethod finalize ((this <clack-session-state>) id res options)
   (declare (ignore this id options))
   res)

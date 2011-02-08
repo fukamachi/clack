@@ -72,6 +72,7 @@
                     :components
                     ((:file "static")
                      (:module "session"
+                      :serial t
                       :components
                       ((:file "state")
                        (:file "state/cookie")

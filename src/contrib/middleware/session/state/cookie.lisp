@@ -20,7 +20,7 @@
         :clack.request
         :clack.response
         :clack.session.state)
-  (:shadow :body)
+  (:shadow :body :finalize)
   (:export :<clack-session-state-cookie>
            :path
            :domain
@@ -28,11 +28,11 @@
            :secure
            :httponly
            :session-id
-           :expire-session-id
-           :finalize-state
+           :expire
+           :finalize
            :valid-sid-p
-           :extract
-           :generate))
+           :extract-id
+           :generate-id))
 
 (defclass <clack-session-state-cookie> (<clack-session-state>)
      ((path :initarg :path :initform "/" :accessor path)
@@ -52,16 +52,16 @@
     :expires (+ (get-universal-time) (expires this)))
    options))
 
-(defmethod expire-session-id ((this <clack-session-state-cookie>)
+(defmethod expire ((this <clack-session-state-cookie>)
                               id res &optional options)
   (setf (gethash :expires options) 0)
-  (finalize-state this id res options))
+  (finalize this id res options))
 
 (defmethod session-id ((this <clack-session-state-cookie>) req)
   (let ((r (make-request req)))
     (cookies r (session-key this))))
 
-(defmethod finalize-state ((this <clack-session-state-cookie>) id res options)
+(defmethod finalize ((this <clack-session-state-cookie>) id res options)
   (set-cookie this id res
               (merge-options this options)))
 
