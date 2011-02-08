@@ -64,20 +64,19 @@
                   :depends-on ("core")
                   :serial t
                   :components
-                  ((:module "core/session"
-                    :serial t
-                    :components
-                    ((:file "state")
-                     (:file "state/cookie")
-                     (:file "store")))
-                   (:module "app"
+                  ((:module "app"
                     :components
                     ((:file "file")
                      (:file "route")))
                    (:module "middleware"
                     :components
                     ((:file "static")
-                     (:file "session")))))))))
+                     (:module "session"
+                      :components
+                      ((:file "state")
+                       (:file "state/cookie")
+                       (:file "store")
+                       (:file "session")))))))))))
 
 ;; Run unit tests.
 #|
