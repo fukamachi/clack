@@ -37,7 +37,8 @@
                :cl-fad
                :cl-test-more
                :ironclad
-               :drakma)
+               :drakma
+               :local-time)
   :components ((:module "src"
                 :serial t
                 :components
@@ -50,6 +51,7 @@
                   ((:file "component")
                    (:file "middleware" :depends-on ("component"))
                    (:file "builder" :depends-on ("middleware"))
+                   (:file "logger")
                    (:file "response")
                    (:file "request")
                    (:module "handler"
