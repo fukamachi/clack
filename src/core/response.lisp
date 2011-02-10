@@ -15,9 +15,11 @@
 (clack.util:namespace clack.response
   (:use :cl
         :clack.util
-        :clack.util.hunchentoot
-        :alexandria
-        :anaphora)
+        :alexandria)
+  (:import-from :anaphora :awhen)
+  (:import-from :local-time
+                :format-rfc1123-timestring
+                :universal-to-timestamp)
   (:export :<response>
            :make-response
            :finalize
@@ -143,7 +145,10 @@ Example:
                    ,(Hunchentoot:url-encode (getf v :value))))))
     (awhen (getf v :domain) (push `("domain" ,it) cookie))
     (awhen (getf v :path) (push `("path" ,it) cookie))
-    (awhen (getf v :expires) (push `("expires" ,(format-rfc1123-timestring it)) cookie))
+    (awhen (getf v :expires)
+      (push `("expires"
+              ,(format-rfc1123-timestring
+                nil (universal-to-timestamp it))) cookie))
     (awhen (getf v :secure) (push '("secure") cookie))
     (awhen (getf v :httponly) (push '("HttpOnly") cookie))
 

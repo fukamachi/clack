@@ -13,19 +13,19 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(in-package :cl-user)
-
-(defpackage clack.app.file
-  (:use :cl
-        :cl-ppcre
-        :cl-fad
-        :clack.component
-        :anaphora
-        :clack.util.hunchentoot
-        )
+(clack.util:namespace clack.app.file
+  (:use :cl)
+  (:import-from :cl-fad :file-exists-p)
+  (:import-from :anaphora :aand)
+  (:import-from :clack.component
+                :<component>)
+  (:import-from :clack.util.hunchentoot
+                :mime-type)
+  (:import-from :cl-ppcre :scan)
+  (:import-from :local-time
+                :format-rfc1123-timestring
+                :universal-to-timestamp)
   (:export :<clack-app-file>))
-
-(in-package :clack.app.file)
 
 (defclass <clack-app-file> (<component>)
      ((file :initarg :file :initform nil :accessor file)
@@ -83,5 +83,6 @@
       `(200
         (:content-type ,content-type
          :content-length ,(file-length stream)
-         :last-modified ,(clack.util.hunchentoot:format-rfc1123-timestring univ-time))
+         :last-modified
+         ,(format-rfc1123-timestring nil (universal-to-timestamp univ-time)))
         ,file))))
