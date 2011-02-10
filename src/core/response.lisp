@@ -16,7 +16,7 @@
   (:use :cl
         :clack.util
         :alexandria)
-  (:import-from :anaphora :awhen)
+  (:import-from :anaphora :awhen :it)
   (:import-from :local-time
                 :format-rfc1123-timestring
                 :universal-to-timestamp)

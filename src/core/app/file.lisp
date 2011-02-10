@@ -16,7 +16,7 @@
 (clack.util:namespace clack.app.file
   (:use :cl)
   (:import-from :cl-fad :file-exists-p)
-  (:import-from :anaphora :aand)
+  (:import-from :anaphora :aand :it)
   (:import-from :clack.component
                 :<component>)
   (:import-from :clack.util.hunchentoot
