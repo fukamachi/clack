@@ -61,16 +61,14 @@
                      #+(or allegro cmu lispworks sbcl)
                      (:file "apache")))
                    (:file "test")
-                   (:file "test/suite" :depends-on ("test"))))
-                 (:module "contrib"
-                  :depends-on ("core")
-                  :serial t
-                  :components
-                  ((:module "app"
+                   (:file "test/suite" :depends-on ("test"))
+                   (:module "app"
+                    :depends-on ("component")
                     :components
-                    ((:file "file")
-                     (:file "route")))
-                   (:module "middleware"
+                    ((:file "file")))
+                   (:module "mw"
+                    :pathname "middleware"
+                    :depends-on ("middleware")
                     :components
                     ((:file "static")
                      (:module "session"
@@ -79,7 +77,12 @@
                       ((:file "state")
                        (:file "state/cookie")
                        (:file "store")
-                       (:file "session")))))))))))
+                       (:file "session")))))))
+                 (:module "contrib"
+                  :components
+                  ((:module "app"
+                    :components
+                    ((:file "route")))))))))
 
 ;; Run unit tests.
 #|
