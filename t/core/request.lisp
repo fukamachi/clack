@@ -2,9 +2,12 @@
 
 (defpackage clack-test.request
   (:use :cl
+        :asdf
         :cl-test-more
         :flexi-streams
-        :clack.request))
+        :clack.request
+        :clack.test
+        :drakma))
 
 (in-package :clack-test.request)
 
@@ -23,7 +26,7 @@
                          #(110 97 109 101 61 230 183 177 231 148 186 232 139 177 229 164 170 233 131 142))
                         :external-format :utf-8))))
 
-(plan 11)
+(plan 13)
 
 (is (content-type req)
     "application/x-www-form-urlencoded; charset=utf-8"
@@ -63,5 +66,23 @@
 
 (is (cookies req) '(:|hoge| "1" :|fuga| "2") "cookies")
 (is (cookies req "hoge") "1" "cookie value")
+
+(diag "file upload")
+
+(defvar *clack-pathname*
+    (asdf:component-pathname (asdf:find-system :clack)))
+
+(setf clack.test:*clack-test-port* 4242)
+
+(test-app
+ (lambda (req)
+   `(200 nil (,(caddar (uploads (make-request req))))))
+ (lambda ()
+   (multiple-value-bind (body status)
+       (http-request "http://localhost:4242/"
+                     :method :post
+                     :parameters `(("file" ,(merge-pathnames #p"tmp/jellyfish.jpg" *clack-pathname*) :content-type "image/jpeg" :filename "jellyfish.jpg")))
+     (is status 200)
+     (is body "jellyfish.jpg"))))
 
 (finalize)

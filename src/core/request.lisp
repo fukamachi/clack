@@ -44,6 +44,7 @@
            :body-parameters
            :query-parameters
            :parameters
+           :uploads
            ))
 
 (defclass <request> ()
@@ -83,7 +84,8 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
       (http-cookie :initarg :http-cookie :initform nil)
 
       (body-parameters :initform nil)
-      (query-parameters :initform nil))
+      (query-parameters :initform nil)
+      (uploads :initarg :clack.uploads :initform nil :accessor uploads))
   (:documentation "Portable HTTP Request object for Clack Request."))
 
 (defmethod initialize-instance :after ((this <request>) &rest initargs)
@@ -98,21 +100,23 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
         (parameters->plist (query-string this)))
 
   ;; POST parameters
-  (setf (slot-value this 'body-parameters)
-        (bind ((body (raw-body this))
-               ((:values type subtype charset)
-                (parse-content-type (content-type this)))
-               (content-type (concatenate 'string type "/" subtype))
-               (external-format
-                (flex:make-external-format
-                 (if charset
-                     (intern (string-upcase charset) :keyword)
-                     :utf-8)
-                 :eol-style :lf)))
-          (cond
-            ((string= content-type "application/x-www-form-urlencoded")
-             (parameters->plist (read-line body nil "")))
-            ((string= content-type "multipart/form-data")
+  (bind ((body (raw-body this))
+         ((:values type subtype charset)
+          (parse-content-type (content-type this)))
+         (content-type (concatenate 'string type "/" subtype))
+         (external-format
+          (flex:make-external-format
+           (if charset
+               (intern (string-upcase charset) :keyword)
+               :utf-8)
+           :eol-style :lf)))
+    (cond
+      ((string= content-type "application/x-www-form-urlencoded")
+       (setf (slot-value this 'body-parameters)
+             (parameters->plist (read-line body nil ""))))
+      ((and (string= content-type "multipart/form-data")
+            (not (uploads this))) ;; not set yet.
+       (setf (uploads this)
              (clack.util.hunchentoot:parse-rfc2388-form-data
               (flex:make-flexi-stream body)
               content-type
