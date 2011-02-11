@@ -33,9 +33,7 @@
        (:file "builder")
        (:file "response")
        (:file "request")
-       (:file "handler/hunchentoot")))
-     (:module "contrib"
-      :components
-      ((:file "app/file")
+       (:file "handler/hunchentoot")
+       (:file "app/file")
        (:file "middleware/static")
        (:file "middleware/session")))))))

@@ -47,10 +47,11 @@
                   ((:file "util")
                    (:file "hunchentoot")))
                  (:module "core"
+                  :serial t
                   :components
                   ((:file "component")
-                   (:file "middleware" :depends-on ("component"))
-                   (:file "builder" :depends-on ("middleware"))
+                   (:file "middleware")
+                   (:file "builder")
                    (:file "logger")
                    (:file "response")
                    (:file "request")
