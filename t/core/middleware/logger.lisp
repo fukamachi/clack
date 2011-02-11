@@ -10,8 +10,6 @@
 
 (plan 2)
 
-(setf clack.test:*clack-test-port* 4242)
-
 (test-app
  (builder
   (<clack-middleware-logger> :logger nil)

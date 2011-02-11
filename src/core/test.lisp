@@ -24,7 +24,7 @@
 (defvar *clack-test-handler* 'clack.handler.hunchentoot
   "Backend Handler to run tests on. String or Symbol are allowed.")
 
-(defvar *clack-test-port* 8080
+(defvar *clack-test-port* 4242
   "HTTP port number of Handler.")
 
 (defvar *enable-debug-p* t)

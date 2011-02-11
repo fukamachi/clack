@@ -15,8 +15,6 @@
 (defvar *clack-pathname*
     (asdf:component-pathname (asdf:find-system :clack)))
 
-(setf clack.test:*clack-test-port* 4242)
-
 (test-app
  (make-instance '<clack-app-file>
     :root (merge-pathnames #p"tmp/" *clack-pathname*))

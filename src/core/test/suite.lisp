@@ -34,7 +34,6 @@ you would call like this: `(run-server-tests :foo)'."
   (setf *clack-test-handler*
         (concatenate 'string "CLACK.HANDLER."
                      (symbol-name handler-name)))
-  (setf *clack-test-port* 4242)
   (if name
       (progn
         (plan nil)

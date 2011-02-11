@@ -11,8 +11,6 @@
 
 (plan nil)
 
-(setf clack.test:*clack-test-port* 4242)
-
 (test-app
  (builder
   (<clack-middleware-session> :state (make-instance '<clack-session-state-cookie>))

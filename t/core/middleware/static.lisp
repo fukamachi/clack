@@ -16,8 +16,6 @@
 (defvar *clack-pathname*
     (asdf:component-pathname (asdf:find-system :clack)))
 
-(setf clack.test:*clack-test-port* 4242)
-
 (test-app
  (builder
   (<clack-middleware-static>
