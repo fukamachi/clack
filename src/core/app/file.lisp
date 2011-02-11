@@ -18,7 +18,8 @@
   (:import-from :cl-fad :file-exists-p)
   (:import-from :anaphora :aand :it)
   (:import-from :clack.component
-                :<component>)
+                :<component>
+                :call)
   (:import-from :clack.util.hunchentoot
                 :mime-type)
   (:import-from :cl-ppcre :scan)
