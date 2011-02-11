@@ -39,7 +39,7 @@
                        (declare (ignore args))
                        (byte-array-to-hex-string
                         (digest-sequence
-                         (make-digest :sha1)
+                         (make-digest :SHA1)
                          (format nil "~A~A"
                                  (random 1.0) (get-universal-time)))))
                      :accessor sid-generator)

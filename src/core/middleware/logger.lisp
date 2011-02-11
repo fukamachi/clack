@@ -17,7 +17,8 @@
   (:import-from :clack.component
                 :call)
   (:import-from :clack.middleware
-                :<middleware>)
+                :<middleware>
+                :call-next)
   (:import-from :clack.logger
                 :*logger-output*
                 :*logger-format-string*
@@ -47,3 +48,8 @@
   (setf-if-slot-bound *logger-format-string* this 'format-string)
   (setf-if-slot-bound *logger-time-format* this 'time-format)
   (setf-if-slot-bound *logger-min-level* this 'min-level))
+
+(defmethod call ((this <clack-middleware-logger>) req)
+  ;; do nothing
+  (call-next this req)
+  )

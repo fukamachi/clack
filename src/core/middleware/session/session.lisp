@@ -16,6 +16,7 @@
 (clack.util:namespace clack.middleware.session
   (:use :cl
         :alexandria
+        :clack.component
         :clack.middleware
         :clack.session.state
         :clack.session.store)

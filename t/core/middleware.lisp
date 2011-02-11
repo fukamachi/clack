@@ -3,6 +3,7 @@
 (defpackage clack-test.middleware
   (:use :cl
         :cl-test-more
+        :clack.component
         :clack.middleware))
 
 (in-package :clack-test.middleware)

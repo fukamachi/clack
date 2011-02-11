@@ -20,6 +20,7 @@
         :alexandria
         :cl-ppcre
         :anaphora
+        :clack.component
         :clack.middleware
         :clack.app.file)
   (:export :<clack-middleware-static>))
