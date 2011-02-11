@@ -15,8 +15,9 @@
 (clack.util:namespace clack.logger
   (:use :cl)
   (:import-from :local-time
-                :now
                 :format-timestring)
+  (:import-from :clack.util
+                :now)
   (:export :*logger-output*
            :*logger-time-format*
            :*logger-min-level*

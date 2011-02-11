@@ -20,11 +20,12 @@
   (:import-from :clack.component
                 :<component>
                 :call)
+  (:import-from :clack.util
+                :format-rfc1123-timestring)
   (:import-from :clack.util.hunchentoot
                 :mime-type)
   (:import-from :cl-ppcre :scan)
   (:import-from :local-time
-                :format-rfc1123-timestring
                 :universal-to-timestamp)
   (:export :<clack-app-file>))
 

@@ -16,11 +16,17 @@
 
 (defpackage clack.util
   (:use :cl)
+  (:import-from :local-time
+                :format-timestring
+                :unix-to-timestamp
+                :+rfc-1123-format+
+                :+gmt-zone+)
   (:export :namespace
            :getf*
            :getf-all
            :merge-plist
-           :enable-duck-reader))
+           :enable-duck-reader
+           :now))
 
 (in-package :clack.util)
 
@@ -103,3 +109,19 @@
 (defmacro disable-duck-reader ()
   `(eval-when (:compile-toplevel :load-toplevel :execute)
      (%disable-duck-reader)))
+
+;; LOCAL-TIME
+
+(defun now ()
+  "Returns a timestamp representing the present moment."
+  (multiple-value-bind (sec nsec)
+      (values (- (get-universal-time)
+                 #.(encode-universal-time 0 0 0 1 1 1970 0))
+              0)
+    (assert (and sec nsec) () "Failed to get the current time from the operating system. How did this happen?")
+    (unix-to-timestamp sec :nsec nsec)))
+
+(defun format-rfc1123-timestring (destination timestamp)
+  (format-timestring destination timestamp
+                     :format +rfc-1123-format+
+                     :timezone +gmt-zone+))

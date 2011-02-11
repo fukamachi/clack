@@ -20,7 +20,6 @@
                 :url-encode)
   (:import-from :anaphora :awhen :it)
   (:import-from :local-time
-                :format-rfc1123-timestring
                 :universal-to-timestamp)
   (:export :<response>
            :make-response
