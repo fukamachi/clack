@@ -72,6 +72,7 @@
                     :depends-on ("middleware")
                     :components
                     ((:file "static")
+                     (:file "logger")
                      (:module "session"
                       :serial t
                       :components
