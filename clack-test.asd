@@ -36,4 +36,5 @@
        (:file "handler/hunchentoot")
        (:file "app/file")
        (:file "middleware/static")
-       (:file "middleware/session")))))))
+       (:file "middleware/session")
+       (:file "middleware/logger")))))))

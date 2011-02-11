@@ -14,22 +14,13 @@
 
 (clack.util:namespace clack.middleware
   (:use :cl :clack.component)
-  (:shadow :call)
   (:export :<middleware>
-           :call
            :call-next
            :wrap))
 
 (defclass <middleware> (<component>)
      ((app :initarg :app :reader app))
   (:documentation "Class for Clack Middleware."))
-
-(defgeneric call (mw req)
-  (:documentation "Invoke this Middleware. This shoulb be override in subclasses."))
-
-(defmethod call ((app function) req)
-  "Functions should be called like Component."
-  (funcall app req))
 
 (defmethod call-next ((this <middleware>) req)
   "Call next middleware or application."

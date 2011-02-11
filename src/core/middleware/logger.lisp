@@ -14,9 +14,10 @@
 
 (clack.util:namespace clack.middleware.logger
   (:use :cl)
-  (:import-from :clack.middleware
-                :<middleware>
+  (:import-from :clack.component
                 :call)
+  (:import-from :clack.middleware
+                :<middleware>)
   (:import-from :clack.logger
                 :*logger-output*
                 :*logger-format-string*
