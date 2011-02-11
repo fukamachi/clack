@@ -16,6 +16,8 @@
   (:use :cl
         :clack.util
         :alexandria)
+  (:import-from :clack.util.hunchentoot
+                :url-encode)
   (:import-from :anaphora :awhen :it)
   (:import-from :local-time
                 :format-rfc1123-timestring
@@ -141,8 +143,8 @@ Example:
   "Create a string for Set-Cookie of the request header."
   (unless v (return-from bake-cookie ""))
 
-  (let ((cookie `((,(hunchentoot:url-encode (symbol-name k))
-                   ,(Hunchentoot:url-encode (getf v :value))))))
+  (let ((cookie `((,(url-encode (symbol-name k))
+                   ,(url-encode (getf v :value))))))
     (awhen (getf v :domain) (push `("domain" ,it) cookie))
     (awhen (getf v :path) (push `("path" ,it) cookie))
     (awhen (getf v :expires)
