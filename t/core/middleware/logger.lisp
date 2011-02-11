@@ -5,15 +5,16 @@
         :clack.builder
         :clack.logger
         :clack.middleware.logger
+        :clack.logger.stream
         :drakma))
 
-(plan nil)
+(plan 2)
 
 (setf clack.test:*clack-test-port* 4242)
 
 (test-app
  (builder
-  (<clack-middleware-logger>)
+  (<clack-middleware-logger> :logger nil)
   (lambda (req)
     (declare (ignore req))
     (log-message :notice "hoge")

@@ -72,7 +72,13 @@
                     :depends-on ("middleware")
                     :components
                     ((:file "static")
-                     (:file "logger")
+                     (:module "log"
+                      :pathname "logger"
+                      :serial t
+                      :components
+                      ((:file "base")
+                       (:file "stream")
+                       (:file "logger")))
                      (:module "session"
                       :serial t
                       :components
