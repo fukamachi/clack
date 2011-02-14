@@ -14,7 +14,8 @@
 
 (clack.util:namespace clack.builder
   (:use :cl
-        :clack.middleware)
+        :clack.middleware
+        :clack.component)
   (:export :builder
            :builder-lazy))
 
