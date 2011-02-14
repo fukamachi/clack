@@ -26,17 +26,18 @@
 (in-package :clack.app.route)
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (defun compile-path (path &aux names)
-    (let* ((quoted (format nil "^~A$" (quote-meta-chars path)))
-           (regex (regex-replace-all
-                   "\\\\:([\\w-]+)"
-                   quoted
-                   (lambda (name &rest _)
-                     (declare (ignore _))
-                     (push (string-upcase (subseq name 2)) names)
-                     "(.+?)")
-                   :simple-calls t)))
-      (list regex (nreverse names)))))
+  (defun compile-path (path)
+    (loop with list = (split ":([\\w-]+)" path :with-registers-p t)
+          while list
+          for prefix = (pop list)
+          for name = (pop list)
+          collect (quote-meta-chars prefix) into parts
+          if name
+            collect (string-upcase name) into names
+            and collect "(.+?)" into parts
+          finally
+       (return (list (format nil "^~{~A~}$"  parts)
+                     names)))))
 
 (defmacro defroutes (name &body routes &aux (otherwise (last routes)))
   (if (member (car otherwise) '(t otherwise))
