@@ -10,6 +10,7 @@
 
 (plan 2)
 
+#+thread-support
 (test-app
  (builder
   (<clack-middleware-logger> :logger nil)
@@ -26,5 +27,7 @@
    (http-request "http://localhost:4242/")
    (is (get-output-stream-string *logger-output*) "" "min level is WARNING")
    ))
+#-thread-support
+(skip 2 "because your lisp doesn't support threads")
 
 (finalize)

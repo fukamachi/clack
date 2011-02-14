@@ -22,6 +22,7 @@
 (defsystem clack-test
   :depends-on (:clack
                :cl-test-more
+               :bordeaux-threads
                :drakma)
   :components
   ((:module "t"

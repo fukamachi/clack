@@ -16,6 +16,7 @@
 (defvar *clack-pathname*
     (asdf:component-pathname (asdf:find-system :clack)))
 
+#+thread-support
 (test-app
  (builder
   (<clack-middleware-static>
@@ -39,5 +40,8 @@
      (is status 200)
      (is (cdr (assoc :content-type headers)) "text/plain")
      (is body "Happy Valentine!"))))
+
+#-thread-support
+(skip 8 "because your lisp doesn't support threads")
 
 (finalize)

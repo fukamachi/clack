@@ -72,6 +72,7 @@
 (defvar *clack-pathname*
     (asdf:component-pathname (asdf:find-system :clack)))
 
+#+thread-support
 (test-app
  (lambda (req)
    `(200 nil (,(caddar (uploads (make-request req))))))
@@ -82,5 +83,7 @@
                      :parameters `(("file" ,(merge-pathnames #p"tmp/jellyfish.jpg" *clack-pathname*) :content-type "image/jpeg" :filename "jellyfish.jpg")))
      (is status 200)
      (is body "jellyfish.jpg"))))
+#-thread-support
+(skip 2 "because your lisp doesn't support threads")
 
 (finalize)

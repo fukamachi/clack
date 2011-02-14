@@ -9,8 +9,9 @@
         :drakma)
   (:shadowing-import-from :cl-test-more :finalize))
 
-(plan nil)
+(plan 4)
 
+#+thread-support
 (test-app
  (builder
   (<clack-middleware-session> :state (make-instance '<clack-session-state-cookie>))
@@ -35,5 +36,8 @@
        (diag "2nd request")
        (is status 200)
        (is body "Hello, you've been here for 2th times!")))))
+
+#-thread-support
+(skip 4 "because your lisp doesn't support threads")
 
 (finalize)

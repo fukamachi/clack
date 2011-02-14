@@ -15,6 +15,7 @@
 (defvar *clack-pathname*
     (asdf:component-pathname (asdf:find-system :clack)))
 
+#+thread-support
 (test-app
  (make-instance '<clack-app-file>
     :root (merge-pathnames #p"tmp/" *clack-pathname*))
@@ -30,6 +31,7 @@
      (is (cdr (assoc :content-type headers)) "image/png")
      (is (length body) 12155))))
 
+#+thread-support
 (test-app
  (make-instance '<clack-app-file>
     :file "jellyfish.jpg"
@@ -45,5 +47,8 @@
      (is status 200)
      (is (cdr (assoc :content-type headers)) "image/jpeg")
      (is (length body) 139616))))
+
+#-thread-support
+(skip 12 "because your lisp doesn't support threads")
 
 (finalize)

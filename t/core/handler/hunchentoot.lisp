@@ -6,4 +6,5 @@
 
 (in-package :clack-test.handler.hunchentoot)
 
+#+thread-support
 (clack.test.suite:run-server-tests :hunchentoot)
