@@ -141,7 +141,7 @@ you would call like this: `(run-server-tests :foo)'."
 
 (define-app-test |return pathname|
   (lambda (req)
-    (declare (ignore req))
+    @ignore req
     `(200
       (:content-type "text/plain")
       ,(merge-pathnames #p"tmp/file.txt" *clack-pathname*)))
@@ -154,7 +154,7 @@ you would call like this: `(run-server-tests :foo)'."
 
 (define-app-test |binary file|
   (lambda (req)
-    (declare (ignore req))
+    @ignore req
     (let ((file (merge-pathnames #p"tmp/redhat.png" *clack-pathname*)))
       `(200
         (:content-type "image/png"
@@ -169,7 +169,7 @@ you would call like this: `(run-server-tests :foo)'."
 
 (define-app-test |bigger file|
   (lambda (req)
-    (declare (ignore req))
+    @ignore req
     (let ((file (merge-pathnames #p"tmp/jellyfish.jpg" *clack-pathname*)))
       `(200
         (:content-type "image/jpeg"
@@ -281,7 +281,7 @@ you would call like this: `(run-server-tests :foo)'."
 
 (define-app-test |Do not crash when the app dies|
   (lambda (req)
-    (declare (ignore req))
+    @ignore req
     (error "Throwing an exception from app handler. Server shouldn't crash."))
   (lambda ()
     (is (nth-value 1 (http-request "http://localhost:4242/"))
@@ -302,7 +302,7 @@ you would call like this: `(run-server-tests :foo)'."
 
 (define-app-test |multi headers (response)|
   (lambda (req)
-    (declare (ignore req))
+    @ignore req
     `(200
       (:content-type "text/plain"
        :x-foo "foo"
@@ -331,7 +331,7 @@ you would call like this: `(run-server-tests :foo)'."
 ;;   though 304 Not Modified.
 (define-app-test |no entity headers on 304|
   (lambda (req)
-    (declare (ignore req))
+    @ignore req
     `(304 nil nil))
   (lambda ()
     (if (string= "CLACK.HANDLER.HUNCHENTOOT" *clack-test-handler*)
@@ -372,7 +372,7 @@ you would call like this: `(run-server-tests :foo)'."
 
 (define-app-test |CRLF output|
   (lambda (req)
-    (declare (ignore req))
+    @ignore req
     `(200
       (:content-type "text/plain")
       (,(format nil "Foo: Bar~A~A~A~AHello World"
@@ -387,7 +387,7 @@ you would call like this: `(run-server-tests :foo)'."
 
 (define-app-test |test 404|
   (lambda (req)
-    (declare (ignore req))
+    @ignore req
     `(404
       (:content-type "text/plain")
       ("Not Found")))
@@ -410,7 +410,7 @@ you would call like this: `(run-server-tests :foo)'."
 
 (define-app-test |Content-Length 0 is not set Transfer-Encoding|
   (lambda (req)
-    (declare (ignore req))
+    @ignore req
     `(200
       (:content-length 0)
       ("")))

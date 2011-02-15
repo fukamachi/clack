@@ -58,7 +58,7 @@
 (defmethod obtain-request-token ((this <clack-middleware-oauth>) req)
   (bind ((oauth-token (query-parameters req "oauth_token"))
          ((req-token time) (gethash oauth-token (oauth-state this))))
-    (declare (ignore time))
+    @ignore time
     req-token))
 
 (defmethod obtain-access-token ((this <clack-middleware-oauth>) req-token)

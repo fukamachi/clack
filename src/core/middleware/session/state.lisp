@@ -34,7 +34,7 @@
       (sid-generator :initarg :sid-generator
                      :initform
                      (lambda (&rest args)
-                       (declare (ignore args))
+                       @ignore args
                        (byte-array-to-hex-string
                         (digest-sequence
                          (make-digest :SHA1)
@@ -50,7 +50,7 @@
 @export
 (defmethod expire ((this <clack-session-state>)
                    id res &optional options)
-  (declare (ignore this id res options)))
+  @ignore (this id res options))
 
 @export
 (defmethod session-id ((this <clack-session-state>) req)
@@ -72,5 +72,5 @@
 
 @export
 (defmethod finalize ((this <clack-session-state>) id res options)
-  (declare (ignore this id options))
+  @ignore (this id options)
   res)

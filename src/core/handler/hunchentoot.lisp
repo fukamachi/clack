@@ -44,7 +44,8 @@
                   (if debug (call app req)
                       (aif (handler-case (call app req)
                              (condition (error)
-                               (declare (ignore error)) nil))
+                               @ignore error
+                               nil))
                            it
                            '(500 nil nil))))))))
   (start (make-instance '<debuggable-acceptor>

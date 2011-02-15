@@ -46,10 +46,8 @@ If nil, won't output any logs.")
   `(when (slot-boundp ,object ,slot)
      (setf ,place (slot-value ,object ,slot))))
 
-(defmethod initialize-instance :after ((this <clack-middleware-logger>)
-                                       &rest initargs)
+(defmethod initialize-instance :after ((this <clack-middleware-logger>) &key)
   "Set parameters in 'clack.logger'."
-  (declare (ignore initargs))
   (setf-if-slot-bound *logger-format-string* this 'format-string)
   (setf-if-slot-bound *logger-time-format* this 'time-format)
   (setf-if-slot-bound *logger-min-level* this 'min-level))

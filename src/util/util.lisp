@@ -55,7 +55,7 @@
 
 @export
 (defun (setf getf-all) (val plist key)
-  (declare (ignore val plist key))
+  @ignore (val plist key)
   (error "TODO"))
 
 @export
@@ -86,7 +86,7 @@
   `(apply (duck-function ,fn ,obj) ,obj ,@body))
 
 (defun duck-reader (stream arg)
-  (declare (ignore arg))
+  @ignore arg
   (let ((args (gensym "ARGS"))
         (fn (read-preserving-whitespace stream))
         (obj (read-preserving-whitespace stream)))

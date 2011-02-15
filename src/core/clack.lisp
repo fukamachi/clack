@@ -41,5 +41,5 @@ Example:
            :port 8080
            :debug t)
 "
-  (declare (ignore app handler-name port debug))
+  @ignore (app handler-name port debug)
   (error "TODO"))
