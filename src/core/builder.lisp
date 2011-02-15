@@ -15,9 +15,9 @@
 (clack.util:namespace clack.builder
   (:use :cl
         :clack.middleware
-        :clack.component)
-  (:export :builder
-           :builder-lazy))
+        :clack.component))
+
+(cl-annot:enable-annot-syntax)
 
 (defun %builder (&rest app-or-middleware)
   "Wrap Clack application with middlewares and return it as one function."
@@ -29,10 +29,12 @@
            :initial-value ,(car (last app-or-middleware))
            :from-end t))
 
+@export
 (defmacro builder (&rest app-or-middleware)
   "Some Middleware and Applications reduce into one function."
   (apply #'%builder app-or-middleware))
 
+@export
 (defmacro builder-lazy (&rest app-or-middleware)
   "Some Middleware and Applications reduce into one function. This evals given Components in each HTTP request time."
   (let ((req (gensym "REQ")))

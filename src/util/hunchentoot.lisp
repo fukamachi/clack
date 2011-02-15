@@ -40,18 +40,13 @@
 ;;; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (in-package :cl-user)
-
 (defpackage clack.util.hunchentoot
   (:use :cl
         :flexi-streams
-        :rfc2388)
-  (:export :format-rfc1123-timestring
-           :parse-rfc2388-form-data
-           :mime-type
-           :url-decode
-           :url-encode))
-
+        :rfc2388))
 (in-package :clack.util.hunchentoot)
+
+(cl-annot:enable-annot-syntax)
 
 (defparameter *mime-type-list* '(("application/andrew-inset" "ez")
                                  ("application/cu-seeme" "cu")
@@ -380,6 +375,7 @@ of file suffixes for the corresponding type.")
     hash)
   "A hash table which maps file suffixes to MIME types.")
 
+@export
 (defun mime-type (pathspec)
   "Given a pathname designator PATHSPEC returns the MIME type
 \(as a string) corresponding to the suffix of the file denoted by
@@ -395,6 +391,7 @@ has returned."
   (flex:octets-to-string (map '(vector (unsigned-byte 8) *) 'char-code string)
                          :external-format external-format))
 
+@export
 (defun parse-rfc2388-form-data (stream content-type-header external-format)
   "Creates an alist of POST parameters from the stream STREAM which is
 supposed to be of content type 'multipart/form-data'."
@@ -442,6 +439,7 @@ The macro also uses SETQ to store the new vector in VECTOR."
                                                `(aref ,vector i)))
                finally (return new-vector))))
 
+@export
 (defun url-decode (string &optional (external-format *default-external-format*))
   "Decodes a URL-encoded STRING which is assumed to be encoded using
 the external format EXTERNAL-FORMAT."
@@ -486,6 +484,7 @@ the external format EXTERNAL-FORMAT."
            (upgrade-vector vector 'character :converter #'code-char))
           (t (octets-to-string vector :external-format external-format)))))
 
+@export
 (defun url-encode (string &optional (external-format *default-external-format*))
   "URL-encodes a string using the external format EXTERNAL-FORMAT."
   (with-output-to-string (s)

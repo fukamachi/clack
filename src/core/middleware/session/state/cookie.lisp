@@ -22,19 +22,20 @@
         :clack.session.state)
   (:shadow :body)
   (:shadowing-import-from :clack.session.state :finalize)
-  (:export :<clack-session-state-cookie>
-           :path
+  (:export :path
            :domain
            :expires
            :secure
            :httponly
-           :session-id
-           :expire
-           :finalize
+
+           ;; imported from clack.session.state
            :valid-sid-p
            :extract-id
            :generate-id))
 
+(cl-annot:enable-annot-syntax)
+
+@export
 (defclass <clack-session-state-cookie> (<clack-session-state>)
      ((path :initarg :path :initform "/" :accessor path)
       (domain :initarg :domain :initform nil :accessor domain)
@@ -53,15 +54,18 @@
     :expires (+ (get-universal-time) (expires this)))
    options))
 
+@export
 (defmethod expire ((this <clack-session-state-cookie>)
                               id res &optional options)
   (setf (gethash :expires options) 0)
   (finalize this id res options))
 
+@export
 (defmethod session-id ((this <clack-session-state-cookie>) req)
   (let ((r (make-request req)))
     (cookies r (session-key this))))
 
+@export
 (defmethod finalize ((this <clack-session-state-cookie>) id res options)
   (set-cookie this id res
               (merge-options this options)))

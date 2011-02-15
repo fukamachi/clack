@@ -28,6 +28,7 @@
                :metabang-bind
                :anaphora
                :split-sequence
+               :cl-annot
                ;; Server
                :hunchentoot
                #+(or allegro cmu lispworks sbcl)

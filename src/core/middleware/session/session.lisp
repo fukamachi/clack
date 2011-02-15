@@ -20,11 +20,12 @@
         :clack.middleware
         :clack.session.state
         :clack.session.store)
-  (:shadow :finalize :expire)
-  (:export :<clack-middleware-session>))
-
+  (:shadow :finalize :expire))
 #.(rename-package :clack.session.state :clack.session.state '(state))
 
+(cl-annot:enable-annot-syntax)
+
+@export
 (defclass <clack-middleware-session> (<middleware>)
      ((state :initarg :state
              :initform

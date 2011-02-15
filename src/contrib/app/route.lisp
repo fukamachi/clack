@@ -16,14 +16,13 @@
 
 (in-package :cl-user)
 
-(defpackage clack.app.route
+(clack.util:namespace clack.app.route
   (:use :cl
         :clack.component
         :alexandria
-        :cl-ppcre)
-  (:export :defroutes))
+        :cl-ppcre))
 
-(in-package :clack.app.route)
+(cl-annot:enable-annot-syntax)
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun compile-path (path)
@@ -39,6 +38,7 @@
        (return (list (format nil "^~{~A~}$"  parts)
                      names)))))
 
+@export
 (defmacro defroutes (name &body routes &aux (otherwise (last routes)))
   (if (member (car otherwise) '(t otherwise))
       (setf routes (butlast routes))

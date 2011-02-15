@@ -14,21 +14,22 @@
 
 (clack.util:namespace :clack.test
   (:use :cl
-        :cl-test-more)
-  (:export :test-app
-           :define-app-test
-           :*clack-test-handler*
-           :*clack-test-port*
-           :*enable-debug-p*))
+        :cl-test-more))
 
+(cl-annot:enable-annot-syntax)
+
+@export
 (defvar *clack-test-handler* 'clack.handler.hunchentoot
   "Backend Handler to run tests on. String or Symbol are allowed.")
 
+@export
 (defvar *clack-test-port* 4242
   "HTTP port number of Handler.")
 
+@export
 (defvar *enable-debug-p* t)
 
+@export
 (defun test-app (app client &optional desc)
   "Test Clack Application."
   (let* ((handler
@@ -44,6 +45,7 @@
         (funcall client)
       (funcall (intern "STOP" handler) acceptor))))
 
+@export
 (defmacro define-app-test (desc app client &optional (enable-debug-p *enable-debug-p*))
   "Define tests for Clack Application. This just wrap `cl-test-more:deftest', so you can run this test by calling `(cl-test-more:run-test :foo)'."
   `(deftest ,desc

@@ -13,19 +13,21 @@
 |#
 
 (clack.util:namespace clack.middleware
-  (:use :cl :clack.component)
-  (:export :<middleware>
-           :call-next
-           :wrap))
+  (:use :cl :clack.component))
 
+(cl-annot:enable-annot-syntax)
+
+@export
 (defclass <middleware> (<component>)
      ((app :initarg :app :reader app))
   (:documentation "Class for Clack Middleware."))
 
+@export
 (defmethod call-next ((this <middleware>) req)
   "Call next middleware or application."
   (call (app this) req))
 
+@export
 (defmethod wrap ((this <middleware>) app-or-middleware)
   "Compose this and given application or middleware instance into one function.
 The function takes request plist."

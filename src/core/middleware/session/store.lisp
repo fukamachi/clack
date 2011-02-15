@@ -16,20 +16,22 @@
 (clack.util:namespace clack.session.store
   (:use :cl
         :clack.util
-        :alexandria)
-  (:export :<clack-session-store>
-           :fetch
-           :store-session
-           :remove-session))
+        :alexandria))
 
+(cl-annot:enable-annot-syntax)
+
+@export
 (defclass <clack-session-store> ()
      ((stash :initform nil :accessor stash)))
 
+@export
 (defmethod fetch ((this <clack-session-store>) sid)
   (getf* (stash this) sid))
 
+@export
 (defmethod store-session ((this <clack-session-store>) sid session)
   (setf (getf* (stash this) (intern sid :keyword)) session))
 
+@export
 (defmethod remove-session ((this <clack-session-store>) sid)
   (remove-from-plistf (stash this) sid))

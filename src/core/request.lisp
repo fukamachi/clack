@@ -19,9 +19,7 @@
         :flexi-streams
         :metabang-bind
         :anaphora)
-  (:export :<request>
-           :make-request
-           :request-method
+  (:export :request-method
            :script-name
            :path-info
            :server-name
@@ -37,16 +35,13 @@
            :content-type
            :clack-handler
 
-           :securep
            :referer
            :user-agent
-           :cookies
-           :body-parameters
-           :query-parameters
-           :parameters
-           :uploads
-           ))
+           :uploads))
 
+(cl-annot:enable-annot-syntax)
+
+@export
 (defclass <request> ()
      ((request-method :initarg :request-method :initform nil
                       :reader request-method
@@ -122,15 +117,18 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
               content-type
               external-format))))))
 
+@export
 ;; constructor
 (defun make-request (req)
   "A synonym for (make-instance '<request> ...).
 Make a <request> instance from request plist."
   (apply #'make-instance '<request> :allow-other-keys t req))
 
+@export
 (defmethod securep ((req <request>))
   (eq (uri-scheme req) :https))
 
+@export
 (defmethod cookies ((req <request>) &optional name)
   "Returns cookies as a plist. If optional `name' is specified, returns the value corresponds to it."
   (let ((params (slot-value req 'http-cookie)))
@@ -138,6 +136,7 @@ Make a <request> instance from request plist."
         (getf-all params name)
         params)))
 
+@export
 (defmethod body-parameters ((req <request>) &optional name)
   "Return POST parameters as a plist. If optional `name' is specified, returns the value corresponds to it."
   (let ((params (slot-value req 'body-parameters)))
@@ -145,6 +144,7 @@ Make a <request> instance from request plist."
         (getf-all params name)
         params)))
 
+@export
 (defmethod query-parameters ((req <request>) &optional name)
   "Returns GET parameters as a plist. If optional `name' is specified, returns the value corresponds to it."
   (let ((params (slot-value req 'query-parameters)))
@@ -152,6 +152,7 @@ Make a <request> instance from request plist."
         (getf-all params name)
         params)))
 
+@export
 (defmethod parameters ((req <request>) &optional name)
   "Returns request parameters containing (merged) GET and POST parameters. If optional `name' is specified, returns the value corresponds to it."
   (let ((params (merge-plist (query-parameters req)
@@ -160,9 +161,6 @@ Make a <request> instance from request plist."
         (getf-all params name)
         params)))
 
-;;====================
-;; Private functions
-;;====================
 (defun parameters->plist (params)
   "Convert parameters into plist. The `params' must be a string."
   (loop for kv in (ppcre:split "&" params)

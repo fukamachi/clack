@@ -13,20 +13,18 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(in-package :cl-user)
-
-(defpackage clack.middleware.static
+(clack.util:namespace clack.middleware.static
   (:use :cl
         :alexandria
         :cl-ppcre
         :anaphora
         :clack.component
         :clack.middleware
-        :clack.app.file)
-  (:export :<clack-middleware-static>))
+        :clack.app.file))
 
-(in-package :clack.middleware.static)
+(cl-annot:enable-annot-syntax)
 
+@export
 (defclass <clack-middleware-static> (<middleware>)
      ((path :initarg :path :accessor static-path)
       (root :initarg :root :initform #p"./" :accessor static-root))

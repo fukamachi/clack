@@ -26,9 +26,11 @@
                 :*logger-time-format*
                 :*logger-min-level*)
   (:import-from :clack.logger.base :output)
-  (:import-from :clack.logger.stream :<clack-logger-stream>)
-  (:export :<clack-middleware-logger>))
+  (:import-from :clack.logger.stream :<clack-logger-stream>))
 
+(cl-annot:enable-annot-syntax)
+
+@export
 (defclass <clack-middleware-logger> (<middleware>)
      ((logger :initarg :logger :initform (make-instance '<clack-logger-stream>)
               :accessor logger

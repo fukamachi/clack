@@ -21,16 +21,11 @@
   (:import-from :anaphora :awhen :it)
   (:import-from :local-time
                 :universal-to-timestamp)
-  (:export :<response>
-           :make-response
-           :finalize
-           :status
-           :headers
-           :push-header
-           :body
-           :set-cookies
-           :redirect))
+  (:export :status))
 
+(cl-annot:enable-annot-syntax)
+
+@export
 (defclass <response> ()
      ((status :initarg :status :initform nil :accessor status)
       (headers :initarg :headers :initform nil)
@@ -44,6 +39,7 @@
     (when (stringp body)
       (setf (slot-value res 'body) (list body)))))
 
+@export
 ;; constructor
 (defun make-response (&optional status headers body)
   "A synonym for (make-instance '<response> ...).
@@ -53,6 +49,7 @@ Create a <response> instance."
      :headers headers
      :body body))
 
+@export
 (defmethod headers ((res <response>) &optional name)
   "Get whole of headers or header value of given name.
 
@@ -66,6 +63,7 @@ Example:
       (getf* (headers res) name)
       (slot-value res 'headers)))
 
+@export
 (defmethod (setf headers) (value (res <response>) &optional name)
   "Set headers.
 
@@ -77,17 +75,20 @@ Example:
       (setf (getf* (slot-value res 'headers) name) value)
       (setf (slot-value res 'headers) value)))
 
+@export
 (defmethod push-header ((res <response>) name value)
   "Push the given header pair into response headers.
 Example: (push-header res :content-type \"text/html\")"
   (setf (headers res)
         (append (list name value) (headers res))))
 
+@export
 (defmethod (setf body) (value (res <response>))
   "Set body with normalizing. body must be a list."
   (setf (slot-value res 'body)
         (normalize-body value)))
 
+@export
 (defmethod set-cookies ((res <response>) &optional name)
   "Get whole of set-cookies plist or the set-cookie value of given name.
 
@@ -102,6 +103,7 @@ Example:
         (getf* cookies name)
         cookies)))
 
+@export
 (defmethod (setf set-cookies) (value (res <response>) &optional name)
   "Set set-cookies.
 
@@ -116,12 +118,14 @@ Example:
                 `(:value ,value)))
       (setf (slot-value res 'set-cookies) value)))
 
+@export
 (defmethod redirect ((res <response>) url &optional (status 302))
   "Set headers for redirecting to given url."
   (setf (headers res :location) url)
   (setf (status res) status)
   url)
 
+@export
 (defmethod finalize ((res <response>))
   "Return a Clack response list containing three values, status, headers and body."
   (finalize-cookies res)
@@ -130,9 +134,6 @@ Example:
    (headers res)
    (body res)))
 
-;;====================
-;; Private methods
-;;====================
 (defmethod finalize-cookies ((res <response>))
   "Convert set-cookies into a header pair and push it into headers."
   (doplist (k v (set-cookies res))
@@ -157,9 +158,6 @@ Example:
             "~{~{~A~^=~}~^; ~}"
             (nreverse cookie))))
 
-;;====================
-;; Private functions
-;;====================
 (defun normalize-body (body)
   "body must be a list."
   (if (stringp body) (list body) body))

@@ -14,12 +14,14 @@
 |#
 
 (clack.util:namespace clack.logger.base
-  (:use :cl)
-  (:export :<clack-logger-base>
-           :output))
+  (:use :cl))
 
+(cl-annot:enable-annot-syntax)
+
+@export
 (defclass <clack-logger-base> () ()
   (:documentation "Base class for Clack loggers."))
 
+@export
 (defgeneric output (logger)
   (:documentation "Output log messages by each loggers' way. All logger must implement this method."))

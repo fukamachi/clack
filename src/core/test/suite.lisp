@@ -19,12 +19,14 @@
         :drakma
         :flexi-streams
         :cl-test-more
-        :clack.test)
-  (:export :run-server-tests))
+        :clack.test))
+
+(cl-annot:enable-annot-syntax)
 
 (defvar *clack-pathname*
     (asdf:component-pathname (asdf:find-system :clack)))
 
+@export
 (defun run-server-tests (handler-name &optional name)
   "Run tests for clack.handler.
 Handler name is a keyword and doesn't include the clack.handler prefix.

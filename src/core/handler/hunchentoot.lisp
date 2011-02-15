@@ -20,8 +20,9 @@
         :alexandria
         :anaphora
         :flexi-streams)
-  (:shadow :stop)
-  (:export :run :stop))
+  (:shadow :stop))
+
+(cl-annot:enable-annot-syntax)
 
 (defun initialize ()
   (setf *hunchentoot-default-external-format*
@@ -29,6 +30,7 @@
         *handle-http-errors-p* nil
         *default-content-type* "text/html; charset=utf-8"))
 
+@export
 (defun run (app &key debug (port 8080))
   "Start Hunchentoot server."
   (initialize)
@@ -49,6 +51,7 @@
             :port port
             :request-dispatcher 'clack-request-dispatcher)))
 
+@export
 (defun stop (acceptor)
   "Stop Hunchentoot server.
 If no acceptor given, try to stop `*acceptor*' by default."

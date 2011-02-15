@@ -17,9 +17,11 @@
   (:use :cl)
   (:import-from :anaphora :awhen :it)
   (:import-from :clack.logger :*logger-output*)
-  (:import-from :clack.logger.base :<clack-logger-base> :output)
-  (:export :<clack-logger-stream>))
+  (:import-from :clack.logger.base :<clack-logger-base> :output))
 
+(cl-annot:enable-annot-syntax)
+
+@export
 (defclass <clack-logger-stream> (<clack-logger-base>)
      ((output-stream :initarg :output-stream :initform *standard-output*
                      :reader output-stream)))

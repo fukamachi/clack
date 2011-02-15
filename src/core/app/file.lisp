@@ -26,9 +26,11 @@
                 :mime-type)
   (:import-from :cl-ppcre :scan)
   (:import-from :local-time
-                :universal-to-timestamp)
-  (:export :<clack-app-file>))
+                :universal-to-timestamp))
 
+(cl-annot:enable-annot-syntax)
+
+@export
 (defclass <clack-app-file> (<component>)
      ((file :initarg :file :initform nil :accessor file)
       (root :initarg :root :initform #p"./" :accessor root)

@@ -19,17 +19,13 @@
         :cl-ppcre
         :ironclad)
   (:shadowing-import-from :cl :null)
-  (:export :<clack-session-state>
-           :session-key
+  (:export :session-key
            :sid-generator
-           :sid-validator
-           :session-id
-           :valid-session-p
-           :extract-id
-           :generate-id
-           :finalize
-           :expire))
+           :sid-validator))
 
+(cl-annot:enable-annot-syntax)
+
+@export
 (defclass <clack-session-state> ()
      ((session-key :initarg :session-key :initform :clack.session
                    :accessor session-key)
@@ -49,24 +45,30 @@
                        (not (null (scan "\\A[0-9a-f]{40}\\Z" sid))))
                      :accessor sid-validator)))
 
+@export
 (defmethod expire ((this <clack-session-state>)
                    id res &optional options)
   (declare (ignore this id res options)))
 
+@export
 (defmethod session-id ((this <clack-session-state>) req)
   (getf req (session-key this)))
 
+@export
 (defmethod valid-sid-p ((this <clack-session-state>) id)
   (funcall (sid-validator this) id))
 
+@export
 (defmethod extract-id ((this <clack-session-state>) req)
   (aand (session-id this req)
         (valid-sid-p this it)
         it))
 
+@export
 (defmethod generate-id ((this <clack-session-state>) &rest args)
   (apply (sid-generator this) args))
 
+@export
 (defmethod finalize ((this <clack-session-state>) id res options)
   (declare (ignore this id options))
   res)
