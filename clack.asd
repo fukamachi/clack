@@ -37,6 +37,7 @@
                :cl-ppcre
                :cl-fad
                :cl-test-more
+               :cl-oauth
                :ironclad
                :drakma
                :local-time)
@@ -89,7 +90,10 @@
                        (:file "session")))))))
                  (:module "contrib"
                   :components
-                  ((:module "app"
+                  ((:module "middleware"
+                    :components
+                    ((:file "oauth")))
+                   (:module "app"
                     :components
                     ((:file "route")))))))))
 
