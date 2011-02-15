@@ -121,6 +121,7 @@ before pass to Clack application."
                         (parse-integer it :junk-allowed t))
       :content-type (header-in* :content-type req)
       :clack.uploads (and (eq (request-method* req) :post)
+                          (header-in* :content-type req)
                           (multiple-value-bind (type subtype)
                               (hunchentoot::parse-content-type (header-in* :content-type req))
                             (if (and (string= type "multipart")
