@@ -17,9 +17,8 @@
 (in-package :cl-user)
 
 (clack.util:namespace clack.app.route
-  (:use :cl)
-  (:import-from :clack.component
-                :call)
+  (:use :cl
+        :clack.component)
   (:import-from :cl-ppcre
                 :scan-to-strings
                 :split

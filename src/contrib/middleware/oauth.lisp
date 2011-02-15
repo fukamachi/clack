@@ -3,12 +3,9 @@
         :anaphora
         :metabang-bind
         :clack.request
-        :clack.response)
-  (:import-from :clack.component
-                :call)
-  (:import-from :clack.middleware
-                :<middleware>
-                :call-next))
+        :clack.response
+        :clack.component
+        :clack.middleware))
 
 (cl-annot:enable-annot-syntax)
 

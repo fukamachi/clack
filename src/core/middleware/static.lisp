@@ -15,11 +15,9 @@
 
 (clack.util:namespace clack.middleware.static
   (:use :cl
-        :anaphora)
-  (:import-from :clack.component :call)
-  (:import-from :clack.middleware
-                :<middleware>
-                :call-next)
+        :anaphora
+        :clack.component
+        :clack.middleware)
   (:import-from :clack.app.file
                 :<clack-app-file>)
   (:import-from :alexandria

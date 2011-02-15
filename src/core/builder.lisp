@@ -13,10 +13,9 @@
 |#
 
 (clack.util:namespace clack.builder
-  (:use :cl)
-  (:import-from :clack.component :call)
-  (:import-from :clack.middleware
-                :wrap))
+  (:use :cl
+        :clack.component
+        :clack.middleware))
 
 (cl-annot:enable-annot-syntax)
 
