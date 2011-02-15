@@ -95,7 +95,7 @@
 (defun %enable-duck-reader ()
   (push *readtable* *previous-readtables*)
   (setq *readtable* (copy-readtable))
-  (set-macro-character #\@ #'duck-reader)
+  (set-macro-character #\& #'duck-reader)
   (values))
 
 (defun %disable-duck-reader ()
