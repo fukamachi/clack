@@ -14,11 +14,14 @@
 
 (clack.util:namespace clack.response
   (:use :cl
-        :clack.util
-        :alexandria)
+        :anaphora)
+  (:import-from :alexandria
+                :doplist)
+  (:import-from :clack.util
+                :getf*
+                :format-rfc1123-timestring)
   (:import-from :clack.util.hunchentoot
                 :url-encode)
-  (:import-from :anaphora :awhen :it)
   (:import-from :local-time
                 :universal-to-timestamp)
   (:export :status))
@@ -33,8 +36,7 @@
       (set-cookies :initform nil))
   (:documentation "Portable HTTP Response object for Clack response."))
 
-(defmethod initialize-instance :after ((res <response>) &rest initargs)
-  (declare (ignore initargs))
+(defmethod initialize-instance :after ((res <response>) &key)
   (let ((body (body res)))
     (when (stringp body)
       (setf (slot-value res 'body) (list body)))))
@@ -78,7 +80,8 @@ Example:
 @export
 (defmethod push-header ((res <response>) name value)
   "Push the given header pair into response headers.
-Example: (push-header res :content-type \"text/html\")"
+Example: (push-header res :content-type \"text/html\")
+"
   (setf (headers res)
         (append (list name value) (headers res))))
 

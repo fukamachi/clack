@@ -13,15 +13,16 @@
 |#
 
 (clack.util:namespace clack.builder
-  (:use :cl
-        :clack.middleware
-        :clack.component))
+  (:use :cl)
+  (:import-from :clack.component :call)
+  (:import-from :clack.middleware
+                :wrap))
 
 (cl-annot:enable-annot-syntax)
 
 (defun %builder (&rest app-or-middleware)
   "Wrap Clack application with middlewares and return it as one function."
-  `(reduce #'clack.middleware:wrap
+  `(reduce #'wrap
            (list ,@(loop for arg in (butlast app-or-middleware)
                          if (consp arg)
                            collect `(make-instance ',(car arg) ,@(cdr arg))

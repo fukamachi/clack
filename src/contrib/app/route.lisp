@@ -17,10 +17,15 @@
 (in-package :cl-user)
 
 (clack.util:namespace clack.app.route
-  (:use :cl
-        :clack.component
-        :alexandria
-        :cl-ppcre))
+  (:use :cl)
+  (:import-from :clack.component
+                :call)
+  (:import-from :cl-ppcre
+                :scan-to-strings
+                :split
+                :quote-meta-chars)
+  (:import-from :alexandria
+                :with-gensyms))
 
 (cl-annot:enable-annot-syntax)
 

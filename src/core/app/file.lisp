@@ -14,9 +14,8 @@
 |#
 
 (clack.util:namespace clack.app.file
-  (:use :cl)
-  (:import-from :cl-fad :file-exists-p)
-  (:import-from :anaphora :aand :it)
+  (:use :cl
+        :anaphora)
   (:import-from :clack.component
                 :<component>
                 :call)
@@ -26,7 +25,8 @@
                 :mime-type)
   (:import-from :cl-ppcre :scan)
   (:import-from :local-time
-                :universal-to-timestamp))
+                :universal-to-timestamp)
+  (:import-from :cl-fad :file-exists-p))
 
 (cl-annot:enable-annot-syntax)
 
@@ -65,7 +65,7 @@
   (let ((file (merge-pathnames path root)))
     (cond
       ((position #\Null (namestring file)) return-400)
-      ((not (file-exists-p file)) return-404)
+      ((not (cl-fad:file-exists-p file)) return-404)
 ;      ((not (find :user-read (file-permissions file)))
 ;       return-403)
       (t file))))

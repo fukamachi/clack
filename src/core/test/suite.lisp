@@ -14,12 +14,20 @@
 
 (clack.util:namespace clack.test.suite
   (:use :cl
-        :asdf
         :anaphora
-        :drakma
-        :flexi-streams
-        :cl-test-more
-        :clack.test))
+        :cl-test-more)
+  (:import-from :flexi-streams
+                :octet
+                :octets-to-string)
+  (:import-from :clack.test
+                :*clack-test-handler*
+                :define-app-test)
+  (:import-from :drakma
+                :*drakma-default-external-format*
+                :http-request)
+  (:import-from :asdf
+                :find-system
+                :component-pathname))
 
 (cl-annot:enable-annot-syntax)
 
@@ -96,13 +104,13 @@ you would call like this: `(run-server-tests :foo)'."
 (define-app-test |big POST|
   (lambda (req)
     (let ((body
-           (make-array (getf req :content-length) :element-type 'octet)))
+           (make-array (getf req :content-length) :element-type 'flex:octet)))
       (read-sequence body (getf req :raw-body))
       `(200
         (:content-type "text/plain"
          :client-content-length ,(getf req :content-length)
          :client-content-type ,(getf req :content-type))
-        (,(octets-to-string body)))))
+        (,(flex:octets-to-string body)))))
   (lambda ()
     (let* ((chunk
             (with-output-to-string (chunk)

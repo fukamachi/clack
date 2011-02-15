@@ -15,10 +15,12 @@
 
 (clack.util:namespace clack.session.state
   (:use :cl
-        :anaphora
-        :cl-ppcre
-        :ironclad)
-  (:shadowing-import-from :cl :null)
+        :anaphora)
+  (:import-from :ironclad
+                :make-digest
+                :digest-sequence
+                :byte-array-to-hex-string)
+  (:import-from :cl-ppcre :scan)
   (:export :session-key
            :sid-generator
            :sid-validator))
@@ -42,7 +44,7 @@
       (sid-validator :initarg :sid-validator
                      :initform
                      (lambda (sid)
-                       (not (null (scan "\\A[0-9a-f]{40}\\Z" sid))))
+                       (not (null (ppcre:scan "\\A[0-9a-f]{40}\\Z" sid))))
                      :accessor sid-validator)))
 
 @export

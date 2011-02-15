@@ -13,8 +13,8 @@
 |#
 
 (clack.util:namespace clack.middleware.logger
-  (:use :cl)
-  (:import-from :anaphora :awhen :it)
+  (:use :cl
+        :anaphora)
   (:import-from :clack.component
                 :call)
   (:import-from :clack.middleware

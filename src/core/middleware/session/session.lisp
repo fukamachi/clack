@@ -15,12 +15,15 @@
 
 (clack.util:namespace clack.middleware.session
   (:use :cl
-        :alexandria
-        :clack.component
-        :clack.middleware
         :clack.session.state
         :clack.session.store)
-  (:shadow :finalize :expire))
+  (:shadow :finalize :expire)
+  (:import-from :alexandria :hash-table-plist)
+  (:import-from :clack.component
+                :call)
+  (:import-from :clack.middleware
+                :<middleware>
+                :call-next))
 #.(rename-package :clack.session.state :clack.session.state '(state))
 
 (cl-annot:enable-annot-syntax)

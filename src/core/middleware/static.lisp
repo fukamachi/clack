@@ -15,12 +15,15 @@
 
 (clack.util:namespace clack.middleware.static
   (:use :cl
-        :alexandria
-        :cl-ppcre
-        :anaphora
-        :clack.component
-        :clack.middleware
-        :clack.app.file))
+        :anaphora)
+  (:import-from :clack.component :call)
+  (:import-from :clack.middleware
+                :<middleware>
+                :call-next)
+  (:import-from :clack.app.file
+                :<clack-app-file>)
+  (:import-from :alexandria
+                :starts-with-subseq))
 
 (cl-annot:enable-annot-syntax)
 

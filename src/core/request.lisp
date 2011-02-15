@@ -14,11 +14,18 @@
 
 (clack.util:namespace clack.request
   (:use :cl
-        :clack.util
-        :cl-ppcre
-        :flexi-streams
-        :metabang-bind
-        :anaphora)
+        :anaphora
+        :metabang-bind)
+  (:import-from :flexi-streams
+                :make-external-format
+                :make-flexi-stream)
+  (:import-from :cl-ppcre
+                :split
+                :scan-to-strings
+                :register-groups-bind)
+  (:import-from :clack.util
+                :getf-all
+                :merge-plist)
   (:export :request-method
            :script-name
            :path-info
@@ -83,9 +90,7 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
       (uploads :initarg :clack.uploads :initform nil :accessor uploads))
   (:documentation "Portable HTTP Request object for Clack Request."))
 
-(defmethod initialize-instance :after ((this <request>) &rest initargs)
-  (declare (ignore initargs))
-
+(defmethod initialize-instance :after ((this <request>) &key)
   ;; cookies
   (swhen (slot-value this 'http-cookie)
     (setf it (parameters->plist it)))
@@ -171,7 +176,7 @@ Make a <request> instance from request plist."
 
 (defun parse-content-type (content-type)
   "Parse Content-Type from Request header."
-  (register-groups-bind (type subtype params)
+  (ppcre:register-groups-bind (type subtype params)
       ("^(.+?)/([^;]+);?(?:(.+)|$)" content-type)
     (values
      (or type "application")

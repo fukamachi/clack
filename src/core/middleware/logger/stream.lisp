@@ -14,8 +14,8 @@
 |#
 
 (clack.util:namespace clack.logger.stream
-  (:use :cl)
-  (:import-from :anaphora :awhen :it)
+  (:use :cl
+        :anaphora)
   (:import-from :clack.logger :*logger-output*)
   (:import-from :clack.logger.base :<clack-logger-base> :output))
 

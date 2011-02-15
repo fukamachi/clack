@@ -14,9 +14,10 @@
 |#
 
 (clack.util:namespace clack.session.store
-  (:use :cl
-        :clack.util
-        :alexandria))
+  (:use :cl)
+  (:import-from :alexandria
+                :remove-from-plist)
+  (:import-from :clack.util :getf*))
 
 (cl-annot:enable-annot-syntax)
 

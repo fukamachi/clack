@@ -12,9 +12,11 @@
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
-(clack.util:namespace :clack.test
-  (:use :cl
-        :cl-test-more))
+(clack.util:namespace clack.test
+  (:use :cl)
+  (:import-from :cl-test-more
+                :diag
+                :deftest))
 
 (cl-annot:enable-annot-syntax)
 

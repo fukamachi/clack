@@ -15,13 +15,17 @@
 
 (clack.util:namespace clack.session.state.cookie
   (:use :cl
-        :alexandria
-        :clack.util
-        :clack.request
-        :clack.response
         :clack.session.state)
-  (:shadow :body)
-  (:shadowing-import-from :clack.session.state :finalize)
+  (:import-from :clack.request
+                :make-request
+                :cookies)
+  (:import-from :clack.util
+                :merge-plist)
+  (:import-from :alexandria
+                :remove-from-plist)
+  (:import-from :clack.response
+                :make-response
+                :set-cookies)
   (:export :path
            :domain
            :expires

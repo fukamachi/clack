@@ -14,11 +14,11 @@
 
 (clack.util:namespace clack.handler.apache
   (:use :cl
-        :clack.component
         :modlisp
-        :alexandria
-        :split-sequence
-        :metabang-bind))
+        :metabang-bind
+        :split-sequence)
+  (:import-from :clack.component :call)
+  (:import-from :alexandria :doplist))
 
 (cl-annot:enable-annot-syntax)
 

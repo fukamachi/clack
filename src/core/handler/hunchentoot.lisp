@@ -14,13 +14,13 @@
 
 (clack.util:namespace clack.handler.hunchentoot
   (:use :cl
-        :clack.component
         :hunchentoot
-        :split-sequence
-        :alexandria
         :anaphora
-        :flexi-streams)
-  (:shadow :stop))
+        :split-sequence)
+  (:shadow :stop)
+  (:import-from :clack.component :call)
+  (:import-from :flexi-streams
+                :make-external-format))
 
 (cl-annot:enable-annot-syntax)
 
