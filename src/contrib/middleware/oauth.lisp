@@ -1,3 +1,18 @@
+#|
+  This file is a part of Clack package.
+  URL: http://github.com/fukamachi/clack
+  Copyright (c) 2011 Eitarow Fukamachi <e.arrows@gmail.com>
+
+  Clack is freely distributable under the LLGPL License.
+|#
+
+#|
+  Clack.Middleware.OAuth
+  Supports authorization mechanism by OAuth.
+
+  Author: Norihisa Fujita <n.fujita@ariel-networks.com>
+|#
+
 (clack.util:namespace clack.middleware.oauth
   (:use :cl
         :clack

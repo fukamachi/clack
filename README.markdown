@@ -155,6 +155,7 @@ And you should get following response in time.
 
 ## Dependency
 
+* CL-ANNOT
 * CL-PPCRE
 * CL-FAD
 * Alexandria
@@ -163,6 +164,7 @@ And you should get following response in time.
 * metabang-bind
 * Hunchentoot
 * modlisp
+* cl-oauth
 
 ## Author
 
@@ -175,6 +177,7 @@ Copyright (c) 2011 Eitarow Fukamachi
 ## Contributors
 
 * Tomohiro Matsuyama
+* Norihisa Fujita
 
 ## License
 
