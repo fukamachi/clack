@@ -1,17 +1,20 @@
-(in-package :cl-user)
+(clack.util:namespace clack.middleware.oauth
+  (:use :cl
+        :anaphora
+        :metabang-bind
+        :clack.request
+        :clack.response)
+  (:import-from :clack.component
+                :call)
+  (:import-from :clack.middleware
+                :<middleware>
+                :call-next))
 
-(defpackage clack.middleware.oauth
-  (:use . (:cl
-           :anaphora
-           :metabang-bind
-           :clack.component
-           :clack.request
-           :clack.response
-           :clack.middleware))
-  (:export :<clack-middleware-oauth>))
+(cl-annot:enable-annot-syntax)
 
 (in-package :clack.middleware.oauth)
 
+@export
 (defclass <clack-middleware-oauth> (<middleware>)
      ((path :initarg :path :accessor oauth-path)
       (callback-base :initarg :callback-base :accessor oauth-callback-base)
@@ -24,7 +27,7 @@
       (state :initform (make-hash-table :test #'equal) :accessor oauth-state)
       (state-expire :initarg :state-expire :initform 60 :accessor oauth-state-expire)))
 
-(defmethod clack.component:call ((this <clack-middleware-oauth>) req)
+(defmethod call ((this <clack-middleware-oauth>) req)
   (if (not (string-equal (oauth-path this) (getf req :path-info)))
       (call-next this req)
       (authorize this (make-request req))))
@@ -36,8 +39,7 @@
                       :key (oauth-consumer-key this)
                       :secret (oauth-consumer-secret this))
                      :callback-uri (format nil "~a~a" (oauth-callback-base this) (oauth-path this))))
-         (state (oauth-state this))
-         (oauth-token (cl-oauth:token-key req-token)))
+         (state (oauth-state this)))
     (when (gethash (cl-oauth:token-key req-token) state)
       (error "OAuth request token collision is detected."))
     (setf (gethash (cl-oauth:token-key req-token) state)
@@ -77,9 +79,9 @@
   (cleanup-states this)
   (if (is-authorizing this req)
       (authorize-cont this req)
-      (authorize-init this req)))
+      (authorize-init this)))
 
-(defmethod authorize-init ((this <clack-middleware-oauth>) req)
+(defmethod authorize-init ((this <clack-middleware-oauth>))
   (let ((req-token (obtain-request-token-from-provider this))
         (res (make-response)))
     (redirect res (cl-oauth:make-authorization-uri (oauth-authorize-uri this) req-token))
