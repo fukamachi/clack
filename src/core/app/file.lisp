@@ -15,10 +15,8 @@
 
 (clack.util:namespace clack.app.file
   (:use :cl
+        :clack
         :anaphora)
-  (:import-from :clack.component
-                :<component>
-                :call)
   (:import-from :clack.util
                 :format-rfc1123-timestring)
   (:import-from :clack.util.hunchentoot

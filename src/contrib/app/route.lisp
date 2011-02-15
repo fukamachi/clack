@@ -18,7 +18,7 @@
 
 (clack.util:namespace clack.app.route
   (:use :cl
-        :clack.component)
+        :clack)
   (:import-from :cl-ppcre
                 :scan-to-strings
                 :split

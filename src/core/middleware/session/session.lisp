@@ -15,10 +15,9 @@
 
 (clack.util:namespace clack.middleware.session
   (:use :cl
+        :clack
         :clack.session.state
-        :clack.session.store
-        :clack.component
-        :clack.middleware)
+        :clack.session.store)
   (:shadow :finalize :expire)
   (:import-from :alexandria :hash-table-plist))
 #.(rename-package :clack.session.state :clack.session.state '(state))

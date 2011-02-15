@@ -17,7 +17,9 @@
   (:use :cl
         :anaphora)
   (:import-from :clack.logger :*logger-output*)
-  (:import-from :clack.logger.base :<clack-logger-base> :output))
+  (:import-from :clack.logger.base
+                :<clack-logger-base>
+                :output))
 
 (cl-annot:enable-annot-syntax)
 

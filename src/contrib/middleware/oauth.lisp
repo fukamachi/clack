@@ -1,15 +1,12 @@
 (clack.util:namespace clack.middleware.oauth
   (:use :cl
+        :clack
         :anaphora
         :metabang-bind
         :clack.request
-        :clack.response
-        :clack.component
-        :clack.middleware))
+        :clack.response))
 
 (cl-annot:enable-annot-syntax)
-
-(in-package :clack.middleware.oauth)
 
 @export
 (defclass <clack-middleware-oauth> (<middleware>)

@@ -14,9 +14,8 @@
 
 (clack.util:namespace clack.middleware.logger
   (:use :cl
-        :anaphora
-        :clack.component
-        :clack.middleware)
+        :clack
+        :anaphora)
   (:import-from :clack.logger
                 :*logger-output*
                 :*logger-format-string*
