@@ -65,6 +65,7 @@
                      (:file "apache")))
                    (:file "test")
                    (:file "test/suite" :depends-on ("test"))
+                   (:file "clack")
                    (:module "app"
                     :depends-on ("component")
                     :components
