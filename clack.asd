@@ -46,7 +46,8 @@
                 :components
                 ((:module "util"
                   :components
-                  ((:file "util")
+                  ((:file "doc")
+                   (:file "util")
                    (:file "hunchentoot")))
                  (:module "core"
                   :serial t
