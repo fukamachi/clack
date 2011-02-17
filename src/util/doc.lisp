@@ -40,20 +40,25 @@ because they append sections duplicately when the packaged is reloaded."
   (setf (documentation *package* t) ""))
 
 @export
-(defun section (header string &optional (level 1))
+(defun doc (header string &optional (level 1))
   "Set documentation to current package"
   (setf (documentation *package* t)
         (concatenate 'string
-                     (or (documentation *package* t) "")
-                     (format nil "~:[~;~:*~V@{~A~:*~}~* ~A~2%~]~A~%" level "#" header string))))
+                     (documentation *package* t)
+                     (section header string level))))
+
+@export
+(defun section (header string &optional (level 1))
+  (format nil "~:[~;~:*~V@{~A~:*~}~* ~A~2%~]~A~2&"
+          level "#" header string))
 
 #.`(progn
      ,@(loop for (fn-name sec) on *section-plist* by #'cddr
              collect
              `@export
                (defun ,(intern (symbol-name fn-name)) (string)
-                 (section ,sec
-                          (string-left-trim #(#\Newline) string)))))
+                 (doc ,sec
+                      (string-left-trim #(#\Newline) string)))))
 
 ;; Generator
 
@@ -110,7 +115,8 @@ because they append sections duplicately when the packaged is reloaded."
          (symbols (do-external-symbols (symb pkg symbols)
                     (push symb symbols))))
     (concatenate 'string
-                 (documentation pkg t)
+                 (or (documentation pkg t)
+                     (section "NAME" (package-name pkg)))
                  (section "EXTERNAL SYMBOLS"
                           (external-symbols-documentation symbols)))))
 
@@ -118,7 +124,7 @@ because they append sections duplicately when the packaged is reloaded."
 (defmethod generate-documentation ((system asdf:system))
   (apply #'concatenate
          'string
-         (or (ignore-errors (slot-value system 'asdf::description)) "")
+         (ignore-errors (slot-value system 'asdf::description))
          (mapcar #'generate-documentation (asdf-system-packages system))))
 
 (defun external-symbols-documentation (symbols)
