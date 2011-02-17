@@ -6,13 +6,6 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-#|
-  Clack.Middleware.OAuth
-  Supports authorization mechanism by OAuth.
-
-  Author: Norihisa Fujita <n.fujita@ariel-networks.com>
-|#
-
 (clack.util:namespace clack.middleware.oauth
   (:use :cl
         :clack
@@ -106,3 +99,23 @@
       (unless (remhash oauth-token (oauth-state this))
         (error "BUG"))
       (funcall (oauth-authorized this) req acc-token))))
+
+(doc:start)
+
+@doc:NAME "
+Clack.Middleware.OAuth - Supports authorization mechanism by OAuth.
+"
+
+@doc:SYNOPSIS "
+I don't know how to use this.
+Hey Fujita, would you write some documentation?
+Or, tell me how, someone :p -- Eitarow Fukamachi
+"
+
+@doc:DESCRIPTION "
+Blah Blah Blah.
+"
+
+@doc:AUTHOR "
+* Norihisa Fujita (n.fujita@ariel-networks.com)
+"
