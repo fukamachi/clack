@@ -6,12 +6,6 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-#|
-  Clack.Util
-
-  Author: Eitarow Fukamachi (e.arrows@gmail.com)
-|#
-
 (in-package :cl-user)
 (defpackage clack.util
   (:use :cl)
@@ -26,6 +20,8 @@
 
 @export
 (defmacro namespace (name &rest body)
+  "Similar to `defpackage', but the difference is ensure to be in :CL-USER before and to be in the new package after.
+This may be useful for 'one-package-per-one-file' style."
   `(progn
      (in-package :cl-user)
      (defpackage ,(symbol-name name) ,@body)
@@ -40,6 +36,7 @@
 
 @export
 (defmacro getf* (place key)
+  "Similar to `getf' but allows many types for the `key', String, Keyword or Symbol."
   `(getf ,place (normalize-key ,key)))
 
 @export
@@ -60,10 +57,16 @@
 
 @export
 (defun merge-plist (p1 p2)
-  "Merge two plist into one plist."
+  "Merge two plist into one plist.
+If same keys in two plist, second one will be adopted.
+
+Example:
+  (merge-plist '(:apple 1 :grape 2) '(:banana 3 :apple 4))
+  ;;=> (:GRAPE 2 :BANANA 3 :APPLE 4)
+"
   (loop with notfound = '#:notfound
         for (indicator value) on p1 by #'cddr
-        when (eq (getf p2 indicator notfound) notfound) 
+        when (eq (getf p2 indicator notfound) notfound)
           do (progn
                (push value p2)
                (push indicator p2)))
@@ -71,18 +74,25 @@
 
 ;; Duck Typing
 
-(defvar *previous-readtables* nil)
+(defvar *previous-readtables* nil
+  "Stack of readtables for duck-typing reader.")
 
 @export
 (defun duck-function (fn obj)
+  "Detect correct function for `obj'.
+The function should be interned a package which exports a class of `obj'."
   (symbol-function (intern (symbol-name fn) (symbol-package (type-of obj)))))
 
 @export
 (defmacro duckcall (fn obj &body body)
+  "Call `duck-function' of the `obj'.
+I supposed `enable-duck-reader' may help you."
   `(funcall (duck-function ,fn ,obj) ,obj ,@body))
 
 @export
 (defmacro duckapply (fn obj &body body)
+  "Apply `duck-function' of the `obj'.
+I supposed `enable-duck-reader' may help you."
   `(apply (duck-function ,fn ,obj) ,obj ,@body))
 
 (defun duck-reader (stream arg)
@@ -106,11 +116,17 @@
 
 @export
 (defmacro enable-duck-reader ()
+  "Enable duck-typing-reader.
+
+Example:
+  (&call app req)
+"
   `(eval-when (:compile-toplevel :load-toplevel :execute)
      (%enable-duck-reader)))
 
 @export
 (defmacro disable-duck-reader ()
+  "Disable duck-typing-reader if it is enabled."
   `(eval-when (:compile-toplevel :load-toplevel :execute)
      (%disable-duck-reader)))
 
@@ -131,3 +147,19 @@
   (format-timestring destination timestamp
                      :format +rfc-1123-format+
                      :timezone +gmt-zone+))
+
+(doc:start)
+
+@doc:NAME "
+Clack.Util - Utilities for Clack core or middleware development.
+"
+
+@doc:DESCRIPTION "
+Most of time, Clack uses other utility libraries (ex. Alexandria), but I realized they were not enough for Clack.
+
+See each description of these functions for detail.
+"
+
+@doc:AUTHOR "
+Eitarow Fukamachi (e.arrows@gmail.com)
+"
