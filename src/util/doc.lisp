@@ -64,6 +64,7 @@ because they append sections duplicately when the packaged is reloaded."
 
 (defvar *external-symbols-hash* nil)
 (defvar *external-symbols-list* nil)
+(defvar *asdf-system-packages* (make-hash-table :test #'equal))
 
 (defun gendoc (name &key type (description "") (arg-list nil))
   (format nil "
@@ -184,22 +185,21 @@ because they append sections duplicately when the packaged is reloaded."
      (loop for c in (slot-value comp 'asdf::components)
            append (asdf-component-files c)))))
 
-@export
-(defun asdf-system-packages (system)
+(defun asdf-system-reload (system)
   (let (*error-output*)
     (unless (typep system 'asdf::component)
       (setf system (asdf:find-system system)))
     (asdf:oos 'asdf:load-op system :verbose nil)
+    (setf (gethash (slot-value (asdf:find-system :clack) 'asdf::name) *asdf-system-packages*) nil)
     (setf *external-symbols-hash* (make-hash-table :test #'equal))
-    (let ((macroexpand-hook *macroexpand-hook*)
-          packages)
+    (let ((macroexpand-hook *macroexpand-hook*))
       (setf *macroexpand-hook*
             (lambda (fun form env)
               (when (and (consp form)
                          (ignore-errors (string (second form))))
                 (case (first form)
                   (cl:defpackage
-                   (push (second form) packages))
+                   (push (second form) (gethash (slot-value (asdf:find-system :clack) 'asdf::name) *asdf-system-packages*)))
                   ((cl:defun cl:defmacro)
                    (push (cons (second form) 'function)
                          (gethash (package-name *package*) *external-symbols-hash*)))
@@ -216,10 +216,18 @@ because they append sections duplicately when the packaged is reloaded."
                    (push (cons (second form) 'variable)
                          (gethash (package-name *package*) *external-symbols-hash*)))))
               (funcall macroexpand-hook fun form env)))
-      (prog2
-        (map nil #'load (asdf-component-files system))
-        packages
-        (setf *macroexpand-hook* macroexpand-hook)))))
+      (map nil #'load (asdf-component-files system))
+      (setf *macroexpand-hook* macroexpand-hook)
+      t)))
+
+@export
+(defun asdf-system-packages (system)
+  (let ((packages (gethash (slot-value system 'asdf::name)
+                           *asdf-system-packages*
+                           ':unprepared)))
+  (when (eq :unprepared packages)
+    (asdf-system-reload system))
+  packages))
 
 ;; Utility functions
 
