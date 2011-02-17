@@ -6,21 +6,22 @@ Clack is a Web Application Environment for Common Lisp inspired by Python's WSGI
 
     (defpackage simple-app
       (:use :cl
-            :clack.handler.hunchentoot))
-    
+            :clack))
     (in-package :simple-app)
     
-    (defvar app
+    (clackup
       #'(lambda (req)
           '(200 (:content-type "text/plain") ("Hello, Clack!"))))
-    
-    (run app)
 
-Now access [http://localhost:8080/](http://localhost:8080/) and Clack show you "Hello, Clack!".
+Now access [http://localhost:8080/](http://localhost:8080/) and Clack may show you "Hello, Clack!".
+
+## Installation
+
+TODO.
 
 ## Application
 
-Clack Application is a lambda. It takes exactly one argument, the "Request", and returns the "Response" as a list containing exactly three values.
+Clack Application is just a lambda. It takes exactly one argument, the "Request", and returns the "Response" as a list containing exactly three values.
 
     (defvar app
       #'(lambda (req)
@@ -86,10 +87,10 @@ Clack Applications run via Clack Handlers, which are in turn responsible for imp
 
 Now Clack Applications works on Hunchentoot and Apache, by using following handler.
 
-* clack.handler.hunchentoot
-* clack.handler.apache
+* Clack.Handler.Hunchentoot
+* Clack.Handler.Apache (not recommended because not tested well yet)
 
-If you hope them to run on other server (such as tpd2), you can write a handler for it easily.
+If you hope them to run on other server (such as teepeedee2), you can write a handler for it easily.
 
 ## Middleware
 
@@ -97,35 +98,18 @@ Middleware is one of the Clack Component. It takes another Application and runs 
 
 ### Bundle Middleware
 
-#### clack.middleware.static
-
-    (defpackage simple-app
-      (:use :cl
-            :clack.builder
-            :clack.handler.hunchentoot
-            :clack.middleware.static))
-    
-    (in-package :simple-app)
-    
-    (defvar app
-      (lambda (req)
-        '(200 (:content-type "text/plain") ("Hello, Clack!"))))
-    
-    (run
-     (builder
-      (<clack-middleware-static>
-       :path "/static"
-       :root #p"/public/")
-      app))
+* Clack.Middleware.Static - Serves static files.
+* Clack.Middleware.Logger - Logging in Clack Application or Middleware.
+* Clack.Middleware.Session - Session management.
+* Clack.Middleware.OAuth - Authorization by OAuth.
 
 ### How to write Middleware?
 
-All you have to do is to inherit from clack:<middleware> and then implement the callback <code>call</code> method (or <code>make-app</code> method that would return a function) to do the actual work. You can use <code>call-next</code> to call the original (wrapped) application.
+All you have to do is to inherit from `<middleware>' and then implement the callback <code>call</code> method (or <code>make-app</code> method that would return a function) to do the actual work. You can use <code>call-next</code> to call the original (wrapped) application.
 
     (defpackage clack.middleware.example
-      (:use :cl :clack.middleware)
+      (:use :cl :clack)
       (:export :<simple-middleware>))
-    
     (in-package :clack.middleware.example)
     
     (defclass <simple-middleware> (<middleware>) ())
@@ -136,17 +120,16 @@ All you have to do is to inherit from clack:<middleware> and then implement the 
 
     (defpackage simple-app
       (:use :cl
+            :clack
             :clack.builder
-            :clack.handler.hunchentoot
             :clack.middleware.example))
-    
     (in-package :simple-app)
     
     (defvar app
-      (lambda (req)
-        '(200 (:content-type "text/plain") ("Hello, Clack!"))))
+      #'(lambda (req)
+          '(200 (:content-type "text/plain") ("Hello, Clack!"))))
     
-    (run (builder <simple-middleware> app))
+    (clackup (builder <simple-middleware> app))
 
 And you should get following response in time.
 
@@ -168,7 +151,7 @@ And you should get following response in time.
 
 ## Author
 
-* Eitarow Fukamachi
+* Eitarow Fukamachi (e.arrows@gmail.com)
 
 ## Copyright
 
@@ -176,8 +159,8 @@ Copyright (c) 2011 Eitarow Fukamachi
 
 ## Contributors
 
-* Tomohiro Matsuyama
-* Norihisa Fujita
+* Tomohiro Matsuyama (tomo@cx4a.org)
+* Norihisa Fujita (n.fujita@ariel-networks.com)
 
 ## License
 
