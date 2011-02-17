@@ -6,12 +6,6 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-#|
-  Class for Clack Middleware.
-
-  Author: Eitarow Fukamachi (e.arrows@gmail.com)
-|#
-
 (clack.util:namespace clack.middleware
   (:use :cl)
   (:import-from :clack.component
@@ -36,3 +30,40 @@
 The function takes request plist."
   (setf (slot-value this 'app) app-or-middleware)
   #'(lambda (req) (call this req)))
+
+(doc:start)
+
+@doc:NAME "
+Clack.Middleware - Base Class for Clack Middleware.
+"
+
+@doc:SYNOPSIS "
+    (in-package :cl-user)
+    (defpackage clack.middleware.example
+      (:use :cl :clack)
+      (:export :<clack-middleware-example>))
+    (in-package :clack.middleware.example)
+    
+    (defclass <clack-middleware-example> (<middleware>) ())
+    (defmethod call ((this <clack-middleware-example>) req)
+      ;; pre-processing `req'
+      (let ((res (call-next this req)))
+        ;; post-processing `res'
+        res))
+"
+
+@doc:DESCRIPTION "
+Clack.Middleware is the base class to write Clack Middleware.
+
+All you have to do is to inherit from <code>&lt;middleware&gt;</code> and then implement the callback `call' method to do the actual work.
+
+Middleware is similar to ':around' method of CLOS. You can delegate some processes to Application (or next Middleware) to call `call-next'.
+"
+
+@doc:AUTHOR "
+  Author: Eitarow Fukamachi (e.arrows@gmail.com)
+"
+
+@doc:SEE "
+* Clack.Component
+"
