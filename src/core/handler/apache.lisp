@@ -6,12 +6,6 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-#|
-  Clack handler for Apache2 + mod_lisp.
-
-  Author: Eitarow Fukamachi (e.arrows@gmail.com)
-|#
-
 (clack.util:namespace clack.handler.apache
   (:use :cl
         :modlisp
@@ -98,3 +92,19 @@ This is called on each request."
           (force-output ml:*modlisp-socket*)
           (finish-output ml:*modlisp-socket*))
       (setf ml:*close-modlisp-socket* (not keep-alive-p)))))
+
+(doc:start)
+
+@doc:NAME "
+Clack.Handler.Apache - Clack handler for Apache2 + mod_lisp.
+"
+
+@doc:DESCRIPTION "
+Clack.Handler.Apache is a Clack handler for Apache2 + mod_lisp.
+
+This is not maintained well. Sorry.
+"
+
+@doc:AUTHOR "
+Eitarow Fukamachi (e.arrows@gmail.com)
+"

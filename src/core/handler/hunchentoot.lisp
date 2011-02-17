@@ -6,12 +6,6 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-#|
-  Clack handler for Hunchentoot.
-
-  Author: Eitarow Fukamachi (e.arrows@gmail.com)
-|#
-
 (clack.util:namespace clack.handler.hunchentoot
   (:use :cl
         :hunchentoot
@@ -163,3 +157,29 @@ before pass to Clack application."
     (lambda (request)
       (handler-bind ((error #'invoke-debugger))
         (funcall dispatcher request)))))
+
+(doc:start)
+
+@doc:NAME "
+Clack.Handler.Hunchentoot - Clack handler for Hunchentoot.
+"
+
+@doc:SYNOPSIS "
+    (defpackage clack-test
+      (:use :cl
+            :clack.handler.hunchentoot))
+    (in-package :clack-test)
+    
+    ;; Start Server
+    (run (lambda (req)
+           '(200 nil (\"ok\")))
+         :port 8080)
+"
+
+@doc:DESCRIPTION "
+Clack.Handler.Hunchentoot is a Clack handler for Hunchentoot, Lisp web server. This package exports `run' and `stop'.
+"
+
+@doc:AUTHOR "
+Eitarow Fukamachi (e.arrows@gmail.com)
+"
