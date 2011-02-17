@@ -6,12 +6,6 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-#|
-  Logging utility for Clack.
-
-  Author: Eitarow Fukamachi (e.arrows@gmail.com)
-|#
-
 (clack.util:namespace clack.logger
   (:use :cl)
   (:import-from :local-time
@@ -82,3 +76,17 @@ Example:
     (:critical +critical+)
     (:alert +alert+)
     (:emergency +emergency+)))
+
+(doc:start)
+
+@doc:NAME "
+Clack.Logger - Logging utility for Clack.
+"
+
+@doc:AUTHOR "
+Eitarow Fukamachi (e.arrows@gmail.com)
+"
+
+@doc:SEE "
+* Clack.Middleware.Logger
+"
