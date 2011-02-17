@@ -6,12 +6,6 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-#|
-  Portable HTTP Response object for Clack response.
-
-  Author: Eitarow Fukamachi (e.arrows@gmail.com)
-|#
-
 (clack.util:namespace clack.response
   (:use :cl
         :anaphora)
@@ -165,58 +159,40 @@ Example:
   "body must be a list."
   (if (stringp body) (list body) body))
 
-#|
-=markdown
+(doc:start)
 
-# NAME
+@doc:NAME "
+Clack.Response - Portable HTTP Response object for Clack response.
+"
 
-clack.response - Provide easy accessing to Clack Request.
-
-# SYNOPSIS
-
+@doc:SYNOPSIS "
     (defvar res nil)
     
     (setf res (make-response 200))
-    (setf res (make-response 200 '(:content-type "text/html")))
-    (setf res (make-response 200 '(:content-type "text/html") '("aiueo")))
+    (setf res (make-response 200 '(:content-type \"text/html\")))
+    (setf res (make-response 200 '(:content-type \"text/html\") '(\"aiueo\")))
     
     ;; Access each fields
     (status res)
     ;;=> 200
     (headers res)
-    ;;=> (:content-type "text/html")
+    ;;=> (:content-type \"text/html\")
     (headers res :content-type)
-    ;;=> "text/html"
+    ;;=> \"text/html\"
     (body res)
-    ;;=> ("aiueo")
+    ;;=> (\"aiueo\")
     
     ;; Set to each fields
     (setf (status res) 304)
-    (setf (headers res :content-type) "text/plain")
-    (setf (body res) '("moved"))
-    (setf (body res) "moved") ;; string also allowed
+    (setf (headers res :content-type) \"text/plain\")
+    (setf (body res) '(\"moved\"))
+    (setf (body res) \"moved\") ;; string also allowed
+"
 
-# DESCRIPTION
+@doc:DESCRIPTION "
+Clack.Response allows you a way to create Clack response.
+"
 
-clack.response allows you a way to create Clack response.
-
-## Functions
-
-* make-response
-* status
-* headers
-* body
-* finalize
-* set-cookies
-* redirect
-
-# AUTHOR
-
-* Eitarow Fukamachi
-
-# COPYRIGHT AND LICENSE
-
-Copyright 2011 (c) Eitarow Fukamachi  
-Licensed under the LLGPL License.
-
-|#
+@doc:AUTHOR "
+* Eitarow Fukamachi (e.arrows@gmail.com)
+"
