@@ -65,14 +65,6 @@ because they append sections duplicately when the packaged is reloaded."
 (defvar *external-symbols-hash* nil)
 (defvar *external-symbols-list* nil)
 
-@export
-(defvar *external-symbols-sort-function*
-    #'(lambda (a b)
-        (> (or (position a
-                         *external-symbols-list*) -1)
-           (or (position b
-                         *external-symbols-list*) -1))))
-
 (defun gendoc (name &key type (description "") (arg-list nil))
   (format nil "
 - ~:(~A~): ~(~A~)~:[~;~:* [~{~(~A~)~^ ~}]~]~:[~;~:*
@@ -121,7 +113,7 @@ because they append sections duplicately when the packaged is reloaded."
                      (section "NAME" (string-capitalize (package-name pkg))))
                  (section "EXTERNAL SYMBOLS"
                           (external-symbols-documentation
-                           (nreverse symbol-list)
+                           (reverse symbol-list)
                            pkg)))))
 
 @export
