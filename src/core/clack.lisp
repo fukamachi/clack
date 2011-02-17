@@ -26,8 +26,10 @@
 (cl-annot:enable-annot-syntax)
 
 @export
-(defun clackup (app &key (handler-name :hunchentoot) (port 8080) debug)
-  "
+(defun clackup (app &key (server :hunchentoot) (port 8080) debug)
+  "Easy way to run Clack Application.
+You can specify backend server with passing `:server'. The default is `:hunchentoot'.
+
 Example:
   (clackup (lambda (req)
              (declare (ignore req))
@@ -35,8 +37,15 @@ Example:
            :port 8080
            :debug t)
 "
-  @ignore (app handler-name port debug)
-  (error "TODO"))
+  (let* ((handler-name (concatenate 'string
+                                    "CLACK.HANDLER."
+                                    (symbol-name server)))
+         (handler (or (find-package handler-name)
+                      (error "Handler package is not found. Forgot to load it?: ~A"
+                             handler-name))))
+    (funcall (intern "RUN" handler) app
+             :port port
+             :debug debug)))
 
 (doc:start)
 
@@ -45,6 +54,11 @@ Clack main package just for convenience.
 "
 
 @doc:SYNOPSIS "
+    (clackup (lambda (req)
+               (declare (ignore req))
+               '(200 nil (\"Hello, Clack!\")))
+             :port 8080
+             :debug t)
 "
 
 @doc:DESCRIPTION "
