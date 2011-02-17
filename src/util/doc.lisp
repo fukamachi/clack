@@ -118,7 +118,7 @@ because they append sections duplicately when the packaged is reloaded."
 (defmethod generate-documentation ((system asdf:system))
   (apply #'concatenate
          'string
-         (slot-value system 'asdf::description)
+         (or (ignore-errors (slot-value system 'asdf::description)) "")
          (mapcar #'generate-documentation (asdf-system-packages system))))
 
 (defun external-symbols-documentation (symbols)
