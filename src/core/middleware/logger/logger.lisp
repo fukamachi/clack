@@ -6,12 +6,6 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-#|
-  Clack Middleware for logging.
-
-  Author: Eitarow Fukamachi (e.arrows@gmail.com)
-|#
-
 (clack.util:namespace clack.middleware.logger
   (:use :cl
         :clack
@@ -56,3 +50,40 @@ If nil, won't output any logs.")
   "Output log messages."
   (prog1 (call-next this req)
          (awhen (logger this) (output it))))
+
+(doc:start)
+
+@doc:NAME "
+Clack.Middleware.Logger - Clack Middleware for logging.
+"
+
+@doc:SYNOPSIS "
+    ;; Output log messages.
+    (clackup (builder
+              <clack-middleware-logger>
+              (lambda (req)
+                (log-message :notice \"You've got an access!\")
+                '(200 nil (\"ok\")))))
+    
+    ;; Output log messages to other place.
+    (clackup (builder
+              (<clack-middleware-logger>
+               :logger (make-instance '<clack-logger-file>))
+              (lambda (req)
+                (log-message :notice \"You've got an access!\")
+                '(200 nil (\"ok\")))))
+"
+
+@doc:DESCRIPTION "
+Clack.Middleware.Logger allows you logging message without stopping process. You can customize minimum level to log, format of messages, and where to output them.
+
+Currently, Clack.Middleware.Logger can have only one logger. Sorry to the uncovinient.
+"
+
+@doc:AUTHOR "
+Eitarow Fukamachi (e.arrows@gmail.com)
+"
+
+@doc:SEE "
+* Clack.Logger
+"

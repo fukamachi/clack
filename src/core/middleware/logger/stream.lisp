@@ -6,13 +6,6 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-#|
-  Clack.Logger.Stream
-  Output log messages to stream.
-
-  Author: Eitarow Fukamachi (e.arrows@gmail.com)
-|#
-
 (clack.util:namespace clack.logger.stream
   (:use :cl
         :anaphora)
@@ -32,3 +25,34 @@
   "Output log messages to 'output-stream' in this slot."
   (awhen (get-output-stream-string *logger-output*)
     (write-string it (output-stream this))))
+
+(doc:start)
+
+@doc:NAME "
+Clack.Logger.Stream - Output log messages to stream.
+"
+
+@doc:SYNOPSIS "
+    (clackup (builder
+              (<clack-middleware-logger>
+               :logger (make-instance '<clack-logger-stream>))
+              (lambda (req)
+                (log-message :notice \"You've got an access!\")
+                '(200 nil (\"ok\")))))
+"
+
+@doc:DESCRIPTION "
+Clack.Logger.Stream is a logger outputs log messages to stream, `*standard-output*' for default.
+
+This logger is used in Clack.Middleware.Logger as a default logger.
+"
+
+@doc:AUTHOR "
+Eitarow Fukamachi (e.arrows@gmail.com)
+"
+
+@doc:SEE "
+* Clack.Logger.Base
+* Clack.Middleware.Logger
+* Clack.Logger
+"

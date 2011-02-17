@@ -55,7 +55,7 @@ Clack.Middleware - Base Class for Clack Middleware.
 @doc:DESCRIPTION "
 Clack.Middleware is the base class to write Clack Middleware.
 
-All you have to do is to inherit from <code>&lt;middleware&gt;</code> and then implement the callback `call' method to do the actual work.
+All you have to do is to inherit from `<middleware>' and then implement the callback `call' method to do the actual work.
 
 Middleware is similar to ':around' method of CLOS. You can delegate some processes to Application (or next Middleware) to call `call-next'.
 "
