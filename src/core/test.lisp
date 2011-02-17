@@ -6,12 +6,6 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-#|
-  Testing Clack Applications.
-
-  Author: Eitarow Fukamachi (e.arrows@gmail.com)
-|#
-
 (clack.util:namespace clack.test
   (:use :cl)
   (:import-from :cl-test-more
@@ -53,3 +47,43 @@
   `(deftest ,desc
        (let ((*enable-debug-p* ,enable-debug-p))
          (test-app ,app ,client))))
+
+(doc:start)
+
+@doc:NAME "
+Clack.Test - Testing Clack Applications.
+"
+
+@doc:SYNOPSIS "
+    (defpackage clack-test.sample
+      (:use :cl
+            :clack.test
+            :cl-test-more
+            :drakma))
+    (in-package :clack-test.sample)
+    
+    (test-app
+     (lambda (req)
+       (declare (ignore req))
+       `(200 (:content-type \"text/plain\") (\"Hello, Clack!\")))
+     (lambda ()
+       (multiple-value-bind (body status headers)
+           (http-request \"http://localhost:4242\")
+         (is status 200)
+         (is body \"Hello, Clack!\")
+         (is (getf headers :content-type) \"text/plain\")))
+     \"Testing simple application\")
+"
+
+@doc:DESCRIPTION "
+Clack.Test provides simple interface to test Clack Application or Middleware.
+"
+
+@doc:AUTHOR "
+Eitarow Fukamachi (e.arrows@gmail.com)
+"
+
+@doc:SEE "
+* [CL-TEST-MORE](https://github.com/fukamachi/cl-test-more)
+* Drakma
+"
