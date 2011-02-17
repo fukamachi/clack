@@ -7,15 +7,6 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-#|
-  Clack.App.Route.
-  URL dispatcher.
-
-  Author: Tomohiro Matsuyama <tomo@cx4a.org>
-|#
-
-(in-package :cl-user)
-
 (clack.util:namespace clack.app.route
   (:use :cl
         :clack)
@@ -68,3 +59,33 @@
              ,(if otherwise
                   `(call ,(cadr otherwise) ,req)
                   '(list 404 nil nil)))))))
+
+(doc:start)
+
+@doc:NAME "
+Clack.App.Route - URL dispatcher.
+"
+
+@doc:SYNOPSIS "
+    (defpackage clack-sample
+      (:use :cl
+            :clack
+            :clack.app.route))
+    (in-package :clack-sample)
+    
+    (defroute app (req)
+      (GET \"/\" #'index)
+      (GET \"/login\" #'login)
+      (POST \"/login\" #'authorize)
+      (GET \"/member/:id\" #'member))
+    
+    (clackup #'app)
+"
+
+@doc:DESCRIPTION "
+Clack.App.Route provides an URL based dispacher, inspired by Ruby's Sinatra.
+"
+
+@doc:AUTHOR "
+* Tomohiro Matsuyama (tomo@cx4a.org)
+"
