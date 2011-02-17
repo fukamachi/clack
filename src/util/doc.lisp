@@ -136,10 +136,6 @@ because they append sections duplicately when the packaged is reloaded."
                         *external-symbols-sort-function*)))))
 
 @export
-(defmethod generate-documentation ((key keyword))
-  (generate-documentation (intern (symbol-name key))))
-
-@export
 (defmethod generate-documentation ((class standard-class))
   (gendoc (class-name class)
           :type "Class"

@@ -45,6 +45,7 @@
                 :serial t
                 :components
                 ((:module "util"
+                  :serial t
                   :components
                   ((:file "doc")
                    (:file "util")
