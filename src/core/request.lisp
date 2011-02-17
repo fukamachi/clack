@@ -6,12 +6,6 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-#|
-  Portable HTTP Request object for Clack Request.
-
-  Author: Eitarow Fukamachi (e.arrows@gmail.com)
-|#
-
 (clack.util:namespace clack.request
   (:use :cl
         :anaphora
@@ -186,42 +180,24 @@ Make a <request> instance from request plist."
                            "charset=([^; ]+)" params))
              (aref it 0))))))
 
-#|
-=markdown
+(doc:start)
 
-# NAME
+@doc:NAME "
+Clack.Request - Portable HTTP Request object for Clack Request.
+"
 
-clack.request - Portable HTTP Request object for Clack Request.
-
-# SYNOPSIS
-
+@doc:SYNOPSIS "
     (defun app (req)
       (let ((req (make-request req)))
       `(200
-        (:content-type "text/plain")
-        ("Hello, " (query-parameters req "name)))))
+        (:content-type \"text/plain\")
+        (\"Hello, \" (query-parameters req \"name)))))
+"
 
-# DESCRIPTION
+@doc:DESCRIPTION "
+Clack.Request provides a consistent API for request objects.
+"
 
-clack.request provides a consistent API for request objects.
-
-## <request>
-
-## Functions
-
-* make-request
-* query-parameters
-* body-parameters
-* parameters
-* cookies
-
-# AUTHOR
-
-* Eitarow Fukamachi
-
-# COPYRIGHT AND LICENSE
-
-Copyright 2011 (c) Eitarow Fukamachi  
-Licensed under the LLGPL License.
-
-|#
+@doc:AUTHOR "
+* Eitarow Fukamachi (e.arrows@gmail.com)
+"
