@@ -105,7 +105,7 @@ Middleware is one of the Clack Component. It takes another Application and runs 
 
 ### How to write Middleware?
 
-All you have to do is to inherit from `<middleware>' and then implement the callback <code>call</code> method (or <code>make-app</code> method that would return a function) to do the actual work. You can use <code>call-next</code> to call the original (wrapped) application.
+All you have to do is to inherit from <code>&lt;middleware&gt;</code> and then implement the callback <code>call</code> method (or <code>make-app</code> method that would return a function) to do the actual work. You can use <code>call-next</code> to call the original (wrapped) application.
 
     (defpackage clack.middleware.example
       (:use :cl :clack)
