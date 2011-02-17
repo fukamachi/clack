@@ -6,13 +6,6 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-#|
-  Clack.Middleware.Session.
-  Middleware for session management.
-
-  Author: Eitarow Fukamachi (e.arrows@gmail.com)
-|#
-
 (clack.util:namespace clack.middleware.session
   (:use :cl
         :clack
@@ -28,7 +21,7 @@
 (defclass <clack-middleware-session> (<middleware>)
      ((state :initarg :state
              :initform
-             (make-instance '<clack-session-state>)
+             (make-instance '<clack-session-state-cookie>)
              :accessor state)
       (store :initarg :store
              :initform
@@ -86,3 +79,39 @@
    (state this)
    id res
    (hash-table-plist (getf req :clack.session.options))))
+
+(doc:start)
+
+@doc:NAME "
+Clack.Middleware.Session - Middleware for session management.
+"
+
+@doc:SYNOPSIS "
+    (clackup (builder
+              (<clack-middleware-session>
+               :state (make-instance '<clack-session-state-cookie>))
+              (lambda (req)
+                (sunless (gethash :counter (getf req :clack.session))
+                  (setf it 0))
+                `(200
+                  (:content-type \"text/plain\")
+                  (,(format nil \"Hello, you've been here for ~Ath times!\"
+                            (incf (gethash :counter (getf req :clack.session)))))))))
+"
+
+@doc:DESCRIPTION "
+Clack.Middleware.Session provides you session interface. By default this will use cookies to keep session state and store data in memory.
+
+You can change this behavior to inherit `<clack-session-state>' and `<clack-session-store>'.
+
+Note the `:clack.session' is a hash table, not a plist, because plist cannot keep state between functions.
+"
+
+@doc:AUTHOR "
+Eitarow Fukamachi (e.arrows@gmail.com)
+"
+
+@doc:SEE "
+* Clack.Session.State
+* Clack.Session.Store
+"

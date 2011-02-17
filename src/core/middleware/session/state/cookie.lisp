@@ -6,13 +6,6 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-#|
-  Clack.Session.State.Cookie
-  Basic cookie-based session state
-
-  Author: Eitarow Fukamachi (e.arrows@gmail.com)
-|#
-
 (clack.util:namespace clack.session.state.cookie
   (:use :cl
         :clack.session.state)
@@ -79,3 +72,22 @@
     (setf (set-cookies r (session-key this))
           (append `(:value ,id) options))
     (clack.response:finalize r)))
+
+(doc:start)
+
+@doc:NAME "
+Clack.Session.State.Cookie - Basic cookie-based session state.
+"
+
+@doc:DESCRIPTION "
+Clack.Session.State.Cookie will maintain session state using browser cookies.
+"
+
+@doc:AUTHOR "
+Eitarow Fukamachi (e.arrows@gmail.com)
+"
+
+@doc:SEE "
+* Clack.Session.State
+* Clack.Middleware.Session
+"

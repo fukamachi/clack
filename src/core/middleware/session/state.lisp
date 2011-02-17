@@ -6,13 +6,6 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-#|
-  Clack.Session.State
-  Basic parameter-based session state.
-
-  Author: Eitarow Fukamachi (e.arrows@gmail.com)
-|#
-
 (clack.util:namespace clack.session.state
   (:use :cl
         :anaphora)
@@ -74,3 +67,21 @@
 (defmethod finalize ((this <clack-session-state>) id res options)
   @ignore (this id options)
   res)
+
+(doc:start)
+
+@doc:NAME "
+Clack.Session.State - Basic parameter-based session state.
+"
+
+@doc:DESCRIPTION "
+Clack.Session.State maintains session state by passing the session through the request params. Usually you wouldn't use this because this cannot keep session through each HTTP request. This is just for creating new session state manager.
+"
+
+@doc:AUTHOR "
+Eitarow Fukamachi (e.arrows@gmail.com)
+"
+
+@doc:SEE "
+* Clack.Middleware.Session
+"

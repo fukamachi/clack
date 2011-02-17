@@ -6,13 +6,6 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-#|
-  Clack.Session.Store
-  Basic in-memory session store
-
-  Author: Eitarow Fukamachi (e.arrows@gmail.com)
-|#
-
 (clack.util:namespace clack.session.store
   (:use :cl)
   (:import-from :alexandria
@@ -36,3 +29,21 @@
 @export
 (defmethod remove-session ((this <clack-session-store>) sid)
   (remove-from-plistf (stash this) sid))
+
+(doc:start)
+
+@doc:NAME "
+Clack.Session.Store - Basic in-memory session store.
+"
+
+@doc:DESCRIPTION "
+Clack.Session.Store is basic in-memory session data store. This is volatile storage and not recommended for multiprocessing environments. However this is very useful for development and testing.
+"
+
+@doc:AUTHOR "
+Eitarow Fukamachi (e.arrows@gmail.com)
+"
+
+@doc:SEE "
+* Clack.Middleware.Session
+"
