@@ -6,13 +6,6 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-#|
-  Clack.Middleware.Static.
-  Middleware to serve static files.
-
-  Author: Eitarow Fukamachi (e.arrows@gmail.com)
-|#
-
 (clack.util:namespace clack.middleware.static
   (:use :cl
         :clack
@@ -58,24 +51,22 @@
                 (call-next this req))))
         (call-next this req))))
 
-#|
-=markdown
+(doc:start)
 
-# NAME
+@doc:NAME "
+Clack.Middleware.Static - Middleware to serve static files.
+"
 
-clack.middleware.static - Middleware for serving static files.
-
-# SYNOPSIS
-
+@doc:SYNOPSIS "
     (run
       (builder
        (<clack-middleware-static>
-        :path "/public/"
-        :root #p"/static-files/")
+        :path \"/public/\"
+        :root #p\"/static-files/\")
        app))
+"
 
-# DESCRIPTION
-
+@doc:DESCRIPTION "
 This is a Clack Middleware component for serving static files.
 
 ## Slots
@@ -84,21 +75,21 @@ This is a Clack Middleware component for serving static files.
 
 <code>path</code> specifies the prefix of URL or a callback to match with requests to serve static files for.
 
-Notice. Don't forget to add slush "/" to the end.
+Notice. Don't forget to add slush \"/\" to the end.
 
 * root (Optional, Pathname)
 
 <code>root</code> specifies the root directory to serve static files from.
+"
 
-## Example
-
+@doc:EXAMPLE "
 Following example code would serve */public/foo.jpg* from */static-files/foo.jpg*.
 
     (run
       (builder
        (<clack-middleware-static>
-        :path "/public/"
-        :root #p"/static-files/")
+        :path \"/public/\"
+        :root #p\"/static-files/\")
        app))
 
 You can set any function that returns mapped filename, for <code>:path</code>. Above example is able to be rewritten as following code.
@@ -106,18 +97,16 @@ You can set any function that returns mapped filename, for <code>:path</code>. A
     (run
       (builder
        (<clack-middleware-static>
-        :path (lambda (path) (and (ppcre:scan path "^/public/")
+        :path (lambda (path) (and (ppcre:scan path \"^/public/\")
                               (subseq path 7)))
-        :root #p"/static-files/")
+        :root #p\"/static-files/\")
        app))
+"
 
-# AUTHOR
+@doc:AUTHOR "
+* Eitarow Fukamachi (e.arrows@gmail.com)
+"
 
-* Eitarow Fukamachi
-
-# COPYRIGHT AND LICENSE
-
-Copyright 2011 (c) Eitarow Fukamachi  
-Licensed under the LLGPL License.
-
-|#
+@doc:SEE "
+* Clack.App.File
+"
