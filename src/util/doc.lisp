@@ -49,8 +49,8 @@ because they append sections duplicately when the packaged is reloaded."
 
 @export
 (defun section (header string &optional (level 1))
-  (format nil "~:[~;~:*~V@{~A~:*~}~* ~A~2%~]~A~2&"
-          level "#" header string))
+  (format nil "~:[~;~:*~V@{~A~:*~}~* ~A~2&~]~A~2&"
+          level "#" header (string-left-trim #(#\Newline) string)))
 
 #.`(progn
      ,@(loop for (fn-name sec) on *section-plist* by #'cddr
@@ -62,17 +62,16 @@ because they append sections duplicately when the packaged is reloaded."
 
 ;; Generator
 
-@export
-(defvar *external-symbols-order*
-    '(package constant variable class struct generic method function macro))
+(defvar *external-symbols-hash* nil)
+(defvar *external-symbols-list* nil)
 
 @export
 (defvar *external-symbols-sort-function*
     #'(lambda (a b)
-        (< (or (position (type-of* a)
-                         *external-symbols-order*) 100)
-           (or (position (type-of* b)
-                         *external-symbols-order*) 100))))
+        (> (or (position a
+                         *external-symbols-list*) -1)
+           (or (position b
+                         *external-symbols-list*) -1))))
 
 (defun gendoc (name &key type (description "") (arg-list nil))
   (format nil "
@@ -85,6 +84,7 @@ because they append sections duplicately when the packaged is reloaded."
 
 (defun type-of* (symb)
   (cond
+    ((keywordp symb) (type-of* (intern (symbol-name symb))))
     ((typep (find-class symb nil) 'structure-class) 'struct)
     ((find-class symb nil) 'class)
     ((declared-special-p symb) (if (constantp symb) 'constant 'variable))
@@ -103,7 +103,7 @@ because they append sections duplicately when the packaged is reloaded."
     ((constant variable) (generate-variable-documentation symb))
     ((function generic macro) (generate-function-documentation symb))
     (package (generate-documentation (find-package symb)))
-    (system (mapcar #'generate-documentation (asdf-system-packages symb)))))
+    (system (generate-documentation (asdf:find-system symb)))))
 
 @export
 (defmethod generate-documentation ((str string))
@@ -111,29 +111,41 @@ because they append sections duplicately when the packaged is reloaded."
 
 @export
 (defmethod generate-documentation ((pkg package))
-  (let* (symbols
-         (symbols (do-external-symbols (symb pkg symbols)
-                    (push symb symbols))))
+  (let* (symbol-list
+         (symbol-list (if *external-symbols-hash*
+                          (gethash (package-name pkg) *external-symbols-hash*)
+                          (do-external-symbols (symb pkg symbol-list)
+                            (push (cons symb nil) symbol-list)))))
     (concatenate 'string
                  (or (documentation pkg t)
-                     (section "NAME" (package-name pkg)))
+                     (section "NAME" (string-capitalize (package-name pkg))))
                  (section "EXTERNAL SYMBOLS"
-                          (external-symbols-documentation symbols)))))
+                          (external-symbols-documentation
+                           (nreverse symbol-list)
+                           pkg)))))
 
 @export
 (defmethod generate-documentation ((system asdf:system))
-  (apply #'concatenate
-         'string
-         (ignore-errors (slot-value system 'asdf::description))
-         (mapcar #'generate-documentation (asdf-system-packages system))))
+  (let ((packages (asdf-system-packages system)))
+    (apply
+     #'concatenate
+     'string
+     (ignore-errors (slot-value system 'asdf::description))
+     (mapcar #'generate-documentation (nreverse packages)))))
 
-(defun external-symbols-documentation (symbols)
-  (string-left-trim
-   #(#\Newline)
-   (apply #'concatenate 'string
-          (mapcar #'generate-documentation
-                  (sort symbols
-                        *external-symbols-sort-function*)))))
+(defun external-symbols-documentation (symbol-list pkg)
+  (let* (exported
+         (exported (do-external-symbols (s pkg exported)
+                     (push s exported))))
+    (apply #'concatenate 'string
+           (loop for symb in symbol-list
+                 if (member (car symb) exported)
+                   collect
+                   (ecase (cdr symb)
+                     (variable (generate-variable-documentation (car symb)))
+                     (function (generate-function-documentation (car symb)))
+                     (class (generate-documentation (find-class (car symb))))
+                     ((nil) (generate-documentation (car symb))))))))
 
 @export
 (defmethod generate-documentation ((class standard-class))
@@ -182,21 +194,38 @@ because they append sections duplicately when the packaged is reloaded."
 
 @export
 (defun asdf-system-packages (system)
-  (let (*standard-output* *error-output*)
+  (let (*error-output*)
     (unless (typep system 'asdf::component)
       (setf system (asdf:find-system system)))
     (asdf:oos 'asdf:load-op system :verbose nil)
+    (setf *external-symbols-hash* (make-hash-table :test #'equal))
     (let ((macroexpand-hook *macroexpand-hook*)
           packages)
       (setf *macroexpand-hook*
             (lambda (fun form env)
               (when (and (consp form)
-                         (eq (first form) 'cl:defpackage)
                          (ignore-errors (string (second form))))
-                (push (cadr form) packages))
+                (case (first form)
+                  (cl:defpackage
+                   (push (second form) packages))
+                  ((cl:defun cl:defmacro)
+                   (push (cons (second form) 'function)
+                         (gethash (package-name *package*) *external-symbols-hash*)))
+                  ((cl:defmethod cl:defgeneric)
+                   (unless (member (cons (second form) 'function)
+                                   (gethash (package-name *package*) *external-symbols-hash*)
+                                   :test #'equal)
+                     (push (cons (second form) 'function)
+                           (gethash (package-name *package*) *external-symbols-hash*))))
+                  ((cl:defclass cl:defstruct)
+                   (push (cons (second form) 'class)
+                         (gethash (package-name *package*) *external-symbols-hash*)))
+                  ((cl:defconstant cl:defparameter cl:defvar)
+                   (push (cons (second form) 'variable)
+                         (gethash (package-name *package*) *external-symbols-hash*)))))
               (funcall macroexpand-hook fun form env)))
       (prog2
-        (mapcar #'load (asdf-component-files system))
+        (map nil #'load (asdf-component-files system))
         packages
         (setf *macroexpand-hook* macroexpand-hook)))))
 
