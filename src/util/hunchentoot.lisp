@@ -6,13 +6,6 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-#|
-  Clack.Util.Hunchentoot
-  This package is ported from Hunchentoot, Lisp Web server.
-
-  Only these function and variables, in this file, under BSD-style license.
-|#
-
 ;;; Copyright (c) 2004-2010, Dr. Edmund Weitz. All rights reserved.
 
 ;;; Redistribution and use in source and binary forms, with or without
@@ -501,3 +494,23 @@ the external format EXTERNAL-FORMAT."
                                                                :end (1+ index)
                                                                :external-format external-format)
                             do (format s "%~2,'0x" octet)))))))
+
+(doc:start)
+
+@doc:NAME "
+Clack.Util.Hunchentoot - This package is ported from Hunchentoot, Lisp Web server.
+"
+
+@doc:DESCRIPTION "
+Hunchentoot is great product, but it is too huge as a Web server. It has also useful utility.
+Though I don't like to Clack depends on Hunchentoot. So, I had decided to port needed utilities in Hunchentoot to this package.
+
+From such details, only these function and variables, in this file, under BSD-style license, same as Hunchentoot's one.
+
+Thanks Edi!
+"
+
+@doc:AUTHOR "
+* Eitarow Fukamachi (e.arrows@gmail.com)
+* Dr. Edmund Weitz [Original Writer]
+"
