@@ -6,12 +6,6 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-#|
-  Test suite for Clack handlers.
-
-  Author: Eitarow Fukamachi (e.arrows@gmail.com)
-|#
-
 (clack.util:namespace clack.test.suite
   (:use :cl
         :anaphora
@@ -452,3 +446,31 @@ you would call like this: `(run-server-tests :foo)'."
       (is status 200)
       (is (get-header headers :content-type) "text/plain")
       (is body "/foo///bar/baz"))))
+
+(doc:start)
+
+@doc:NAME "
+Clack.Test.Suite - Test suite for Clack handlers.
+"
+
+@doc:SYNOPSIS "
+    ;; Tests Clack.Handler.Hunchentoot.
+    (clack.test.suite:run-server-tests :hunchentoot)
+    
+    ;; Tests one test.
+    (clack.test.suite:run-server-tests :hunchentoot '|% double encoding in PATH-INFO|)
+"
+
+@doc:DESCRIPTION "
+Clack.Test.Suite is a test suite to test a new Clack server implementation. It automatically loads a new handler environment and uses Drakma to send HTTP requests to the local server to make sure your handler implements the Clack specification correctly.
+
+Your Lisp have to support multi-thread to run these tests.
+"
+
+@doc:AUTHOR "
+Eitarow Fukamachi (e.arrows@gmail.com)
+"
+
+@doc:SEE "
+* Clack.Test
+"

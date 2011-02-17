@@ -77,6 +77,8 @@ Clack.Test - Testing Clack Applications.
 
 @doc:DESCRIPTION "
 Clack.Test provides simple interface to test Clack Application or Middleware.
+
+Your Lisp have to support multi-thread to run this.
 "
 
 @doc:AUTHOR "
