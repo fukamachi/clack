@@ -97,7 +97,15 @@
                     ((:file "oauth")))
                    (:module "app"
                     :components
-                    ((:file "route")))))))))
+                    ((:file "route"))))))))
+  :description
+  #.(with-open-file (stream
+                     (merge-pathnames #p"README.markdown"
+                                      (or *load-pathname* *compile-file-pathname*))
+                     :direction :input)
+      (let ((seq (make-array (file-length stream) :element-type 'character :fill-pointer t)))
+        (setf (fill-pointer seq) (read-sequence seq stream))
+        seq)))
 
 ;; Run unit tests.
 #|
