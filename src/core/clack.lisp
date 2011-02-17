@@ -6,12 +6,6 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-#|
-  Clack main package just for convenience.
-
-  Author: Eitarow Fukamachi (e.arrows@gmail.com)
-|#
-
 (clack.util:namespace clack
   (:use :cl)
   (:import-from :clack.component
@@ -43,3 +37,24 @@ Example:
 "
   @ignore (app handler-name port debug)
   (error "TODO"))
+
+(doc:start)
+
+@doc:NAME "
+Clack main package just for convenience.
+"
+
+@doc:SYNOPSIS "
+"
+
+@doc:DESCRIPTION "
+"
+
+@doc:AUTHOR "
+* Eitarow Fukamachi (e.arrows@gmail.com)
+"
+
+@doc:SEE "
+* Clack.Component
+* Clack.Middleware
+"
