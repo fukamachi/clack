@@ -88,7 +88,8 @@ because they append sections duplicately when the packaged is reloaded."
                        'generic)
                       ((macro-function symb) 'macro)
                       (t 'function)))
-    ((find-package symb) 'package)))
+    ((find-package symb) 'package)
+    ((asdf:find-system symb nil) 'system)))
 
 @export
 (defmethod generate-documentation ((symb symbol))
@@ -96,7 +97,12 @@ because they append sections duplicately when the packaged is reloaded."
     (class (generate-documentation (find-class symb)))
     ((constant variable) (generate-variable-documentation symb))
     ((function generic macro) (generate-function-documentation symb))
-    (package (generate-documentation (find-package symb)))))
+    (package (generate-documentation (find-package symb)))
+    (system (mapcar #'generate-documentation (asdf-system-packages symb)))))
+
+@export
+(defmethod generate-documentation ((str string))
+  (generate-documentation (intern str)))
 
 @export
 (defmethod generate-documentation ((pkg package))
@@ -107,6 +113,12 @@ because they append sections duplicately when the packaged is reloaded."
                  (documentation pkg t)
                  (section "EXTERNAL SYMBOLS"
                           (external-symbols-documentation symbols)))))
+
+@export
+(defmethod generate-documentation ((system asdf:system))
+  (apply #'concatenate
+         'string
+         (mapcar #'generate-documentation (asdf-system-packages system))))
 
 (defun external-symbols-documentation (symbols)
   (string-left-trim
@@ -157,6 +169,33 @@ because they append sections duplicately when the packaged is reloaded."
                                :description (documentation meth t)))
                    (c2mop:generic-function-methods generic)))))
 
+(defun asdf-component-files (comp)
+  (etypecase comp
+    (asdf::cl-source-file
+     (list (slot-value comp 'asdf::absolute-pathname)))
+    (asdf::component
+     (loop for c in (slot-value comp 'asdf::components)
+           append (asdf-component-files c)))))
+
+@export
+(defun asdf-system-packages (system)
+  (let (*standard-output* *error-output*)
+    (unless (typep system 'asdf::component)
+      (setf system (asdf:find-system system)))
+    (asdf:oos 'asdf:load-op system :verbose nil)
+    (let ((macroexpand-hook *macroexpand-hook*)
+          packages)
+      (setf *macroexpand-hook*
+            (lambda (fun form env)
+              (when (and (consp form)
+                         (eq (first form) 'cl:defpackage)
+                         (ignore-errors (string (second form))))
+                (push (cadr form) packages))
+              (funcall macroexpand-hook fun form env)))
+      (prog2
+        (mapcar #'load (asdf-component-files system))
+        packages
+        (setf *macroexpand-hook* macroexpand-hook)))))
 
 ;; Utility functions
 
