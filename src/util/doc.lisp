@@ -161,6 +161,23 @@ because they append sections duplicately when the packaged is reloaded."
               :arg-list (function-lambda-list fn-symb)
               :description (documentation fn-symb 'function))))
 
+(defun method-specializers (method)
+  #+ccl
+  (slot-value method 'ccl::specializers)
+  #+sbcl
+  (slot-value method 'sb-pcl::specializers)
+  #+cmu
+  (slot-value method 'pcl::specializers)
+  #+allegro
+  (slot-value method 'excl::specializers)
+  #+ecl
+  (slot-value method 'clos::specializers)
+  #+lispworks
+  (slot-value method 'clos::specializers)
+  #+clisp
+  (slot-value method 'clos::$specializers)
+  )
+
 (defun generate-method-documentation (generic-symb)
   (let ((generic (symbol-function generic-symb)))
     (apply #'concatenate 'string
@@ -173,7 +190,13 @@ because they append sections duplicately when the packaged is reloaded."
            (mapcar #'(lambda (meth)
                        (gendoc generic-symb
                                :type "Method"
-                               :arg-list (function-lambda-list meth)
+                               :arg-list
+                               (mapcar #'(lambda (arg type)
+                                           (if (eq t (class-name type))
+                                               arg
+                                               (list arg (class-name type))))
+                                       (function-lambda-list meth)
+                                       (method-specializers meth))
                                :description (documentation meth t)))
                    (c2mop:generic-function-methods generic)))))
 
