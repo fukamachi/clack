@@ -224,10 +224,11 @@ because they append sections duplicately when the packaged is reloaded."
 (defun asdf-system-packages (system)
   (let ((packages (gethash (slot-value system 'asdf::name)
                            *asdf-system-packages*
-                           ':unprepared)))
-  (when (eq :unprepared packages)
-    (asdf-system-reload system))
-  packages))
+                           :unprepared)))
+    (when (eq :unprepared packages)
+      (asdf-system-reload system)))
+  (gethash (slot-value system 'asdf::name)
+           *asdf-system-packages*))
 
 ;; Utility functions
 
