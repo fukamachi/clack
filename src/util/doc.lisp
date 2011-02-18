@@ -126,19 +126,37 @@ because they append sections duplicately when the packaged is reloaded."
      (ignore-errors (slot-value system 'asdf::description))
      (mapcar #'generate-documentation (reverse packages)))))
 
-(defun external-symbols-documentation (symbol-list pkg)
+(defun external-symbol-p (symbol &optional pkg)
   (let* (exported
-         (exported (do-external-symbols (s pkg exported)
+         (exported (do-external-symbols (s (or pkg
+                                               (symbol-package symbol))
+                                           exported)
                      (push s exported))))
-    (apply #'concatenate 'string
-           (loop for symb in symbol-list
-                 if (member (car symb) exported)
-                   collect
-                   (ecase (cdr symb)
-                     (variable (generate-variable-documentation (car symb)))
-                     (function (generate-function-documentation (car symb)))
-                     (class (generate-documentation (find-class (car symb))))
-                     ((nil) (generate-documentation (car symb))))))))
+    (not (null (member symbol exported :test #'eq)))))
+
+(defun external-symbols-documentation (symbol-list pkg)
+  (apply #'concatenate 'string
+         (loop for symb in symbol-list
+               if (or (external-symbol-p (car symb) pkg)
+                      (and (eq 'method (second symb))
+                           (not (equal (symbol-package (first symb)) pkg))
+                           (external-symbol-p (car symb))))
+                 collect
+                 (ecase (second symb)
+                   (variable (generate-variable-documentation (car symb)))
+                   (function (generate-function-documentation (car symb)))
+                   (method (generate-method-documentation (car symb) (third symb)))
+                   (class (generate-documentation (find-class (car symb))))
+                   ((nil) (generate-documentation (car symb)))))))
+
+(defun find-method-function (symb lambda-list)
+  (if (not lambda-list)
+      (symbol-function symb)
+      (find-if
+       #'(lambda (meth)
+           (equal (mapcar #'class-name (method-specializers meth))
+                  lambda-list))
+       (c2mop:generic-function-methods (symbol-function symb)))))
 
 @export
 (defmethod generate-documentation ((class standard-class))
@@ -154,12 +172,10 @@ because they append sections duplicately when the packaged is reloaded."
           :description (documentation var-symb 'variable)))
 
 (defun generate-function-documentation (fn-symb)
-  (if (typep (symbol-function fn-symb) 'generic-function)
-      (generate-method-documentation fn-symb)
-      (gendoc fn-symb
-              :type (type-of* fn-symb)
-              :arg-list (function-lambda-list fn-symb)
-              :description (documentation fn-symb 'function))))
+  (gendoc fn-symb
+          :type (type-of* fn-symb)
+          :arg-list (function-lambda-list fn-symb)
+          :description (documentation fn-symb 'function)))
 
 (defun method-specializers (method)
   #+ccl
@@ -178,27 +194,19 @@ because they append sections duplicately when the packaged is reloaded."
   (slot-value method 'clos::$specializers)
   )
 
-(defun generate-method-documentation (generic-symb)
-  (let ((generic (symbol-function generic-symb)))
-    (apply #'concatenate 'string
-           (if (documentation generic 'function)
-               (gendoc generic-symb
-                       :type "Generic"
-                       :arg-list (function-lambda-list (symbol-function generic-symb))
-                       :description (documentation generic 'function))
-               "")
-           (mapcar #'(lambda (meth)
-                       (gendoc generic-symb
-                               :type "Method"
-                               :arg-list
-                               (mapcar #'(lambda (arg type)
-                                           (if (eq t (class-name type))
-                                               arg
-                                               (list arg (class-name type))))
-                                       (function-lambda-list meth)
-                                       (method-specializers meth))
-                               :description (documentation meth t)))
-                   (c2mop:generic-function-methods generic)))))
+(defun generate-method-documentation (generic-symb lambda-list)
+  (let ((method (find-method-function generic-symb lambda-list)))
+    (gendoc generic-symb
+            :type (if lambda-list "Method" "Generic")
+            :arg-list
+            (or lambda-list
+                (mapcar #'(lambda (arg type)
+                            (if (eq t (class-name type))
+                                arg
+                                (list arg (class-name type))))
+                        (function-lambda-list method)
+                        (method-specializers method)))
+            :description (documentation method t))))
 
 (defun asdf-component-files (comp)
   (etypecase comp
@@ -223,20 +231,17 @@ because they append sections duplicately when the packaged is reloaded."
                 (case (first form)
                   (cl:defpackage
                    (push (second form) (gethash (slot-value system 'asdf::name) *asdf-system-packages*)))
-                  ((cl:defun cl:defmacro)
-                   (push (cons (second form) 'function)
+                  ((cl:defun cl:defmacro cl:defgeneric)
+                   (push (list (second form) 'function)
                          (gethash (package-name *package*) *external-symbols-hash*)))
-                  ((cl:defmethod cl:defgeneric)
-                   (unless (member (cons (second form) 'function)
-                                   (gethash (package-name *package*) *external-symbols-hash*)
-                                   :test #'equal)
-                     (push (cons (second form) 'function)
-                           (gethash (package-name *package*) *external-symbols-hash*))))
+                  ((cl:defmethod)
+                   (push (list (second form) 'method (third form))
+                         (gethash (package-name *package*) *external-symbols-hash*)))
                   ((cl:defclass cl:defstruct)
-                   (push (cons (second form) 'class)
+                   (push (list (second form) 'class)
                          (gethash (package-name *package*) *external-symbols-hash*)))
                   ((cl:defconstant cl:defparameter cl:defvar)
-                   (push (cons (second form) 'variable)
+                   (push (list (second form) 'variable)
                          (gethash (package-name *package*) *external-symbols-hash*)))))
               (funcall macroexpand-hook fun form env)))
       (map nil #'load (asdf-component-files system))
