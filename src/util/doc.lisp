@@ -124,7 +124,7 @@ because they append sections duplicately when the packaged is reloaded."
      #'concatenate
      'string
      (ignore-errors (slot-value system 'asdf::description))
-     (mapcar #'generate-documentation (nreverse packages)))))
+     (mapcar #'generate-documentation (reverse packages)))))
 
 (defun external-symbols-documentation (symbol-list pkg)
   (let* (exported
@@ -213,7 +213,7 @@ because they append sections duplicately when the packaged is reloaded."
     (unless (typep system 'asdf::component)
       (setf system (asdf:find-system system)))
     (asdf:oos 'asdf:load-op system :verbose nil)
-    (setf (gethash (slot-value (asdf:find-system :clack) 'asdf::name) *asdf-system-packages*) nil)
+    (setf (gethash (slot-value system 'asdf::name) *asdf-system-packages*) nil)
     (setf *external-symbols-hash* (make-hash-table :test #'equal))
     (let ((macroexpand-hook *macroexpand-hook*))
       (setf *macroexpand-hook*
@@ -222,7 +222,7 @@ because they append sections duplicately when the packaged is reloaded."
                          (ignore-errors (string (second form))))
                 (case (first form)
                   (cl:defpackage
-                   (push (second form) (gethash (slot-value (asdf:find-system :clack) 'asdf::name) *asdf-system-packages*)))
+                   (push (second form) (gethash (slot-value system 'asdf::name) *asdf-system-packages*)))
                   ((cl:defun cl:defmacro)
                    (push (cons (second form) 'function)
                          (gethash (package-name *package*) *external-symbols-hash*)))
