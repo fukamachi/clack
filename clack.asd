@@ -20,7 +20,7 @@
 (in-package :clack-asd)
 
 (defsystem clack
-  :version "1.0"
+  :version "0.1-SNAPSHOT"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
   :depends-on (;; Utility
@@ -47,10 +47,7 @@
                 ((:module "util"
                   :serial t
                   :components
-                  ((:module "doc"
-                    :serial t
-                    :components
-                    ((:file "doc")))
+                  ((:file "doc")
                    (:file "util")
                    (:file "hunchentoot")))
                  (:module "core"
