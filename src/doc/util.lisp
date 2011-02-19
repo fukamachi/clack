@@ -142,3 +142,17 @@ macro function. For example, the lambda list for the common lisp function
               (let ((exp (function-lambda-expression func)))
                 (and exp (return (values (second exp) t)))))
             (values nil nil)))))
+
+@export
+(defclass <list-metaclass> (standard-class)
+     ((all-instances :initform () :accessor class-all-instances)))
+
+#-(or clisp allegro)
+(defmethod c2mop:validate-superclass ((class <list-metaclass>)
+                                      (super standard-class))
+  t)
+
+(defmethod allocate-instance ((class <list-metaclass>) &key)
+  (let ((new-instance (call-next-method)))
+    (push new-instance (class-all-instances class))
+    new-instance))

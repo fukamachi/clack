@@ -37,6 +37,9 @@
                          (ignore-errors (string (second form))))
                 (case (first form)
                   (cl:defpackage
+                   (make-instance '<doc-package>
+                      :name (format nil "~A" (second form))
+                      :system (slot-value system 'asdf::name))
                    (push (format nil "~A" (second form))
                     (gethash (slot-value system 'asdf::name) *asdf-system-packages*)))
                   ((cl:defun cl:defmacro)

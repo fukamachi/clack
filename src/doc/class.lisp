@@ -13,7 +13,8 @@
   (:import-from :clack.doc.util
                 :find-method-function
                 :class-direct-superclasses
-                :external-symbol-p))
+                :external-symbol-p
+                :<list-metaclass>))
 (in-package :clack.doc.class)
 
 (cl-annot:enable-annot-syntax)
@@ -38,20 +39,25 @@
 
 @export
 (defclass <doc-package> (<doc-base>)
-     ((system :initarg :system :accessor package-system)))
+     ((system :initarg :system :accessor package-system))
+  (:metaclass <list-metaclass>))
 
 (defmethod initalize-instance :after ((this <doc-package>) &key)
   (setf (doc-type this) :package))
 
+(defmethod find-entity ((this <doc-package>))
+  (find-package (doc-name this)))
+
 @export
 (defmethod generate-documentation ((this <doc-package>))
-  (apply #'concatenate
-         'string
+  (format nil
+          "~2&~A~&# EXTERNAL SYMBOLS~%~{~A~}"
          (or (documentation (find-entity this) t)
              (format nil "# NAME~2%~A" (string-capitalize (doc-name this))))
-         "# EXTERNAL SYMBOLS"
          (mapcar #'generate-documentation
-                 (reverse (gethash (doc-name this) *package-symbols-hash*)))))
+                 (remove-if-not
+                  #'externalp
+                  (reverse (gethash (doc-name this) *package-symbols-hash*))))))
 
 @export
 (defclass <doc-symbol-base> (<doc-base>)
