@@ -75,6 +75,50 @@ because they append sections duplicately when the packaged is reloaded."
 " type name arg-list (and description
                           (split-sequence #\Newline description))))
 
+(defclass <doc-base> ()
+     ((type :initform nil :accessor doc-type)
+      (name :initarg :name :accessor doc-name)))
+
+(defmethod generate-documentation ((this <doc-base>)))
+
+(defclass <doc-package> (<doc-base>) ())
+
+(defmethod initalize-instance :after ((this <doc-package>) &key initargs)
+  (setf (doc-type this) :package)
+  (push this
+        (gethash (getf initargs :system) *asdf-system-packages*)))
+
+(defclass <doc-symbol-base> (<doc-base>) ())
+
+(defmethod initialize-instance :after ((this <doc-base>) &key initargs)
+  (push this
+        (gethash (getf initargs :package) *external-symbols-hash*)))
+
+(defclass <doc-function> (<doc-symbol-base>)
+     ((lambda-list :initarg :lambda-list :initform nil :accessor function-lambda-list)))
+
+(defmethod initialize-instance :after ((this <doc-function>) &key)
+  (unless (doc-type this)
+    (setf (doc-type this) :function)))
+
+(defclass <doc-method> (<doc-function>)
+     ((order :initarg :order :initform nil :accessor method-order)))
+
+(defmethod initialize-instance :after ((this <doc-method>) &key)
+  (setf (doc-type this) :method))
+
+(defclass <doc-class> (<doc-symbol-base>)
+     ((slots :initarg :slots :initform nil :accessor class-slots)
+      (superclasses :initarg :superclasses :initform nil :accessor class-superclasses)))
+
+(defmethod initialize-instance :after ((this <doc-class>) &key)
+  (setf (doc-type this) :class))
+
+(defclass <doc-variable> (<doc-symbol-base>) ())
+
+(defmethod initialize-instance :after ((this <doc-variable>) &key)
+  (setf (doc-type this) :variable))
+
 (defun type-of* (symb)
   (cond
     ((keywordp symb) (type-of* (intern (symbol-name symb))))
@@ -126,14 +170,6 @@ because they append sections duplicately when the packaged is reloaded."
      (ignore-errors (slot-value system 'asdf::description))
      (mapcar #'generate-documentation (reverse packages)))))
 
-(defun external-symbol-p (symbol &optional pkg)
-  (let* (exported
-         (exported (do-external-symbols (s (or pkg
-                                               (symbol-package symbol))
-                                           exported)
-                     (push s exported))))
-    (not (null (member symbol exported :test #'eq)))))
-
 (defun external-symbols-documentation (symbol-list pkg)
   (apply #'concatenate 'string
          (loop for symb in symbol-list
@@ -149,22 +185,18 @@ because they append sections duplicately when the packaged is reloaded."
                    (class (generate-documentation (find-class (car symb))))
                    ((nil) (generate-documentation (car symb)))))))
 
-(defun find-method-function (symb lambda-list)
-  (if (not lambda-list)
-      (symbol-function symb)
-      (find-if
-       #'(lambda (meth)
-           (equal (mapcar #'class-name (method-specializers meth))
-                  lambda-list))
-       (c2mop:generic-function-methods (symbol-function symb)))))
-
 @export
 (defmethod generate-documentation ((class standard-class))
-  (gendoc (class-name class)
-          :type "Class"
-          :description (documentation class 'class)
-          :arg-list (mapcar #'c2mop:slot-definition-name
-                            (c2mop:compute-slots class))))
+  (let ((super-classes
+         (loop for super in (class-direct-superclasses class)
+               unless (eq (type-of super) 'built-in-class)
+                 collect (class-name super))))
+    (gendoc (format nil "~A inherits ~A"
+                    (class-name class) super-classes)
+            :type "Class"
+            :description (documentation class 'class)
+            :arg-list (mapcar #'c2mop:slot-definition-name
+                              (c2mop:compute-slots class)))))
 
 (defun generate-variable-documentation (var-symb)
   (gendoc var-symb
@@ -176,23 +208,6 @@ because they append sections duplicately when the packaged is reloaded."
           :type (type-of* fn-symb)
           :arg-list (function-lambda-list fn-symb)
           :description (documentation fn-symb 'function)))
-
-(defun method-specializers (method)
-  #+ccl
-  (slot-value method 'ccl::specializers)
-  #+sbcl
-  (slot-value method 'sb-pcl::specializers)
-  #+cmu
-  (slot-value method 'pcl::specializers)
-  #+allegro
-  (slot-value method 'excl::specializers)
-  #+ecl
-  (slot-value method 'clos::specializers)
-  #+lispworks
-  (slot-value method 'clos::specializers)
-  #+clisp
-  (slot-value method 'clos::$specializers)
-  )
 
 (defun generate-method-documentation (generic-symb lambda-list)
   (let ((method (find-method-function generic-symb lambda-list)))
@@ -207,6 +222,8 @@ because they append sections duplicately when the packaged is reloaded."
                         (function-lambda-list method)
                         (method-specializers method)))
             :description (documentation method t))))
+
+;; ASDF Functions
 
 (defun asdf-component-files (comp)
   (etypecase comp
@@ -230,12 +247,24 @@ because they append sections duplicately when the packaged is reloaded."
                          (ignore-errors (string (second form))))
                 (case (first form)
                   (cl:defpackage
-                   (push (second form) (gethash (slot-value system 'asdf::name) *asdf-system-packages*)))
+                   (make-instance '<doc-package>
+                      :name (second form)
+                      :system (slot-value system 'asdf::name)))
                   ((cl:defun cl:defmacro cl:defgeneric)
-                   (push (list (second form) 'function)
-                         (gethash (package-name *package*) *external-symbols-hash*)))
+                   (make-instance '<doc-function>
+                      :name (second form)
+                      :package (package-name *package*)))
                   ((cl:defmethod)
-                   (push (list (second form) 'method (third form))
+                   (make-instance '<doc-method>
+                      :name (second form)
+                      
+                   (push (list (second form)
+                               'method
+                               (if (listp (third form))
+                                   (third form)
+                                   (fourth form))
+                               (unless (listp (third form))
+                                 (nth 3 form)))
                          (gethash (package-name *package*) *external-symbols-hash*)))
                   ((cl:defclass cl:defstruct)
                    (push (list (second form) 'class)
@@ -344,6 +373,46 @@ macro function. For example, the lambda list for the common lisp function
               (let ((exp (function-lambda-expression func)))
                 (and exp (return (values (second exp) t)))))
             (values nil nil)))))
+
+(defun external-symbol-p (symbol &optional pkg)
+  (let* (exported
+         (exported (do-external-symbols (s (or pkg
+                                               (symbol-package symbol))
+                                           exported)
+                     (push s exported))))
+    (not (null (member symbol exported :test #'eq)))))
+
+(defun find-method-function (symb lambda-list)
+  (if (not lambda-list)
+      (symbol-function symb)
+      (find-if
+       #'(lambda (meth)
+           (equal (mapcar #'class-name (method-specializers meth))
+                  lambda-list))
+       (c2mop:generic-function-methods (symbol-function symb)))))
+
+(defun method-specializers (method)
+  #+ccl
+  (slot-value method 'ccl::specializers)
+  #+sbcl
+  (slot-value method 'sb-pcl::specializers)
+  #+cmu
+  (slot-value method 'pcl::specializers)
+  #+allegro
+  (slot-value method 'excl::specializers)
+  #+ecl
+  (slot-value method 'clos::specializers)
+  #+lispworks
+  (slot-value method 'clos::specializers)
+  #+clisp
+  (slot-value method 'clos::$specializers)
+  )
+
+(defun class-direct-superclasses (class)
+  #+ccl
+  (slot-value class 'ccl::direct-superclasses)
+  #-ccl
+  (error "not implemented"))
 
 (doc::start)
 
