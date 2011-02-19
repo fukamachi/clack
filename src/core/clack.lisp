@@ -37,15 +37,23 @@ Example:
            :port 8080
            :debug t)
 "
-  (let* ((handler-name (concatenate 'string
-                                    "CLACK.HANDLER."
-                                    (symbol-name server)))
-         (handler (or (find-package handler-name)
-                      (error "Handler package is not found. Forgot to load it?: ~A"
-                             handler-name))))
+  (let* ((handler (find-handler server)))
     (funcall (intern "RUN" handler) app
              :port port
              :debug debug)))
+
+@export
+(defun stop (acceptor)
+  "Stop Clack server. Currently works only Hunchentoot."
+  (clack.handler.hunchentoot:stop acceptor))
+
+(defun find-handler (server)
+  (let ((handler-name (concatenate 'string
+                                    "CLACK.HANDLER."
+                                    (symbol-name server))))
+    (or (find-package handler-name)
+        (error "Handler package is not found. Forgot to load it?: ~A"
+               handler-name))))
 
 (doc:start)
 
