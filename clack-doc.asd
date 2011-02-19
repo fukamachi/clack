@@ -20,9 +20,8 @@
                :cl-annot)
   :components ((:module "src"
                 :pathname "src/doc"
-                :serial t
                 :components
-                ((:file "util")
-                 (:file "class")
-                 (:file "asdf")
-                 (:file "doc")))))
+                ((:file "doc" :depends-on ("class" "asdf"))
+                 (:file "class" :depends-on ("util"))
+                 (:file "util")
+                 (:file "asdf" :depends-on ("class"))))))

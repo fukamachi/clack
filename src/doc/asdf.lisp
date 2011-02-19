@@ -12,7 +12,7 @@
         :clack.doc.class))
 (in-package :clack.doc.asdf)
 
-(defvar *asdf-system-packages* (make-hash-table :test #'equal))
+(defvar *asdf-registered-system* nil)
 
 @export
 (defun asdf-component-files (comp)
@@ -23,13 +23,9 @@
      (loop for c in (slot-value comp 'asdf::components)
            append (asdf-component-files c)))))
 
-@export
 (defun asdf-system-reload (system)
   (let (*error-output*)
-    (unless (typep system 'asdf::component)
-      (setf system (asdf:find-system system)))
     (asdf:oos 'asdf:load-op system :verbose nil)
-    (setf (gethash (slot-value system 'asdf::name) *asdf-system-packages*) nil)
     (let ((macroexpand-hook *macroexpand-hook*))
       (setf *macroexpand-hook*
             (lambda (fun form env)
@@ -37,11 +33,9 @@
                          (ignore-errors (string (second form))))
                 (case (first form)
                   (cl:defpackage
-                   (make-instance '<doc-package>
-                      :name (format nil "~A" (second form))
-                      :system (slot-value system 'asdf::name))
-                   (push (format nil "~A" (second form))
-                    (gethash (slot-value system 'asdf::name) *asdf-system-packages*)))
+                   (register-package-system
+                    (format nil "~A" (second form))
+                    (slot-value system 'asdf::name)))
                   ((cl:defun cl:defmacro)
                    (make-instance '<doc-function>
                       :name (second form)
@@ -80,11 +74,12 @@
       t)))
 
 @export
-(defun asdf-system-packages (system)
-  (let ((packages (gethash (slot-value system 'asdf::name)
-                           *asdf-system-packages*
-                           :unprepared)))
-    (when (eq :unprepared packages)
-      (asdf-system-reload system)))
-  (gethash (slot-value system 'asdf::name)
-           *asdf-system-packages*))
+(defun ensure-system-loaded (system &key force)
+  (if (and (not force)
+           (find system *asdf-registered-system* :test #'equal))
+      (values t nil)
+      (progn
+        (format t "Loading system ~A..." system)
+        (asdf-system-reload system)
+        (push system *asdf-registered-system*)
+        (values t t))))

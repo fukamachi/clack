@@ -13,13 +13,12 @@
   (:import-from :clack.doc.util
                 :find-method-function
                 :class-direct-superclasses
-                :external-symbol-p
-                :<list-metaclass>))
+                :external-symbol-p))
 (in-package :clack.doc.class)
 
 (cl-annot:enable-annot-syntax)
 
-(defvar *package-symbols-hash* (make-hash-table :test #'equal))
+(defvar *doc-packages* nil)
 
 (defun gendoc (type summary &optional description)
   (format nil "
@@ -39,11 +38,8 @@
 
 @export
 (defclass <doc-package> (<doc-base>)
-     ((system :initarg :system :accessor package-system))
-  (:metaclass <list-metaclass>))
-
-(defmethod initalize-instance :after ((this <doc-package>) &key)
-  (setf (doc-type this) :package))
+     ((systems :initform nil :accessor package-systems)
+      (symbols :initform nil :accessor package-symbols)))
 
 (defmethod find-entity ((this <doc-package>))
   (find-package (doc-name this)))
@@ -51,22 +47,47 @@
 @export
 (defmethod generate-documentation ((this <doc-package>))
   (format nil
-          "~2&~A~&# EXTERNAL SYMBOLS~%~{~A~}"
+          "~2&~A~2&# EXTERNAL SYMBOLS~%~{~A~}"
          (or (documentation (find-entity this) t)
-             (format nil "# NAME~2%~A" (string-capitalize (doc-name this))))
+             (format nil "# NAME~2%~A~%" (string-capitalize (doc-name this))))
          (mapcar #'generate-documentation
                  (remove-if-not
                   #'externalp
-                  (reverse (gethash (doc-name this) *package-symbols-hash*))))))
+                  (reverse (package-symbols this))))))
+
+@export
+(defun find-package* (package-name &key force)
+  (let ((pkg (find-if #'(lambda (pkg) (string-equal package-name
+                                                (doc-name pkg)))
+                      *doc-packages*)))
+    (if (or pkg (not force))
+        pkg
+        (let ((pkg (make-instance '<doc-package>
+                      :name package-name)))
+          (push pkg *doc-packages*)
+          pkg))))
+
+@export
+(defun register-package-system (package-name system-name)
+  (pushnew system-name
+           (package-systems
+            (find-package* package-name :force t))))
+
+@export
+(defun find-system-packages (system)
+  (remove-if-not #'(lambda (pkg)
+                     (find (slot-value system 'asdf::name)
+                           (package-systems pkg)
+                           :test #'string-equal))
+                 *doc-packages*))
 
 @export
 (defclass <doc-symbol-base> (<doc-base>)
      ((docstring :initform nil :accessor docstring)
-      (package :initarg :package :initform (package-name *package*) :accessor symbol-package*)))
+      (package :initarg :package :initform (format nil "~A" (package-name *package*)) :accessor symbol-package*)))
 
 (defmethod initialize-instance :after ((this <doc-symbol-base>) &key)
-  (push this
-        (gethash (symbol-package* this) *package-symbols-hash*)))
+  (push this (package-symbols (find-package* (symbol-package* this)))))
 
 @export
 (defmethod externalp ((this <doc-symbol-base>))
