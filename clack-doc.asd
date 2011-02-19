@@ -17,11 +17,13 @@
   :license "LLGPL"
   :depends-on (:closer-mop
                :split-sequence
+               :cl-ppcre
                :cl-annot)
   :components ((:module "src"
                 :pathname "src/doc"
                 :components
                 ((:file "doc" :depends-on ("class" "asdf"))
-                 (:file "class" :depends-on ("util"))
+                 (:file "class" :depends-on ("util" "markdown"))
                  (:file "util")
-                 (:file "asdf" :depends-on ("class"))))))
+                 (:file "asdf" :depends-on ("class"))
+                 (:file "markdown")))))

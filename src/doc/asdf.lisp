@@ -12,6 +12,8 @@
         :clack.doc.class))
 (in-package :clack.doc.asdf)
 
+(cl-annot:enable-annot-syntax)
+
 (defvar *asdf-registered-system* nil)
 
 @export
@@ -19,6 +21,7 @@
   (etypecase comp
     (asdf::cl-source-file
      (list (slot-value comp 'asdf::absolute-pathname)))
+    (asdf::static-file nil)
     (asdf::component
      (loop for c in (slot-value comp 'asdf::components)
            append (asdf-component-files c)))))
