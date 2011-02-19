@@ -19,7 +19,7 @@
                :split-sequence
                :cl-annot)
   :components ((:module "src"
-                :pathname "src/util/doc"
+                :pathname "src/doc"
                 :serial t
                 :components
                 ((:file "util")
