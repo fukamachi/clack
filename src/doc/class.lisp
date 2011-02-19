@@ -12,7 +12,8 @@
         :split-sequence)
   (:import-from :clack.doc.util
                 :find-method-function
-                :class-direct-superclasses))
+                :class-direct-superclasses
+                :external-symbol-p))
 (in-package :clack.doc.class)
 
 (cl-annot:enable-annot-syntax)
@@ -60,6 +61,10 @@
 (defmethod initialize-instance :after ((this <doc-symbol-base>) &key)
   (push this
         (gethash (symbol-package* this) *package-symbols-hash*)))
+
+@export
+(defmethod externalp ((this <doc-symbol-base>))
+  (external-symbol-p (doc-name this)))
 
 @export
 (defclass <doc-function> (<doc-symbol-base>)

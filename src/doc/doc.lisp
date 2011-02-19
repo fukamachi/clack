@@ -10,7 +10,8 @@
 (defpackage clack.doc
   (:use :cl)
   (:import-from :clack.doc.class
-                :generate-documentation)
+                :generate-documentation
+                :externalp)
   (:import-from :clack.doc.asdf
                 :asdf-system-packages))
 (in-package :clack.doc)
@@ -25,5 +26,10 @@
      'string
      (ignore-errors (slot-value system 'asdf::description))
      (loop for pkg in (reverse packages)
-           append (mapcar #'generate-documentation
-                            (gethash pkg clack.doc.class::*package-symbols-hash*))))))
+           append
+           (mapcar
+             #'generate-documentation
+             (remove-if-not #'externalp
+               (reverse
+                ;; FIXME
+                (gethash pkg clack.doc.class::*package-symbols-hash*))))))))
