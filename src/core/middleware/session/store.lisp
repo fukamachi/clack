@@ -9,7 +9,7 @@
 (clack.util:namespace clack.session.store
   (:use :cl)
   (:import-from :alexandria
-                :remove-from-plist)
+                :remove-from-plistf)
   (:import-from :clack.util :getf*))
 
 (cl-annot:enable-annot-syntax)
