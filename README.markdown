@@ -24,7 +24,12 @@ It is a really cool product written by [Tomohiro Matsuyama](http://twitter.com/#
 Clack and cl-annot isn't in Quicklisp's repository yet ([now on request](https://github.com/quicklisp/quicklisp-projects/issues/120)). Then I think ASDF-INSTALL is the best way to setup them.
 
     (asdf-install:install "https://github.com/arielnetworks/cl-annot/tarball/master")
-    (asdf-install:install "https://github.com/fukamachi/clack/tarball/master")
+
+Next, [download Clack](https://github.com/fukamachi/clack/tarball/master), extract it and put it in a place where ASDF can find it.
+
+In the end, you can load Clack with [Quicklisp](https://www.quicklisp.org/beta/).
+
+    (ql:quickload :clack)
 
 ## Application
 
@@ -33,6 +38,20 @@ Clack Application is just a lambda. It takes exactly one argument, the "Request"
     (defvar app
       #'(lambda (req)
           '(200 (:content-type "text/plain") ("Hello, World"))))
+
+### Clack.App.Route
+
+Clack is not a Web Application Framework. But Clack can also be used as such way.
+
+Clack bundles "Clack.App.Route", written by [Tomohiro Matsuyama](http://twitter.com/#!/m2ym). It allows you to write an URL-based dispatcher, like Ruby's Sinatra.
+
+    (defroute app (req)
+      (GET \"/\" #'index)
+      (GET \"/login\" #'login)
+      (POST \"/login\" #'authorize)
+      (GET \"/member/:id\" #'member))
+
+    (clackup #'app)
 
 ### The Request
 
