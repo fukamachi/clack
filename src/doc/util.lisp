@@ -23,6 +23,7 @@
     (not (null (member symbol exported :test #'eq)))))
 
 @export
+;; FIXME: works only CCL
 (defun class-direct-superclasses (class)
   #+ccl
   (slot-value class 'ccl::direct-superclasses)
@@ -35,7 +36,8 @@
         with args = nil
         if (listp arg)
           do (if (and (listp (cadr arg)) (eq (caadr arg) 'eql))
-                 (push (make-instance 'eql-specializer :object (eval (cadadr arg))) args)
+                 ;; FIXME: works only CCL
+                 (push (ccl:intern-eql-specializer (eval (cadadr arg))) args)
                  (push (find-class (cadr arg)) args))
         else if (find arg lambda-list-keywords)
                return (nreverse args)

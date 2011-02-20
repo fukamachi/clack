@@ -123,7 +123,8 @@
 
 (defmethod find-entity ((this <doc-method>))
   (or (find-method (symbol-function (doc-name this))
-                   (and (method-order this) (list(method-order this)))
+                   ;; FIXME: ugly
+                   (and (method-order this) (list (method-order this)))
                    (lambda-list->specializers (function-lambda-list this)))
       (error "Method not found: ~A ~A"
              (doc-name this) (function-lambda-list this))))
@@ -148,7 +149,7 @@
   (let ((class (find-entity this)))
     (setf (class-super-classes this)
           (loop for super in (class-direct-superclasses class)
-                unless (eq (type-of super) 'built-in-class)
+                unless (member (type-of super) '(built-in-class eql-specializer))
                   collect (class-name super)))
     (setf (class-slots this)
           (mapcar #'c2mop:slot-definition-name
