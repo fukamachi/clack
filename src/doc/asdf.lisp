@@ -28,7 +28,8 @@
 
 (defun asdf-system-reload (system)
   (let (*error-output*)
-    (asdf:oos 'asdf:load-op system :verbose nil)
+    #+quicklisp (ql:quickload (slot-value system 'asdf::name) :verbose nil)
+    #-quicklisp (asdf:oos 'asdf:load-op system :verbose nil)
     (let ((macroexpand-hook *macroexpand-hook*))
       (setf *macroexpand-hook*
             (lambda (fun form env)
