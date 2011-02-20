@@ -17,7 +17,14 @@ Now access [http://localhost:8080/](http://localhost:8080/) and Clack may show y
 
 ## Installation
 
-TODO.
+I want to keep minimum dependencies of Clack, but now Clack depends on [cl-annot](https://github.com/arielnetworks/cl-annot) heavily.
+
+It is a really cool product written by [Tomohiro Matsuyama](http://twitter.com/#!/m2ym), my friend. So I recommend you to install it anyway.
+
+Clack and cl-annot isn't in Quicklisp's repository yet ([now on request](https://github.com/quicklisp/quicklisp-projects/issues/120)). Then I think ASDF-INSTALL is the best way to setup them.
+
+    (asdf-install:install "https://github.com/arielnetworks/cl-annot/tarball/master")
+    (asdf-install:install "https://github.com/fukamachi/clack/tarball/master")
 
 ## Application
 
