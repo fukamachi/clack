@@ -107,13 +107,48 @@ Clack.Middleware.OAuth - Supports authorization mechanism by OAuth.
 "
 
 @doc:SYNOPSIS "
-I don't know how to use this.
-Hey Fujita, would you write some documentation?
-Or, tell me how, someone :p -- Eitarow Fukamachi
+    (run
+      (builder
+       (<clack-middleware-oauth>
+         :consumer-key \"XXXXXXXXXXXXXXXXXXXXX\"
+         :consumer-secret \"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"
+         :authorize-uri \"http://localhost/authorize\"
+         :request-token-uri \"http://localhost/request\"
+         :access-token-uri \"http://localhost/access\"
+         :path \"/auth\"
+         :callback-base \"http://localhost/\"
+         :authorized #'callback)
+       app))
 "
 
 @doc:DESCRIPTION "
-Blah Blah Blah.
+This is a Clack Middleware for OAuth.
+Please read rfc5849 for more information.
+
+## Slots
+
+* consumer-key, consumer-secret (Required, String)
+
+OAuth parameter.
+
+* authorize-uri, request-token-uri, access-token-uri (Required, String)
+
+URIs to process OAuth.
+
+* path
+
+A path to be handled by <clack.middleware.oauth>.
+
+* callback-base
+
+A host address will be passed to OAuth Provider.
+(format nil \"~a~a\" `callback-base' `path') should be valid URI.
+
+* authorized (Required, function)
+
+A callback function when authorization is suceeded.
+It will be called with two parameters: clack request and cl-oauth:access-token.
+
 "
 
 @doc:AUTHOR "
