@@ -8,7 +8,7 @@
 
 @export
 (defun markdown-escape-string (string)
-  (ppcre:regex-replace-all "([\\`*_{}\\[\\]()#+.!<>-])" string
+  (ppcre:regex-replace-all "([\\`*_{}\\[\\]()#.!<>])" string
    (lambda (stream match)
      @ignore stream
      (cond
