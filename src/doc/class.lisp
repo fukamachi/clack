@@ -11,9 +11,9 @@
   (:use :cl
         :split-sequence)
   (:import-from :clack.doc.util
-                :find-method-function
                 :class-direct-superclasses
-                :external-symbol-p)
+                :external-symbol-p
+                :lambda-list->specializers)
   (:import-from :clack.doc.markdown
                 :markdown-escape))
 (in-package :clack.doc.class)
@@ -122,8 +122,9 @@
   (setf (doc-type this) :method))
 
 (defmethod find-entity ((this <doc-method>))
-  (or (find-method-function (doc-name this)
-                            (function-lambda-list this))
+  (or (find-method (symbol-function (doc-name this))
+                   (and (method-order this) (list(method-order this)))
+                   (lambda-list->specializers (function-lambda-list this)))
       (error "Method not found: ~A ~A"
              (doc-name this) (function-lambda-list this))))
 
