@@ -100,7 +100,8 @@
                   ((:file "doc")
                    (:file "util")
                    (:file "hunchentoot"))))))
-  :description
+  :description "Web Application Environment for Common Lisp"
+  :long-description
   #.(with-open-file (stream (merge-pathnames
                              #p"README.markdown"
                              (or *load-pathname* *compile-file-pathname*))
