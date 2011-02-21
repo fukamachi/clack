@@ -24,7 +24,7 @@
 
 (defun gendoc (type summary &optional description)
   ;; export 'pre' tags directly because of Cl-Markdown's bug.
-  (format nil "- ~:(~A~): ~A~:[~;~:*<pre>~{~A~^<br />~}</pre>~]"
+  (format nil "- ~:(~A~): ~A~:[~;~:*<pre>~{~/clack.doc.markdown:markdown-escape/~^<br />~}</pre>~]"
           type summary (and description
                             (split-sequence #\Newline description))))
 
