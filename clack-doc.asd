@@ -18,7 +18,8 @@
   :depends-on (:closer-mop
                :split-sequence
                :cl-ppcre
-               :cl-annot)
+               :cl-annot
+               :cl-markdown)
   :components ((:module "src"
                 :pathname "src/doc"
                 :components

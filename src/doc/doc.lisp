@@ -9,9 +9,12 @@
 (in-package :cl-user)
 (defpackage clack.doc
   (:use :cl)
+  (:import-from :cl-markdown
+                :markdown)
   (:import-from :clack.doc.class
                 :generate-documentation
-                :find-system-packages)
+                :find-system-packages
+                :doc-name)
   (:import-from :clack.doc.asdf
                 :ensure-system-loaded))
 (in-package :clack.doc)
@@ -22,9 +25,19 @@
 (defmethod generate-documentation ((system asdf:system))
   (ensure-system-loaded system)
   (let ((packages (find-system-packages system)))
-    (apply
-     #'concatenate
-     'string
-     (ignore-errors (slot-value system 'asdf::description))
-     (mapcar #'generate-documentation
-             (reverse packages)))))
+    (loop for pkg in (reverse packages)
+          do (with-open-file (stream (format nil "~(~A~).html" (doc-name pkg))
+                                     :direction :output
+                                     :if-exists :supersede)
+               (markdown (generate-documentation pkg) :stream stream)))
+    (with-open-file (stream "index.html"
+                            :direction :output
+                            :if-exists :supersede)
+      (markdown (ignore-errors (slot-value system 'asdf::description))
+                :stream stream)
+      (write-string "<h2>API Reference</h2>" stream)
+      (write-string "<ul>" stream)
+      (loop for pkg in (reverse packages)
+            do (format stream "<li><a href=\"~(~A~).html\">~:*~:(~A~)</a></li>" (doc-name pkg)))
+      (write-string "</ul>" stream)))
+  t)
