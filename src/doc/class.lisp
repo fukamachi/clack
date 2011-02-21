@@ -115,7 +115,7 @@
 @export
 (defmethod generate-documentation ((this <doc-function>))
   (gendoc (doc-type this)
-          (format nil "~(~/clack.doc.markdown:markdown-escape/~)~:[~;~:* [~{~(~/clack.doc.markdown:markdown-escape/~)~^ ~}]~]"
+          (format nil "**~(~/clack.doc.markdown:markdown-escape/~)**~:[~;~:* [~{~(~/clack.doc.markdown:markdown-escape/~)~^ ~}]~]"
                   (doc-name this)
                   (normalized-lambda-list this))
           (documentation (find-entity this) 'function)))
@@ -138,7 +138,7 @@
 @export
 (defmethod generate-documentation ((this <doc-method>))
   (gendoc (doc-type this)
-          (format nil "~(~/clack.doc.markdown:markdown-escape/~)~:[~;~:* [~{~(~/clack.doc.markdown:markdown-escape/~)~^ ~}]~]"
+          (format nil "**~(~/clack.doc.markdown:markdown-escape/~)**~:[~;~:* [~{~(~/clack.doc.markdown:markdown-escape/~)~^ ~}]~]"
                   (doc-name this)
                   (normalized-lambda-list this))
           (documentation (find-entity this) t)))
@@ -168,7 +168,7 @@
 (defmethod generate-documentation ((this <doc-class>))
   (prepare this)
   (gendoc (doc-type this)
-          (format nil "~(~/clack.doc.markdown:markdown-escape/~)~:[~;~:* inherits ~(~/clack.doc.markdown:markdown-escape/~)~]~:[~;~:* [~{~(~/clack.doc.markdown:markdown-escape/~)~^ ~}]~]"
+          (format nil "**~(~/clack.doc.markdown:markdown-escape/~)**~:[~;~:* inherits ~(~/clack.doc.markdown:markdown-escape/~)~]~:[~;~:* [~{~(~/clack.doc.markdown:markdown-escape/~)~^ ~}]~]"
                   (doc-name this)
                   (class-super-classes this)
                   (class-slots this))
@@ -183,6 +183,6 @@
 @export
 (defmethod generate-documentation ((this <doc-variable>))
   (gendoc (doc-type this)
-          (clack.doc.markdown:markdown-escape-string
-           (string-downcase (doc-name this)))
+          (format nil "**~/clack.doc.markdown:markdown-escape/**"
+                  (string-downcase (doc-name this)))
           (documentation this 'variable)))
