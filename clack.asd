@@ -42,23 +42,18 @@
                :drakma
                :local-time)
   :components ((:module "src"
-                :serial t
                 :components
-                ((:module "util"
-                  :serial t
+                ((:module "core"
+                  :depends-on ("util")
                   :components
-                  ((:file "doc")
-                   (:file "util")
-                   (:file "hunchentoot")))
-                 (:module "core"
-                  :serial t
-                  :components
-                  ((:file "component")
-                   (:file "middleware")
+                  ((:file "clack"
+                    :depends-on ("component" "middleware" "handler"))
                    (:file "builder")
-                   (:file "logger")
                    (:file "response")
                    (:file "request")
+                   (:file "component")
+                   (:file "middleware" :depends-on ("component"))
+                   (:file "logger")
                    (:module "handler"
                     :depends-on ("component")
                     :components
@@ -67,7 +62,6 @@
                      (:file "apache")))
                    (:file "test")
                    (:file "test/suite" :depends-on ("test"))
-                   (:file "clack")
                    (:module "app"
                     :depends-on ("component")
                     :components
@@ -92,19 +86,28 @@
                        (:file "store")
                        (:file "session")))))))
                  (:module "contrib"
+                  :depends-on ("util" "core")
                   :components
-                  ((:module "middleware"
+                  ((:module "app"
                     :components
-                    ((:file "oauth")))
-                   (:module "app"
+                    ((:file "route")))
+                   (:module "middleware"
                     :components
-                    ((:file "route"))))))))
+                    ((:file "oauth")))))
+                 (:module "util"
+                  :serial t
+                  :components
+                  ((:file "doc")
+                   (:file "util")
+                   (:file "hunchentoot"))))))
   :description
-  #.(with-open-file (stream
-                     (merge-pathnames #p"README.markdown"
-                                      (or *load-pathname* *compile-file-pathname*))
-                     :direction :input)
-      (let ((seq (make-array (file-length stream) :element-type 'character :fill-pointer t)))
+  #.(with-open-file (stream (merge-pathnames
+                             #p"README.markdown"
+                             (or *load-pathname* *compile-file-pathname*))
+                            :direction :input)
+      (let ((seq (make-array (file-length stream)
+                             :element-type 'character
+                             :fill-pointer t)))
         (setf (fill-pointer seq) (read-sequence seq stream))
         seq)))
 
