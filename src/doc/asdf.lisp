@@ -43,6 +43,9 @@
                   ((cl:defun cl:defmacro)
                    (make-instance '<doc-function>
                       :name (second form)
+                      :type (if (eq (first form) 'cl:defun)
+                                :function
+                                :macro)
                       :lambda-list (third form)))
                   (cl:defgeneric
                    (make-instance '<doc-function>
@@ -52,7 +55,7 @@
                   ((cl:defmethod)
                    (make-instance '<doc-method>
                       :name (second form)
-                      :order (unless (listp (third form)) (third form))
+                      :qualifier (unless (listp (third form)) (third form))
                       :lambda-list (if (listp (third form))
                                        (third form)
                                        (fourth form))))

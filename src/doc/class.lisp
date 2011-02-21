@@ -118,11 +118,11 @@
           (format nil "<strong>~(~/clack.doc.markdown:markdown-escape/~)</strong>~:[~;~:* [~{~(~/clack.doc.markdown:markdown-escape/~)~^ ~}]~]"
                   (doc-name this)
                   (normalized-lambda-list this))
-          (documentation (find-entity this) 'function)))
+          (documentation (doc-name this) 'function)))
 
 @export
 (defclass <doc-method> (<doc-function>)
-     ((order :initarg :order :initform nil :accessor method-order)))
+     ((qualifier :initarg :qualifier :initform nil :accessor method-qualifier)))
 
 (defmethod initialize-instance :after ((this <doc-method>) &key)
   (setf (doc-type this) :method))
@@ -130,7 +130,7 @@
 (defmethod find-entity ((this <doc-method>))
   (or (find-method (symbol-function (doc-name this))
                    ;; FIXME: ugly
-                   (and (method-order this) (list (method-order this)))
+                   (and (method-qualifier this) (list (method-qualifier this)))
                    (lambda-list->specializers (function-lambda-list this)))
       (error "Method not found: ~A ~A"
              (doc-name this) (normalized-lambda-list this))))
