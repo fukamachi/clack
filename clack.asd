@@ -63,12 +63,12 @@
                    (:file "test")
                    (:file "test/suite" :depends-on ("test"))
                    (:module "app"
-                    :depends-on ("component")
+                    :depends-on ("clack")
                     :components
                     ((:file "file")))
                    (:module "mw"
                     :pathname "middleware"
-                    :depends-on ("middleware")
+                    :depends-on ("clack" "response" "request")
                     :components
                     ((:file "static")
                      (:module "log"
