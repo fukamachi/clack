@@ -24,7 +24,8 @@
 (defvar *doc-packages* nil)
 
 (defun gendoc (type summary &optional description)
-  ;; export 'pre' tags directly because of Cl-Markdown's bug.
+  (when description
+    (setf description (string-trim #(#\Newline) description)))
   (format nil "- ~:(~A~): ~A~:[~;~:*<pre>~{~/clack.doc.markdown:markdown-escape/~^<br />~}</pre>~]
 "
           type summary (and description
@@ -48,7 +49,7 @@
 @export
 (defmethod generate-documentation ((this <doc-package>))
   (format nil
-          "~2&~A~2&## EXTERNAL SYMBOLS~%~{~A~}"
+          "~2&~A~2&## EXTERNAL SYMBOLS~2%<div class=\"symbol\">~2%~{~A~}</div>"
          (or (documentation (find-entity this) t)
              (format nil "# ~A~%" (string-capitalize (doc-name this))))
          (mapcar #'generate-documentation
