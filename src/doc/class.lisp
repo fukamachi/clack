@@ -23,13 +23,10 @@
 (defvar *doc-packages* nil)
 
 (defun gendoc (type summary &optional description)
-  (format nil "
-- ~:(~A~): ~A~:[~;~:*
-
-~{    ~A~^
-~}~]
-" type summary (and description
-                    (split-sequence #\Newline description))))
+  ;; export 'pre' tags directly because of Cl-Markdown's bug.
+  (format nil "- ~:(~A~): ~A~:[~;~:*<pre>~{~A~^<br />~}</pre>~]"
+          type summary (and description
+                            (split-sequence #\Newline description))))
 
 (defclass <doc-base> ()
      ((type :initarg :type :initform nil :accessor doc-type)
