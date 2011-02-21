@@ -43,3 +43,12 @@
                return (nreverse args)
         else do (push t args)
         finally (return (nreverse args))))
+
+@export
+(defun map-tree (f tree)
+  (mapcar (lambda (e)
+            (cond
+              ((null e) nil)
+              ((listp e) (map-tree f e))
+              (t (funcall f e))))
+          tree))

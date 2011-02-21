@@ -13,7 +13,8 @@
   (:import-from :clack.doc.util
                 :class-direct-superclasses
                 :external-symbol-p
-                :lambda-list->specializers)
+                :lambda-list->specializers
+                :map-tree)
   (:import-from :clack.doc.markdown
                 :markdown-escape))
 (in-package :clack.doc.class)
@@ -104,12 +105,18 @@
 (defmethod find-entity ((this <doc-function>))
   (symbol-function (doc-name this)))
 
+(defmethod normalized-lambda-list ((this <doc-function>))
+  (map-tree #'(lambda (obj) (if (keywordp obj)
+                            (format nil "~S" obj)
+                            (format nil "~A" obj)))
+            (function-lambda-list this)))
+
 @export
 (defmethod generate-documentation ((this <doc-function>))
   (gendoc (doc-type this)
           (format nil "~(~/clack.doc.markdown:markdown-escape/~)~:[~;~:* [~{~(~/clack.doc.markdown:markdown-escape/~)~^ ~}]~]"
                   (doc-name this)
-                  (function-lambda-list this))
+                  (normalized-lambda-list this))
           (documentation (find-entity this) 'function)))
 
 @export
@@ -125,14 +132,14 @@
                    (and (method-order this) (list (method-order this)))
                    (lambda-list->specializers (function-lambda-list this)))
       (error "Method not found: ~A ~A"
-             (doc-name this) (function-lambda-list this))))
+             (doc-name this) (normalized-lambda-list this))))
 
 @export
 (defmethod generate-documentation ((this <doc-method>))
   (gendoc (doc-type this)
           (format nil "~(~/clack.doc.markdown:markdown-escape/~)~:[~;~:* [~{~(~/clack.doc.markdown:markdown-escape/~)~^ ~}]~]"
                   (doc-name this)
-                  (function-lambda-list this))
+                  (normalized-lambda-list this))
           (documentation (find-entity this) t)))
 
 @export
