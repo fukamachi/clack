@@ -29,15 +29,18 @@
           do (with-open-file (stream (format nil "~(~A~).html" (doc-name pkg))
                                      :direction :output
                                      :if-exists :supersede)
-               (markdown (generate-documentation pkg) :stream stream)))
+               (write-string "<html><head><link href=\"doc.css\" rel=\"stylesheet\" type=\"text/css\"></head><body>" stream)
+               (markdown (generate-documentation pkg) :stream stream)
+               (write-string "</body></html>" stream)))
     (with-open-file (stream "index.html"
                             :direction :output
                             :if-exists :supersede)
+      (write-string "<html><head><link href=\"doc.css\" rel=\"stylesheet\" type=\"text/css\"></head><body>" stream)
       (markdown (ignore-errors (slot-value system 'asdf::description))
                 :stream stream)
       (write-string "<h2>API Reference</h2>" stream)
       (write-string "<ul>" stream)
       (loop for pkg in (reverse packages)
             do (format stream "<li><a href=\"~(~A~).html\">~:*~:(~A~)</a></li>" (doc-name pkg)))
-      (write-string "</ul>" stream)))
+      (write-string "</ul></body></html>" stream)))
   t)

@@ -1,0 +1,19 @@
+@charset "UTF-8";
+
+body {
+  margin: 0 200px;
+}
+
+pre {
+  padding: 5px;
+  background-color: #eee;
+}
+
+code {
+  border: 1px solid #aaa;
+  background-color: #eef;
+}
+
+h2 {
+  border: 4px solid #E0E0E0;
+}
