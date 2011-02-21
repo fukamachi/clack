@@ -29,13 +29,17 @@
           do (with-open-file (stream (format nil "~(~A~).html" (doc-name pkg))
                                      :direction :output
                                      :if-exists :supersede)
-               (write-string "<html><head><link href=\"doc.css\" rel=\"stylesheet\" type=\"text/css\"></head><body>" stream)
+               (format stream
+                       "<html><head><title>~:(~A~) - ~:(~A~) API Reference</title><link href=\"doc.css\" rel=\"stylesheet\" type=\"text/css\"></head><body>"
+                       (doc-name pkg) (slot-value system 'asdf::name))
                (markdown (generate-documentation pkg) :stream stream)
                (write-string "</body></html>" stream)))
     (with-open-file (stream "index.html"
                             :direction :output
                             :if-exists :supersede)
-      (write-string "<html><head><link href=\"doc.css\" rel=\"stylesheet\" type=\"text/css\"></head><body>" stream)
+      (format stream "<html><head><title>~:(~A~) - ~A</title><link href=\"doc.css\" rel=\"stylesheet\" type=\"text/css\"></head><body>"
+              (slot-value system 'asdf::name)
+              (slot-value system 'asdf::description))
       (markdown (ignore-errors (slot-value system 'asdf::long-description))
                 :stream stream)
       (write-string "<h2>API Reference</h2>" stream)
