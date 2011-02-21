@@ -30,9 +30,6 @@
                                      :direction :output
                                      :if-exists :supersede)
                (write-string "<html><head><link href=\"doc.css\" rel=\"stylesheet\" type=\"text/css\"></head><body>" stream)
-               (format stream "<h1>~:(~A~) - ~A</h1>"
-                              (slot-value system 'asdf::name)
-                              (slot-value system 'asdf::description))
                (markdown (generate-documentation pkg) :stream stream)
                (write-string "</body></html>" stream)))
     (with-open-file (stream "index.html"

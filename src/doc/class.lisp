@@ -48,9 +48,9 @@
 @export
 (defmethod generate-documentation ((this <doc-package>))
   (format nil
-          "~2&~A~2&# EXTERNAL SYMBOLS~%~{~A~}"
+          "~2&~A~2&## EXTERNAL SYMBOLS~%~{~A~}"
          (or (documentation (find-entity this) t)
-             (format nil "# NAME~2%~A~%" (string-capitalize (doc-name this))))
+             (format nil "# ~A~%" (string-capitalize (doc-name this))))
          (mapcar #'generate-documentation
                  (remove-if-not
                   #'externalp

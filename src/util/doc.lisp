@@ -20,8 +20,7 @@
 
 @export
 '#.(defvar *section-plist*
-       '(:name "NAME"
-         :synopsis "SYNOPSIS"
+       '(:synopsis "SYNOPSIS"
          :explanation "EXPLANATION"
          :dependencies "DEPENDENCIES"
          :description "DESCRIPTION"
@@ -40,7 +39,7 @@ because they append sections duplicately when the packaged is reloaded."
   (setf (documentation *package* t) ""))
 
 @export
-(defun doc (header string &optional (level 1))
+(defun doc (header &optional (string "") (level 1))
   "Set documentation to current package"
   (setf (documentation *package* t)
         (concatenate 'string
@@ -48,9 +47,13 @@ because they append sections duplicately when the packaged is reloaded."
                      (section header string level))))
 
 @export
-(defun section (header string &optional (level 1))
+(defun section (header &optional (string "") (level 1))
   (format nil "~:[~;~:*~V@{~A~:*~}~* ~A~2&~]~A~2&"
           level "#" header (string-left-trim #(#\Newline) string)))
+
+@export
+(defun name (string)
+  (doc string))
 
 #.`(progn
      ,@(loop for (fn-name sec) on *section-plist* by #'cddr
@@ -58,7 +61,8 @@ because they append sections duplicately when the packaged is reloaded."
              `@export
                (defun ,(intern (symbol-name fn-name)) (string)
                  (doc ,sec
-                      (string-left-trim #(#\Newline) string)))))
+                      (string-left-trim #(#\Newline) string)
+                      2))))
 
 (doc::start)
 
