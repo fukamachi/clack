@@ -1,20 +1,31 @@
 @charset "UTF-8";
 
 body {
-  margin: 0 200px;
+  margin: 0 150px;
+  line-height: 150%;
 }
 
 pre {
-  padding: 5px;
+  padding: 8px;
   background-color: #eee;
+  line-height: normal;
   white-space: pre-wrap;
 }
 
-code {
-  border: 1px solid #aaa;
-  background-color: #eef;
+h1, h2, h3, h4, h5, h6, h7, h8, h9 {
+  line-height: normal;
+}
+h2 {
+  border-top: 4px solid #E0E0E0;
+  padding-top: 5px;
 }
 
-h2 {
-  border: 4px solid #E0E0E0;
+.symbol ul {
+  padding: 0 10px 0 25px;
+}
+.symbol pre {
+  border: 1px solid #eee;
+  background-color: transparent;
+  font-family: inherit;
+  margin-top: 0;
 }
