@@ -52,7 +52,7 @@
                       :name (second form)
                       :type :generic
                       :lambda-list (third form)))
-                  ((cl:defmethod)
+                  (cl:defmethod
                    (make-instance '<doc-method>
                       :name (second form)
                       :qualifier (unless (listp (third form)) (third form))

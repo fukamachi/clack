@@ -53,9 +53,10 @@
          (or (documentation (find-entity this) t)
              (format nil "# ~A~%" (string-capitalize (doc-name this))))
          (mapcar #'generate-documentation
-                 (remove-if-not
-                  #'externalp
-                  (reverse (package-symbols this))))))
+                 (reverse
+                  (remove-if-not
+                   #'externalp
+                   (package-symbols this))))))
 
 @export
 (defun find-package* (package-name &key force)
