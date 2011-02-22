@@ -158,8 +158,7 @@
                 unless (member (type-of super) '(built-in-class eql-specializer))
                   collect (class-name super)))
     (setf (class-slots this)
-          (mapcar #'c2mop:slot-definition-name
-                  (c2mop:compute-slots class)))))
+          (c2mop:class-direct-slots class))))
 
 (defmethod find-entity ((this <doc-class>))
   (find-class (doc-name this)))
@@ -167,12 +166,32 @@
 @export
 (defmethod generate-documentation ((this <doc-class>))
   (prepare this)
-  (gendoc (doc-type this)
-          (format nil "<strong>~(~/clack.doc.markdown:markdown-escape/~)</strong>~:[~;~:* inherits ~(~/clack.doc.markdown:markdown-escape/~)~]~:[~;~:* [~{~(~/clack.doc.markdown:markdown-escape/~)~^ ~}]~]"
-                  (doc-name this)
-                  (class-super-classes this)
-                  (class-slots this))
-          (documentation (find-entity this) 'class)))
+  (concatenate
+   'string
+   (gendoc (doc-type this)
+           (format nil "<strong>~(~/clack.doc.markdown:markdown-escape/~)</strong>~:[~;~:* inherits ~(~/clack.doc.markdown:markdown-escape/~)~]"
+                   (doc-name this)
+                   (class-super-classes this)
+                   )
+           (documentation (doc-name this) 'type))
+   (format nil "~:[~;~:*~2&<dl>~{~A~}</dl>~]~%"
+           (mapcar #'generate-documentation
+                   (class-slots this)))))
+
+(defmethod generate-documentation ((this c2mop:standard-direct-slot-definition))
+  (let* ((accessors (intersection (c2mop:slot-definition-readers this)
+                                  (mapcar #'cadr (c2mop:slot-definition-writers this))))
+         (readers (set-difference (c2mop:slot-definition-readers this)
+                                  accessors))
+         (writers (set-difference (mapcar #'cadr (c2mop:slot-definition-writers this))
+                                  accessors)))
+    (format nil
+            "<dt><strong>~(~A~)</strong>~:[~;~:* Accessor:~{ ~(~A~)~}~]~:[~;~:* Reader:~{ ~(~A~)~}~]~:[~;~:* Writer:~{ ~(~A~)~}~]</small></dt>~:[~;~:*<dd>~A</dd>~]"
+            (c2mop:slot-definition-name this)
+            accessors
+            readers
+            writers
+            (documentation this t))))
 
 @export
 (defclass <doc-variable> (<doc-symbol-base>) ())

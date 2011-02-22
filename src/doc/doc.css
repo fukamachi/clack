@@ -29,3 +29,17 @@ h2 {
   font-family: inherit;
   margin-top: 0;
 }
+
+dl {
+  margin: -10px auto auto 20px;
+}
+
+dt {
+  font-size: small;
+  font-style: italic;
+}
+
+dt strong {
+  font-size: small;
+  font-style: normal;
+}
