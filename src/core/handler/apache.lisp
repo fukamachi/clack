@@ -12,13 +12,14 @@
         :metabang-bind
         :split-sequence)
   (:import-from :clack.component :call)
-  (:import-from :alexandria :doplist))
+  (:import-from :alexandria :plist-alist))
 
 (cl-annot:enable-annot-syntax)
 
 @export
 (defun run (app &key debug (port 3000))
   "Start talking to mod_lisp process."
+  @ignore debug
   (ml:modlisp-start :port port
                     :processor 'clack-request-dispatcher
                     :processor-args (list app)))
@@ -61,37 +62,29 @@ This is called on each request."
 
 (defun handle-response (res)
   "Function for managing response. Take response and output it to `ml:*modlisp-socket*'."
-  (bind ((keep-alive-p (getf header :content-length))
-         ((status headers body) res))
+  (bind (((status headers body) res)
+         (keep-alive-p (getf headers :content-length)))
     (setf (getf headers :status) (write-to-string status))
     (when keep-alive-p
       (setf (getf headers :keep-socket) "1"
             (getf headers :connection) "Keep-Alive"))
 
-    (doplist (key val headers)
-      (ml:write-header-line (string-capitalize key) val))
-    (write-line "end" ml:*modlisp-socket*)
+    (setf headers (plist-alist headers))
 
-    (prog1
-      (etypecase body
-        (pathname
-         (with-open-file (file body
-                          :direction :input
-                          :element-type 'octet
-                          :if-does-not-exist nil)
-           (loop with buf = (make-array 1024 :element-type 'octet)
-                 for pos = (read-sequence buf file)
-                 until (zerop pos)
-                 do (write-sequence buf ml:*modlisp-socket* :end pos)
-                    (finish-output ml:*modlisp-socket*))))
-        (list
-         (format ml:*modlisp-socket*
-                 "~{~A~^~%~}" body)))
-
-      (if keep-alive-p
-          (force-output ml:*modlisp-socket*)
-          (finish-output ml:*modlisp-socket*))
-      (setf ml:*close-modlisp-socket* (not keep-alive-p)))))
+    (etypecase body
+      (pathname
+       (with-open-file (file body
+                             :direction :input
+                             :element-type '(unsigned-byte 8)
+                             :if-does-not-exist nil)
+         (ml::write-response (:headers headers
+                              :len (format nil "~A" (file-length file)))
+          (loop with buf = (make-array 1024 :element-type '(unsigned-byte 8))
+                for pos = (read-sequence buf file)
+                until (zerop pos)
+                do (write-sequence buf ml:*modlisp-socket* :end pos)))))
+      (list
+       (ml:output-html-page (format nil "~{~A~^~%~}" body) :headers headers)))))
 
 (doc:start)
 
