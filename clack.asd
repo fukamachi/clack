@@ -68,7 +68,7 @@
                     ((:file "file")))
                    (:module "mw"
                     :pathname "middleware"
-                    :depends-on ("clack" "response" "request")
+                    :depends-on ("clack" "response" "request" "logger")
                     :components
                     ((:file "static")
                      (:module "log"
