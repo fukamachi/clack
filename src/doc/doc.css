@@ -43,3 +43,7 @@ dt strong {
   font-size: small;
   font-style: normal;
 }
+
+dd {
+  font-size: small;
+}
