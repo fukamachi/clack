@@ -26,6 +26,11 @@
 
 (cl-annot:enable-annot-syntax)
 
+@export
+(defvar *clack-test-access-port* *clack-test-port*
+  "Port of localhost to request.
+Use if you want to set another port. The default is `*clack-test-port*`.")
+
 (defvar *clack-pathname*
     (asdf:component-pathname (asdf:find-system :clack)))
 
@@ -58,7 +63,7 @@ you would call like this: `(run-server-tests :foo)'."
 (defun localhost (&optional path)
   (format nil
           "http://localhost:~D/~:[~;~:*~A~]"
-          *clack-test-port*
+          *clack-test-access-port*
           path))
 
 ;; Tests
