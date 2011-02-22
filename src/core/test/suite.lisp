@@ -235,7 +235,7 @@ you would call like this: `(run-server-tests :foo)'."
                          "PATH-INFO:/foo/"
                          "QUERY-STRING:ediweitz=weitzedi"
                          "SERVER-NAME:localhost"
-                         ,(format nil "SERVER-PORT:~D" *clack-test-port*)))))))
+                         ,(format nil "SERVER-PORT:~D" *clack-test-access-port*)))))))
 
 (define-app-test |% encoding in PATH-INFO|
   (lambda (req)
