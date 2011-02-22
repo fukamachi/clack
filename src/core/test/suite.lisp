@@ -15,6 +15,7 @@
                 :octets-to-string)
   (:import-from :clack.test
                 :*clack-test-handler*
+                :*clack-test-port*
                 :define-app-test)
   (:import-from :drakma
                 :*drakma-default-external-format*
@@ -54,6 +55,12 @@ you would call like this: `(run-server-tests :foo)'."
   (with-open-file (in file :direction :input)
     (file-length in)))
 
+(defun localhost (&optional path)
+  (format nil
+          "http://localhost:~D/~:[~;~:*~A~]"
+          *clack-test-port*
+          path))
+
 ;; Tests
 
 (define-app-test |SCRIPT-NAME|
@@ -62,7 +69,7 @@ you would call like this: `(run-server-tests :foo)'."
       (:content-type "text/plain")
       (,(getf req :script-name))))
   (lambda ()
-    (is (http-request "http://localhost:4242/") nil)))
+    (is (http-request (localhost)) nil)))
 
 (define-app-test |GET|
   (lambda (req)
@@ -71,7 +78,7 @@ you would call like this: `(run-server-tests :foo)'."
       (,(format nil "Hello, ~A" (getf req :query-string)))))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (http-request "http://localhost:4242/?name=fukamachi")
+        (http-request (localhost "?name=fukamachi"))
       (is status 200)
       (is (get-header headers :content-type)
           "text/plain")
@@ -87,7 +94,7 @@ you would call like this: `(run-server-tests :foo)'."
         (,(format nil "Hello, ~A" body)))))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (http-request "http://localhost:4242/"
+        (http-request (localhost)
                       :method :post
                       :parameters '(("name" . "eitarow")))
       (is status 200)
@@ -112,7 +119,7 @@ you would call like this: `(run-server-tests :foo)'."
               chunk))
            (len (length chunk)))
       (multiple-value-bind (body status headers)
-          (http-request "http://localhost:4242/"
+          (http-request (localhost)
                         :method :post
                         :content-type "application/octet-stream"
                         :content-length len
@@ -128,7 +135,7 @@ you would call like this: `(run-server-tests :foo)'."
       (,(getf req :url-scheme))))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (http-request "http://localhost:4242/" :method :post)
+        (http-request (localhost) :method :post)
       (is status 200)
       (is (get-header headers :content-type) "text/plain")
       (is body "HTTP"))))
@@ -141,7 +148,7 @@ you would call like this: `(run-server-tests :foo)'."
       ,(merge-pathnames #p"tmp/file.txt" *clack-pathname*)))
   (lambda ()
       (multiple-value-bind (body status headers)
-          (http-request "http://localhost:4242/")
+          (http-request (localhost))
         (is status 200)
         (is (get-header headers :content-type) "text/plain")
         (like body "This is a text for test."))))
@@ -156,7 +163,7 @@ you would call like this: `(run-server-tests :foo)'."
         ,file)))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (http-request "http://localhost:4242/redhat.png")
+        (http-request (localhost "redhat.png"))
       (is status 200)
       (is (get-header headers :content-type) "image/png")
       (is (length body) 12155))))
@@ -171,7 +178,7 @@ you would call like this: `(run-server-tests :foo)'."
         ,file)))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (http-request "http://localhost:4242/jellyfish.jpg")
+        (http-request (localhost "jellyfish.jpg"))
       (is status 200)
       (is (get-header headers :content-type) "image/jpeg")
       (is (length body) 139616))))
@@ -183,7 +190,7 @@ you would call like this: `(run-server-tests :foo)'."
       (,(getf req :http-foo))))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (http-request "http://localhost:4242/foo/?ediweitz=weitzedi"
+        (http-request (localhost "foo/?ediweitz=weitzedi")
                       :additional-headers '(("Foo" . "Bar")))
       (is status 200)
       (is (get-header headers :content-type) "text/plain")
@@ -196,7 +203,7 @@ you would call like this: `(run-server-tests :foo)'."
       (,(getf req :http-cookie))))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (http-request "http://localhost:4242/foo/?ediweitz=weitzedi"
+        (http-request (localhost "foo/?ediweitz=weitzedi")
                       :additional-headers '(("Cookie" . "foo")))
       (is status 200)
       (is (get-header headers :content-type) "text/plain")
@@ -215,15 +222,15 @@ you would call like this: `(run-server-tests :foo)'."
                      collect (format nil "~A:~A~%" h (getf req h)))))))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (http-request "http://localhost:4242/foo/?ediweitz=weitzedi")
+        (http-request (localhost "foo/?ediweitz=weitzedi"))
       (is status 200)
       (is (get-header headers :content-type) "text/plain")
       (is body (format nil "~{~A~%~}"
-                       '("REQUEST-METHOD:GET"
+                       `("REQUEST-METHOD:GET"
                          "PATH-INFO:/foo/"
                          "QUERY-STRING:ediweitz=weitzedi"
                          "SERVER-NAME:localhost"
-                         "SERVER-PORT:4242"))))))
+                         ,(format nil "SERVER-PORT:~D" *clack-test-port*)))))))
 
 (define-app-test |% encoding in PATH-INFO|
   (lambda (req)
@@ -231,7 +238,7 @@ you would call like this: `(run-server-tests :foo)'."
       (:content-type "text/plain")
       (,(getf req :path-info))))
   (lambda ()
-    (is (http-request "http://localhost:4242/foo/bar%2cbaz") "/foo/bar,baz")))
+    (is (http-request (localhost "foo/bar%2cbaz")) "/foo/bar,baz")))
 
 (define-app-test |% double encoding in PATH-INFO|
   (lambda (req)
@@ -239,7 +246,7 @@ you would call like this: `(run-server-tests :foo)'."
       (:content-type "text/plain")
       (,(getf req :path-info))))
   (lambda ()
-    (is (http-request "http://localhost:4242/foo/bar%252cbaz") "/foo/bar%2cbaz")))
+    (is (http-request (localhost "foo/bar%252cbaz")) "/foo/bar%2cbaz")))
 
 (define-app-test |% encoding in PATH-INFO (outside of URI characters)|
   (lambda (req)
@@ -247,7 +254,7 @@ you would call like this: `(run-server-tests :foo)'."
       (:content-type "text/plain")
       (,(getf req :path-info))))
   (lambda ()
-    (is (http-request "http://localhost:4242/foo%E3%81%82")
+    (is (http-request (localhost "foo%E3%81%82"))
         (format nil "/foo~A"
                 (flex:octets-to-string #(#xE3 #x81 #x82) :external-format :utf-8)))))
 
@@ -258,7 +265,7 @@ you would call like this: `(run-server-tests :foo)'."
       (,(getf req :server-protocol))))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (http-request "http://localhost:4242/foo/?ediweitz=weitzedi")
+        (http-request (localhost "foo/?ediweitz=weitzedi"))
       (is status 200)
       (is (get-header headers :content-type) "text/plain")
       (like body "^HTTP/1\\.[01]$"))))
@@ -269,7 +276,7 @@ you would call like this: `(run-server-tests :foo)'."
       (:content-type "text/plain")
       (,(not (null (getf req :script-name))))))
   (lambda ()
-    (is (http-request "http://localhost:4242/foo/?ediweitz=weitzedi")
+    (is (http-request (localhost "foo/?ediweitz=weitzedi"))
         "T"
         :test #'equalp)))
 
@@ -278,7 +285,7 @@ you would call like this: `(run-server-tests :foo)'."
     @ignore req
     (error "Throwing an exception from app handler. Server shouldn't crash."))
   (lambda ()
-    (is (nth-value 1 (http-request "http://localhost:4242/"))
+    (is (nth-value 1 (http-request (localhost)))
         500))
   nil)
 
@@ -289,7 +296,7 @@ you would call like this: `(run-server-tests :foo)'."
       (,(getf req :http-foo))))
   (lambda ()
     (like
-     (http-request "http://localhost:4242/"
+     (http-request (localhost)
                    :additional-headers '(("Foo" . "bar")
                                          ("Foo" . "baz")))
      "^bar,\\s*baz$")))
@@ -303,7 +310,7 @@ you would call like this: `(run-server-tests :foo)'."
        :x-foo "bar, baz")
       ("hi")))
   (lambda ()
-    (let ((headers (nth-value 2 (http-request "http://localhost:4242/"))))
+    (let ((headers (nth-value 2 (http-request (localhost)))))
       (like (get-header headers :x-foo) "foo,\\s*bar,\\s*baz"))))
 
 (define-app-test |Do not set COOKIE|
@@ -314,7 +321,7 @@ you would call like this: `(run-server-tests :foo)'."
       (,(getf req :http-cookie))))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (http-request "http://localhost:4242/"
+        (http-request (localhost)
                       :additional-headers '(("Cookie" . "foo=bar")))
       (is status 200)
       (is (get-header headers :x-cookie) nil)
@@ -331,7 +338,7 @@ you would call like this: `(run-server-tests :foo)'."
     (if (string= "CLACK.HANDLER.HUNCHENTOOT" *clack-test-handler*)
         (skip 5 "because of Hunchentoot's bug")
         (multiple-value-bind (body status headers)
-            (http-request "http://localhost:4242/")
+            (http-request (localhost))
           (is status 304)
           (is body nil)
           (is (nth-value 1 (get-header headers :content-type)) nil "No Content-Type")
@@ -344,7 +351,7 @@ you would call like this: `(run-server-tests :foo)'."
       (:content-type "text/plain")
       (,(getf req :request-uri))))
   (lambda ()
-    (let ((uri (puri:parse-uri "http://localhost:4242/foo/bar%20baz%73?x=a")))
+    (let ((uri (puri:parse-uri (localhost "foo/bar%20baz%73?x=a"))))
       (setf (puri:uri-path uri) "/foo/bar%20baz%73")
       (is (http-request uri) "/foo/bar%20baz%73?x=a"))))
 
@@ -359,7 +366,7 @@ you would call like this: `(run-server-tests :foo)'."
              (dotimes (i 12000) (write-string "abcdefgh" chunk))
              chunk)))
       (multiple-value-bind (body status)
-          (http-request "http://localhost:4242/"
+          (http-request (localhost)
                         :additional-headers `(("X-Foo" . ,chunk)))
         (is status 200)
         (is body chunk)))))
@@ -373,7 +380,7 @@ you would call like this: `(run-server-tests :foo)'."
                 #\Return #\NewLine #\Return #\NewLine))))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (http-request "http://localhost:4242/")
+        (http-request (localhost))
       (is status 200)
       (is (get-header headers :foo) nil)
       (is body (format nil "Foo: Bar~A~A~A~AHello World"
@@ -387,7 +394,7 @@ you would call like this: `(run-server-tests :foo)'."
       ("Not Found")))
   (lambda ()
     (multiple-value-bind (body status)
-        (http-request "http://localhost:4242/")
+        (http-request (localhost))
       (is status 404)
       (is body "Not Found"))))
 
@@ -397,7 +404,7 @@ you would call like this: `(run-server-tests :foo)'."
       (:content-type "text/plain")
       (,(read-line (getf req :raw-body)))))
   (lambda ()
-    (is (http-request "http://localhost:4242/"
+    (is (http-request (localhost)
                       :method :post
                       :content "body")
         "body")))
@@ -410,7 +417,7 @@ you would call like this: `(run-server-tests :foo)'."
       ("")))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (http-request "http://localhost:4242/")
+        (http-request (localhost))
       (is status 200)
       (is (get-header headers :client-transfer-encoding) nil)
       (is body nil))))
@@ -423,14 +430,14 @@ you would call like this: `(run-server-tests :foo)'."
       (,(or (getf req :http-authorization) ""))))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (http-request "http://localhost:4242/"
+        (http-request (localhost)
                       :additional-headers '(("Authorization" . "Basic XXXX")))
       (is status 200)
       (is (get-header headers :x-authorization) "T"
           :test #'equalp)
       (is body "Basic XXXX"))
     (multiple-value-bind (body status headers)
-        (http-request "http://localhost:4242/")
+        (http-request (localhost))
       (is status 200)
       (is (get-header headers :x-authorization) nil)
       (is body nil :test #'eq))))
@@ -442,7 +449,7 @@ you would call like this: `(run-server-tests :foo)'."
       (,(getf req :path-info))))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (http-request "http://localhost:4242/foo///bar/baz")
+        (http-request (localhost "foo///bar/baz"))
       (is status 200)
       (is (get-header headers :content-type) "text/plain")
       (is body "/foo///bar/baz"))))
