@@ -10,7 +10,8 @@
   (:use :cl
         :modlisp
         :metabang-bind
-        :split-sequence)
+        :split-sequence
+        :anaphora)
   (:import-from :clack.component :call)
   (:import-from :alexandria :plist-alist))
 
@@ -38,15 +39,19 @@ This is called on each request."
 
 (defun command->plist (command)
   (bind ((url (ml:header-value command :url))
-         (pos (position #\? url))
+         (pos (or (position #\? url) 0))
          ((server-name server-port)
           (split-sequence #\: (ml:header-value command :host))))
     (list
      :request-method (ml:header-value command :method)
      :script-name ""
      :path-info (subseq url 0 pos)
-     :query-string (ml:header-value command :url-params)
-     :raw-body (ml:header-value command :posted-content)
+     :query-string (subseq url (1+ pos))
+     :raw-body (awhen (ml:header-value command :posted-content)
+                 (make-string-input-stream it))
+     :content-length (parse-integer (ml:header-value command :content-length)
+                                    :junk-allowed t)
+     :content-type (ml:header-value command :content-type)
      :server-name server-name
      :server-port (parse-integer server-port :junk-allowed t)
      :server-protocol (ml:header-value command :server-protocol)
