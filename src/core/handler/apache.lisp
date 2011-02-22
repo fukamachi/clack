@@ -84,7 +84,8 @@ This is called on each request."
                 until (zerop pos)
                 do (write-sequence buf ml:*modlisp-socket* :end pos)))))
       (list
-       (ml:output-html-page (format nil "~{~A~^~%~}" body) :headers headers)))))
+       (ml::write-response (:headers headers)
+        (format ml:*modlisp-socket* "~{~A~^~%~}" body))))))
 
 (doc:start)
 
