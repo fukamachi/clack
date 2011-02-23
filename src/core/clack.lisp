@@ -37,15 +37,16 @@ Example:
            :port 8080
            :debug t)
 "
-  (let* ((handler (find-handler server)))
+  (let ((handler (find-handler server)))
     (funcall (intern "RUN" handler) app
              :port port
              :debug debug)))
 
 @export
-(defun stop (acceptor)
+(defun stop (acceptor &key (server :hunchentoot))
   "Stop Clack server. Currently works only Hunchentoot."
-  (clack.handler.hunchentoot:stop acceptor))
+  (let ((handler (find-handler server)))
+    (funcall (intern "STOP" handler) acceptor)))
 
 (defun find-handler (server)
   (let ((handler-name (concatenate 'string
