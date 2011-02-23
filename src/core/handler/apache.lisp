@@ -105,7 +105,10 @@ This is called on each request."
                 do (write-sequence buf ml:*modlisp-socket* :end pos)))))
       (list
        (ml::write-response (:headers headers)
-        (format ml:*modlisp-socket* "~{~A~^~%~}" body))))))
+        (write-sequence (flex:string-to-octets
+                         (format nil "~{~A~^~%~}" body)
+                         :external-format :utf-8)
+         ml:*modlisp-socket*))))))
 
 (doc:start)
 
