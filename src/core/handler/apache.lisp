@@ -12,8 +12,7 @@
         :metabang-bind
         :split-sequence
         :anaphora)
-  (:import-from :clack.component :call)
-  (:import-from :alexandria :plist-alist))
+  (:import-from :clack.component :call))
 
 (cl-annot:enable-annot-syntax)
 
@@ -48,7 +47,10 @@ This is called on each request."
      :path-info (subseq url 0 pos)
      :query-string (subseq url (1+ pos))
      :raw-body (awhen (ml:header-value command :posted-content)
-                 (make-string-input-stream it))
+                 (flex:make-flexi-stream
+                  (flex:make-in-memory-input-stream
+                   (flex:string-to-octets it))
+                  :external-format :utf-8))
      :content-length (parse-integer (ml:header-value command :content-length)
                                     :junk-allowed t)
      :content-type (ml:header-value command :content-type)
@@ -75,7 +77,10 @@ This is called on each request."
       (setf (getf headers :keep-socket) "1"
             (getf headers :connection) "Keep-Alive"))
 
-    (setf headers (plist-alist headers))
+    ;; Convert plist to alist and make sure the values are strings.
+    (setf headers
+          (loop for (k v) on headers by #'cddr
+                collect (cons k (format nil "~A" v))))
 
     (etypecase body
       (pathname
