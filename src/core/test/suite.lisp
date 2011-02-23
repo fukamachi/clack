@@ -345,7 +345,7 @@ you would call like this: `(run-server-tests :foo)'."
         (multiple-value-bind (body status headers)
             (http-request (localhost))
           (is status 304)
-          (is body nil)
+          (is body #() :test #'equalp)
           (is (nth-value 1 (get-header headers :content-type)) nil "No Content-Type")
           (is (nth-value 1 (get-header headers :content-length)) nil "No Content-Length")
           (is (nth-value 1 (get-header headers :transfer-encoding)) nil "No Transfer-Encoding")))))
