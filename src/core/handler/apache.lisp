@@ -89,6 +89,7 @@ This is called on each request."
     ;; Convert plist to alist and make sure the values are strings.
     (setf headers
           (loop for (k v) on headers by #'cddr
+                if v
                 collect (cons k (format nil "~A" v))))
 
     (etypecase body
