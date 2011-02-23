@@ -20,18 +20,19 @@
 
 @export
 (defun run (app &key debug (port 3000))
-  "Start talking to mod_lisp process."
+  "Start talking to mod_lisp process.
+Note the `port` is for socket, not Apache's."
   (ml:modlisp-start :port port
                     :processor (make-request-dispatcher debug)
                     :processor-args (list app)))
 
 @export
 (defun stop (server)
-  "Close socket to talk with mod_lisp.
-If no server given, try to stop `*server*' by default."
+  "Close socket to talk with mod_lisp."
   (ml:modlisp-stop server))
 
 (defun make-request-dispatcher (&optional debug)
+  "Return a function which calls `clack-request-dispatcher`."
   (if debug
       #'(lambda (&rest args)
           (handler-bind ((error #'invoke-debugger))
@@ -41,7 +42,7 @@ If no server given, try to stop `*server*' by default."
 
 (defun clack-request-dispatcher (command app &key debug)
   "Apache(mod_lisp) request dispatcher for Clack. Process modlisp command alist.
-This is called on each request."
+This function is called on each request."
       (handler-bind ((error #'invoke-debugger))
       (handle-response (call app (command->plist command)))))
 
@@ -73,10 +74,6 @@ This is called on each request."
       :url-scheme :http
       :remote-addr (ml:header-value command :remote-ip-addr)
       :remote-port (ml:header-value command :remote-ip-port)
-;      :http-user-agent (ml:header-value command :user-agent)
-;      :http-referer (ml:header-value command :referer)
-;      :http-host (ml:header-value command :host)
-;      :http-cookies (ml:header-value command :cookie)
       :http-server :modlisp)
 
      ;; NOTE: this code almost same thing of Clack.Handler.Hunchentoot's
@@ -133,10 +130,31 @@ This is called on each request."
 Clack.Handler.Apache - Clack handler for Apache2 + mod_lisp.
 "
 
-@doc:DESCRIPTION "
-Clack.Handler.Apache is a Clack handler for Apache2 + mod_lisp.
+@doc:SYNOPSIS "
+(clackup #'(lambda (req)
+             '(200
+               (:content-type \"text/plain\")
+               (\"Hello, Clack!\")))
+         :server :apache
+         :port 3000)
+"
 
-This is not maintained well. Sorry.
+@doc:DESCRIPTION "
+Clack.Handler.Apache is a Clack handler for Apache2 + mod_lisp. This handler depends on a library \"cl-modlisp\", so only works on CMUCL, SBCL, AllegroCL and LispWorks.
+
+You should make sure Apache server and [mod_lisp](http://www.fractalconcept.com/asp/html/mod_lisp.html) installed on your machine. The configuration of Apache might be like this.
+
+    Listen 12345
+    NameVirtualHost *:12345
+    <VirtualHost *:12345>
+      ErrorLog \"/tmp/mod-lisp.log\"
+      LispServer 127.0.0.1 3000 \"www\"
+      <Location />
+        SetHandler lisp-handler
+      </Location>
+    </VirtualHost>
+
+This configuration means to open port 12345 to web browsers, and listening Lisp process on port 3000.
 "
 
 @doc:AUTHOR "

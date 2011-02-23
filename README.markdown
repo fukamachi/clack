@@ -114,9 +114,9 @@ Clack Applications run via Clack Handlers, which are in turn responsible for imp
 Now Clack Applications works on Hunchentoot and Apache, by using following handler.
 
 * Clack.Handler.Hunchentoot
-* Clack.Handler.Apache (not recommended because not tested well yet)
+* Clack.Handler.Apache
 
-If you hope them to run on other server (such as teepeedee2), you can write a handler for it easily.
+If you hope them to run on other server (such as AllegroServe or teepeedee2), you can write a handler for it easily.
 
 ## Middleware
 
