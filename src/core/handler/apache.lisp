@@ -41,32 +41,36 @@ This is called on each request."
          (pos (or (position #\? url) 0))
          ((server-name server-port)
           (split-sequence #\: (ml:header-value command :host))))
-    (list
-     :request-method (ml:header-value command :method)
-     :script-name ""
-     :path-info (subseq url 0 pos)
-     :query-string (subseq url (1+ pos))
-     :raw-body (awhen (ml:header-value command :posted-content)
-                 (flex:make-flexi-stream
-                  (flex:make-in-memory-input-stream
-                   (flex:string-to-octets it))
-                  :external-format :utf-8))
-     :content-length (parse-integer (ml:header-value command :content-length)
-                                    :junk-allowed t)
-     :content-type (ml:header-value command :content-type)
-     :server-name server-name
-     :server-port (parse-integer server-port :junk-allowed t)
-     :server-protocol (ml:header-value command :server-protocol)
-     :request-uri url
-     :remote-addr (ml:header-value command :remote-ip-addr)
-     :remote-port (ml:header-value command :remote-ip-port)
-     :http-user-agent (ml:header-value command :user-agent)
-     :http-referer (ml:header-value command :referer)
-     :http-host (ml:header-value command :host)
-     ;; NOTE: :cookie returns string.
-     :http-cookies (ml:header-value command :cookie)
-     :http-server :modlisp
-     :%request command)))
+    (append
+     (list
+      :request-method (ml:header-value command :method)
+      :script-name ""
+      :path-info (subseq url 0 pos)
+      :query-string (subseq url (1+ pos))
+      :raw-body (awhen (ml:header-value command :posted-content)
+                  (flex:make-flexi-stream
+                   (flex:make-in-memory-input-stream
+                    (flex:string-to-octets it))
+                   :external-format :utf-8))
+      :content-length (parse-integer (ml:header-value command :content-length)
+                                     :junk-allowed t)
+      :content-type (ml:header-value command :content-type)
+      :server-name server-name
+      :server-port (parse-integer server-port :junk-allowed t)
+      :server-protocol (ml:header-value command :server-protocol)
+      :request-uri url
+      :remote-addr (ml:header-value command :remote-ip-addr)
+      :remote-port (ml:header-value command :remote-ip-port)
+;      :http-user-agent (ml:header-value command :user-agent)
+;      :http-referer (ml:header-value command :referer)
+;      :http-host (ml:header-value command :host)
+;      :http-cookies (ml:header-value command :cookie)
+      :http-server :modlisp)
+
+     ;; NOTE: this code almost same thing of Clack.Handler.Hunchentoot's
+     (loop for (k . v) in command
+           unless (member k '(:request-method :script-name :path-info :server-name :server-port :server-protocol :request-uri :remote-addr :remote-port :query-string :content-length :content-type :accept :connection))
+             append (list (intern (concatenate 'string "HTTP-" (string-upcase k)) :keyword) v)))))
 
 (defun handle-response (res)
   "Function for managing response. Take response and output it to `ml:*modlisp-socket*'."
