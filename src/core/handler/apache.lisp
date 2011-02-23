@@ -86,11 +86,20 @@ This is called on each request."
       (setf (getf headers :keep-socket) "1"
             (getf headers :connection) "Keep-Alive"))
 
+    ;; NOTE: This almost same of Clack.Handler.Hunchentoot's.
     ;; Convert plist to alist and make sure the values are strings.
     (setf headers
           (loop for (k v) on headers by #'cddr
-                if v
-                collect (cons k (format nil "~A" v))))
+                with hash = (make-hash-table :test #'eq)
+                if (gethash k hash)
+                  do (setf (gethash k hash)
+                           (format nil "~:[~;~:*~A, ~]~A" (gethash k hash) v))
+                else do (setf (gethash k hash) v)
+                finally
+             (return (loop for k being the hash-keys in hash
+                           using (hash-value v)
+                           if v
+                             collect (cons k (format nil "~A" v))))))
 
     (etypecase body
       (pathname
