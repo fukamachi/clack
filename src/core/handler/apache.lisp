@@ -12,7 +12,9 @@
         :metabang-bind
         :split-sequence
         :anaphora)
-  (:import-from :clack.component :call))
+  (:import-from :clack.component :call)
+  (:import-from :clack.util.hunchentoot
+                :url-decode))
 
 (cl-annot:enable-annot-syntax)
 
@@ -45,7 +47,8 @@ This is called on each request."
      (list
       :request-method (ml:header-value command :method)
       :script-name ""
-      :path-info (subseq url 0 pos)
+      :path-info (awhen (subseq url 0 pos)
+                   (url-decode it))
       :query-string (subseq url (1+ (or pos 0)))
       :raw-body (awhen (ml:header-value command :posted-content)
                   (flex:make-flexi-stream
