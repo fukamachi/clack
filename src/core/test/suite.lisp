@@ -130,7 +130,8 @@ you would call like this: `(run-server-tests :foo)'."
                         :content-length len
                         :parameters `((,chunk)))
         (is status 200)
-        (is (get-header headers :client-content-length) (format nil "~A" len))
+        (is (get-header headers :client-content-length)
+            (princ-to-string len))
         (is (length body) len)))))
 
 (define-app-test |url-scheme|

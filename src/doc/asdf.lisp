@@ -38,7 +38,7 @@
                 (case (first form)
                   (cl:defpackage
                    (register-package-system
-                    (format nil "~A" (second form))
+                    (princ-to-string (second form))
                     (slot-value system 'asdf::name)))
                   ((cl:defun cl:defmacro)
                    (make-instance '<doc-function>

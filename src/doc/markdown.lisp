@@ -20,4 +20,4 @@
 @export
 (defun markdown-escape (stream object &optional colon-p at-sign-p)
   @ignore (colon-p at-sign-p)
-  (format stream (markdown-escape-string (format nil "~A" object))))
+  (format stream (markdown-escape-string (princ-to-string object))))

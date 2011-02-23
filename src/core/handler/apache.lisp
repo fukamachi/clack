@@ -106,7 +106,7 @@ This is called on each request."
              (return (loop for k being the hash-keys in hash
                            using (hash-value v)
                            if v
-                             collect (cons k (format nil "~A" v))))))
+                             collect (cons k (princ-to-string v))))))
 
     (etypecase body
       (pathname
@@ -115,7 +115,7 @@ This is called on each request."
                              :element-type '(unsigned-byte 8)
                              :if-does-not-exist nil)
          (ml::write-response (:headers headers
-                              :len (format nil "~A" (file-length file)))
+                              :len (princ-to-string (file-length file)))
           (loop with buf = (make-array 1024 :element-type '(unsigned-byte 8))
                 for pos = (read-sequence buf file)
                 until (zerop pos)

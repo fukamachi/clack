@@ -87,7 +87,7 @@
 @export
 (defclass <doc-symbol-base> (<doc-base>)
      ((docstring :initform nil :accessor docstring)
-      (package :initarg :package :initform (format nil "~A" (package-name *package*)) :accessor symbol-package*)))
+      (package :initarg :package :initform (princ-to-string (package-name *package*)) :accessor symbol-package*)))
 
 (defmethod initialize-instance :after ((this <doc-symbol-base>) &key)
   (push this (package-symbols (find-package* (symbol-package* this)))))
