@@ -59,6 +59,8 @@ This is called on each request."
       :server-port (parse-integer server-port :junk-allowed t)
       :server-protocol (ml:header-value command :server-protocol)
       :request-uri url
+      ;; FIXME: always return :http
+      :url-scheme :http
       :remote-addr (ml:header-value command :remote-ip-addr)
       :remote-port (ml:header-value command :remote-ip-port)
 ;      :http-user-agent (ml:header-value command :user-agent)
