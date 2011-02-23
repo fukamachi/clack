@@ -110,13 +110,13 @@ you would call like this: `(run-server-tests :foo)'."
 (define-app-test |big POST|
   (lambda (req)
     (let ((body
-           (make-array (getf req :content-length) :element-type 'flex:octet)))
+           (make-array (getf req :content-length))))
       (read-sequence body (getf req :raw-body))
       `(200
         (:content-type "text/plain"
          :client-content-length ,(getf req :content-length)
          :client-content-type ,(getf req :content-type))
-        (,(flex:octets-to-string body)))))
+        (,(coerce body 'string)))))
   (lambda ()
     (let* ((chunk
             (with-output-to-string (chunk)
