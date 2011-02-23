@@ -21,9 +21,8 @@
 @export
 (defun run (app &key debug (port 3000))
   "Start talking to mod_lisp process."
-  @ignore debug
   (ml:modlisp-start :port port
-                    :processor 'clack-request-dispatcher
+                    :processor (make-request-dispatcher debug)
                     :processor-args (list app)))
 
 @export
@@ -32,11 +31,19 @@
 If no server given, try to stop `*server*' by default."
   (ml:modlisp-stop server))
 
-(defun clack-request-dispatcher (command app)
+(defun make-request-dispatcher (&optional debug)
+  (if debug
+      #'(lambda (&rest args)
+          (handler-bind ((error #'invoke-debugger))
+            (apply #'clack-request-dispatcher args)))
+      #'(lambda (&rest args)
+          (apply #'clack-request-dispatcher args))))
+
+(defun clack-request-dispatcher (command app &key debug)
   "Apache(mod_lisp) request dispatcher for Clack. Process modlisp command alist.
 This is called on each request."
-  (handler-bind ((error #'invoke-debugger))
-    (handle-response (call app (command->plist command)))))
+      (handler-bind ((error #'invoke-debugger))
+      (handle-response (call app (command->plist command)))))
 
 (defun command->plist (command)
   (bind ((url (ml:header-value command :url))
