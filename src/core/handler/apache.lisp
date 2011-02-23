@@ -38,7 +38,7 @@ This is called on each request."
 
 (defun command->plist (command)
   (bind ((url (ml:header-value command :url))
-         (pos (or (position #\? url) 0))
+         (pos (position #\? url))
          ((server-name server-port)
           (split-sequence #\: (ml:header-value command :host))))
     (append
@@ -46,7 +46,7 @@ This is called on each request."
       :request-method (ml:header-value command :method)
       :script-name ""
       :path-info (subseq url 0 pos)
-      :query-string (subseq url (1+ pos))
+      :query-string (subseq url (1+ (or pos 0)))
       :raw-body (awhen (ml:header-value command :posted-content)
                   (flex:make-flexi-stream
                    (flex:make-in-memory-input-stream
