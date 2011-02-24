@@ -7,9 +7,11 @@
 |#
 
 (clack.util:namespace clack.builder
-  (:use :cl
-        :clack.component
-        :clack.middleware))
+  (:use :cl)
+  (:import-from :clack.component
+                :call)
+  (:import-from :clack.middleware
+                :wrap))
 
 (cl-annot:enable-annot-syntax)
 

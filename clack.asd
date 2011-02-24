@@ -48,7 +48,8 @@
                   :components
                   ((:file "clack"
                     :depends-on ("component" "middleware" "handler"))
-                   (:file "builder")
+                   (:file "builder"
+                    :depends-on ("component" "middleware"))
                    (:file "request")
                    (:file "response")
                    (:file "component")
