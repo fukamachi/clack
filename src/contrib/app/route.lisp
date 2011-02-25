@@ -10,6 +10,8 @@
 (clack.util:namespace clack.app.route
   (:use :cl
         :clack)
+  (:import-from :cl-annot.eval-when
+                :eval-always)
   (:import-from :cl-ppcre
                 :scan-to-strings
                 :split
@@ -19,19 +21,29 @@
 
 (cl-annot:enable-annot-syntax)
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (defun compile-path (path)
-    (loop with list = (split ":([\\w-]+)" path :with-registers-p t)
-          while list
-          for prefix = (pop list)
-          for name = (pop list)
-          collect (quote-meta-chars prefix) into parts
-          if name
-            collect (string-upcase name) into names
-            and collect "(.+?)" into parts
-          finally
-       (return (list (format nil "^~{~A~}$"  parts)
-                     names)))))
+@eval-always
+@doc "
+Convert an URL rule into a regex.
+
+Example:
+  (url-rule->regex \"/login\")
+  ;;=> (\"^\\/login$\" NIL)
+  (url-rule->regex \"/member/:id\")
+  ;;=> (\"^\\/member\\/(.+?)$\" (ID))
+"
+@export
+(defun url-rule->regex (url)
+  (loop with list = (split ":([\\w-]+)" url :with-registers-p t)
+        while list
+        for prefix = (pop list)
+        for name = (pop list)
+        collect (quote-meta-chars prefix) into parts
+        if name
+          collect (intern (string-upcase name)) into names
+          and collect "(.+?)" into parts
+        finally
+     (return (list (format nil "^~{~A~}$"  parts)
+                   names))))
 
 @export
 (defmacro defroutes (name &body routes &aux (otherwise (last routes)))
@@ -44,8 +56,7 @@
              (,request-path (getf ,req :path-info)))
          (declare (ignorable ,request-method ,request-path))
          (or ,@(loop for (method path form) in routes
-                     for (regex names) = (compile-path path)
-                     for symbols = (mapcar (lambda (name) (intern name *package*)) names)
+                     for (regex symbols) = (url-rule->regex path)
                      collect `(and (string= ,request-method ',method)
                                    (multiple-value-bind (,matched ,regs)
                                        (scan-to-strings ,regex ,request-path)
@@ -88,4 +99,8 @@ Clack.App.Route provides an URL based dispacher, inspired by Ruby's Sinatra.
 
 @doc:AUTHOR "
 * Tomohiro Matsuyama (tomo@cx4a.org)
+"
+
+@doc:CONTRIBUTORS "
+* Eitarow Fukamachi (e.arrows@gmail.com)
 "
