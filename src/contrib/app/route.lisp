@@ -12,6 +12,8 @@
         :clack)
   (:import-from :cl-annot.eval-when
                 :eval-always)
+  (:import-from :cl-annot.doc
+                :doc)
   (:import-from :cl-ppcre
                 :scan-to-strings
                 :split
