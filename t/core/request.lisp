@@ -42,25 +42,25 @@
     "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-US)"
     "user-agent")
 
-(is (query-parameters req)
+(is (query-parameter req)
     '(:|ediweitz| "weitzedi" :|q| "C++")
-    "query-parameters")
+    "query-parameter")
 
-(is (query-parameters req "q")
+(is (query-parameter req "q")
     "C++"
-    "query-parameters (accessing each field)")
+    "query-parameter (accessing each field)")
 
-(is (body-parameters req)
+(is (body-parameter req)
     `(:|name| ,(flex:octets-to-string
                 #(230 183 177 231 148 186 232 139 177 229 164 170 233 131 142)
                 :external-format :utf-8))
-    "body-parameters")
+    "body-parameter")
 
-(is (body-parameters req "name")
+(is (body-parameter req "name")
     (flex:octets-to-string
      #(230 183 177 231 148 186 232 139 177 229 164 170 233 131 142)
      :external-format :utf-8)
-    "body-parameters (accessing each field)")
+    "body-parameter (accessing each field)")
 
 (is-type (make-request '(:hoge "a")) '<request> "<request> allow other keys")
 

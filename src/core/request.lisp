@@ -136,7 +136,7 @@ Make a <request> instance from request plist."
         params)))
 
 @export
-(defmethod body-parameters ((req <request>) &optional name)
+(defmethod body-parameter ((req <request>) &optional name)
   "Return POST parameters as a plist. If optional `name' is specified, returns the value corresponds to it."
   (let ((params (slot-value req 'body-parameters)))
     (if name
@@ -144,7 +144,7 @@ Make a <request> instance from request plist."
         params)))
 
 @export
-(defmethod query-parameters ((req <request>) &optional name)
+(defmethod query-parameter ((req <request>) &optional name)
   "Returns GET parameters as a plist. If optional `name' is specified, returns the value corresponds to it."
   (let ((params (slot-value req 'query-parameters)))
     (if name
@@ -152,10 +152,10 @@ Make a <request> instance from request plist."
         params)))
 
 @export
-(defmethod parameters ((req <request>) &optional name)
+(defmethod parameter ((req <request>) &optional name)
   "Returns request parameters containing (merged) GET and POST parameters. If optional `name' is specified, returns the value corresponds to it."
-  (let ((params (merge-plist (query-parameters req)
-                             (body-parameters req))))
+  (let ((params (merge-plist (query-parameter req)
+                             (body-parameter req))))
     (if name
         (getf-all params name)
         params)))
@@ -191,7 +191,7 @@ Clack.Request - Portable HTTP Request object for Clack Request.
       (let ((req (make-request req)))
       `(200
         (:content-type \"text/plain\")
-        (\"Hello, \" (query-parameters req \"name)))))
+        (\"Hello, \" (query-parameter req \"name)))))
 "
 
 @doc:DESCRIPTION "
