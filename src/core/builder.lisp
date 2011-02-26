@@ -15,6 +15,9 @@
 
 (cl-annot:enable-annot-syntax)
 
+@export
+(defvar *clack-builder-lazy-p* nil)
+
 (defun %builder (&rest app-or-middleware)
   "Wrap Clack application with middlewares and return it as one function."
   `(reduce #'wrap
@@ -28,7 +31,9 @@
 @export
 (defmacro builder (&rest app-or-middleware)
   "Some Middleware and Applications reduce into one function."
-  (apply #'%builder app-or-middleware))
+  `(if *clack-builder-lazy-p*
+       (builder-lazy ,@app-or-middleware)
+       ,(apply #'%builder app-or-middleware)))
 
 @export
 (defmacro builder-lazy (&rest app-or-middleware)
