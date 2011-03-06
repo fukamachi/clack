@@ -40,7 +40,8 @@
                :cl-oauth
                :ironclad
                :drakma
-               :local-time)
+               :local-time
+               :clsql)
   :components ((:module "src"
                 :components
                 ((:module "core"
@@ -94,7 +95,8 @@
                     ((:file "route")))
                    (:module "middleware"
                     :components
-                    ((:file "oauth")))))
+                    ((:file "oauth")
+                     (:file "clsql")))))
                  (:module "util"
                   :serial t
                   :components
