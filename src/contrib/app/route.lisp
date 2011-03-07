@@ -39,7 +39,7 @@ Example:
         while list
         for prefix = (pop list)
         for name = (pop list)
-        collect (quote-meta-chars prefix) into parts
+        collect prefix into parts
         if name
           collect (intern (string-upcase name)) into names
           and collect "(.+?)" into parts
