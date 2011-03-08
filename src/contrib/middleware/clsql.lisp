@@ -25,12 +25,12 @@
                     :accessor connect-args)))
 
 (defmethod call ((this <clack-middleware-clsql>) req)
-  (prog2
-    (apply #'connect
-           (connection-spec this)
-           :database-type (database-type this)
-           (connect-args this))
-    (call-next this req)
+  (apply #'connect
+         (connection-spec this)
+         :database-type (database-type this)
+         (connect-args this))
+  (unwind-protect
+      (call-next this req)
     (disconnect)))
 
 (doc:start)
