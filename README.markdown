@@ -17,13 +17,13 @@ Now access [http://localhost:8080/](http://localhost:8080/) and Clack may show y
 
 ## Installation
 
-I want to keep minimum dependencies of Clack, but now Clack depends on [cl-annot](https://github.com/arielnetworks/cl-annot) heavily.
+Though I want to keep the dependencies of Clack minimum, Clack depends on [cl-annot](https://github.com/arielnetworks/cl-annot) heavily.
 
 It is a really cool product written by [Tomohiro Matsuyama](http://twitter.com/#!/m2ym), my friend. So I recommend you to install it anyway.
 
 Clack and cl-annot isn't in Quicklisp's repository yet ([now on request](https://github.com/quicklisp/quicklisp-projects/issues/120)). Then you have to do following steps.
 
-1. Config ASDF
+### 1. Config ASDF
 
     $ mkdir ~/lisp/systems
     $ vi ~/.config/common-lisp/source-registry.conf.d/01-add-local-lisp.conf
@@ -34,7 +34,7 @@ And write the following code.
 
 Now, ASDF can find .asd from `~/lisp/systems` or it's sub directories.
 
-2. Clone
+### 2. Clone
 
 Download Clack and cl-annot from their repository and make sure they are in `~/lisp/systems`.
 
@@ -42,7 +42,7 @@ Download Clack and cl-annot from their repository and make sure they are in `~/l
     $ git clone git://github.com/arielnetworks/cl-annot
     $ git clone git://github.com/fukamachi/clack
 
-3. Load
+### 3. Load
 
 In the end, you can load Clack with [Quicklisp](https://www.quicklisp.org/beta/).
 
