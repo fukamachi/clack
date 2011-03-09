@@ -30,13 +30,13 @@ Clack and cl-annot isn't in Quicklisp's repository yet ([now on request](https:/
 
 And write the following code.
 
-    (:tree "~/lisp/systems")
+    (:tree (:home "lisp/systems/"))
 
-Now, ASDF can find .asd from `~/lisp/systems` or it's sub directories.
+Now, ASDF can find .asd from `~/lisp/systems/` or it's sub directories.
 
 ### 2. Clone
 
-Download Clack and cl-annot from their repository and make sure they are in `~/lisp/systems`.
+Download Clack and cl-annot from their repository and make sure they are in `~/lisp/systems/`.
 
     $ cd ~/lisp/systems
     $ git clone git://github.com/arielnetworks/cl-annot
