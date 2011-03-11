@@ -11,7 +11,7 @@
         :cl-annot.doc)
   (:import-from :local-time
                 :format-timestring)
-  (:import-from :clack.util
+  (:import-from :clack.util.localtime
                 :now))
 
 (cl-annot:enable-annot-syntax)

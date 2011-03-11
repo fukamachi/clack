@@ -9,11 +9,7 @@
 (in-package :cl-user)
 (defpackage clack.util
   (:use :cl)
-  (:import-from :local-time
-                :format-timestring
-                :unix-to-timestamp
-                :+rfc-1123-format+
-                :+gmt-zone+))
+)
 (in-package :clack.util)
 
 (cl-annot:enable-annot-syntax)
@@ -84,24 +80,6 @@ Example:
     (or (find-package handler-name)
         (error "Handler package is not found. Forgot to load it?: ~A"
                handler-name))))
-
-;; LOCAL-TIME
-
-@export
-(defun now ()
-  "Returns a timestamp representing the present moment."
-  (multiple-value-bind (sec nsec)
-      (values (- (get-universal-time)
-                 #.(encode-universal-time 0 0 0 1 1 1970 0))
-              0)
-    (assert (and sec nsec) () "Failed to get the current time from the operating system. How did this happen?")
-    (unix-to-timestamp sec :nsec nsec)))
-
-@export
-(defun format-rfc1123-timestring (destination timestamp)
-  (format-timestring destination timestamp
-                     :format +rfc-1123-format+
-                     :timezone +gmt-zone+))
 
 (doc:start)
 

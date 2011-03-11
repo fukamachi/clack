@@ -102,6 +102,8 @@
                   :components
                   ((:file "doc")
                    (:file "util")
+                   (:file "ducktype")
+                   (:file "localtime")
                    (:file "hunchentoot"))))))
   :description "Web Application Environment for Common Lisp"
   :long-description

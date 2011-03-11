@@ -10,7 +10,7 @@
   (:use :cl
         :clack
         :anaphora)
-  (:import-from :clack.util
+  (:import-from :clack.util.localtime
                 :format-rfc1123-timestring)
   (:import-from :clack.util.hunchentoot
                 :mime-type)

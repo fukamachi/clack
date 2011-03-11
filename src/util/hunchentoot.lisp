@@ -498,7 +498,7 @@ the external format EXTERNAL-FORMAT."
 (doc:start)
 
 @doc:NAME "
-Clack.Util.Hunchentoot - This package is ported from Hunchentoot, Lisp Web server.
+Clack.Util.Hunchentoot - Ported from Hunchentoot, Lisp Web server.
 "
 
 @doc:DESCRIPTION "

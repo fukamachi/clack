@@ -13,7 +13,8 @@
                 :ensure-list
                 :doplist)
   (:import-from :clack.util
-                :getf*
+                :getf*)
+  (:import-from :clack.util.localtime
                 :format-rfc1123-timestring)
   (:import-from :clack.util.hunchentoot
                 :url-encode)
