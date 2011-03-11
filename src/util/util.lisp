@@ -85,64 +85,6 @@ Example:
         (error "Handler package is not found. Forgot to load it?: ~A"
                handler-name))))
 
-;; Duck Typing
-
-(defvar *previous-readtables* nil
-  "Stack of readtables for duck-typing reader.")
-
-@export
-(defun duck-function (fn obj)
-  "Detect correct function for `obj'.
-The function should be interned a package which exports a class of `obj'."
-  (symbol-function (intern (symbol-name fn) (symbol-package (type-of obj)))))
-
-@export
-(defmacro duckcall (fn obj &body body)
-  "Call `duck-function' of the `obj'.
-I supposed `enable-duck-reader' may help you."
-  `(funcall (duck-function ,fn ,obj) ,obj ,@body))
-
-@export
-(defmacro duckapply (fn obj &body body)
-  "Apply `duck-function' of the `obj'.
-I supposed `enable-duck-reader' may help you."
-  `(apply (duck-function ,fn ,obj) ,obj ,@body))
-
-(defun duck-reader (stream arg)
-  @ignore arg
-  (let ((args (gensym "ARGS"))
-        (fn (read-preserving-whitespace stream))
-        (obj (read-preserving-whitespace stream)))
-    `(lambda (&rest ,args) (duckapply ',fn ,obj ,args))))
-
-(defun %enable-duck-reader ()
-  (push *readtable* *previous-readtables*)
-  (setq *readtable* (copy-readtable))
-  (set-macro-character #\& #'duck-reader)
-  (values))
-
-(defun %disable-duck-reader ()
-  (setq *readtable*
-        (if *previous-readtables*
-            (pop *previous-readtables*)
-            (copy-readtable nil))))
-
-@export
-(defmacro enable-duck-reader ()
-  "Enable duck-typing-reader.
-
-Example:
-  (&call app req)
-"
-  `(eval-when (:compile-toplevel :load-toplevel :execute)
-     (%enable-duck-reader)))
-
-@export
-(defmacro disable-duck-reader ()
-  "Disable duck-typing-reader if it is enabled."
-  `(eval-when (:compile-toplevel :load-toplevel :execute)
-     (%disable-duck-reader)))
-
 ;; LOCAL-TIME
 
 @export
