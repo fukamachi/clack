@@ -41,9 +41,7 @@ Handler name is a keyword and doesn't include the clack.handler prefix.
 For example, if you have a handler `clack.handler.foo',
 you would call like this: `(run-server-tests :foo)'."
   (setq *drakma-default-external-format* :utf-8)
-  (setf *clack-test-handler*
-        (concatenate 'string "CLACK.HANDLER."
-                     (symbol-name handler-name)))
+  (setf *clack-test-handler* handler-name)
   (if name
       (progn
         (plan nil)

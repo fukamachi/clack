@@ -17,7 +17,7 @@
 (cl-annot:enable-annot-syntax)
 
 @export
-(defvar *clack-test-handler* 'clack.handler.hunchentoot
+(defvar *clack-test-handler* :hunchentoot
   "Backend Handler to run tests on. String or Symbol are allowed.")
 
 @export
