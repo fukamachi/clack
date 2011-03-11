@@ -10,7 +10,9 @@
   (:use :cl)
   (:import-from :cl-test-more
                 :diag
-                :deftest))
+                :deftest)
+  (:import-from :clack.util
+                :find-handler))
 
 (cl-annot:enable-annot-syntax)
 
@@ -28,10 +30,7 @@
 @export
 (defun test-app (app client &optional desc)
   "Test Clack Application."
-  (let* ((handler
-          (or (find-package *clack-test-handler*)
-              (error "Handler package is not found. Forgot to load it?: ~A"
-                     *clack-test-handler*)))
+  (let* ((handler (find-handler *clack-test-handler*))
          (acceptor (funcall (intern "RUN" handler)
                             app
                             :port *clack-test-port*

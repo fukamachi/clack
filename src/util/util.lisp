@@ -72,6 +72,19 @@ Example:
                (push indicator p2)))
   p2)
 
+@export
+(defun find-handler (server)
+  "Return a handler package. `server' must be a symbol or a keyword, not containing \"Clack.Handler.\" as a prefix.
+
+Example:
+  (find-handler :hunchentoot)"
+  (let ((handler-name (concatenate 'string
+                                    "CLACK.HANDLER."
+                                    (symbol-name server))))
+    (or (find-package handler-name)
+        (error "Handler package is not found. Forgot to load it?: ~A"
+               handler-name))))
+
 ;; Duck Typing
 
 (defvar *previous-readtables* nil

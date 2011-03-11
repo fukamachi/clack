@@ -17,6 +17,8 @@
                 :<middleware>
                 :call-next
                 :wrap)
+  (:import-from :clack.util
+                :find-handler)
   (:export :<component>
            :<middleware>
            :call
@@ -49,14 +51,6 @@ Example:
   "Stop Clack server. Currently works only Hunchentoot."
   (let ((handler (find-handler server)))
     (funcall (intern "STOP" handler) acceptor)))
-
-(defun find-handler (server)
-  (let ((handler-name (concatenate 'string
-                                    "CLACK.HANDLER."
-                                    (symbol-name server))))
-    (or (find-package handler-name)
-        (error "Handler package is not found. Forgot to load it?: ~A"
-               handler-name))))
 
 (doc:start)
 
