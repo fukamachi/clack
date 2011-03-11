@@ -10,6 +10,7 @@
   (:use :cl
         :anaphora)
   (:import-from :alexandria
+                :ensure-list
                 :doplist)
   (:import-from :clack.util
                 :getf*
@@ -31,9 +32,9 @@
   (:documentation "Portable HTTP Response object for Clack response."))
 
 (defmethod initialize-instance :after ((res <response>) &key)
-  (let ((body (body res)))
-    (when (stringp body)
-      (setf (slot-value res 'body) (list body)))))
+  (when (stringp (body res))
+    (setf (body res)
+          `(,(body res)))))
 
 @export
 ;; constructor
@@ -53,8 +54,7 @@ Example:
   (headers res)
   ;;=> (:content-type \"text/plain\")
   (headers res :content-type)
-  ;;=> \"text/plain\"
-"
+  ;;=> \"text/plain\""
   (if name
       (getf* (headers res) name)
       (slot-value res 'headers)))
@@ -65,8 +65,7 @@ Example:
 
 Example:
   (setf (headers res) '(:content-type \"text/html\"))
-  (setf (headers res :content-type) \"text/html\")
-"
+  (setf (headers res :content-type) \"text/html\")"
   (if name
       (setf (getf* (slot-value res 'headers) name) value)
       (setf (slot-value res 'headers) value)))
@@ -74,16 +73,15 @@ Example:
 @export
 (defmethod push-header ((res <response>) name value)
   "Push the given header pair into response headers.
-Example: (push-header res :content-type \"text/html\")
-"
+Example: (push-header res :content-type \"text/html\")"
   (setf (headers res)
-        (append (list name value) (headers res))))
+        `(,name ,value ,@(headers res))))
 
 @export
 (defmethod (setf body) (value (res <response>))
   "Set body with normalizing. body must be a list."
   (setf (slot-value res 'body)
-        (normalize-body value)))
+        (ensure-list value)))
 
 @export
 (defmethod set-cookies ((res <response>) &optional name)
@@ -93,8 +91,7 @@ Example:
   (set-cookies res)
   ;;=> (:hoge \"1\")
   (set-cookies res :hoge)
-  ;;=> \"1\"
-"
+  ;;=> \"1\""
   (let ((cookies (slot-value res 'set-cookies)))
     (if name
         (getf* cookies name)
@@ -106,8 +103,7 @@ Example:
 
 Example:
   (setf (set-cookies res) '(:hoge \"1\"))
-  (setf (set-cookies res :hoge) \"1\")
-"
+  (setf (set-cookies res :hoge) \"1\")"
   (if name
       (setf (getf* (slot-value res 'set-cookies) name)
             (if (consp value)
@@ -126,10 +122,9 @@ Example:
 (defmethod finalize ((res <response>))
   "Return a Clack response list containing three values, status, headers and body."
   (finalize-cookies res)
-  (list
-   (status res)
-   (headers res)
-   (body res)))
+  (list (status res)
+        (headers res)
+        (body res)))
 
 (defmethod finalize-cookies ((res <response>))
   "Convert set-cookies into a header pair and push it into headers."
@@ -154,10 +149,6 @@ Example:
     (format nil
             "~{~{~A~^=~}~^; ~}"
             (nreverse cookie))))
-
-(defun normalize-body (body)
-  "body must be a list."
-  (if (stringp body) (list body) body))
 
 (doc:start)
 
