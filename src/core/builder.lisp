@@ -8,6 +8,8 @@
 
 (clack.util:namespace clack.builder
   (:use :cl)
+  (:import-from :alexandria
+                :ensure-list)
   (:import-from :clack.component
                 :call)
   (:import-from :clack.middleware
@@ -24,10 +26,9 @@ This is useful in development phase.")
 (defun %builder (&rest app-or-middleware)
   "Wrap Clack application with middlewares and return it as one function."
   `(reduce #'wrap
-           (list ,@(loop for arg in (butlast app-or-middleware)
-                         if (consp arg)
-                           collect `(make-instance ',(car arg) ,@(cdr arg))
-                         else collect `(make-instance ',arg)))
+           (list ,@(loop for item in (butlast app-or-middleware)
+                         for (class . args) = (ensure-list item)
+                         collect `(make-instance ',class ,@args)))
            :initial-value ,(car (last app-or-middleware))
            :from-end t))
 
