@@ -26,30 +26,30 @@
 (defmethod call ((this <clack-middleware-static>) req)
   (let* ((path-info (getf req :path-info))
          (path (static-path this)))
-    (if path
+    (if (null path)
+        (call-next this req)
         (etypecase path
           (string
            (if (starts-with-subseq path path-info)
+               ;; Serve static file with Clack.App.File
                (progn
-                 ;; rewrite :PATH-INFO
-                 (setf (getf req :path-info)
+                 (setf (getf req :path-info) ; rewrite :PATH-INFO
                        (subseq path-info (1- (length path))))
-                 (clack.component:call
-                  (make-instance '<clack-app-file>
-                     :root (static-root this))
-                  req))
+                 (call-app-file this req))
                (call-next this req)))
           (function
            (aif (funcall path path-info)
                 (progn
-                  ;; rewrite :PATH-INFO
-                  (setf (getf req :path-info) it)
-                  (clack.component:call
-                   (make-instance '<clack-app-file>
-                      :root (static-root this))
-                   req))
-                (call-next this req))))
-        (call-next this req))))
+                  (setf (getf req :path-info) it) ; rewrite :PATH-INFO
+                  (call-app-file this req))
+                (call-next this req)))))))
+
+(defmethod call-app-file ((this <clack-middleware-static>) req)
+  "Call Clack.App.File."
+  (clack.component:call
+   (make-instance '<clack-app-file>
+      :root (static-root this))
+   req))
 
 (doc:start)
 
