@@ -130,32 +130,29 @@ Make a <request> instance from request plist."
 @export
 (defmethod cookies ((req <request>) &optional name)
   "Returns cookies as a plist. If optional `name' is specified, returns the value corresponds to it."
-  (let ((params (slot-value req 'http-cookie)))
-    (if name
-        (getf-all params name)
-        params)))
+  (get-whole-or-specified req 'http-cookie name))
 
 @export
 (defmethod body-parameter ((req <request>) &optional name)
   "Return POST parameters as a plist. If optional `name' is specified, returns the value corresponds to it."
-  (let ((params (slot-value req 'body-parameters)))
-    (if name
-        (getf-all params name)
-        params)))
+  (get-whole-or-specified req 'body-parameters name))
 
 @export
 (defmethod query-parameter ((req <request>) &optional name)
   "Returns GET parameters as a plist. If optional `name' is specified, returns the value corresponds to it."
-  (let ((params (slot-value req 'query-parameters)))
-    (if name
-        (getf-all params name)
-        params)))
+  (get-whole-or-specified req 'query-parameters name))
 
 @export
 (defmethod parameter ((req <request>) &optional name)
   "Returns request parameters containing (merged) GET and POST parameters. If optional `name' is specified, returns the value corresponds to it."
   (let ((params (merge-plist (query-parameter req)
                              (body-parameter req))))
+    (if name
+        (getf-all params name)
+        params)))
+
+(defmethod get-whole-or-specified ((req <request>) key &optional name)
+  (let ((params (slot-value req key)))
     (if name
         (getf-all params name)
         params)))
