@@ -7,7 +7,8 @@
 |#
 
 (clack.util:namespace clack.logger
-  (:use :cl)
+  (:use :cl
+        :cl-annot.doc)
   (:import-from :local-time
                 :format-timestring)
   (:import-from :clack.util
@@ -19,6 +20,7 @@
 (defvar *logger-output* (make-string-output-stream)
   "Output stream for logger.
 To get all log messages as one string: (get-output-stream-string *logger-output*)")
+
 @export
 (defvar *logger-time-format*
     '((:DAY 2) #\/ :SHORT-MONTH #\/ (:YEAR 4) #\:
@@ -26,6 +28,7 @@ To get all log messages as one string: (get-output-stream-string *logger-output*
   "Format list of timestamp in log messages. This is same as LOCAL-TIME.
 Default:
   11/Feb/2011:03:37:39 +09:00")
+
 (defvar *logger-format-string* "~A [~:@(~A~)] ~A"
   "Log format string for cl:format.
 Example:
@@ -42,13 +45,14 @@ Example:
 @export
 (defvar *logger-min-level* +warning+)
 
-@export
-(defun log-message (level message)
-  "Output a log if the log level is more than `*logger-min-level*'.
+@doc "
+Output a log if the log level is more than `*logger-min-level*'.
 Log level must be a integer 0-7, or a keyword represents log level.
 
 Example:
   (log-message :warning \"Something wrong.\")"
+@export
+(defun log-message (level message)
   (when (>= (normalize-loglevel level) *logger-min-level*)
     (format *logger-output*
             *logger-format-string*

@@ -7,7 +7,8 @@
 |#
 
 (clack.util:namespace clack
-  (:use :cl)
+  (:use :cl
+        :cl-annot.doc)
   (:import-from :clack.component
                 :<component>
                 :call
@@ -25,9 +26,8 @@
 
 (cl-annot:enable-annot-syntax)
 
-@export
-(defun clackup (app &key (server :hunchentoot) (port 8080) debug)
-  "Easy way to run Clack Application.
+@doc "
+Easy way to run Clack Application.
 You can specify backend server with passing `:server'. The default is `:hunchentoot'.
 
 Example:
@@ -37,6 +37,8 @@ Example:
            :port 8080
            :debug t)
 "
+@export
+(defun clackup (app &key (server :hunchentoot) (port 8080) debug)
   (let ((handler (find-handler server)))
     (funcall (intern "RUN" handler) app
              :port port

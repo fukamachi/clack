@@ -13,8 +13,8 @@
 
 @export
 (defclass <component> () ()
-  (:documentation "Base Class for Clack Component shared between <middleware>
-and Clack Application."))
+  (:documentation
+   "Base Class for Clack Component shared between <middleware> and Clack Application."))
 
 @export
 (defgeneric call (comp req)
