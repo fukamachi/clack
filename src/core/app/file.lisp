@@ -66,8 +66,10 @@
         (= it 0)))
 
 (defun serve-file (file encoding)
-  (let ((content-type (or (clack.util.hunchentoot:mime-type file) "application/octet-stream"))
-        (univ-time (or (file-write-date file) (get-universal-time))))
+  (let ((content-type (or (clack.util.hunchentoot:mime-type file)
+                          "application/octet-stream"))
+        (univ-time (or (file-write-date file)
+                       (get-universal-time))))
     (when (text-file-p content-type)
       (setf content-type
             (format nil "~A ;charset=~A"
@@ -79,7 +81,8 @@
         (:content-type ,content-type
          :content-length ,(file-length stream)
          :last-modified
-         ,(format-rfc1123-timestring nil (universal-to-timestamp univ-time)))
+         ,(format-rfc1123-timestring nil
+           (universal-to-timestamp univ-time)))
         ,file))))
 
 (doc:start)
