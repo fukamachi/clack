@@ -86,7 +86,7 @@ Clack.App.Route - URL dispatcher.
             :clack.app.route))
     (in-package :clack-sample)
     
-    (defroute app (req)
+    (defroutes app (req)
       (GET \"/\" #'index)
       (GET \"/login\" #'login)
       (POST \"/login\" #'authorize)

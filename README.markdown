@@ -62,7 +62,7 @@ Clack is not a Web Application Framework. But Clack can also be used as such way
 
 Clack bundles "Clack.App.Route", written by [Tomohiro Matsuyama](http://twitter.com/#!/m2ym). It allows you to write an URL-based dispatcher, like Ruby's Sinatra.
 
-    (defroute app (req)
+    (defroutes app (req)
       (GET \"/\" #'index)
       (GET \"/login\" #'login)
       (POST \"/login\" #'authorize)
