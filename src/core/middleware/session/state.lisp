@@ -22,22 +22,26 @@
 
 @export
 (defclass <clack-session-state> ()
-     ((session-key :initarg :session-key :initform :clack.session
+     ((session-key :type keyword
+                   :initarg :session-key
+                   :initform :clack.session
                    :accessor session-key)
-      (sid-generator :initarg :sid-generator
+      (sid-generator :type function
+                     :initarg :sid-generator
                      :initform
-                     (lambda (&rest args)
-                       @ignore args
-                       (byte-array-to-hex-string
-                        (digest-sequence
-                         (make-digest :SHA1)
-                         (format nil "~A~A"
-                                 (random 1.0) (get-universal-time)))))
+                     #'(lambda (&rest args)
+                         @ignore args
+                         (byte-array-to-hex-string
+                          (digest-sequence
+                           (make-digest :SHA1)
+                           (format nil "~A~A"
+                                   (random 1.0) (get-universal-time)))))
                      :accessor sid-generator)
-      (sid-validator :initarg :sid-validator
+      (sid-validator :type function
+                     :initarg :sid-validator
                      :initform
-                     (lambda (sid)
-                       (not (null (ppcre:scan "\\A[0-9a-f]{40}\\Z" sid))))
+                     #'(lambda (sid)
+                         (not (null (ppcre:scan "\\A[0-9a-f]{40}\\Z" sid))))
                      :accessor sid-validator)))
 
 @export

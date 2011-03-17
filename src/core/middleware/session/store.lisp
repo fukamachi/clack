@@ -16,7 +16,9 @@
 
 @export
 (defclass <clack-session-store> ()
-     ((stash :initform nil :accessor stash)))
+     ((stash :type list
+             :initform nil
+             :accessor stash)))
 
 @export
 (defmethod fetch ((this <clack-session-store>) sid)

@@ -44,44 +44,89 @@
 
 @export
 (defclass <request> ()
-     ((request-method :initarg :request-method :initform nil
+     ((request-method :type keyword
+                      :initarg :request-method
                       :reader request-method
                       :documentation "The HTTP request method.
 This must be one of :GET, :HEAD, :OPTIONS, :PUT, :POST, or :DELETE.")
-      (script-name :initarg :script-name :initform nil :reader script-name
+      (script-name :type string
+                   :initarg :script-name
+                   :reader script-name
                    :documentation "The initial portion of the request URL's path, corresponding to the application.
 This may be an empty string if the application corresponds to the server's root URI. If this key is not empty, it must start with a forward slash (/).")
-      (path-info :initarg :path-info :initform nil :reader path-info
+      (path-info :type string
+                 :initarg :path-info
+                 :reader path-info
                  :documentation "The remainder of the request URL's path.
 This may be an empty string if the request URL targets the application root and does no have a trailing slash.")
-      (server-name :initarg :server-name :initform nil :reader server-name
+      (server-name :type string
+                   :initarg :server-name
+                   :reader server-name
                    :documentation "The resolved server name, or the server IP address.")
-      (server-port :initarg :server-port :initform nil :reader server-port
+      (server-port :type integer
+                   :initarg :server-port
+                   :reader server-port
                    :documentation "The port on which the request is being handled.")
-      (server-protocol :initarg :server-protocol :initform nil
+      (server-protocol :type keyword
+                       :initarg :server-protocol
                        :reader server-protocol
                        :documentation "The version of the protocol the client used to send the request.
 Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
-      (request-uri :initarg :request-uri :initform nil :reader request-uri
+      (request-uri :type string
+                   :initarg :request-uri
+                   :reader request-uri
                    :documentation "The request URI. Must start with '/'.")
-      (uri-scheme :initarg :uri-scheme :initform nil :reader uri-scheme)
-      (remote-addr :initarg :remote-addr :initform nil :reader remote-addr)
-      (remote-port :initarg :remote-port :initform nil :reader remote-port)
-      (query-string :initarg :query-string :initform nil :reader query-string
+      (uri-scheme :type keyword
+                  :initarg :uri-scheme
+                  :initform :http
+                  :reader uri-scheme)
+      (remote-addr :type string
+                   :initarg :remote-addr
+                   :reader remote-addr)
+      (remote-port :type integer
+                   :initarg :remote-port
+                   :reader remote-port)
+      (query-string :type (or string null)
+                    :initarg :query-string
+                    :initform nil
+                    :reader query-string
                     :documentation "The portion of the request URL that follows the '?', if any.")
-      (raw-body :initarg :raw-body :initform nil :reader raw-body)
-      (content-length :initarg :content-length :initform nil
+      (raw-body :type (or stream null)
+                :initarg :raw-body
+                :initform nil
+                :reader raw-body)
+      (content-length :type (or integer null)
+                      :initarg :content-length
+                      :initform nil
                       :reader content-length)
-      (content-type :initarg :content-type :initform nil :reader content-type)
-      (clack-handler :initarg :clack-handler :initform nil :reader clack-handler)
+      (content-type :type (or string null)
+                    :initarg :content-type
+                    :initform nil
+                    :reader content-type)
+      (clack-handler :type keyword
+                     :initarg :clack-handler
+                     :reader clack-handler)
 
-      (http-referer :initarg :http-referer :initform nil :reader referer)
-      (http-user-agent :initarg :http-user-agent :initform nil :reader user-agent)
-      (http-cookie :initarg :http-cookie :initform nil)
+      (http-referer :type (or string null)
+                    :initarg :http-referer
+                    :initform nil
+                    :reader referer)
+      (http-user-agent :type (or string null)
+                       :initarg :http-user-agent
+                       :initform nil
+                       :reader user-agent)
+      (http-cookie :type (or string list)
+                   :initarg :http-cookie
+                   :initform nil)
 
-      (body-parameters :initform nil)
-      (query-parameters :initform nil)
-      (uploads :initarg :clack.uploads :initform nil :accessor uploads))
+      (body-parameters :type list
+                       :initform nil)
+      (query-parameters :type list
+                        :initform nil)
+      (uploads :type list
+               :initarg :clack.uploads
+               :initform nil
+               :accessor uploads))
   (:documentation "Portable HTTP Request object for Clack Request."))
 
 (defmethod initialize-instance :after ((this <request>) &key)

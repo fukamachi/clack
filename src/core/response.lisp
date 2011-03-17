@@ -26,9 +26,17 @@
 
 @export
 (defclass <response> ()
-     ((status :initarg :status :initform nil :accessor status)
-      (headers :initarg :headers :initform nil)
-      (body :initarg :body :initform nil :reader body)
+     ((status :type (or integer null)
+              :initarg :status
+              :initform nil
+              :accessor status)
+      (headers :type list
+               :initarg :headers
+               :initform nil)
+      (body :type list
+            :initarg :body
+            :initform nil
+            :reader body)
       (set-cookies :initform nil))
   (:documentation "Portable HTTP Response object for Clack response."))
 

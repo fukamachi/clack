@@ -22,16 +22,24 @@
 
 @export
 (defclass <clack-middleware-logger> (<middleware>)
-     ((logger :initarg :logger :initform (make-instance '<clack-logger-stream>)
+     ((logger :type (or <clack-logger-stream> null)
+              :initarg :logger
+              :initform (make-instance '<clack-logger-stream>)
               :accessor logger
               :documentation "Logger instance, inherits `<clack-logger-base>'.
 If unspecified, `<clack-logger-stream>' will be used by default, and output logs to `*standard-output*'.
 If nil, won't output any logs.")
-      (min-level :initarg :min-level :reader min-level
+      (min-level :type (or keyword null)
+                 :initarg :min-level
+                 :reader min-level
                  :documentation "Minimum log level to output. See `clack.logger:*logger-min-level*'.")
-      (time-format :initarg :time-format :reader time-format
+      (time-format :type (or cons null)
+                   :initarg :time-format
+                   :reader time-format
                    :documentation "Timestamp format string. See `clack.logger:*logger-time-format*'.")
-      (format-string :initarg :format-string :reader format-string
+      (format-string :type (or string null)
+                     :initarg :format-string
+                     :reader format-string
                      :documentation "Log message format string. See `clack.logger:*logger-format-string*'."))
   (:documentation "Clack Middleware for logging."))
 

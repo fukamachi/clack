@@ -19,8 +19,13 @@
 
 @export
 (defclass <clack-middleware-static> (<middleware>)
-     ((path :initarg :path :accessor static-path)
-      (root :initarg :root :initform #p"./" :accessor static-root))
+     ((path :type (or string function null)
+            :initarg :path
+            :accessor static-path)
+      (root :type pathname
+            :initarg :root
+            :initform #p"./"
+            :accessor static-root))
   (:documentation "Clack Middleware to intercept requests for static files."))
 
 (defmethod call ((this <clack-middleware-static>) req)

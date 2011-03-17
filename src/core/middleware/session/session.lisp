@@ -19,11 +19,13 @@
 
 @export
 (defclass <clack-middleware-session> (<middleware>)
-     ((state :initarg :state
+     ((state :type <clack-session-state>
+             :initarg :state
              :initform
              (make-instance '<clack-session-state-cookie>)
              :accessor state)
-      (store :initarg :store
+      (store :type <clack-session-store>
+             :initarg :store
              :initform
              (make-instance '<clack-session-store>)
              :accessor store))

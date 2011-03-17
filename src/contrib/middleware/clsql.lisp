@@ -17,11 +17,17 @@
 
 @export
 (defclass <clack-middleware-clsql> (<middleware>)
-     ((database-type :initarg :database-type :initform :sqlite3
+     ((database-type :type keyword
+                     :initarg :database-type
+                     :initform :sqlite3
                      :accessor database-type)
-      (connection-spec :initarg :connection-spec :initform '("memory")
+      (connection-spec :type list
+                       :initarg :connection-spec
+                       :initform '("memory")
                        :accessor connection-spec)
-      (connect-args :initarg :connect-args :initform nil
+      (connect-args :type list
+                    :initarg :connect-args
+                    :initform nil
                     :accessor connect-args)))
 
 (defmethod call ((this <clack-middleware-clsql>) req)

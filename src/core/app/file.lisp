@@ -23,9 +23,18 @@
 
 @export
 (defclass <clack-app-file> (<component>)
-     ((file :initarg :file :initform nil :accessor file)
-      (root :initarg :root :initform #p"./" :accessor root)
-      (encoding :initarg :encoding :initform "utf-8" :accessor encoding))
+     ((file :type (or string null)
+            :initarg :file
+            :initform nil
+            :accessor file)
+      (root :type pathname
+            :initarg :root
+            :initform #p"./"
+            :accessor root)
+      (encoding :type string
+                :initarg :encoding
+                :initform "utf-8"
+                :accessor encoding))
   (:documentation "Clack Application to serve static files."))
 
 (defmethod call ((this <clack-app-file>) req)

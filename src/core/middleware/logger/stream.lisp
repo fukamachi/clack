@@ -18,7 +18,9 @@
 
 @export
 (defclass <clack-logger-stream> (<clack-logger-base>)
-     ((output-stream :initarg :output-stream :initform *standard-output*
+     ((output-stream :type stream
+                     :initarg :output-stream
+                     :initform *standard-output*
                      :reader output-stream)))
 
 (defmethod output ((this <clack-logger-stream>))

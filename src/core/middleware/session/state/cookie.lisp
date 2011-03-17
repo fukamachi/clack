@@ -34,11 +34,26 @@
 
 @export
 (defclass <clack-session-state-cookie> (<clack-session-state>)
-     ((path :initarg :path :initform "/" :accessor path)
-      (domain :initarg :domain :initform nil :accessor domain)
-      (expires :initarg :expires :initform (get-universal-time) :accessor expires)
-      (secure :initarg :secure :initform nil :accessor secure)
-      (httponly :initarg :httponly :initform nil :accessor httponly)))
+     ((path :type string
+            :initarg :path
+            :initform "/"
+            :accessor path)
+      (domain :type (or string null)
+              :initarg :domain
+              :initform nil
+              :accessor domain)
+      (expires :type integer
+               :initarg :expires
+               :initform (get-universal-time)
+               :accessor expires)
+      (secure :type boolean
+              :initarg :secure
+              :initform nil
+              :accessor secure)
+      (httponly :type boolean
+                :initarg :httponly
+                :initform nil
+                :accessor httponly)))
 
 (defmethod merge-options ((this <clack-session-state-cookie>) options)
   (setf options (remove-from-plist options :id))

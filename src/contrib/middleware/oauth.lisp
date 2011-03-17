@@ -18,6 +18,7 @@
 
 @export
 (defclass <clack-middleware-oauth> (<middleware>)
+     ;; TODO: declare types for each slots. -- Eitarow Fukamachi
      ((path :initarg :path :accessor oauth-path)
       (callback-base :initarg :callback-base :accessor oauth-callback-base)
       (consumer-key :initarg :consumer-key :accessor oauth-consumer-key)

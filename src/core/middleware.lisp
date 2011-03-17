@@ -16,7 +16,9 @@
 
 @export
 (defclass <middleware> (<component>)
-     ((app :initarg :app :reader app))
+     ((app :type (or <component> function null)
+           :initarg :app
+           :reader app))
   (:documentation "Class for Clack Middleware."))
 
 @export
