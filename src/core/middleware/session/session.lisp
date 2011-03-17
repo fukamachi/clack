@@ -42,8 +42,8 @@
 (defmethod extract ((this <clack-middleware-session>) req)
   "Extract session id and state."
   (let* ((id (extract-id (state this) req))
-         (session (and id
-                       (fetch (store this) id))))
+         (session (when id
+                    (fetch (store this) id))))
     (values (or id (generate-id (state this) req))
             (or session (make-hash-table :test #'equal)))))
 

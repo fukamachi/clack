@@ -389,10 +389,10 @@ has returned."
   "Creates an alist of POST parameters from the stream STREAM which is
 supposed to be of content type 'multipart/form-data'."
   (let* ((parsed-content-type-header (rfc2388:parse-header content-type-header :value))
-	 (boundary (or (cdr (rfc2388:find-parameter
+         (boundary (or (cdr (rfc2388:find-parameter
                              "BOUNDARY"
                              (rfc2388:header-parameters parsed-content-type-header)))
-		       (return-from parse-rfc2388-form-data))))
+                       (return-from parse-rfc2388-form-data))))
     (loop for part in (rfc2388:parse-mime stream boundary)
           for headers = (rfc2388:mime-part-headers part)
           for content-disposition-header = (rfc2388:find-content-disposition-header headers)

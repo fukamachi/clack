@@ -59,16 +59,16 @@ Example:
          (declare (ignorable ,request-method ,request-path))
          (or ,@(loop for (method path form) in routes
                      for (regex symbols) = (url-rule->regex path)
-                     collect `(and (string= ,request-method ',method)
-                                   (multiple-value-bind (,matched ,regs)
-                                       (scan-to-strings ,regex ,request-path)
-                                     (declare (ignorable ,regs))
-                                     (if ,matched
-                                         ,(if symbols
-                                              `(destructuring-bind ,symbols (coerce ,regs 'list)
-                                                 (declare (ignorable ,@symbols))
-                                                 (call ,form ,req))
-                                              `(call ,form ,req))))))
+                     collect `(when (string= ,request-method ',method)
+                                (multiple-value-bind (,matched ,regs)
+                                    (scan-to-strings ,regex ,request-path)
+                                  (declare (ignorable ,regs))
+                                  (if ,matched
+                                      ,(if symbols
+                                           `(destructuring-bind ,symbols (coerce ,regs 'list)
+                                              (declare (ignorable ,@symbols))
+                                              (call ,form ,req))
+                                           `(call ,form ,req))))))
              ,(if otherwise
                   `(call ,(cadr otherwise) ,req)
                   '(list 404 nil nil)))))))
