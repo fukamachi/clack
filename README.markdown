@@ -13,7 +13,7 @@ Clack is a Web Application Environment for Common Lisp inspired by Python's WSGI
       #'(lambda (req)
           '(200 (:content-type "text/plain") ("Hello, Clack!"))))
 
-Now access [http://localhost:8080/](http://localhost:8080/) and Clack may show you "Hello, Clack!".
+Now access [http://localhost:5000/](http://localhost:5000/) and Clack may show you "Hello, Clack!".
 
 ## Installation
 

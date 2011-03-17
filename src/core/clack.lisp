@@ -36,11 +36,11 @@ Example:
   (clackup (lambda (req)
              (declare (ignore req))
              '(200 nil (\"ok\")))
-           :port 8080
+           :port 5000
            :debug t)
 "
 @export
-(defun clackup (app &key (server :hunchentoot) (port 8080) debug)
+(defun clackup (app &key (server :hunchentoot) (port 5000) debug)
   (let ((handler (find-handler server)))
     (funcall (intern "RUN" handler) app
              :port port
@@ -62,7 +62,7 @@ Clack main package just for convenience.
     (clackup (lambda (req)
                (declare (ignore req))
                '(200 nil (\"Hello, Clack!\")))
-             :port 8080
+             :port 5000
              :debug t)
 "
 

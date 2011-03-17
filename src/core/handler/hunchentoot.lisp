@@ -25,7 +25,7 @@
         *default-content-type* "text/html; charset=utf-8"))
 
 @export
-(defun run (app &key debug (port 8080))
+(defun run (app &key debug (port 5000))
   "Start Hunchentoot server."
   (initialize)
   (when debug
@@ -173,7 +173,7 @@ Clack.Handler.Hunchentoot - Clack handler for Hunchentoot.
     ;; Start Server
     (run (lambda (req)
            '(200 nil (\"ok\")))
-         :port 8080)
+         :port 5000)
 "
 
 @doc:DESCRIPTION "
