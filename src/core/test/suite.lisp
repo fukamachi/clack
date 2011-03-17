@@ -339,7 +339,7 @@ you would call like this: `(run-server-tests :foo)'."
     @ignore req
     `(304 nil nil))
   (lambda ()
-    (if (string= "CLACK.HANDLER.HUNCHENTOOT" *clack-test-handler*)
+    (if (eq :hunchentoot *clack-test-handler*)
         (skip 5 "because of Hunchentoot's bug")
         (multiple-value-bind (body status headers)
             (http-request (localhost))
