@@ -36,11 +36,12 @@ Now, ASDF can find .asd from `~/lisp/systems/` or it's sub directories.
 
 ### 2. Clone
 
-Download Clack and cl-annot from their repository and make sure they are in `~/lisp/systems/`.
+Download Clack, cl-annot and macro-utils from their repository and make sure they are in `~/lisp/systems/`.
 
     $ cd ~/lisp/systems
-    $ git clone git://github.com/arielnetworks/cl-annot
     $ git clone git://github.com/fukamachi/clack
+    $ git clone git://github.com/arielnetworks/cl-annot
+    $ git clone git://github.com/arielnetworks/macro-utils
 
 ### 3. Load
 
@@ -181,7 +182,8 @@ And you should get following response in time.
 
 ## Dependency
 
-* CL-ANNOT
+* cl-annot
+* macro-utils
 * CL-PPCRE
 * CL-FAD
 * Alexandria
