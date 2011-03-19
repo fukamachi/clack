@@ -35,6 +35,9 @@
   (:documentation "Clack Middleware to authenticate."))
 
 (defmethod call ((this <clack-middleware-auth-basic>) req)
+  (unless (getf req :http-authorization)
+    (return-from call (unauthorized this)))
+
   (destructuring-bind (user &optional (pass ""))
       (parse-user-and-pass (getf req :http-authorization))
     (if (and user
