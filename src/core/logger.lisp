@@ -29,7 +29,7 @@ To get all log messages as one string: (get-output-stream-string *logger-output*
 Default:
   11/Feb/2011:03:37:39 +09:00")
 
-(defvar *logger-format-string* "~A [~:@(~A~)] ~A"
+(defvar *logger-format-string* "~&~A [~:@(~A~)] ~A~%"
   "Log format string for cl:format.
 Example:
   11/Feb/2011:03:37:39 +09:00 [CRITICAL] Help me!!")
