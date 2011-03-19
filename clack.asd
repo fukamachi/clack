@@ -50,14 +50,16 @@
                   :depends-on ("util")
                   :components
                   ((:file "clack"
-                    :depends-on ("component" "middleware" "handler"))
+                    :depends-on ("component"
+                                 "middleware"
+                                 "handler"
+                                 "middleware/logger"))
                    (:file "builder"
                     :depends-on ("component" "middleware"))
                    (:file "request")
                    (:file "response")
                    (:file "component")
                    (:file "middleware" :depends-on ("component"))
-                   (:file "logger")
                    (:module "handler"
                     :depends-on ("component")
                     :components
@@ -70,18 +72,19 @@
                     :depends-on ("clack")
                     :components
                     ((:file "file")))
+                   (:file "logger")
+                   (:module "middleware/logger"
+                    :depends-on ("logger" "middleware")
+                    :serial t
+                    :components
+                    ((:file "base")
+                     (:file "stream")
+                     (:file "logger")))
                    (:module "mw"
                     :pathname "middleware"
-                    :depends-on ("clack" "response" "request" "logger" "app")
+                    :depends-on ("clack" "response" "request" "app")
                     :components
                     ((:file "static")
-                     (:module "log"
-                      :pathname "logger"
-                      :serial t
-                      :components
-                      ((:file "base")
-                       (:file "stream")
-                       (:file "logger")))
                      (:module "session"
                       :serial t
                       :components

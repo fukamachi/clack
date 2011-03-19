@@ -8,7 +8,8 @@
 
 (clack.util:namespace clack.middleware.logger
   (:use :cl
-        :clack
+        :clack.component
+        :clack.middleware
         :anaphora)
   (:import-from :clack.logger
                 :*logger-output*
