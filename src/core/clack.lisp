@@ -41,7 +41,7 @@ Example:
            :debug t)
 "
 @export
-(defun clackup (app &key (server :hunchentoot) (port 5000) debug)
+(defun clackup (app &key (server :hunchentoot) (port 5000) (debug t))
   (let ((handler (find-handler server))
         (app (if debug
                  (wrap (make-instance '<clack-middleware-logger>)
