@@ -27,6 +27,7 @@
                :alexandria
                :metabang-bind
                :anaphora
+               :arnesi
                :split-sequence
                :cl-annot
                ;; Server
@@ -39,6 +40,7 @@
                :cl-test-more
                :cl-oauth
                :ironclad
+               :cl-base64
                :drakma
                :local-time
                :clsql)
@@ -86,7 +88,8 @@
                       ((:file "state")
                        (:file "state/cookie")
                        (:file "store")
-                       (:file "session")))))))
+                       (:file "session")))
+                     (:file "auth/basic")))))
                  (:module "contrib"
                   :depends-on ("util" "core")
                   :components
