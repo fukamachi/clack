@@ -43,7 +43,8 @@
                :cl-base64
                :drakma
                :local-time
-               :clsql)
+               :clsql
+               :rucksack)
   :components ((:module "src"
                 :components
                 ((:module "core"
@@ -102,7 +103,8 @@
                    (:module "middleware"
                     :components
                     ((:file "oauth")
-                     (:file "clsql")))))
+                     (:file "clsql")
+                     (:file "rucksack")))))
                  (:module "util"
                   :serial t
                   :components
