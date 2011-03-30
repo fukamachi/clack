@@ -10,7 +10,8 @@
   (:use :cl
         :clack)
   (:import-from :rucksack
-                :with-transaction))
+                :with-transaction
+                :current-rucksack))
 
 (cl-annot:enable-annot-syntax)
 
@@ -18,6 +19,7 @@
 (defclass <clack-middleware-rucksack> (<middleware>)
      ((rucksack :type rs:rucksack
                 :initarg :rucksack
+                :initform (current-rucksack)
                 :accessor rucksack)))
 
 (defmethod call ((this <clack-middleware-rucksack>) req)
@@ -36,6 +38,11 @@ Clack.Middleware.Rucksack - Middleware for Rucksack connection management.
     (builder
      (<clack-middleware-rucksack>
       :rucksack *rs*)
+     app)
+
+    ;; also same
+    (builder
+     <clack-middleware-rucksack>
      app)
 "
 
