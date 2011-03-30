@@ -10,18 +10,18 @@
   (:use :cl
         :clack)
   (:import-from :rucksack
-                :with-rucksack))
+                :with-transaction))
 
 (cl-annot:enable-annot-syntax)
 
 @export
 (defclass <clack-middleware-rucksack> (<middleware>)
-     ((directory :type (or string pathname)
-                          :initarg :directory
-                          :accessor database-directory)))
+     ((rucksack :type rs:rucksack
+                :initarg :rucksack
+                :accessor rucksack)))
 
 (defmethod call ((this <clack-middleware-rucksack>) req)
-  (with-rucksack (rs (database-directory this) :if-exists :supersede)
+  (with-transaction (:rs (rucksack this))
     (call-next this req)))
 
 (doc:start)
@@ -31,9 +31,11 @@ Clack.Middleware.Rucksack - Middleware for Rucksack connection management.
 "
 
 @doc:SYNOPSIS "
+    (defvar *rs* (rs:open-rucksack \"db/\"))
+    
     (builder
      (<clack-middleware-rucksack>
-      :directory \"db/\")
+      :rucksack *rs*)
      app)
 "
 
