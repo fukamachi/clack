@@ -42,15 +42,18 @@ Example:
 "
 @export
 (defun clackup (app &key (server :hunchentoot) (port 5000) (debug t))
-  (let ((handler (find-handler server))
-        (app (if debug
-                 (wrap (make-instance '<clack-middleware-logger>)
-                       app)
-                 app)))
-    (funcall (intern "RUN" handler)
-             app
-             :port port
-             :debug debug)))
+  (prog1
+    (let ((handler (find-handler server))
+          (app (if debug
+                   (wrap (make-instance '<clack-middleware-logger>)
+                         app)
+                   app)))
+      (funcall (intern "RUN" handler)
+               app
+               :port port
+               :debug debug))
+    (format t "~&~:(~A~) server is started.~
+             ~%Listening on localhost:~A.~%" server port)))
 
 @export
 (defun stop (acceptor &key (server :hunchentoot))
