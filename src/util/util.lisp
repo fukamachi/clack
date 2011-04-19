@@ -52,6 +52,12 @@ This may be useful for 'one-package-per-one-file' style."
   (error "TODO"))
 
 @export
+(defmacro remf* (place key)
+  "Similar to `remf` but allows many types for the `key', String,
+Keyword or Symbol."
+  `(remf ,place (normalize-key ,key)))
+
+@export
 (defun merge-plist (p1 p2)
   "Merge two plist into one plist.
 If same keys in two plist, second one will be adopted.

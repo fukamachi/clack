@@ -23,28 +23,31 @@
 
 (cl-annot:enable-annot-syntax)
 
-@eval-always
-@doc "
-Convert an URL rule into a regex.
+@eval-always @doc "
+Parse an URL rule and return a list of (regex control-string
+variables).
 
 Example:
-  (url-rule->regex \"/login\")
-  ;;=> (\"^\\/login$\" NIL)
-  (url-rule->regex \"/member/:id\")
-  ;;=> (\"^\\/member\\/(.+?)$\" (ID))
+  (parse-url-rule \"/login\")
+  ;;=> (\"^\\/login$\" \"/login\" NIL)
+  (parse-url-rule \"/member/:id\")
+  ;;=> (\"^\\/member\\/(.+?)$\" \"/member/~A\" (ID))
 "
 @export
-(defun url-rule->regex (url)
+(defun parse-url-rule (url)
   (loop with list = (split ":([\\w-]+)" url :with-registers-p t)
         while list
         for prefix = (pop list)
         for name = (pop list)
-        collect prefix into parts
+        collect prefix into re
+        collect prefix into cs
         if name
           collect (intern (string-upcase name)) into names
-          and collect "(.+?)" into parts
+          and collect "(.+?)" into re
+          and collect "~A" into cs
         finally
-     (return (list (format nil "^~{~A~}$"  parts)
+     (return (list (format nil "^~{~A~}$" re)
+                   (format nil "~{~A~}" cs)
                    names))))
 
 @export
@@ -58,7 +61,9 @@ Example:
              (,request-path (getf ,req :path-info)))
          (declare (ignorable ,request-method ,request-path))
          (or ,@(loop for (method path form) in routes
-                     for (regex symbols) = (url-rule->regex path)
+                     for triple = (parse-url-rule path)
+                     for regex = (first triple)
+                     for symbols = (third triple)
                      collect `(when (string= ,request-method ',method)
                                 (multiple-value-bind (,matched ,regs)
                                     (scan-to-strings ,regex ,request-path)
