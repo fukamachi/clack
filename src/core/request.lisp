@@ -10,6 +10,8 @@
   (:use :cl
         :anaphora
         :metabang-bind)
+  (:import-from :alexandria
+                :when-let)
   (:import-from :flexi-streams
                 :make-external-format
                 :make-flexi-stream)
@@ -20,6 +22,10 @@
   (:import-from :clack.util
                 :getf-all
                 :merge-plist)
+  (:import-from :clack.util.stream
+                :ensure-character-input-stream
+                :make-replay-buffer
+                :make-replay-input-stream)
   (:export :request-method
            :script-name
            :path-info
@@ -152,7 +158,7 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
     (cond
       ((string= content-type "application/x-www-form-urlencoded")
        (setf (slot-value this 'body-parameters)
-             (parameters->plist (read-line body nil ""))))
+             (parameters->plist (read-line (ensure-character-input-stream body) nil ""))))
       ((and (string= content-type "multipart/form-data")
             (not (uploads this))) ;; not set yet.
        (setf (uploads this)
@@ -165,8 +171,25 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
 ;; constructor
 (defun make-request (req)
   "A synonym for (make-instance '<request> ...).
-Make a <request> instance from request plist."
-  (apply #'make-instance '<request> :allow-other-keys t req))
+Make a <request> instance from request plist. Raw-body of the instance
+will be shared, meaning making an instance of <request> doesn't effect
+on an original raw-body."
+  (apply #'make-instance '<request>
+         :allow-other-keys t
+         :raw-body (shared-raw-body req)
+         req))
+
+(defun shared-raw-body (req)
+  "Returns a shared raw-body, or returns nil if raw-body is
+empty. This function modifies REQ to share raw-body among the
+instances of <request>."
+  (when-let ((body (getf req :raw-body)))
+    (let ((buffer (getf req :raw-body-buffer)))
+      (unless buffer
+        ;; Raw-body is fresh and nothing has been read.
+        (setf buffer (make-replay-buffer))
+        (nconc req `(:raw-body-buffer ,buffer)))
+      (make-replay-input-stream body :buffer buffer))))
 
 @export
 (defmethod securep ((req <request>))

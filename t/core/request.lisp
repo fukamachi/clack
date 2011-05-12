@@ -26,7 +26,7 @@
                          #(110 97 109 101 61 230 183 177 231 148 186 232 139 177 229 164 170 233 131 142))
                         :external-format :utf-8))))
 
-(plan 13)
+(plan 15)
 
 (is (content-type req)
     "application/x-www-form-urlencoded; charset=utf-8"
@@ -61,6 +61,17 @@
      #(230 183 177 231 148 186 232 139 177 229 164 170 233 131 142)
      :external-format :utf-8)
     "body-parameter (accessing each field)")
+
+(let* ((body (flex:make-in-memory-input-stream (flex:string-to-octets "foo=bar")))
+       (req `(:raw-body ,body :content-type "application/x-www-form-urlencoded"))
+       (req1 (make-request req))
+       (req2 (make-request req)))
+  (is (body-parameter req1 "foo")
+      "bar"
+      "body-parameter (sharing)")
+  (is (body-parameter req2 "foo")
+      "bar"
+      "body-parameter (confirm sharing)"))
 
 (is-type (make-request '(:hoge "a")) '<request> "<request> allow other keys")
 
