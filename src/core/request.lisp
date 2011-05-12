@@ -168,17 +168,6 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
               external-format))))))
 
 @export
-;; constructor
-(defun make-request (req)
-  "A synonym for (make-instance '<request> ...).
-Make a <request> instance from request plist. Raw-body of the instance
-will be shared, meaning making an instance of <request> doesn't effect
-on an original raw-body."
-  (apply #'make-instance '<request>
-         :allow-other-keys t
-         :raw-body (shared-raw-body req)
-         req))
-
 (defun shared-raw-body (req)
   "Returns a shared raw-body, or returns nil if raw-body is
 empty. This function modifies REQ to share raw-body among the
@@ -190,6 +179,18 @@ instances of <request>."
         (setf buffer (make-replay-buffer))
         (nconc req `(:raw-body-buffer ,buffer)))
       (make-replay-input-stream body :buffer buffer))))
+
+@export
+;; constructor
+(defun make-request (req)
+  "A synonym for (make-instance '<request> ...).
+Make a <request> instance from request plist. Raw-body of the instance
+will be shared, meaning making an instance of <request> doesn't effect
+on an original raw-body."
+  (apply #'make-instance '<request>
+         :allow-other-keys t
+         :raw-body (shared-raw-body req)
+         req))
 
 @export
 (defmethod securep ((req <request>))
