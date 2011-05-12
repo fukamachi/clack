@@ -34,8 +34,9 @@
                          (byte-array-to-hex-string
                           (digest-sequence
                            (make-digest :SHA1)
-                           (format nil "~A~A"
-                                   (random 1.0) (get-universal-time)))))
+                           (flex:string-to-octets
+                            (format nil "~A~A"
+                                    (random 1.0) (get-universal-time))))))
                      :accessor sid-generator)
       (sid-validator :type function
                      :initarg :sid-validator
