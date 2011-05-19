@@ -58,6 +58,14 @@ Keyword or Symbol."
   `(remf ,place (normalize-key ,key)))
 
 @export
+(defun nappend (&rest list-of-list)
+  "Similar to `nconc` but assures `list` to be rewritten with the result."
+  (loop with res = (pop list-of-list)
+        for list in list-of-list
+        do (rplacd (last res) list)
+        finally (return res)))
+
+@export
 (defun merge-plist (p1 p2)
   "Merge two plist into one plist.
 If same keys in two plist, second one will be adopted.

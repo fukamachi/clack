@@ -21,7 +21,8 @@
                 :register-groups-bind)
   (:import-from :clack.util
                 :getf-all
-                :merge-plist)
+                :merge-plist
+                :nappend)
   (:import-from :clack.util.stream
                 :ensure-character-input-stream
                 :make-replay-buffer
@@ -177,7 +178,7 @@ instances of <request>."
       (unless buffer
         ;; Raw-body is fresh and nothing has been read.
         (setf buffer (make-replay-buffer))
-        (nconc req `(:raw-body-buffer ,buffer)))
+        (nappend req `(:raw-body-buffer ,buffer)))
       (make-replay-input-stream body :buffer buffer))))
 
 @export
