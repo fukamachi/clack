@@ -94,7 +94,7 @@ Clack.Middleware.Session - Middleware for session management.
               (<clack-middleware-session>
                :state (make-instance '<clack-session-state-cookie>))
               (lambda (req)
-                (unless (gethash :counter (getf req :clack.session))
+                (sunless (gethash :counter (getf req :clack.session))
                   (setf it 0))
                 `(200
                   (:content-type \"text/plain\")

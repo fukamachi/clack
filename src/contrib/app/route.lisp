@@ -23,7 +23,8 @@
 
 (cl-annot:enable-annot-syntax)
 
-@eval-always @doc "
+@eval-always
+@doc "
 Parse an URL rule and return a list of (regex control-string
 variables).
 
