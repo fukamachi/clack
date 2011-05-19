@@ -112,6 +112,7 @@
                    (:file "util")
                    (:file "ducktype")
                    (:file "localtime")
+                   (:file "stream")
                    (:file "hunchentoot"))))))
   :description "Web Application Environment for Common Lisp"
   :long-description

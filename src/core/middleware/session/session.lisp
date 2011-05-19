@@ -10,6 +10,7 @@
   (:use :cl
         :clack
         :clack.session.state
+        :clack.session.state.cookie
         :clack.session.store)
   (:shadow :finalize :expire)
   (:import-from :alexandria :hash-table-plist))
@@ -93,7 +94,7 @@ Clack.Middleware.Session - Middleware for session management.
               (<clack-middleware-session>
                :state (make-instance '<clack-session-state-cookie>))
               (lambda (req)
-                (sunless (gethash :counter (getf req :clack.session))
+                (unless (gethash :counter (getf req :clack.session))
                   (setf it 0))
                 `(200
                   (:content-type \"text/plain\")

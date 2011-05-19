@@ -41,7 +41,9 @@
                      (cl-oauth:make-consumer-token
                       :key (oauth-consumer-key this)
                       :secret (oauth-consumer-secret this))
-                     :callback-uri (format nil "~a~a" (oauth-callback-base this) (oauth-path this))))
+                     :callback-uri (concatenate 'string
+                                                (oauth-callback-base this)
+                                                (oauth-path this))))
          (state (oauth-state this)))
     (when (gethash (cl-oauth:token-key req-token) state)
       (error "OAuth request token collision is detected."))
@@ -50,7 +52,7 @@
     req-token))
 
 (defmethod obtain-request-token ((this <clack-middleware-oauth>) req)
-  (bind ((oauth-token (query-parameters req "oauth_token"))
+  (bind ((oauth-token (query-parameter req "oauth_token"))
          ((req-token time) (gethash oauth-token (oauth-state this))))
     @ignore time
     req-token))
@@ -73,8 +75,8 @@
            (< (- now (second it)) (oauth-state-expire this))))))
 
 (defmethod is-authorizing ((this <clack-middleware-oauth>) req)
-  (let ((oauth-token (query-parameters req "oauth_token"))
-        (oauth-verifier (query-parameters req "oauth_verifier")))
+  (let ((oauth-token (query-parameter req "oauth_token"))
+        (oauth-verifier (query-parameter req "oauth_verifier")))
     (and oauth-token oauth-verifier
          (not (is-expired this oauth-token)))))
 
@@ -91,8 +93,8 @@
     (finalize res)))
 
 (defmethod authorize-cont ((this <clack-middleware-oauth>) req)
-  (let ((oauth-token (query-parameters req "oauth_token"))
-        (oauth-verifier (query-parameters req "oauth_verifier"))
+  (let ((oauth-token (query-parameter req "oauth_token"))
+        (oauth-verifier (query-parameter req "oauth_verifier"))
         (req-token (obtain-request-token this req)))
     (setf (cl-oauth:request-token-verification-code req-token) oauth-verifier)
     (cl-oauth:authorize-request-token req-token)
