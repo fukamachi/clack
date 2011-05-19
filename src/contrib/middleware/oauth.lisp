@@ -21,6 +21,7 @@
      ;; TODO: declare types for each slots. -- Eitarow Fukamachi
      ((path :initarg :path :accessor oauth-path)
       (callback-base :initarg :callback-base :accessor oauth-callback-base)
+      (callback-uri :initarg :callback-uri :initform nil :accessor oauth-callback-uri)
       (consumer-key :initarg :consumer-key :accessor oauth-consumer-key)
       (consumer-secret :initarg :consumer-secret :accessor oauth-consumer-secret)
       (authorize-uri :initarg :authorize-uri :accessor oauth-authorize-uri)
@@ -35,15 +36,20 @@
       (call-next this req)
       (authorize this (make-request req))))
 
-(defmethod obtain-request-token-from-provider ((this <clack-middleware-oauth>))
-  (let* ((req-token (cl-oauth:obtain-request-token
+(defmethod obtain-request-token-from-provider ((this <clack-middleware-oauth>) req)
+  (let* ((callback-uri (oauth-callback-uri this))
+         (callback-uri (typecase callback-uri
+                         (function (funcall callback-uri req))
+                         (string callback-uri)
+                         (t (concatenate 'string
+                                         (oauth-callback-base this)
+                                         (oauth-path this)))))
+         (req-token (cl-oauth:obtain-request-token
                      (oauth-request-token-uri this)
                      (cl-oauth:make-consumer-token
                       :key (oauth-consumer-key this)
                       :secret (oauth-consumer-secret this))
-                     :callback-uri (concatenate 'string
-                                                (oauth-callback-base this)
-                                                (oauth-path this))))
+                     :callback-uri callback-uri))
          (state (oauth-state this)))
     (when (gethash (cl-oauth:token-key req-token) state)
       (error "OAuth request token collision is detected."))
@@ -84,10 +90,10 @@
   (cleanup-states this)
   (if (is-authorizing this req)
       (authorize-cont this req)
-      (authorize-init this)))
+      (authorize-init this req)))
 
-(defmethod authorize-init ((this <clack-middleware-oauth>))
-  (let ((req-token (obtain-request-token-from-provider this))
+(defmethod authorize-init ((this <clack-middleware-oauth>) req)
+  (let ((req-token (obtain-request-token-from-provider this req))
         (res (make-response)))
     (redirect res (cl-oauth:make-authorization-uri (oauth-authorize-uri this) req-token))
     (finalize res)))
