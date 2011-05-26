@@ -139,7 +139,7 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
 (defmethod initialize-instance :after ((this <request>) &key)
   ;; cookies
   (swhen (slot-value this 'http-cookie)
-    (setf it (parameters->plist it)))
+    (setf it (parameters->plist it :delimiter "\\s*[,;]\\s*")))
 
   ;; GET parameters
   (setf (slot-value this 'query-parameters)
@@ -227,9 +227,9 @@ on an original raw-body."
         (getf-all params name)
         params)))
 
-(defun parameters->plist (params)
+(defun parameters->plist (params &key (delimiter "&"))
   "Convert parameters into plist. The `params' must be a string."
-  (loop for kv in (ppcre:split "&" params)
+  (loop for kv in (ppcre:split delimiter params)
         for (k v) = (ppcre:split "=" kv)
         append (list (intern k :keyword)
                      ;; KLUDGE: calls `ignore-errors'.
