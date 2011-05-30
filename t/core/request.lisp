@@ -18,7 +18,7 @@
                       :uri-scheme :http
                       :http-referer "http://github.com/fukamachi/clack"
                       :http-user-agent "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-US)"
-                      :http-cookie "hoge=1&fuga=2"
+                      :http-cookie "hoge=1;fuga=semi;colon"
                       :query-string "ediweitz=weitzedi&q=C%2B%2B"
                       :raw-body
                       ,(flex:make-flexi-stream
@@ -75,7 +75,7 @@
 
 (is-type (make-request '(:hoge "a")) '<request> "<request> allow other keys")
 
-(is (cookies req) '(:|hoge| "1" :|fuga| "2") "cookies")
+(is (cookies req) '(:|hoge| "1" :|fuga| "semi" :|colon| "") "cookies")
 (is (cookies req "hoge") "1" "cookie value")
 
 (diag "file upload")
