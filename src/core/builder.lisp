@@ -42,8 +42,8 @@ This is useful in development phase.")
 @export
 (defmacro builder-lazy (&rest app-or-middleware)
   "Some Middleware and Applications reduce into one function. This evals given Components in each HTTP request time."
-  (let ((req (gensym "REQ")))
-    `(lambda (,req) (call (eval ',(apply #'%builder app-or-middleware)) ,req))))
+  (let ((env (gensym "ENV")))
+    `(lambda (,env) (call (eval ',(apply #'%builder app-or-middleware)) ,env))))
 
 (doc:start)
 

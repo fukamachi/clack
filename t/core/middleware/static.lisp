@@ -22,8 +22,8 @@
   (<clack-middleware-static>
    :path "/public/"
    :root (merge-pathnames #p"tmp/" *clack-pathname*))
-  (lambda (req)
-    (declare (ignore req))
+  (lambda (env)
+    (declare (ignore env))
     `(200 (:content-type "text/plain") ("Happy Valentine!"))))
  (lambda ()
    (multiple-value-bind (body status headers)

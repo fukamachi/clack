@@ -28,33 +28,33 @@
             :accessor static-root))
   (:documentation "Clack Middleware to intercept requests for static files."))
 
-(defmethod call ((this <clack-middleware-static>) req)
-  (let* ((path-info (getf req :path-info))
+(defmethod call ((this <clack-middleware-static>) env)
+  (let* ((path-info (getf env :path-info))
          (path (static-path this)))
     (if (null path)
-        (call-next this req)
+        (call-next this env)
         (etypecase path
           (string
            (if (starts-with-subseq path path-info)
                ;; Serve static file with Clack.App.File
                (progn
-                 (setf (getf req :path-info) ; rewrite :PATH-INFO
+                 (setf (getf env :path-info) ; rewrite :PATH-INFO
                        (subseq path-info (1- (length path))))
-                 (call-app-file this req))
-               (call-next this req)))
+                 (call-app-file this env))
+               (call-next this env)))
           (function
            (aif (funcall path path-info)
                 (progn
-                  (setf (getf req :path-info) it) ; rewrite :PATH-INFO
-                  (call-app-file this req))
-                (call-next this req)))))))
+                  (setf (getf env :path-info) it) ; rewrite :PATH-INFO
+                  (call-app-file this env))
+                (call-next this env)))))))
 
-(defmethod call-app-file ((this <clack-middleware-static>) req)
+(defmethod call-app-file ((this <clack-middleware-static>) env)
   "Call Clack.App.File."
   (clack.component:call
    (make-instance '<clack-app-file>
       :root (static-root this))
-   req))
+   env))
 
 (doc:start)
 

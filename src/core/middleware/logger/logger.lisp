@@ -55,9 +55,9 @@ If nil, won't output any logs.")
   (setf-if-slot-bound *logger-time-format* this 'time-format)
   (setf-if-slot-bound *logger-min-level* this 'min-level))
 
-(defmethod call ((this <clack-middleware-logger>) req)
+(defmethod call ((this <clack-middleware-logger>) env)
   "Output log messages."
-  (prog1 (call-next this req)
+  (prog1 (call-next this env)
          (awhen (logger this) (output it))))
 
 (doc:start)
@@ -70,7 +70,7 @@ Clack.Middleware.Logger - Clack Middleware for logging.
     ;; Output log messages.
     (clackup (builder
               <clack-middleware-logger>
-              (lambda (req)
+              (lambda (env)
                 (log-message :notice \"You've got an access!\")
                 '(200 nil (\"ok\")))))
     
@@ -78,7 +78,7 @@ Clack.Middleware.Logger - Clack Middleware for logging.
     (clackup (builder
               (<clack-middleware-logger>
                :logger (make-instance '<clack-logger-file>))
-              (lambda (req)
+              (lambda (env)
                 (log-message :notice \"You've got an access!\")
                 '(200 nil (\"ok\")))))
 "

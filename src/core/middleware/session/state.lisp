@@ -51,16 +51,16 @@
   @ignore (this id res options))
 
 @export
-(defmethod session-id ((this <clack-session-state>) req)
-  (getf req (session-key this)))
+(defmethod session-id ((this <clack-session-state>) env)
+  (getf env (session-key this)))
 
 @export
 (defmethod valid-sid-p ((this <clack-session-state>) id)
   (funcall (sid-validator this) id))
 
 @export
-(defmethod extract-id ((this <clack-session-state>) req)
-  (aand (session-id this req)
+(defmethod extract-id ((this <clack-session-state>) env)
+  (aand (session-id this env)
         (valid-sid-p this it)
         it))
 

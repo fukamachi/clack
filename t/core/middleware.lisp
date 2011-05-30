@@ -19,12 +19,12 @@
 (is-error (call mw nil) simple-error "simple-error if call it")
 
 ;; implement `call'.
-(defmethod call ((this <test-middleware>) req)
-  (if (string= "/private" (getf req :path-info))
+(defmethod call ((this <test-middleware>) env)
+  (if (string= "/private" (getf env :path-info))
       '(403 nil ("forbidden"))
-      (call-next this req)))
+      (call-next this env)))
 
-(defvar mw2 (wrap mw (lambda (req) (declare (ignore req)) '(200 nil ("ok")))))
+(defvar mw2 (wrap mw (lambda (env) (declare (ignore env)) '(200 nil ("ok")))))
 
 (is-type mw2 'function "wrap returns a function.")
 (is (call mw2 '(:path-info "/"))

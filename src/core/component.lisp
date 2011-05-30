@@ -17,18 +17,18 @@
    "Base Class for Clack Component shared between <middleware> and Clack Application."))
 
 @export
-(defgeneric call (comp req)
+(defgeneric call (comp env)
   (:documentation "Invoke component. Designed to override in subclasses."))
 
 @export
-(defmethod call ((app function) req)
+(defmethod call ((app function) env)
   "Functions should be called like Component."
-  (funcall app req))
+  (funcall app env))
 
 @export
 (defmethod make-app ((comp <component>))
   "Create a function to call this component."
-  #'(lambda (req) (call comp req)))
+  #'(lambda (env) (call comp env)))
 
 (doc:start)
 
@@ -44,8 +44,8 @@ Clack.Component - Base Class for Clack Component.
     (in-package :clack.app.example)
     
     (defclass <clack-app-example> (<component>) ())
-    (defmethod call ((this <clack-app-example>) req)
-      (declare (ignore this req))
+    (defmethod call ((this <clack-app-example>) env)
+      (declare (ignore this env))
       `(200 (:content-type \"text/plain\") (\"Hello, World!\")))
 "
 

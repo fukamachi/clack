@@ -15,13 +15,13 @@
 (test-app
  (builder
   (<clack-middleware-session> :state (make-instance '<clack-session-state-cookie>))
-  (lambda (req)
-    (sunless (gethash :counter (getf req :clack.session))
+  (lambda (env)
+    (sunless (gethash :counter (getf env :clack.session))
       (setf it 0))
     `(200
       (:content-type "text/plain")
       (,(format nil "Hello, you've been here for ~Ath times!"
-                (incf (gethash :counter (getf req :clack.session))))))))
+                (incf (gethash :counter (getf env :clack.session))))))))
  (lambda ()
    (let ((cookie-jar (make-instance 'cookie-jar)))
      (multiple-value-bind (body status)

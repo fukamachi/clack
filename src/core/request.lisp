@@ -169,29 +169,29 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
               external-format))))))
 
 @export
-(defun shared-raw-body (req)
+(defun shared-raw-body (env)
   "Returns a shared raw-body, or returns nil if raw-body is
 empty. This function modifies REQ to share raw-body among the
 instances of <request>."
-  (when-let ((body (getf req :raw-body)))
-    (let ((buffer (getf req :raw-body-buffer)))
+  (when-let ((body (getf env :raw-body)))
+    (let ((buffer (getf env :raw-body-buffer)))
       (unless buffer
         ;; Raw-body is fresh and nothing has been read.
         (setf buffer (make-replay-buffer))
-        (nappend req `(:raw-body-buffer ,buffer)))
+        (nappend env `(:raw-body-buffer ,buffer)))
       (make-replay-input-stream body :buffer buffer))))
 
 @export
 ;; constructor
-(defun make-request (req)
+(defun make-request (env)
   "A synonym for (make-instance '<request> ...).
-Make a <request> instance from request plist. Raw-body of the instance
+Make a <request> instance from environment plist. Raw-body of the instance
 will be shared, meaning making an instance of <request> doesn't effect
 on an original raw-body."
   (apply #'make-instance '<request>
          :allow-other-keys t
-         :raw-body (shared-raw-body req)
-         req))
+         :raw-body (shared-raw-body env)
+         env))
 
 @export
 (defmethod securep ((req <request>))
@@ -254,8 +254,8 @@ Clack.Request - Portable HTTP Request object for Clack Request.
 "
 
 @doc:SYNOPSIS "
-    (defun app (req)
-      (let ((req (make-request req)))
+    (defun app (env)
+      (let ((req (make-request env)))
       `(200
         (:content-type \"text/plain\")
         (\"Hello, \" (query-parameter req \"name)))))

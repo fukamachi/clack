@@ -38,7 +38,7 @@ Clack.Logger.Stream - Output log messages to stream.
     (clackup (builder
               (<clack-middleware-logger>
                :logger (make-instance '<clack-logger-stream>))
-              (lambda (req)
+              (lambda (env)
                 (log-message :notice \"You've got an access!\")
                 '(200 nil (\"ok\")))))
 "

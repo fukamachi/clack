@@ -56,10 +56,10 @@ Example:
   (if (member (car otherwise) '(t otherwise))
       (setf routes (butlast routes))
       (setf otherwise nil))
-  (with-gensyms (req request-method request-path matched regs)
-    `(defun ,name (,req)
-       (let ((,request-method (getf ,req :request-method))
-             (,request-path (getf ,req :path-info)))
+  (with-gensyms (env request-method request-path matched regs)
+    `(defun ,name (,env)
+       (let ((,request-method (getf ,env :request-method))
+             (,request-path (getf ,env :path-info)))
          (declare (ignorable ,request-method ,request-path))
          (or ,@(loop for (method path form) in routes
                      for triple = (parse-url-rule path)
@@ -73,10 +73,10 @@ Example:
                                       ,(if symbols
                                            `(destructuring-bind ,symbols (coerce ,regs 'list)
                                               (declare (ignorable ,@symbols))
-                                              (call ,form ,req))
-                                           `(call ,form ,req))))))
+                                              (call ,form ,env))
+                                           `(call ,form ,env))))))
              ,(if otherwise
-                  `(call ,(cadr otherwise) ,req)
+                  `(call ,(cadr otherwise) ,env)
                   '(list 404 nil nil)))))))
 
 (doc:start)
@@ -92,7 +92,7 @@ Clack.App.Route - URL dispatcher.
             :clack.app.route))
     (in-package :clack-sample)
     
-    (defroutes app (req)
+    (defroutes app (env)
       (GET \"/\" #'index)
       (GET \"/login\" #'login)
       (POST \"/login\" #'authorize)

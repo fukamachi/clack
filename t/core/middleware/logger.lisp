@@ -14,8 +14,8 @@
 (test-app
  (builder
   (<clack-middleware-logger> :logger nil)
-  (lambda (req)
-    (declare (ignore req))
+  (lambda (env)
+    (declare (ignore env))
     (log-message :notice "hoge")
     '(200 nil nil)))
  (lambda ()

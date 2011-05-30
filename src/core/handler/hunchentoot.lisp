@@ -32,11 +32,11 @@
     (setf *show-lisp-errors-p* t))
   (setf *dispatch-table*
         (list
-         #'(lambda (req)
+         #'(lambda (env)
              #'(lambda ()
                  (handle-response
-                  (if debug (call app req)
-                      (aif (handler-case (call app req)
+                  (if debug (call app env)
+                      (aif (handler-case (call app env)
                              (condition (error)
                                @ignore error
                                nil))
@@ -171,7 +171,7 @@ Clack.Handler.Hunchentoot - Clack handler for Hunchentoot.
     (in-package :clack-test)
     
     ;; Start Server
-    (run (lambda (req)
+    (run (lambda (env)
            '(200 nil (\"ok\")))
          :port 5000)
 "

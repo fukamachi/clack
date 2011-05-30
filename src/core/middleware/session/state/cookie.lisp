@@ -73,9 +73,9 @@
   (finalize this id res options))
 
 @export
-(defmethod session-id ((this <clack-session-state-cookie>) req)
-  (let ((r (make-request req)))
-    (cookies r (session-key this))))
+(defmethod session-id ((this <clack-session-state-cookie>) env)
+  (let ((req (make-request env)))
+    (cookies req (session-key this))))
 
 @export
 (defmethod finalize ((this <clack-session-state-cookie>) id res options)

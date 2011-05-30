@@ -34,8 +34,8 @@ Easy way to run Clack Application.
 You can specify backend server with passing `:server'. The default is `:hunchentoot'.
 
 Example:
-  (clackup (lambda (req)
-             (declare (ignore req))
+  (clackup (lambda (env)
+             (declare (ignore env))
              '(200 nil (\"ok\")))
            :port 5000
            :debug t)
@@ -68,8 +68,8 @@ Clack main package just for convenience.
 "
 
 @doc:SYNOPSIS "
-    (clackup (lambda (req)
-               (declare (ignore req))
+    (clackup (lambda (env)
+               (declare (ignore env))
                '(200 nil (\"Hello, Clack!\")))
              :port 5000
              :debug t)

@@ -22,9 +22,9 @@
                 :initform (current-rucksack)
                 :accessor rucksack)))
 
-(defmethod call ((this <clack-middleware-rucksack>) req)
+(defmethod call ((this <clack-middleware-rucksack>) env)
   (with-transaction (:rs (rucksack this))
-    (call-next this req)))
+    (call-next this env)))
 
 (doc:start)
 

@@ -60,7 +60,7 @@ I supposed `enable-duck-reader' may help you."
   "Enable duck-typing-reader.
 
 Example:
-  (&call app req)
+  (&call app env)
 "
   `(eval-when (:compile-toplevel :load-toplevel :execute)
      (%enable-duck-reader)))

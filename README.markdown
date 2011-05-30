@@ -10,7 +10,7 @@ Clack is a Web Application Environment for Common Lisp inspired by Python's WSGI
     (in-package :simple-app)
     
     (clackup
-      #'(lambda (req)
+      #'(lambda (env)
           '(200 (:content-type "text/plain") ("Hello, Clack!"))))
 
 Now access [http://localhost:5000/](http://localhost:5000/) and Clack may show you "Hello, Clack!".
@@ -23,10 +23,10 @@ Clack is now available on [Quicklisp](https://www.quicklisp.org/beta/).
 
 ## Application
 
-Clack Application is just a lambda. It takes exactly one argument, the "Request", and returns the "Response" as a list containing exactly three values.
+Clack Application is just a lambda. It takes exactly one argument, the "Environment", and returns the "Response" as a list containing exactly three values.
 
     (defvar app
-      #'(lambda (req)
+      #'(lambda (env)
           '(200 (:content-type "text/plain") ("Hello, World"))))
 
 ### Clack.App.Route
@@ -35,7 +35,7 @@ Clack is not a Web Application Framework. But Clack can also be used as such way
 
 Clack bundles "Clack.App.Route", written by [Tomohiro Matsuyama](http://twitter.com/#!/m2ym). It allows you to write an URL-based dispatcher, like Ruby's Sinatra.
 
-    (defroutes app (req)
+    (defroutes app (env)
       (GET \"/\" #'index)
       (GET \"/login\" #'login)
       (POST \"/login\" #'authorize)
@@ -43,7 +43,7 @@ Clack bundles "Clack.App.Route", written by [Tomohiro Matsuyama](http://twitter.
 
     (clackup #'app)
 
-### The Request
+### The Environment
 
 Example: http://localhost:4242/sns/member?id=3
 
@@ -64,7 +64,7 @@ Example: http://localhost:4242/sns/member?id=3
      :http-server :hunchentoot
      :%request #<request {11A02249}>)
 
-The Request is a list containing at least the following keys and corresponding values.
+The Environment is a list containing at least the following keys and corresponding values.
 
 * <code>:request-method</code> (Required, Keyword): The HTTP request method, must be one of <code>:GET</code>, <code>:HEAD</code>, <code>:OPTIONS</code>, <code>:PUT</code>, <code>:POST</code>, or <code>:DELETE</code>.
 * <code>:script-name</code> (Required, String): The initial portion of the request URL's path, corresponding to the application. This may be an empty string if the application corresponds to the server's root URI. If this key is not empty, it must start with a forward slash (<code>/</code>).
@@ -129,10 +129,10 @@ All you have to do is to inherit from <code>&lt;middleware&gt;</code> and then i
     (in-package :clack.middleware.example)
     
     (defclass <simple-middleware> (<middleware>) ())
-    (defmethod call ((this <simple-middleware>) req)
+    (defmethod call ((this <simple-middleware>) env)
       `(200 (:content-type "text/html")
         ,(cons "Hello, Clack Middleware!<br />"
-               (nth 2 (call-next this req)))))
+               (nth 2 (call-next this env)))))
 
     (defpackage simple-app
       (:use :cl
@@ -142,7 +142,7 @@ All you have to do is to inherit from <code>&lt;middleware&gt;</code> and then i
     (in-package :simple-app)
     
     (defvar app
-      #'(lambda (req)
+      #'(lambda (env)
           '(200 (:content-type "text/plain") ("Hello, Clack!"))))
     
     (clackup (builder <simple-middleware> app))

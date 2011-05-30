@@ -22,16 +22,16 @@
   (:documentation "Class for Clack Middleware."))
 
 @export
-(defmethod call-next ((this <middleware>) req)
+(defmethod call-next ((this <middleware>) env)
   "Call next middleware or application."
-  (call (app this) req))
+  (call (app this) env))
 
 @export
 (defmethod wrap ((this <middleware>) app-or-middleware)
   "Compose this and given application or middleware instance into one function.
 The function takes request plist."
   (setf (slot-value this 'app) app-or-middleware)
-  #'(lambda (req) (call this req)))
+  #'(lambda (env) (call this env)))
 
 (doc:start)
 
@@ -47,9 +47,9 @@ Clack.Middleware - Base Class for Clack Middleware.
     (in-package :clack.middleware.example)
     
     (defclass <clack-middleware-example> (<middleware>) ())
-    (defmethod call ((this <clack-middleware-example>) req)
-      ;; pre-processing `req'
-      (let ((res (call-next this req)))
+    (defmethod call ((this <clack-middleware-example>) env)
+      ;; pre-processing `env'
+      (let ((res (call-next this env)))
         ;; post-processing `res'
         res))
 "

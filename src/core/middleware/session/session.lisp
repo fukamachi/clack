@@ -32,56 +32,56 @@
              :accessor store))
   (:documentation "Clack Middleware for session management."))
 
-(defmethod call ((this <clack-middleware-session>) req)
-  (multiple-value-bind (id session) (extract this req)
-    (setf (getf req :clack.session) session)
+(defmethod call ((this <clack-middleware-session>) env)
+  (multiple-value-bind (id session) (extract this env)
+    (setf (getf env :clack.session) session)
     (let ((options (make-hash-table :test #'equal)))
       (setf (gethash :id options) id)
-      (setf (getf req :clack.session.options) options))
+      (setf (getf env :clack.session.options) options))
 
-    (let ((res (call-next this req)))
-      (finalize this req res))))
+    (let ((res (call-next this env)))
+      (finalize this env res))))
 
-(defmethod extract ((this <clack-middleware-session>) req)
+(defmethod extract ((this <clack-middleware-session>) env)
   "Extract session id and state."
-  (let* ((id (extract-id (state this) req))
+  (let* ((id (extract-id (state this) env))
          (session (when id
                     (fetch (store this) id))))
-    (values (or id (generate-id (state this) req))
+    (values (or id (generate-id (state this) env))
             (or session (make-hash-table :test #'equal)))))
 
-(defmethod finalize ((this <clack-middleware-session>) req res)
-  (let ((options (getf req :clack.session.options)))
+(defmethod finalize ((this <clack-middleware-session>) env res)
+  (let ((options (getf env :clack.session.options)))
     (unless (gethash :no-store options)
-      (commit this req))
+      (commit this env))
     (if (gethash :expire options)
-        (expire this (gethash :id options) res req)
-        (save-state this (gethash :id options) res req))))
+        (expire this (gethash :id options) res env)
+        (save-state this (gethash :id options) res env))))
 
-(defmethod commit ((this <clack-middleware-session>) req)
-  (let ((session (getf req :clack.session))
-        (options (getf req :clack.session.options)))
+(defmethod commit ((this <clack-middleware-session>) env)
+  (let ((session (getf env :clack.session))
+        (options (getf env :clack.session.options)))
     (cond
       ((gethash :expire options)
        (remove-session (store this) (gethash :id session)))
       ((gethash :change-id options)
        (remove-session (store this) (gethash :id session))
-       (setf (gethash :id options) (generate-id (state this) req))
+       (setf (gethash :id options) (generate-id (state this) env))
        (store-session (store this) (gethash :id options) session))
       (t
        (store-session (store this) (gethash :id options) session)))))
 
-(defmethod expire ((this <clack-middleware-session>) id res req)
+(defmethod expire ((this <clack-middleware-session>) id res env)
   (state:expire
    (state this)
    id res
-   (hash-table-plist (getf req :clack.session.options))))
+   (hash-table-plist (getf env :clack.session.options))))
 
-(defmethod save-state ((this <clack-middleware-session>) id res req)
+(defmethod save-state ((this <clack-middleware-session>) id res env)
   (state:finalize
    (state this)
    id res
-   (hash-table-plist (getf req :clack.session.options))))
+   (hash-table-plist (getf env :clack.session.options))))
 
 (doc:start)
 
@@ -93,13 +93,13 @@ Clack.Middleware.Session - Middleware for session management.
     (clackup (builder
               (<clack-middleware-session>
                :state (make-instance '<clack-session-state-cookie>))
-              (lambda (req)
-                (sunless (gethash :counter (getf req :clack.session))
+              (lambda (env)
+                (sunless (gethash :counter (getf env :clack.session))
                   (setf it 0))
                 `(200
                   (:content-type \"text/plain\")
                   (,(format nil \"Hello, you've been here for ~Ath times!\"
-                            (incf (gethash :counter (getf req :clack.session)))))))))
+                            (incf (gethash :counter (getf env :clack.session)))))))))
 "
 
 @doc:DESCRIPTION "

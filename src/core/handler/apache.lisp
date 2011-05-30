@@ -131,12 +131,12 @@ Clack.Handler.Apache - Clack handler for Apache2 + mod_lisp.
 "
 
 @doc:SYNOPSIS "
-(clackup #'(lambda (req)
-             '(200
-               (:content-type \"text/plain\")
-               (\"Hello, Clack!\")))
-         :server :apache
-         :port 3000)
+    (clackup #'(lambda (env)
+                 '(200
+                   (:content-type \"text/plain\")
+                   (\"Hello, Clack!\")))
+             :server :apache
+             :port 3000)
 "
 
 @doc:DESCRIPTION "

@@ -34,17 +34,17 @@
              :accessor realm))
   (:documentation "Clack Middleware to authenticate."))
 
-(defmethod call ((this <clack-middleware-auth-basic>) req)
-  (unless (getf req :http-authorization)
+(defmethod call ((this <clack-middleware-auth-basic>) env)
+  (unless (getf env :http-authorization)
     (return-from call (unauthorized this)))
 
   (destructuring-bind (user &optional (pass ""))
-      (parse-user-and-pass (getf req :http-authorization))
+      (parse-user-and-pass (getf env :http-authorization))
     (if (and user
              (funcall (authenticator this) user pass))
         (progn
-          (setf (getf req :remote-user) user)
-          (call-next this req))
+          (setf (getf env :remote-user) user)
+          (call-next this env))
         (unauthorized this))))
 
 (defmethod unauthorized ((this <clack-middleware-auth-basic>))

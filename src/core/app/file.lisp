@@ -37,10 +37,10 @@
                 :accessor encoding))
   (:documentation "Clack Application to serve static files."))
 
-(defmethod call ((this <clack-app-file>) req)
+(defmethod call ((this <clack-app-file>) env)
   (let ((file (locate-file (or (file this)
                                ;; remove "/"
-                               (subseq (getf req :path-info) 1))
+                               (subseq (getf env :path-info) 1))
                            (root this))))
     (if (consp file) ;; some error case
         file

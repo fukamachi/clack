@@ -31,10 +31,10 @@
       (state :initform (make-hash-table :test #'equal) :accessor oauth-state)
       (state-expire :initarg :state-expire :initform 60 :accessor oauth-state-expire)))
 
-(defmethod call ((this <clack-middleware-oauth>) req)
-  (if (not (string-equal (oauth-path this) (getf req :path-info)))
-      (call-next this req)
-      (authorize this (make-request req))))
+(defmethod call ((this <clack-middleware-oauth>) env)
+  (if (not (string-equal (oauth-path this) (getf env :path-info)))
+      (call-next this env)
+      (authorize this (make-request env))))
 
 (defmethod obtain-request-token-from-provider ((this <clack-middleware-oauth>) req)
   (let* ((callback-uri (oauth-callback-uri this))

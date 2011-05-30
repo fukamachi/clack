@@ -30,13 +30,13 @@
                     :initform nil
                     :accessor connect-args)))
 
-(defmethod call ((this <clack-middleware-clsql>) req)
+(defmethod call ((this <clack-middleware-clsql>) env)
   (apply #'connect
          (connection-spec this)
          :database-type (database-type this)
          (connect-args this))
   (unwind-protect
-      (call-next this req)
+      (call-next this env)
     (disconnect)))
 
 (doc:start)

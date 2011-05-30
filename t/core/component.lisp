@@ -18,8 +18,8 @@
 (is-error (call comp nil) simple-error "simple-error if call it")
 
 ;; implement `call'.
-(defmethod call ((this <test-component>) req)
-  `(200 nil (,(getf req :path-info))))
+(defmethod call ((this <test-component>) env)
+  `(200 nil (,(getf env :path-info))))
 
 (is (call comp '(:path-info "/")) '(200 nil ("/")) "can call")
 (is-type (make-app comp) 'function "make-app")

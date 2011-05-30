@@ -62,8 +62,8 @@ Clack.Test - Testing Clack Applications.
     (in-package :clack-test.sample)
     
     (test-app
-     (lambda (req)
-       (declare (ignore req))
+     (lambda (env)
+       (declare (ignore env))
        `(200 (:content-type \"text/plain\") (\"Hello, Clack!\")))
      (lambda ()
        (multiple-value-bind (body status headers)

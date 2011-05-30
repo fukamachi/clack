@@ -63,9 +63,9 @@
     "body-parameter (accessing each field)")
 
 (let* ((body (flex:make-in-memory-input-stream (flex:string-to-octets "foo=bar")))
-       (req `(:raw-body ,body :content-type "application/x-www-form-urlencoded"))
-       (req1 (make-request req))
-       (req2 (make-request req)))
+       (env `(:raw-body ,body :content-type "application/x-www-form-urlencoded"))
+       (req1 (make-request env))
+       (req2 (make-request env)))
   (is (body-parameter req1 "foo")
       "bar"
       "body-parameter (sharing)")
@@ -85,8 +85,8 @@
 
 #+thread-support
 (test-app
- (lambda (req)
-   `(200 nil (,(caddar (uploads (make-request req))))))
+ (lambda (env)
+   `(200 nil (,(caddar (uploads (make-request env))))))
  (lambda ()
    (multiple-value-bind (body status)
        (http-request "http://localhost:4242/"

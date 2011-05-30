@@ -11,14 +11,14 @@
 ;; initialize
 
 (defvar app
-    (lambda (req)
-      (declare (ignore req))
+    (lambda (env)
+      (declare (ignore env))
       '(200 (:content-type "text/html") "ok from app")))
 
-(defmethod call ((this <middleware>) req)
-  (if (string= "/private" (getf req :path-info))
+(defmethod call ((this <middleware>) env)
+  (if (string= "/private" (getf env :path-info))
       '(403 nil ("forbidden"))
-      (call-next this req)))
+      (call-next this env)))
 
 (defclass <simple-middleware> (<middleware>) ()
   (:documentation "Middleware for unit testing."))
