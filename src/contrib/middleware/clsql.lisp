@@ -31,13 +31,16 @@
                     :accessor connect-args)))
 
 (defmethod call ((this <clack-middleware-clsql>) env)
-  (apply #'connect
-         (connection-spec this)
-         :database-type (database-type this)
-         (connect-args this))
-  (unwind-protect
-      (call-next this env)
-    (disconnect)))
+  (let* ((db (apply #'connect
+                    (connection-spec this)
+                    :if-exists :new
+                    :make-default nil
+                    :database-type (database-type this)
+                    (connect-args this)))
+         (clsql:*default-database* db))
+    (unwind-protect
+        (call-next this env)
+      (disconnect :database db))))
 
 (doc:start)
 
