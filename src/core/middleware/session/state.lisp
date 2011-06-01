@@ -9,10 +9,8 @@
 (clack.util:namespace clack.session.state
   (:use :cl
         :anaphora)
-  (:import-from :ironclad
-                :make-digest
-                :digest-sequence
-                :byte-array-to-hex-string)
+  (:import-from :clack.util
+                :generate-random-id)
   (:import-from :cl-ppcre :scan)
   (:export :session-key
            :sid-generator
@@ -31,12 +29,7 @@
                      :initform
                      #'(lambda (&rest args)
                          @ignore args
-                         (byte-array-to-hex-string
-                          (digest-sequence
-                           (make-digest :SHA1)
-                           (flex:string-to-octets
-                            (format nil "~A~A"
-                                    (random 1.0) (get-universal-time))))))
+                         (clack.util:generate-random-id))
                      :accessor sid-generator)
       (sid-validator :type function
                      :initarg :sid-validator

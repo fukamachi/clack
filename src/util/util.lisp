@@ -9,7 +9,12 @@
 (in-package :cl-user)
 (defpackage clack.util
   (:use :cl)
-)
+  (:import-from :ironclad
+                :byte-array-to-hex-string
+                :digest-sequence
+                :make-digest)
+  (:import-from :flexi-streams
+                :string-to-octets))
 (in-package :clack.util)
 
 (cl-annot:enable-annot-syntax)
@@ -94,6 +99,16 @@ Example:
     (or (find-package handler-name)
         (error "Handler package is not found. Forgot to load it?: ~A"
                handler-name))))
+
+@export
+(defun generate-random-id ()
+  "Generate a random token."
+  (byte-array-to-hex-string
+   (digest-sequence
+    (make-digest :SHA1)
+    (flex:string-to-octets
+     (format nil "~A~A"
+      (random 1.0) (get-universal-time))))))
 
 (doc:start)
 
