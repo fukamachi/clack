@@ -104,7 +104,8 @@
                     :components
                     ((:file "oauth")
                      (:file "clsql")
-                     (:file "rucksack")))))
+                     (:file "rucksack")
+                     (:file "csrf")))))
                  (:module "util"
                   :serial t
                   :components
