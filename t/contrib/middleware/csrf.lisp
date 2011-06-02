@@ -17,7 +17,7 @@
                 :csrf-html-tag))
 (in-package clack-test.middleware.csrf)
 
-(plan 12)
+(plan 14)
 
 (defun html-form (env)
   (concatenate
@@ -97,6 +97,16 @@
                          :cookie-jar cookie-jar)
          (is status 200 "Status is 200")
          (is (cdr (assoc :content-type headers)) "text/html" "Content-Type is text/html")
-         (is body "Eitarow Fukamachi" "can read body-parameter")))))
+         (is body "Eitarow Fukamachi" "can read body-parameter"))
+       (diag "bad POST request with before token")
+       (multiple-value-bind (body status headers)
+           (http-request "http://localhost:4242/"
+                         :method :post
+                         :parameters `(("name" . "Eitarow Fukamachi")
+                                       ("_csrf_token" . ,csrf-token))
+                         :cookie-jar cookie-jar)
+         (declare (ignore body))
+         (is status 400 "Status is 400")
+         (is (cdr (assoc :content-type headers)) "text/plain" "Content-Type is text/plain")))))
 
 (finalize)

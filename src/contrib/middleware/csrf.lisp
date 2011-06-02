@@ -31,7 +31,10 @@
     (return-from call (call-next this env)))
 
   (if (valid-token-p env)
-      (call-next this env)
+      (progn
+        ;; delete onetime token
+        (remhash :csrf-token (getf env :clack.session))
+        (call-next this env))
       (funcall (error-function this) env)))
 
 (defun return-400 (env)
