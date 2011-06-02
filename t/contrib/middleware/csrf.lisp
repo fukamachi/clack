@@ -17,7 +17,7 @@
                 :csrf-html-tag))
 (in-package clack-test.middleware.csrf)
 
-(plan 14)
+(plan 18)
 
 (defun html-form (env)
   (concatenate
@@ -61,6 +61,11 @@
  #'(lambda ()
      (let (csrf-token
            (cookie-jar (make-instance 'cookie-jar)))
+       (diag "first POST request")
+       (is (nth-value 1 (http-request "http://localhost:4242/"
+                                      :method :post
+                                      :cookie-jar cookie-jar))
+           400)
        (diag "first GET request")
        (multiple-value-bind (body status headers)
            (http-request "http://localhost:4242/"

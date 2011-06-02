@@ -51,9 +51,9 @@
 
 (defun valid-token-p (env)
   (let ((req (make-request env)))
-    (string= (body-parameter req :|_csrf_token|)
-             (gethash :csrf-token
-                      (getf env :clack.session)))))
+    (aand (gethash :csrf-token
+                   (getf env :clack.session))
+          (string= it (body-parameter req :|_csrf_token|)))))
 
 @export
 (defun csrf-html-tag (session)
