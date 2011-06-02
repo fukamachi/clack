@@ -20,10 +20,10 @@
 
 @export
 (defclass <clack-middleware-csrf> (<middleware>)
-     ((error-function :initarg :error-function
-                    :type function
-                    :initform #'return-400
-                    :accessor error-function))
+     ((block-app :initarg :block-app
+                 :type (or function <component>)
+                 :initform #'return-400
+                 :accessor block-app))
   (:documentation "Clack Middleware for easy CSRF protection."))
 
 (defmethod call ((this <clack-middleware-csrf>) env)
@@ -35,7 +35,7 @@
         ;; delete onetime token
         (remhash :csrf-token (getf env :clack.session))
         (call-next this env))
-      (funcall (error-function this) env)))
+      (call (block-app this) env)))
 
 (defun return-400 (env)
   @ignore env
@@ -84,6 +84,20 @@ Clack.Middleware.Csrf - Middleware for easy CSRF protection.
     <%= (csrf-html-tag session) %>
     <input type=\"submit\" value=\"Send\" />
     </form>
+"
+
+@doc:DESCRIPTION "
+## Block behavior
+
+    (builder
+     <clack-middleware-session>
+     (<clack-middleware-csrf>
+      :block-app #'(lambda (env)
+                     @ignore env
+                     '(302
+                       (:location \"http://en.wikipedia.org/wiki/CSRF\")
+                       nil)))
+     app)
 "
 
 @doc:AUTHOR "

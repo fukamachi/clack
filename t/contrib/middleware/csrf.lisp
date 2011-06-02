@@ -109,4 +109,29 @@
          (is status 400 "Status is 400")
          (is (cdr (assoc :content-type headers)) "text/plain" "Content-Type is text/plain")))))
 
+(setf app
+      (builder <clack-middleware-session>
+               (<clack-middleware-csrf>
+                :block-app #'(lambda (env)
+                               (declare (ignore env))
+                               '(302
+                                 (:location "http://en.wikipedia.org/wiki/CSRF")
+                                 nil)))
+               #'(lambda (env)
+                   (declare (ignore env))
+                   `(200
+                     (:content-type "text/html")
+                     ("You look a safety user.")))))
+
+(diag "change blocking behavior")
+(test-app
+ app
+ #'(lambda ()
+     (multiple-value-bind (body status headers)
+         (http-request "http://localhost:4242/"
+                       :method :post)
+       (is status 302 "Status is 302")
+       (is (cdr (assoc :location headers)) "http://en.wikipedia.org/wiki/CSRF")
+       (is body nil))))
+
 (finalize)
