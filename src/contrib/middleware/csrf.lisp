@@ -30,6 +30,9 @@
   (unless (danger-method-p (getf env :request-method))
     (return-from call (call-next this env)))
 
+  (unless (getf env :clack.session)
+    (error ":clack.session is not found in `env'."))
+
   (if (valid-token-p env)
       (progn
         ;; delete onetime token
