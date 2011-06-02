@@ -31,7 +31,10 @@
     (return-from call (call-next this env)))
 
   (if (valid-token-p env)
-      (call-next this env)
+      (progn
+        ;; delete onetime token
+        (remhash :csrf-token (getf env :clack.session))
+        (call-next this env))
       (funcall (error-function this) env)))
 
 (defun return-400 (env)
@@ -57,14 +60,13 @@
   "Return an 'input' tag containing random CSRF token.
 Note this has a side-effect, natually. This function stores the generated id into the current session when called."
   @type hash-table session
-  (let ((csrf-token (generate-random-id)))
-    (setf (gethash :csrf-token session)
-          csrf-token)
-    (concatenate
-     'string
-     "<input type=\"hidden\" name=\"_csrf_token\" value=\""
-     csrf-token
-     "\" />")))
+  (sunless (gethash :csrf-token session)
+    (setf it (generate-random-id)))
+  (concatenate
+   'string
+   "<input type=\"hidden\" name=\"_csrf_token\" value=\""
+   (gethash :csrf-token session)
+   "\" />"))
 
 (doc:start)
 
