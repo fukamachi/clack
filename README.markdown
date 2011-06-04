@@ -1,6 +1,6 @@
 # Clack - Web Application Environment for Common Lisp
 
-Clack is a Web Application Environment for Common Lisp inspired by Python's WSGI and Ruby's Rack. Your awesome framework should base on this.
+Clack is a web application environment for Common Lisp inspired by Python's WSGI and Ruby's Rack. Your awesome framework should base on this.
 
 ## Usage
 
@@ -14,6 +14,22 @@ Clack is a Web Application Environment for Common Lisp inspired by Python's WSGI
           '(200 (:content-type "text/plain") ("Hello, Clack!"))))
 
 Now access [http://localhost:5000/](http://localhost:5000/) and Clack may show you "Hello, Clack!".
+
+## About Clack
+
+### What is Clack?
+
+Clack is an interface between CL web applications and web servers. It wraps HTTP requests and responses in the simplest way. This means that it unifies the API for web servers, web frameworks, and software in between (the so-called middleware) into a single method call.
+
+But not only that.
+
+### Middleware is really needed
+
+Clack provides an idea "Middleware". It allows you to develop something you need without rewriting the existing framework. It can filter HTTP request before it is passed to the application, and can modify HTTP response the application generates.
+
+This idea is based on that loose coupling is good for writing reusable products.
+
+There are some middlewares bundled with Clack. You can find them at more below chapter "Bundle Middleware" in this document.
 
 ## Installation
 
@@ -118,6 +134,9 @@ Middleware is one of the Clack Component. It takes another Application and runs 
 * Clack.Middleware.Logger - Logging in Clack Application or Middleware.
 * Clack.Middleware.Session - Session management.
 * Clack.Middleware.OAuth - Authorization by OAuth.
+* Clack.Middleware.Csrf - Provides easy way to protect from CSRF.
+* Clack.Middleware.Clsql - For CLSQL connection management.
+* Clack.Middleware.Rucksack - For wrapping Rucksack transaction.
 
 ### How to write Middleware?
 
