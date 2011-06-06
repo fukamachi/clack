@@ -56,10 +56,10 @@ Example:
              ~%Listening on localhost:~A.~%" server port)))
 
 @export
-(defun stop (acceptor &key (server :hunchentoot))
+(defun stop (handler &key (server :hunchentoot))
   "Stop Clack server. Currently works only Hunchentoot."
   (let ((handler (find-handler server)))
-    (funcall (intern "STOP" handler) acceptor)))
+    (funcall (intern "STOP" handler) handler)))
 
 (doc:start)
 
