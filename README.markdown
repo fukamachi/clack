@@ -133,6 +133,9 @@ Middleware is one of the Clack Component. It takes another Application and runs 
 * Clack.Middleware.Static - Serves static files.
 * Clack.Middleware.Logger - Logging in Clack Application or Middleware.
 * Clack.Middleware.Session - Session management.
+
+### Contrib Middleware
+
 * Clack.Middleware.OAuth - Authorization by OAuth.
 * Clack.Middleware.Csrf - Provides easy way to protect from CSRF.
 * Clack.Middleware.Clsql - For CLSQL connection management.
