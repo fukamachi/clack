@@ -76,7 +76,7 @@ Clack main package just for convenience.
 "
 
 @doc:DESCRIPTION "
-Contrary to your expextations, this package is not so significant. Just exporting symbols imported from Clack.Component and Clack.Middleware.
+Contrary to your expectations, this package is not so significant. Just exporting symbols imported from Clack.Component and Clack.Middleware.
 
 To avoid confusion, especially for beginner, why this package is. Most of peaple expect that there is a package that has the same as asdf:system.
 
