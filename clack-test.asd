@@ -38,4 +38,12 @@
        (:file "app/file")
        (:file "middleware/static")
        (:file "middleware/session")
-       (:file "middleware/logger")))))))
+       (:file "middleware/logger")))
+     (:module "contrib"
+      :components
+      ((:module "middleware"
+        :components
+        ((:file "csrf")))))
+     (:module "util"
+      :components
+      ((:file "route")))))))
