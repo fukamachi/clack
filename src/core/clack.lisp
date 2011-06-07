@@ -58,8 +58,8 @@ Example:
 @export
 (defun stop (handler &key (server :hunchentoot))
   "Stop Clack server. Currently works only Hunchentoot."
-  (let ((handler (find-handler server)))
-    (funcall (intern "STOP" handler) handler)))
+  (let ((handler-package (find-handler server)))
+    (funcall (intern "STOP" handler-package) handler)))
 
 (doc:start)
 
