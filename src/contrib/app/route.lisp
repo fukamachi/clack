@@ -19,7 +19,10 @@
                 :split
                 :quote-meta-chars)
   (:import-from :alexandria
-                :with-gensyms))
+                :with-gensyms)
+  (:import-from :clack.util.route
+                :make-url-rule
+                :match))
 
 (cl-annot:enable-annot-syntax)
 
@@ -56,25 +59,23 @@ Example:
   (if (member (car otherwise) '(t otherwise))
       (setf routes (butlast routes))
       (setf otherwise nil))
-  (with-gensyms (env request-method request-path matched regs)
+  (with-gensyms (env request-method request-path matched params)
     `(defun ,name (,env)
        (let ((,request-method (getf ,env :request-method))
              (,request-path (getf ,env :path-info)))
          (declare (ignorable ,request-method ,request-path))
          (or ,@(loop for (method path form) in routes
-                     for triple = (parse-url-rule path)
-                     for regex = (first triple)
-                     for symbols = (third triple)
                      collect `(when (string= ,request-method ',method)
-                                (multiple-value-bind (,matched ,regs)
-                                    (scan-to-strings ,regex ,request-path)
-                                  (declare (ignorable ,regs))
-                                  (if ,matched
-                                      ,(if symbols
-                                           `(destructuring-bind ,symbols (coerce ,regs 'list)
-                                              (declare (ignorable ,@symbols))
-                                              (call ,form ,env))
-                                           `(call ,form ,env))))))
+                                (multiple-value-bind (,matched ,params)
+                                    (match (make-url-rule ,path) ,request-path)
+                                  (declare (ignorable ,params))
+                                  (when ,matched
+                                    ,(if params
+                                         `(let (,@(loop for (k v) on params by #'cddr
+                                                        collect (list (intern (string k)) v)))
+                                            (declare (ignorable ,@(loop for k in params by #'cddr collect k)))
+                                            (call ,form ,env))
+                                         `(call ,form ,env))))))
              ,(if otherwise
                   `(call ,(cadr otherwise) ,env)
                   '(list 404 nil nil)))))))
