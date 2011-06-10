@@ -136,12 +136,15 @@ Example:
              '(:name \"fukamachi\"))
     ;=> \"/hello/fukamachi\"
 "
-  (apply #'format nil (format-string this)
-         (loop for key in (param-keys this)
-               if (eq key :splat)
-                 collect (pop (getf params key))
-               else
-                 collect (getf params key))))
+  (values
+   (apply #'format nil (format-string this)
+          (loop for key in (param-keys this)
+                if (eq key :splat)
+                  collect (pop (getf params key))
+                else
+                  collect (getf params key)
+                  and do (remf params key)))
+   params))
 
 @export
 (defmethod link-to ((this <regex-url-rule>) params)
@@ -152,8 +155,9 @@ Example:
              '(:name \"fukamachi\"))
     ;=> \"/hello/fukamachi\"
 "
-  (apply #'format nil (format-string this)
-         (getf params :captures)))
+  (values (apply #'format nil (format-string this)
+                 (getf params :captures))
+          (and (remf params :captures) params)))
 
 (doc:start)
 
