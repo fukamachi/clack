@@ -18,6 +18,7 @@
 
 (cl-annot:enable-annot-syntax)
 
+@export
 (defclass <url-rule> ()
      ((url :type string
            :initarg :url
