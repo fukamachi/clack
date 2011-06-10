@@ -111,11 +111,11 @@
                   :components
                   ((:file "doc")
                    (:file "util")
-                   (:file "route")
                    (:file "stream")
                    (:file "ducktype")
                    (:file "localtime")
-                   (:file "hunchentoot"))))))
+                   (:file "hunchentoot")
+                   (:file "route"))))))
   :description "Web Application Environment for Common Lisp"
   :long-description
   #.(with-open-file (stream (merge-pathnames
