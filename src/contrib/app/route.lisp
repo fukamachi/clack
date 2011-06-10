@@ -28,6 +28,7 @@
 
 @eval-always
 @doc "
+[DEPRECATED]
 Parse an URL rule and return a list of (regex control-string
 variables).
 
@@ -104,6 +105,10 @@ Clack.App.Route - URL dispatcher.
 
 @doc:DESCRIPTION "
 Clack.App.Route provides an URL based dispacher, inspired by Ruby's Sinatra.
+
+This package is using Clack.Util.Route to parse rule strings.
+
+Note: Though `parse-url-rule` is provided from this package now, it is now deprecated. Use Clack.Util.Route for instead.
 "
 
 @doc:AUTHOR "
@@ -112,4 +117,8 @@ Clack.App.Route provides an URL based dispacher, inspired by Ruby's Sinatra.
 
 @doc:CONTRIBUTORS "
 * Eitarow Fukamachi (e.arrows@gmail.com)
+"
+
+@doc:SEE "
+* Clack.Util.Route
 "
