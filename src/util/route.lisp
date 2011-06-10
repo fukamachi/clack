@@ -34,6 +34,7 @@
 
 @export
 (defun make-url-rule (url &key regexp)
+  "Construct `<url-rule>` and return it. You must always use this function when you need `<url-rule>`."
   (if regexp
       (make-instance '<regex-url-rule> :url url)
       (make-instance '<url-rule> :url url)))
@@ -80,6 +81,19 @@
 
 @export
 (defmethod match ((this <url-rule>) url-string)
+  "Check whether the `url-string` matches to `this`. This method is for `<url-rule>`.
+Return two values, matched URL and Rule parameters as a plist.
+If the url-rule is containing Wildcard rules, they will be collected as :splat.
+
+Example:
+    (match (make-url-rule \"/hello/:name\") \"/hello/fukamachi\")
+    ;=> \"/hello/fukamachi\"
+        (:NAME \"fukamachi\")
+
+    (match (make-url-rule \"/say/*/to/*\") \"/say/hello/to/world\")
+    ;=> \"/say/hello/to/world\"
+        (:SPLAT (\"hello\" \"world\"))
+"
   @type string url-string
   (multiple-value-bind (matchp values)
       (scan-to-strings (regex this) url-string)
@@ -97,6 +111,16 @@
 
 @export
 (defmethod match ((this <regex-url-rule>) url-string)
+  "Check whether the `url-string` matches to `this`. This method is for `<regex-url-rule>`.
+Return two values, matched URL and Rule parameters as a plist.
+Captured strings in `url-string` are collected as :captures.
+
+Example:
+    (match (make-url-rule \"/hello([\\w]+)\" :regexp t)
+           \"/hello/world\")
+    ;=> \"/hello/world\"
+        (:CAPTURES (\"world\"))
+"
   (multiple-value-bind (matchp values)
       (scan-to-strings (regex this) url-string)
     (values matchp
@@ -104,7 +128,13 @@
 
 @export
 (defmethod link-to ((this <url-rule>) params)
-  @type list params
+  "Return an URL from a rule and parameters.
+
+Example:
+    (link-to (make-url-rule \"/hello/:name\")
+             '(:name \"fukamachi\"))
+    ;=> \"/hello/fukamachi\"
+"
   (apply #'format nil (format-string this)
          (loop for key in (param-keys this)
                if (eq key :splat)
@@ -114,6 +144,13 @@
 
 @export
 (defmethod link-to ((this <regex-url-rule>) params)
+  "Return an URL from a rule and parameters.
+
+Example:
+    (link-to (make-url-rule \"/hello/:name\")
+             '(:name \"fukamachi\"))
+    ;=> \"/hello/fukamachi\"
+"
   (apply #'format nil (format-string this)
          (getf params :captures)))
 
