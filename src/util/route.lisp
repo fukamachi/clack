@@ -11,7 +11,9 @@
   (:use :cl)
   (:import-from :cl-ppcre
                 :scan-to-strings
-                :split))
+                :regex-replace-all
+                :split
+                :quote-meta-chars))
 (in-package :clack.util.route)
 
 (cl-annot:enable-annot-syntax)
@@ -21,34 +23,60 @@
            :initarg :url
            :accessor url)
       (regex :type string
+             :initarg :regex
              :accessor regex)
       (format-string :type string
                      :accessor format-string)
       (param-keys :type list
                   :accessor param-keys)))
 
+(defclass <regex-url-rule> (<url-rule>) ())
+
 @export
-(defun make-url-rule (url)
-  (make-instance '<url-rule> :url url))
+(defun make-url-rule (url &key regexp)
+  (if regexp
+      (make-instance '<regex-url-rule> :url url)
+      (make-instance '<url-rule> :url url)))
 
 (defmethod initialize-instance :after ((this <url-rule>) &key)
   (compile-rule this))
 
+(defmethod initialize-instance :after ((this <regex-url-rule>) &key)
+  (setf (regex this) (url this)
+        (format-string this)
+        (ppcre:regex-replace-all "\\(.+?\\)" (regex this) "~A")))
+
 (defmethod compile-rule ((this <url-rule>))
-  (loop with list = (split ":([\\w-]+)" (url this) :with-registers-p t)
+  (loop with pattern = (ppcre:regex-replace-all
+                        "[^\\?\\%\\\\/:\\*\\w]" (url this)
+                        #'escape-special-char
+                        :simple-calls t)
+        with list = (split "(?::([\\w-]+)|(\\*))" pattern
+                           :with-registers-p t :omit-unmatched-p t)
         while list
         for prefix = (pop list)
         for name = (pop list)
         collect prefix into re
         collect prefix into cs
-        if name
+        if (string= name "*")
+          collect :splat into names
+          and collect "(.*?)" into re
+          and collect "~A" into cs
+        else if name
           collect (intern (string-upcase name) :keyword) into names
-          and collect "(.+?)" into re
+          and collect "([^/?#]+)" into re
           and collect "~A" into cs
         finally
      (setf (regex this) (format nil "^~{~A~}$" re)
            (format-string this) (format nil "~{~A~}" cs)
            (param-keys this) names)))
+
+(defun escape-special-char (char)
+  (let ((enc (clack.util.hunchentoot:url-encode (string char))))
+    (cond
+      ((string= char " ") (format nil "(?:~A|~A)" enc (escape-special-char #\+)))
+      ((string= enc char) (ppcre:quote-meta-chars enc))
+      (t enc))))
 
 @export
 (defmethod match ((this <url-rule>) url-string)
@@ -58,19 +86,41 @@
     (values matchp
             (loop for key in (param-keys this)
                   for val across values
-                  append (list key val)))))
+                  if (eq key :splat)
+                    collect val into splat
+                  else
+                    append (list key val) into result
+                  finally
+               (return (if splat
+                           `(:splat ,splat ,@result)
+                           result))))))
+
+@export
+(defmethod match ((this <regex-url-rule>) url-string)
+  (multiple-value-bind (matchp values)
+      (scan-to-strings (regex this) url-string)
+    (values matchp
+            `(:captures ,(coerce values 'list)))))
 
 @export
 (defmethod link-to ((this <url-rule>) params)
   @type list params
   (apply #'format nil (format-string this)
          (loop for key in (param-keys this)
-               collect (getf params key))))
+               if (eq key :splat)
+                 collect (pop (getf params key))
+               else
+                 collect (getf params key))))
+
+@export
+(defmethod link-to ((this <regex-url-rule>) params)
+  (apply #'format nil (format-string this)
+         (getf params :captures)))
 
 (doc:start)
 
 @doc:NAME "
-Clack.Util.Route - Class for Sinatra-like URL rule.
+Clack.Util.Route - Class for Sinatra-compatible URL rule.
 "
 
 @doc:SYNOPSIS "
@@ -83,6 +133,41 @@ Clack.Util.Route - Class for Sinatra-like URL rule.
     
     (link-to *url-rule* '(:name \"fukamachi\"))
     ;=> \"/hello/fukamachi\"
+"
+
+@doc:DESCRIPTION "
+Clack.Util.Route provides a Sinatra-compatible routing class.
+
+## Named Parameter
+
+    (match (make-url-rule \"/hello/:name\") \"/hello/fukamachi\")
+    ;=> \"/hello/fukamachi\"
+        (:NAME \"fukamachi\")
+
+## Wildcard Parameter
+
+    (match (make-url-rule \"/say/*/to/*\") \"/say/hello/to/world\")
+    ;=> \"/say/hello/to/world\"
+        (:SPLAT (\"hello\" \"world\"))
+
+## Optional Parameter
+
+    (match (make-url-rule \"/?:foo?/?:bar?\") \"/hello/world\")
+    ;=> \"/hello/world\"
+        (:FOO \"hello\" :BAR \"world\")
+    (match (make-url-rule \"/?:foo?/?:bar?\") \"/hello\")
+    ;=> \"/hello\"
+        (:FOO \"hello\" :BAR NIL)
+    (match (make-url-rule \"/?:foo?/?:bar?\") \"/\")
+    ;=> \"/\"
+        (:FOO NIL :BAR NIL)
+
+## Regular Expression
+
+    (match (make-url-rule \"/hello([\\w]+)\" :regexp t)
+           \"/hello/world\")
+    ;=> \"/hello/world\"
+        (:CAPTURES (\"world\"))
 "
 
 @doc:AUTHOR "
