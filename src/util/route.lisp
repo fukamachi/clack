@@ -180,19 +180,19 @@ Clack.Util.Route - Class for Sinatra-compatible URL rule.
 @doc:DESCRIPTION "
 Clack.Util.Route provides a Sinatra-compatible routing class.
 
-## Named Parameter
+### Named Parameter
 
     (match (make-url-rule \"/hello/:name\") \"/hello/fukamachi\")
     ;=> \"/hello/fukamachi\"
         (:NAME \"fukamachi\")
 
-## Wildcard Parameter
+### Wildcard Parameter
 
     (match (make-url-rule \"/say/*/to/*\") \"/say/hello/to/world\")
     ;=> \"/say/hello/to/world\"
         (:SPLAT (\"hello\" \"world\"))
 
-## Optional Parameter
+### Optional Parameter
 
     (match (make-url-rule \"/?:foo?/?:bar?\") \"/hello/world\")
     ;=> \"/hello/world\"
@@ -204,7 +204,7 @@ Clack.Util.Route provides a Sinatra-compatible routing class.
     ;=> \"/\"
         (:FOO NIL :BAR NIL)
 
-## Regular Expression
+### Regular Expression
 
     (match (make-url-rule \"/hello([\\w]+)\" :regexp t)
            \"/hello/world\")
