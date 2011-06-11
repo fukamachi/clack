@@ -23,7 +23,11 @@
      ((block-app :initarg :block-app
                  :type (or function <component>)
                  :initform #'return-400
-                 :accessor block-app))
+                 :accessor block-app)
+      (one-time-p :initarg :one-time-p
+                  :type boolean
+                  :initform nil
+                  :accessor one-time-p))
   (:documentation "Clack Middleware for easy CSRF protection."))
 
 (defmethod call ((this <clack-middleware-csrf>) env)
@@ -36,7 +40,8 @@
   (if (valid-token-p env)
       (progn
         ;; delete onetime token
-        (remhash :csrf-token (getf env :clack.session))
+        (when (one-time-p this)
+          (remhash :csrf-token (getf env :clack.session)))
         (call-next this env))
       (call (block-app this) env)))
 
