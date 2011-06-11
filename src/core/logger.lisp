@@ -59,7 +59,7 @@ Example:
             *logger-format-string*
             (format-timestring nil (now) :format *logger-time-format*)
             level
-            (format nil format-control format-args))))
+            (apply #'format nil format-control format-args))))
 
 (defun normalize-loglevel (level)
   "Log level is an integer or a keyword."
