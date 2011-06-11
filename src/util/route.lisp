@@ -98,17 +98,18 @@ Example:
   @type string url-string
   (multiple-value-bind (matchp values)
       (scan-to-strings (regex this) url-string)
-    (values matchp
-            (loop for key in (param-keys this)
-                  for val across values
-                  if (eq key :splat)
-                    collect val into splat
-                  else
-                    append (list key val) into result
-                  finally
-               (return (if splat
-                           `(:splat ,splat ,@result)
-                           result))))))
+    (when matchp
+      (values matchp
+              (loop for key in (param-keys this)
+                    for val across values
+                    if (eq key :splat)
+                      collect val into splat
+                    else
+                      append (list key val) into result
+                    finally
+                 (return (if splat
+                             `(:splat ,splat ,@result)
+                             result)))))))
 
 @export
 (defmethod match ((this <regex-url-rule>) url-string)
@@ -124,8 +125,9 @@ Example:
 "
   (multiple-value-bind (matchp values)
       (scan-to-strings (regex this) url-string)
-    (values matchp
-            `(:captures ,(coerce values 'list)))))
+    (when matchp
+      (values matchp
+              `(:captures ,(coerce values 'list))))))
 
 @export
 (defmethod link-to ((this <url-rule>) params)

@@ -31,15 +31,15 @@
 (diag "normal case")
 
 (is-match "/hello" "/hello" '("/hello" nil) "'/hello' matches '/hello'")
-(is-match "/hello" "/bye" '(nil nil) "'/hello' doesn't match '/bye'")
+(is-match "/hello" "/bye" '(nil) "'/hello' doesn't match '/bye'")
 
 (diag "with named parameter")
 
 (is-match "/hello/:name" "/hello/fukamachi" '("/hello/fukamachi" (:name "fukamachi"))
           "match")
-(is-match "/hello/:name" "/hello/fukamachi/eitarow" '(nil nil)
+(is-match "/hello/:name" "/hello/fukamachi/eitarow" '(nil)
           "containing a slash")
-(is-match "/hello/:name" "/bye/fukamachi" '(nil nil)
+(is-match "/hello/:name" "/bye/fukamachi" '(nil)
           "not match")
 
 (diag "with multiple named parameter")
@@ -83,7 +83,7 @@
 (is-match "/te st/" "/te%20st/" '("/te%20st/" nil) "escape space")
 (is-match "/test$/" "/test$/" '("/test$/" nil) "escape $")
 (is-match "/te.st/" "/te.st/" '("/te.st/" nil) "escape .")
-(is-match "/te.st/" "/te0st/" '(nil nil) "escape .")
+(is-match "/te.st/" "/te0st/" '(nil) "escape .")
 (is-match "/test(bar)/" "/test(bar)/" '("/test(bar)/" nil) "escape ()")
 
 (finalize)
