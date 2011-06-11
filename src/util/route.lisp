@@ -50,7 +50,7 @@
 
 (defmethod compile-rule ((this <url-rule>))
   (loop with pattern = (ppcre:regex-replace-all
-                        "[^\\?\\%\\\\/:\\*\\w]" (url this)
+                        "[^\\?\\%\\\\/:\\*\\w-]" (url this)
                         #'escape-special-char
                         :simple-calls t)
         with list = (split "(?::([\\w-]+)|(\\*))" pattern

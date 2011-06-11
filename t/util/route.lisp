@@ -3,7 +3,7 @@
         :clack.util.route
         :cl-test-more))
 
-(plan 21)
+(plan 22)
 
 (defun %is-match (url-rule req-url &optional params comment)
   (is (multiple-value-list (match url-rule req-url))
@@ -41,6 +41,7 @@
           "containing a slash")
 (is-match "/hello/:name" "/bye/fukamachi" '(nil)
           "not match")
+(is-match "/blog/:post-id" "/blog/10" '("/blog/10" (:post-id "10")))
 
 (diag "with multiple named parameter")
 
