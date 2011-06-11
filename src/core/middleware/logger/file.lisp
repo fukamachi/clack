@@ -7,17 +7,17 @@
 |#
 
 (clack.util:namespace clack.logger.file
-  (:use :cl)
-  (:import-from :clack.logger.stream
-                :<clack-logger-stream>
-                :output-stream)
+  (:use :cl
+        :anaphora)
+  (:import-from :clack.logger :*logger-output*)
   (:import-from :clack.logger.base
+                :<clack-logger-base>
                 :output))
 
 (cl-annot:enable-annot-syntax)
 
 @export
-(defclass <clack-logger-file> (<clack-logger-stream>)
+(defclass <clack-logger-file> (<clack-logger-base>)
      ((output-file :type (or string pathname)
                    :initarg :output-file
                    :initform (error ":output-file is required.")
@@ -30,8 +30,8 @@
                           :direction :output
                           :if-exists :append
                           :if-does-not-exist :create)
-    (setf (output-stream this) stream)
-    (call-next-method)))
+    (awhen (get-output-stream-string *logger-output*)
+      (write-string it stream))))
 
 (doc:start)
 
@@ -54,7 +54,6 @@ Clack.Logger.File - Output log messages to a file.
 "
 
 @doc:SEE "
-* Clack.Logger.Stream
 * Clack.Logger.Base
 * Clack.Middleware.Logger
 * Clack.Logger

@@ -23,7 +23,7 @@
 
 @export
 (defclass <clack-middleware-logger> (<middleware>)
-     ((logger :type (or <clack-logger-stream> null)
+     ((logger :type (or <clack-logger-base> null)
               :initarg :logger
               :initform (make-instance '<clack-logger-stream>)
               :accessor logger
