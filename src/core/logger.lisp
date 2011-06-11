@@ -52,13 +52,14 @@ Log level must be a integer 0-7, or a keyword represents log level.
 Example:
   (log-message :warning \"Something wrong.\")"
 @export
-(defun log-message (level message)
+(defun log-message (level format-control &rest format-args)
+  @type string format-control
   (when (>= (normalize-loglevel level) *logger-min-level*)
     (format *logger-output*
             *logger-format-string*
             (format-timestring nil (now) :format *logger-time-format*)
             level
-            message)))
+            (format nil format-control format-args))))
 
 (defun normalize-loglevel (level)
   "Log level is an integer or a keyword."
