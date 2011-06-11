@@ -80,6 +80,7 @@
                     :components
                     ((:file "base")
                      (:file "stream")
+                     (:file "file")
                      (:file "logger")))
                    (:module "mw"
                     :pathname "middleware"

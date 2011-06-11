@@ -6,9 +6,12 @@
         :clack.logger
         :clack.middleware.logger
         :clack.logger.stream
-        :drakma))
+        :clack.logger.file
+        :drakma)
+  (:import-from :cl-fad
+                :file-exists-p))
 
-(plan 2)
+(plan 3)
 
 #+thread-support
 (test-app
@@ -27,6 +30,22 @@
    (http-request "http://localhost:4242/")
    (is (get-output-stream-string *logger-output*) "" "min level is WARNING")
    ))
+#-thread-support
+(skip 2 "because your lisp doesn't support threads")
+
+#+thread-support
+(test-app
+ (builder
+  (<clack-middleware-logger>
+   :logger (make-instance '<clack-logger-file>
+              :output-file (merge-pathnames #p"~/pongi.log")))
+  (lambda (env)
+    (declare (ignore env))
+    (log-message :error "fuga")
+    '(200 nil nil)))
+ (lambda ()
+   (http-request "http://localhost:4242/")
+   (ok (file-exists-p #p"~/pongi.log"))))
 #-thread-support
 (skip 2 "because your lisp doesn't support threads")
 

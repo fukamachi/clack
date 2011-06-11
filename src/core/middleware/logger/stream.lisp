@@ -21,7 +21,7 @@
      ((output-stream :type stream
                      :initarg :output-stream
                      :initform *standard-output*
-                     :reader output-stream)))
+                     :accessor output-stream)))
 
 (defmethod output ((this <clack-logger-stream>))
   "Output log messages to 'output-stream' in this slot."
@@ -50,7 +50,7 @@ This logger is used in Clack.Middleware.Logger as a default logger.
 "
 
 @doc:AUTHOR "
-Eitarow Fukamachi (e.arrows@gmail.com)
+* Eitarow Fukamachi (e.arrows@gmail.com)
 "
 
 @doc:SEE "
