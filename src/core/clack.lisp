@@ -8,8 +8,7 @@
 
 (clack.util:namespace clack
   (:use :cl
-        :cl-annot.doc
-        :clack.middleware.logger)
+        :cl-annot.doc)
   (:import-from :clack.component
                 :<component>
                 :call
@@ -43,12 +42,7 @@ Example:
 @export
 (defun clackup (app &key (server :hunchentoot) (port 5000) (debug t))
   (prog1
-    (let* ((*standard-output* *standard-output*)
-           (handler (find-handler server))
-           (app (if debug
-                    (wrap (make-instance '<clack-middleware-logger>)
-                          app)
-                    app)))
+    (let ((handler (find-handler server)))
       (funcall (intern "RUN" handler)
                app
                :port port
