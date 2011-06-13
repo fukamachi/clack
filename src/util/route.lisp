@@ -20,10 +20,10 @@
 
 @export
 (defclass <url-rule> ()
-     ((method :type symbol
-              :initarg :method
-              :initform :get
-              :accessor method)
+     ((request-method :type symbol
+                      :initarg :method
+                      :initform :get
+                      :accessor request-method)
       (url :type string
            :initarg :url
            :accessor url)
@@ -85,8 +85,8 @@
       (t enc))))
 
 (defmethod match-method-p ((this <url-rule>) method)
-  (or (string= :ANY (method this))
-      (string= method (method this))))
+  (or (string= :ANY (request-method this))
+      (string= method (request-method this))))
 
 @export
 (defmethod match ((this <url-rule>) method url-string)
