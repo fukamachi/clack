@@ -33,7 +33,7 @@
       (headers :type list
                :initarg :headers
                :initform nil)
-      (body :type list
+      (body :type (or list pathname)
             :initarg :body
             :initform nil
             :reader body)
@@ -90,7 +90,10 @@ Example: (push-header res :content-type \"text/html\")"
 (defmethod (setf body) (value (res <response>))
   "Set body with normalizing. body must be a list."
   (setf (slot-value res 'body)
-        (ensure-list value)))
+        (etypecase value
+          (string (ensure-list value))
+          (list value)
+          (pathname value))))
 
 @export
 (defmethod set-cookies ((res <response>) &optional name)
