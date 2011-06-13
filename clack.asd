@@ -61,7 +61,9 @@
                    (:file "response")
                    (:file "component")
                    (:file "middleware" :depends-on ("component"))
-                   (:module "handler"
+                   (:file "handler")
+                   (:module "handlers"
+                    :pathname "handler"
                     :depends-on ("component")
                     :components
                     ((:file "hunchentoot")

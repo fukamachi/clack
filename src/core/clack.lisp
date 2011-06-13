@@ -17,9 +17,13 @@
                 :<middleware>
                 :call-next
                 :wrap)
+  (:import-from :clack.handler
+                :<handler>
+                :stop)
   (:import-from :clack.util
                 :find-handler)
-  (:export :<component>
+  (:export :stop
+           :<component>
            :<middleware>
            :call
            :call-next
@@ -42,19 +46,16 @@ Example:
 @export
 (defun clackup (app &key (server :hunchentoot) (port 5000) (debug t))
   (prog1
-    (let ((handler (find-handler server)))
-      (funcall (intern "RUN" handler)
-               app
-               :port port
-               :debug debug))
+    (let ((handler-package (find-handler server)))
+      (make-instance '<handler>
+         :server-name server
+         :acceptor
+         (funcall (intern "RUN" handler-package)
+                  app
+                  :port port
+                  :debug debug)))
     (format t "~&~:(~A~) server is started.~
              ~%Listening on localhost:~A.~%" server port)))
-
-@export
-(defun stop (handler &key (server :hunchentoot))
-  "Stop Clack server. Currently works only Hunchentoot."
-  (let ((handler-package (find-handler server)))
-    (funcall (intern "STOP" handler-package) handler)))
 
 (doc:start)
 
