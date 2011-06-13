@@ -6,7 +6,7 @@
 (plan 22)
 
 (defun %is-match (url-rule req-url &optional params comment)
-  (is (multiple-value-list (match url-rule req-url))
+  (is (multiple-value-list (match url-rule :get req-url))
       params
       comment))
 

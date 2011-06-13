@@ -20,7 +20,11 @@
 
 @export
 (defclass <url-rule> ()
-     ((url :type string
+     ((method :type symbol
+              :initarg :method
+              :initform :get
+              :accessor method)
+      (url :type string
            :initarg :url
            :accessor url)
       (regex :type string
@@ -34,11 +38,11 @@
 (defclass <regex-url-rule> (<url-rule>) ())
 
 @export
-(defun make-url-rule (url &key regexp)
+(defun make-url-rule (url &key (method :get) regexp)
   "Construct `<url-rule>` and return it. You must always use this function when you need `<url-rule>`."
   (if regexp
-      (make-instance '<regex-url-rule> :url url)
-      (make-instance '<url-rule> :url url)))
+      (make-instance '<regex-url-rule> :method method :url url)
+      (make-instance '<url-rule> :method method :url url)))
 
 (defmethod initialize-instance :after ((this <url-rule>) &key)
   (compile-rule this))
@@ -80,39 +84,44 @@
       ((string= enc char) (ppcre:quote-meta-chars enc))
       (t enc))))
 
+(defmethod match-method-p ((this <url-rule>) method)
+  (or (string= :ANY (method this))
+      (string= method (method this))))
+
 @export
-(defmethod match ((this <url-rule>) url-string)
+(defmethod match ((this <url-rule>) method url-string)
   "Check whether the `url-string` matches to `this`. This method is for `<url-rule>`.
 Return two values, matched URL and Rule parameters as a plist.
 If the url-rule is containing Wildcard rules, they will be collected as :splat.
 
 Example:
-    (match (make-url-rule \"/hello/:name\") \"/hello/fukamachi\")
+    (match (make-url-rule \"/hello/:name\") :GET \"/hello/fukamachi\")
     ;=> \"/hello/fukamachi\"
         (:NAME \"fukamachi\")
 
-    (match (make-url-rule \"/say/*/to/*\") \"/say/hello/to/world\")
+    (match (make-url-rule \"/say/*/to/*\") :ANY \"/say/hello/to/world\")
     ;=> \"/say/hello/to/world\"
         (:SPLAT (\"hello\" \"world\"))
 "
   @type string url-string
-  (multiple-value-bind (matchp values)
-      (scan-to-strings (regex this) url-string)
-    (when matchp
-      (values matchp
-              (loop for key in (param-keys this)
-                    for val across values
-                    if (eq key :splat)
-                      collect val into splat
-                    else
-                      append (list key val) into result
-                    finally
-                 (return (if splat
-                             `(:splat ,splat ,@result)
-                             result)))))))
+  (when (match-method-p this method)
+    (multiple-value-bind (matchp values)
+        (scan-to-strings (regex this) url-string)
+      (when matchp
+        (values matchp
+                (loop for key in (param-keys this)
+                      for val across values
+                      if (eq key :splat)
+                        collect val into splat
+                      else
+                        append (list key val) into result
+                      finally
+                   (return (if splat
+                               `(:splat ,splat ,@result)
+                               result))))))))
 
 @export
-(defmethod match ((this <regex-url-rule>) url-string)
+(defmethod match ((this <regex-url-rule>) method url-string)
   "Check whether the `url-string` matches to `this`. This method is for `<regex-url-rule>`.
 Return two values, matched URL and Rule parameters as a plist.
 Captured strings in `url-string` are collected as :captures.
@@ -123,11 +132,12 @@ Example:
     ;=> \"/hello/world\"
         (:CAPTURES (\"world\"))
 "
-  (multiple-value-bind (matchp values)
-      (scan-to-strings (regex this) url-string)
-    (when matchp
-      (values matchp
-              `(:captures ,(coerce values 'list))))))
+  (when (match-method-p this method)
+    (multiple-value-bind (matchp values)
+        (scan-to-strings (regex this) url-string)
+      (when matchp
+        (values matchp
+                `(:captures ,(coerce values 'list)))))))
 
 @export
 (defmethod link-to ((this <url-rule>) params)
