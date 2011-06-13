@@ -49,8 +49,9 @@ This function is called on each request."
 (defun command->plist (command)
   (bind ((url (ml:header-value command :url))
          (pos (position #\? url))
-         ((server-name server-port)
-          (split-sequence #\: (ml:header-value command :host))))
+         ((server-name &optional (server-port "80"))
+          (split-sequence #\: (ml:header-value command :host)
+                          :from-end t)))
     (append
      (list
       :request-method (ml:header-value command :method)

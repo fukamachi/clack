@@ -97,7 +97,7 @@ before pass to Hunchentoot."
 (defun request->plist (req)
   "Convert Request from server into a plist
 before pass to Clack application."
-  (destructuring-bind (server-name server-port)
+  (destructuring-bind (server-name &optional (server-port "80"))
       (split-sequence #\: (host req) :from-end t)
     (append
      (list
