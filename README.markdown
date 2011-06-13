@@ -15,6 +15,8 @@ Clack is a web application environment for Common Lisp inspired by Python's WSGI
 
 Now access [http://localhost:5000/](http://localhost:5000/) and Clack may show you "Hello, Clack!".
 
+To stop the server, you should just call `(clack:stop *)`.
+
 ## About Clack
 
 ### What is Clack?
