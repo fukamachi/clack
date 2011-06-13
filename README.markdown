@@ -9,13 +9,14 @@ Clack is a web application environment for Common Lisp inspired by Python's WSGI
             :clack))
     (in-package :simple-app)
     
-    (clackup
-      #'(lambda (env)
-          '(200 (:content-type "text/plain") ("Hello, Clack!"))))
+    (defvar *handler*
+        (clackup
+          #'(lambda (env)
+              '(200 (:content-type "text/plain") ("Hello, Clack!")))))
 
 Now access [http://localhost:5000/](http://localhost:5000/) and Clack may show you "Hello, Clack!".
 
-To stop the server, you should just call `(clack:stop *)`.
+To stop the server, you should just call `(clack:stop *handler*)`.
 
 ## About Clack
 
