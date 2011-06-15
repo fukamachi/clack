@@ -20,7 +20,7 @@
 (in-package :clack-asd)
 
 (defsystem clack
-  :version "11.6"
+  :version "11.6-SNAPSHOT"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
   :depends-on (;; Utility
@@ -119,7 +119,7 @@
                    (:file "localtime")
                    (:file "hunchentoot")
                    (:file "route"))))))
-  :description "Web Application Environment for Common Lisp"
+  :description "Web application environment for Common Lisp"
   :long-description
   #.(with-open-file (stream (merge-pathnames
                              #p"README.markdown"
@@ -130,9 +130,3 @@
                              :fill-pointer t)))
         (setf (fill-pointer seq) (read-sequence seq stream))
         seq)))
-
-;; Run unit tests.
-#|
-(defmethod asdf:perform :after ((op load-op) (c (eql (find-system :clack))))
-  (asdf:oos 'asdf:load-op :clack-test))
-|#
