@@ -53,16 +53,15 @@
         (ppcre:regex-replace-all "\\(.+?\\)" (regex this) "~A")))
 
 (defmethod compile-rule ((this <url-rule>))
-  (loop with pattern = (ppcre:regex-replace-all
-                        "[^\\?\\%\\\\/:\\*\\w-]" (url this)
-                        #'escape-special-char
-                        :simple-calls t)
-        with list = (split "(?::([\\w-]+)|(\\*))" pattern
+  (loop with list = (split "(?::([\\w-]+)|(\\*))" (url this)
                            :with-registers-p t :omit-unmatched-p t)
         while list
         for prefix = (pop list)
         for name = (pop list)
-        collect prefix into re
+        collect (ppcre:regex-replace-all
+                 "[^\\?\\/\\w-]" prefix
+                 #'escape-special-char
+                 :simple-calls t) into re
         collect prefix into cs
         if (string= name "*")
           collect :splat into names
