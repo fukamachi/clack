@@ -19,12 +19,12 @@
     (%is-match rule req-url params comment)))
 
 (defun is-link (url-rule params result &optional comment)
-  (is (link-to (make-url-rule url-rule) params)
+  (is (url-for (make-url-rule url-rule) params)
       result
       comment))
 
 (defun is-re-link (url-rule params result &optional comment)
-  (is (link-to (make-url-rule url-rule :regexp t) params)
+  (is (url-for (make-url-rule url-rule :regexp t) params)
       result
       comment))
 
