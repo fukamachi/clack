@@ -53,16 +53,15 @@
         (ppcre:regex-replace-all "\\(.+?\\)" (regex this) "~A")))
 
 (defmethod compile-rule ((this <url-rule>))
-  (loop with pattern = (ppcre:regex-replace-all
-                        "[^\\?\\%\\\\/:\\*\\w-]" (url this)
-                        #'escape-special-char
-                        :simple-calls t)
-        with list = (split "(?::([\\w-]+)|(\\*))" pattern
+  (loop with list = (split "(?::([\\w-]+)|(\\*))" (url this)
                            :with-registers-p t :omit-unmatched-p t)
         while list
         for prefix = (pop list)
         for name = (pop list)
-        collect prefix into re
+        collect (ppcre:regex-replace-all
+                 "[^\\?\\/\\w-]" prefix
+                 #'escape-special-char
+                 :simple-calls t) into re
         collect prefix into cs
         if (string= name "*")
           collect :splat into names
@@ -140,11 +139,11 @@ Example:
                 `(:captures ,(coerce values 'list)))))))
 
 @export
-(defmethod link-to ((this <url-rule>) params)
+(defmethod url-for ((this <url-rule>) params)
   "Return an URL from a rule and parameters.
 
 Example:
-    (link-to (make-url-rule \"/hello/:name\")
+    (url-for (make-url-rule \"/hello/:name\")
              '(:name \"fukamachi\"))
     ;=> \"/hello/fukamachi\"
 "
@@ -159,11 +158,11 @@ Example:
    params))
 
 @export
-(defmethod link-to ((this <regex-url-rule>) params)
+(defmethod url-for ((this <regex-url-rule>) params)
   "Return an URL from a rule and parameters.
 
 Example:
-    (link-to (make-url-rule \"/hello/:name\")
+    (url-for (make-url-rule \"/hello/:name\")
              '(:name \"fukamachi\"))
     ;=> \"/hello/fukamachi\"
 "
@@ -185,7 +184,7 @@ Clack.Util.Route - Class for Sinatra-compatible URL rule.
     (match *url-rule* \"/bye/fukamachi\")
     ;=> NIL
     
-    (link-to *url-rule* '(:name \"fukamachi\"))
+    (url-for *url-rule* '(:name \"fukamachi\"))
     ;=> \"/hello/fukamachi\"
 "
 

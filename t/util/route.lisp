@@ -3,7 +3,7 @@
         :clack.util.route
         :cl-test-more))
 
-(plan 22)
+(plan 23)
 
 (defun %is-match (url-rule req-url &optional params comment)
   (is (multiple-value-list (match url-rule :get req-url))
@@ -19,12 +19,12 @@
     (%is-match rule req-url params comment)))
 
 (defun is-link (url-rule params result &optional comment)
-  (is (link-to (make-url-rule url-rule) params)
+  (is (url-for (make-url-rule url-rule) params)
       result
       comment))
 
 (defun is-re-link (url-rule params result &optional comment)
-  (is (link-to (make-url-rule url-rule :regexp t) params)
+  (is (url-for (make-url-rule url-rule :regexp t) params)
       result
       comment))
 
@@ -86,5 +86,7 @@
 (is-match "/te.st/" "/te.st/" '("/te.st/" nil) "escape .")
 (is-match "/te.st/" "/te0st/" '(nil) "escape .")
 (is-match "/test(bar)/" "/test(bar)/" '("/test(bar)/" nil) "escape ()")
+
+(is-link "/te.st/" nil "/te.st/")
 
 (finalize)
