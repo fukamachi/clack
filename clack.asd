@@ -74,7 +74,8 @@
                    (:module "app"
                     :depends-on ("clack")
                     :components
-                    ((:file "file")))
+                    ((:file "file")
+                     (:file "urlmap")))
                    (:file "logger")
                    (:module "middleware/logger"
                     :depends-on ("logger" "middleware")

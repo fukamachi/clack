@@ -36,6 +36,7 @@
        (:file "request")
        (:file "handler/hunchentoot")
        (:file "app/file")
+       (:file "app/urlmap")
        (:file "middleware/static")
        (:file "middleware/session")
        (:file "middleware/logger")))
