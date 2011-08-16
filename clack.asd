@@ -20,7 +20,7 @@
 (in-package :clack-asd)
 
 (defsystem clack
-  :version "11.07.0"
+  :version "11.08-SNAPSHOT"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
   :depends-on (;; Utility
