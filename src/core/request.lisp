@@ -258,7 +258,7 @@ Clack.Request - Portable HTTP Request object for Clack Request.
       (let ((req (make-request env)))
       `(200
         (:content-type \"text/plain\")
-        (\"Hello, \" (query-parameter req \"name)))))
+        (\"Hello, \" (query-parameter req \"name\")))))
 "
 
 @doc:DESCRIPTION "
