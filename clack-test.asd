@@ -38,6 +38,7 @@
        (:file "app/file")
        (:file "app/urlmap")
        (:file "middleware/static")
+       (:file "middleware/conditional")
        (:file "middleware/session")
        (:file "middleware/logger")))
      (:module "util"

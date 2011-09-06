@@ -13,7 +13,9 @@
   (:import-from :clack.component
                 :call)
   (:import-from :clack.middleware
-                :wrap))
+                :wrap)
+  (:import-from :clack.middleware.conditional
+                :<clack-middleware-conditional>))
 
 (cl-annot:enable-annot-syntax)
 
@@ -28,7 +30,11 @@ This is useful in development phase.")
   `(reduce #'wrap
            (list ,@(loop for item in (butlast app-or-middleware)
                          for (class . args) = (ensure-list item)
-                         collect `(make-instance ',class ,@args)))
+                         if (eq class :condition)
+                           collect `(make-instance '<clack-middleware-conditional>
+                                       :condition ,@args)
+                         else
+                           collect `(make-instance ',class ,@args)))
            :initial-value ,(car (last app-or-middleware))
            :from-end t))
 
