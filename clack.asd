@@ -30,6 +30,7 @@
                :arnesi
                :split-sequence
                :cl-annot
+               :closer-mop
                ;; Server
                :hunchentoot
                #+(or allegro cmu lispworks sbcl)
@@ -38,13 +39,10 @@
                :cl-ppcre
                :cl-fad
                :cl-test-more
-               :cl-oauth
                :ironclad
                :cl-base64
                :drakma
-               :local-time
-               :clsql
-               :rucksack)
+               :local-time)
   :components ((:module "src"
                 :components
                 ((:module "core"
@@ -98,18 +96,6 @@
                        (:file "store")
                        (:file "session")))
                      (:file "auth/basic")))))
-                 (:module "contrib"
-                  :depends-on ("util" "core")
-                  :components
-                  ((:module "app"
-                    :components
-                    ((:file "route")))
-                   (:module "middleware"
-                    :components
-                    ((:file "oauth")
-                     (:file "clsql")
-                     (:file "rucksack")
-                     (:file "csrf")))))
                  (:module "util"
                   :serial t
                   :components
