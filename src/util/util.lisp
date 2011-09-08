@@ -9,6 +9,8 @@
 (in-package :cl-user)
 (defpackage clack.util
   (:use :cl)
+  (:import-from :cl-ppcre
+                :regex-replace-all)
   (:import-from :ironclad
                 :byte-array-to-hex-string
                 :digest-sequence
@@ -109,6 +111,21 @@ Example:
     (flex:string-to-octets
      (format nil "~A~A"
       (random 1.0) (get-universal-time))))))
+
+@export
+(defun html-encode (str)
+  (ppcre:regex-replace-all
+   "([&><\"'])"
+   str
+   #'(lambda (match &rest regs)
+       (declare (ignore regs))
+       (cond
+         ((string= "&" match) "&amp;")
+         ((string= ">" match) "&gt;")
+         ((string= "<" match) "&lt;")
+         ((string= "\"" match) "&quot;")
+         ((string= "'" match) "&#39;")))
+   :simple-calls t))
 
 (doc:start)
 
