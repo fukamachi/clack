@@ -26,7 +26,7 @@
 @export
 (defclass <clack-app-directory> (<clack-app-file>) ())
 
-(defmethod should-handle ((this <clack-app-file>) file)
+(defmethod should-handle ((this <clack-app-directory>) file)
   (file-exists-p file))
 
 (defmethod serve-path ((this <clack-app-directory>) env file encoding)
