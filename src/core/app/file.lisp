@@ -17,7 +17,9 @@
   (:import-from :cl-ppcre :scan)
   (:import-from :local-time
                 :universal-to-timestamp)
-  (:import-from :cl-fad :file-exists-p))
+  (:import-from :cl-fad
+                :file-exists-p
+                :directory-exists-p))
 
 (cl-annot:enable-annot-syntax)
 
@@ -38,13 +40,14 @@
   (:documentation "Clack Application to serve static files."))
 
 (defmethod call ((this <clack-app-file>) env)
-  (let ((file (locate-file (or (file this)
+  (let ((file (locate-file this
+                           (or (file this)
                                ;; remove "/"
                                (subseq (getf env :path-info) 1))
                            (root this))))
     (if (consp file) ;; some error case
         file
-        (serve-file file (encoding this)))))
+        (serve-path this env file (encoding this)))))
 
 (defparameter return-403
               '(403 (:content-type "text/plain"
@@ -61,11 +64,17 @@
                      :content-length 9)
                 ("not found")))
 
-(defun locate-file (path root)
+@export
+(defmethod should-handle ((this <clack-app-file>) file)
+  (and (file-exists-p file)
+       (not (directory-exists-p file))))
+
+@export
+(defmethod locate-file ((this <clack-app-file>) path root)
   (let ((file (merge-pathnames path root)))
     (cond
       ((position #\Null (namestring file)) return-400)
-      ((not (cl-fad:file-exists-p file)) return-404)
+      ((not (should-handle this file)) return-404)
 ;      ((not (find :user-read (file-permissions file)))
 ;       return-403)
       (t file))))
@@ -74,7 +83,8 @@
   (aand (scan "^text" content-type)
         (= it 0)))
 
-(defun serve-file (file encoding)
+@export
+(defmethod serve-path ((this <clack-app-file>) env file encoding)
   (let ((content-type (or (clack.util.hunchentoot:mime-type file)
                           "application/octet-stream"))
         (univ-time (or (file-write-date file)

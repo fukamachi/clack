@@ -73,6 +73,7 @@
                     :depends-on ("clack")
                     :components
                     ((:file "file")
+                     (:file "directory" :depends-on ("file"))
                      (:file "urlmap")))
                    (:file "logger")
                    (:module "middleware/logger"
