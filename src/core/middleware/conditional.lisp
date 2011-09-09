@@ -15,30 +15,30 @@
 @export
 (defclass <clack-middleware-conditional> (<middleware>)
      ((condition :type (or function <component>)
-                 :initarg :condition
-                 :accessor condition)
+                 :initarg :condition)
       (builder :type (or function <component> symbol list)
-               :initarg :builder
-               :accessor builder)
-      (middleware :type (or function <component>)
-                  :accessor middleware)))
+               :initarg :builder)
+      (middleware :type (or function <component>))))
 
 (defmethod initialize-instance :after ((this <clack-middleware-conditional>) &key)
-  (setf (builder this)
-        (typecase (builder this)
-          (symbol (make-instance (builder this)))
-          (list (apply #'make-instance (builder this)))
-          (t (builder this)))))
+  (with-slots (builder) this
+     (setf builder
+           (typecase builder
+             (symbol (make-instance builder))
+             (list (apply #'make-instance builder))
+             (t builder)))))
 
 (defmethod wrap ((this <clack-middleware-conditional>) app)
-  (setf (middleware this)
-        (wrap (builder this) app))
-  (call-next-method))
+  (with-slots (middleware builder) this
+     (setf middleware
+           (wrap builder app))
+     (call-next-method)))
 
 (defmethod call ((this <clack-middleware-conditional>) env)
-  (if (call (condition this) env)
-      (call (middleware this) env)
-      (call-next this env)))
+  (with-slots (condition middleware) this
+     (if (call condition env)
+         (call middleware env)
+         (call-next this env))))
 
 (doc:start)
 
