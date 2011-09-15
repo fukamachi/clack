@@ -43,4 +43,5 @@
        (:file "middleware/logger")))
      (:module "util"
       :components
-      ((:file "route")))))))
+      ((:file "route"))))))
+  :perform (load-op :after (op c) (asdf:clear-system c)))
