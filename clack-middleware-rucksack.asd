@@ -7,22 +7,22 @@
 |#
 
 #|
-  Clack.Middleware.Clsql - Middleware for CLSQL connection management.
+  Clack.Middleware.Rucksack - Middleware for Rucksack connection management.
 
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
 (in-package :cl-user)
-(defpackage :clack.middleware.clsql-asd
+(defpackage :clack-middleware-rucksack-asd
   (:use :cl :asdf))
-(in-package :clack.middleware.clsql-asd)
+(in-package :clack-middleware-rucksack-asd)
 
-(defsystem clack.middleware.clsql
+(defsystem clack-middleware-rucksack
   :version "11.09"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
   :depends-on (:clack
                :cl-annot
-               :clsql)
-  :components ((:file "src/contrib/middleware/clsql"))
-  :description "Middleware for CLSQL connection management")
+               :rucksack)
+  :components ((:file "src/contrib/middleware/rucksack"))
+  :description "Middleware for Rucksack connection management")

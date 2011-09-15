@@ -1,5 +1,5 @@
 (in-package :cl-user)
-(defpackage clack-test.middleware.csrf
+(defpackage clack-middleware-csrf-test.middleware.csrf
   (:use :cl
         :cl-test-more
         :clack
@@ -15,7 +15,7 @@
   (:import-from :clack.middleware.csrf
                 :<clack-middleware-csrf>
                 :csrf-html-tag))
-(in-package clack-test.middleware.csrf)
+(in-package :clack-middleware-csrf-test.middleware.csrf)
 
 (plan 18)
 

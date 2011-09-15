@@ -7,22 +7,23 @@
 |#
 
 #|
-  Clack.Middleware.Rucksack - Middleware for Rucksack connection management.
+  Clack.App.Route - URL dispatcher.
 
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
 (in-package :cl-user)
-(defpackage :clack.middleware.rucksack-asd
+(defpackage :clack-app-route-asd
   (:use :cl :asdf))
-(in-package :clack.middleware.rucksack-asd)
+(in-package :clack-app-route-asd)
 
-(defsystem clack.middleware.rucksack
+(defsystem clack-app-route
   :version "11.09"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
   :depends-on (:clack
                :cl-annot
-               :rucksack)
-  :components ((:file "src/contrib/middleware/rucksack"))
-  :description "Middleware for Rucksack connection management")
+               :cl-ppcre
+               :alexandria)
+  :components ((:file "src/contrib/app/route"))
+  :description "URL dispatcher")

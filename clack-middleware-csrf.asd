@@ -7,23 +7,22 @@
 |#
 
 #|
-  Clack.App.Route - URL dispatcher.
+  Clack.Middleware.Csrf - Middleware for easy CSRF protection.
 
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
 |#
 
 (in-package :cl-user)
-(defpackage :clack.app.route-asd
+(defpackage :clack-middleware-csrf-asd
   (:use :cl :asdf))
-(in-package :clack.app.route-asd)
+(in-package :clack-middleware-csrf-asd)
 
-(defsystem clack.app.route
+(defsystem clack-middleware-csrf
   :version "11.09"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
   :depends-on (:clack
                :cl-annot
-               :cl-ppcre
-               :alexandria)
-  :components ((:file "src/contrib/app/route"))
-  :description "URL dispatcher")
+               :anaphora)
+  :components ((:file "src/contrib/middleware/csrf"))
+  :description "Middleware for easy CSRF protection")

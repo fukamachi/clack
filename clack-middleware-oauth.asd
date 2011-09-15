@@ -13,11 +13,11 @@
 |#
 
 (in-package :cl-user)
-(defpackage :clack.middleware.oauth-asd
+(defpackage :clack-middleware-oauth-asd
   (:use :cl :asdf))
-(in-package :clack.middleware.oauth-asd)
+(in-package :clack-middleware-oauth-asd)
 
-(defsystem clack.middleware.oauth
+(defsystem clack-middleware-oauth
   :version "11.09"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
