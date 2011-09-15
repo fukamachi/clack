@@ -13,10 +13,8 @@
 |#
 
 (in-package :cl-user)
-
 (defpackage clack-asd
   (:use :cl :asdf))
-
 (in-package :clack-asd)
 
 (defsystem clack
@@ -120,4 +118,5 @@
                                :element-type 'character
                                :fill-pointer t)))
           (setf (fill-pointer seq) (read-sequence seq stream))
-          seq))))
+          seq)))
+  :in-order-to ((test-op (load-op clack-test))))
