@@ -13,10 +13,8 @@
 |#
 
 (in-package :cl-user)
-
 (defpackage clack-test-asd
   (:use :cl :asdf))
-
 (in-package :clack-test-asd)
 
 (defsystem clack-test

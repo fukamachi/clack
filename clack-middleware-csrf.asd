@@ -13,7 +13,7 @@
 |#
 
 (in-package :cl-user)
-(defpackage :clack-middleware-csrf-asd
+(defpackage clack-middleware-csrf-asd
   (:use :cl :asdf))
 (in-package :clack-middleware-csrf-asd)
 
@@ -25,4 +25,5 @@
                :cl-annot
                :anaphora)
   :components ((:file "src/contrib/middleware/csrf"))
-  :description "Middleware for easy CSRF protection")
+  :description "Middleware for easy CSRF protection"
+  :in-order-to ((test-op (load-op clack-middleware-csrf-test))))
