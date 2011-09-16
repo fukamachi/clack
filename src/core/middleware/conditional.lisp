@@ -50,9 +50,8 @@ Clack.Middleware.Conditional - Conditional wrapper for Clack middleware.
     (builder
      (:condition (lambda (env)
                    (scan \"WebKit\" (getf env :http-user-agent)))
-      :builder (builder
-                <clack-middleware-something>
-                app)))
+      :builder '<clack-middleware-something>)
+     app)
 
     (builder
       (<clack-middleware-conditional>
@@ -60,8 +59,8 @@ Clack.Middleware.Conditional - Conditional wrapper for Clack middleware.
                     (scan \"WebKit\" (getf env :http-user-agent)))
        :builder '(<clack-middleware-static>
                   :path \"/public/\"
-                  :root #p\"/static-files/\")
-      app))
+                  :root #p\"/static-files/\"))
+      app)
 
     (wrap
      (make-instance '<clack-middleware-conditional>

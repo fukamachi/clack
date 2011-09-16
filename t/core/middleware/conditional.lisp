@@ -14,6 +14,15 @@
                 '(200 nil ("Hello, Clack"))))
 
 (is-type (builder
+          (:condition (lambda (env)
+                        (scan "WebKit" (getf env :http-user-agent)))
+           :builder '(<clack-middleware-static>
+                      :path "/public/"
+                      :root #p"/static-files/"))
+          *app*)
+         'function)
+
+(is-type (builder
           (<clack-middleware-conditional>
            :condition (lambda (env)
                         (scan "WebKit" (getf env :http-user-agent)))
