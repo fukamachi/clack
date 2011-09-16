@@ -66,11 +66,12 @@
   <title>Index of ~A</title>
   <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" />
   <style type='text/css'>
-table { width:100%%; }
-.name { text-align:left; }
-.size, .mtime { text-align:right; }
-.type { width:11em; }
-.mtime { width:15em; }
+table { width: 100%; }
+tr, td { white-space: nowrap; }
+.name { text-align: left; }
+.size, .mtime { text-align: right; }
+.type { width: 11em; text-align: center; }
+.mtime { width: 15em; }
   </style>
 </head><body>
 <h1>Index of ~:*~A</h1>
