@@ -55,9 +55,7 @@
 (defmethod compile-rule ((this <url-rule>))
   (loop with list = (split "(?::([\\w-]+)|(\\*))" (url this)
                            :with-registers-p t :omit-unmatched-p t)
-        while list
-        for prefix = (pop list)
-        for name = (pop list)
+        for (prefix name) on list by #'cddr
         collect (ppcre:regex-replace-all
                  "[^\\?\\/\\w-]" prefix
                  #'escape-special-char
