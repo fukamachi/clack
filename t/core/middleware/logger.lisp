@@ -51,6 +51,6 @@
    (ok (file-exists-p *log-pathname*))
    (delete-file *log-pathname*)))
 #-thread-support
-(skip 2 "because your lisp doesn't support threads")
+(skip 1 "because your lisp doesn't support threads")
 
 (finalize)
