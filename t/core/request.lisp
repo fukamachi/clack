@@ -91,7 +91,10 @@
    (multiple-value-bind (body status)
        (http-request "http://localhost:4242/"
                      :method :post
-                     :parameters `(("file" ,(merge-pathnames #p"tmp/jellyfish.jpg" *clack-pathname*) :content-type "image/jpeg" :filename "jellyfish.jpg")))
+                     :parameters
+                     `(("file" ,(merge-pathnames #p"tmp/jellyfish.jpg" *clack-pathname*)
+                               :content-type "image/jpeg"
+                               :filename "jellyfish.jpg")))
      (is status 200)
      (is body "jellyfish.jpg"))))
 #-thread-support

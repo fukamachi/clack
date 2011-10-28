@@ -122,9 +122,9 @@ before pass to Clack application."
                           (header-in* :content-type req)
                           (multiple-value-bind (type subtype)
                               (hunchentoot::parse-content-type (header-in* :content-type req))
-                            (if (and (string= type "multipart")
-                                     (string= subtype "form-data"))
-                                (hunchentoot::parse-multipart-form-data req (flex:make-external-format :utf-8 :eol-style :lf)))))
+                            (when (and (string= type "multipart")
+                                       (string= subtype "form-data"))
+                              (hunchentoot::parse-multipart-form-data req (flex:make-external-format :utf-8 :eol-style :lf)))))
       :clack-handler :hunchentoot)
 
      (loop for (k . v) in (hunchentoot:headers-in* req)
