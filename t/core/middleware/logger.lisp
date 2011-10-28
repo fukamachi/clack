@@ -33,19 +33,23 @@
 #-thread-support
 (skip 2 "because your lisp doesn't support threads")
 
+(defvar *log-pathname*
+    (asdf:system-relative-pathname (asdf:find-system :clack) #p"t/pongi.log"))
+
 #+thread-support
 (test-app
  (builder
   (<clack-middleware-logger>
    :logger (make-instance '<clack-logger-file>
-              :output-file (merge-pathnames #p"~/pongi.log")))
+              :output-file *log-pathname*))
   (lambda (env)
     (declare (ignore env))
     (log-message :error "fuga")
     '(200 nil nil)))
  (lambda ()
    (http-request "http://localhost:4242/")
-   (ok (file-exists-p #p"~/pongi.log"))))
+   (ok (file-exists-p *log-pathname*))
+   (delete-file *log-pathname*)))
 #-thread-support
 (skip 2 "because your lisp doesn't support threads")
 
