@@ -7,7 +7,7 @@
         :clack.middleware.static
         :cl-ppcre))
 
-(plan 4)
+(plan 5)
 
 (defvar *app* (lambda (env)
                 (declare (ignore env))
