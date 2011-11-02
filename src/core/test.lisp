@@ -70,7 +70,7 @@ Clack.Test - Testing Clack Applications.
            (http-request \"http://localhost:4242\")
          (is status 200)
          (is body \"Hello, Clack!\")
-         (is (getf headers :content-type) \"text/plain\")))
+         (is (assoc :content-type headers) \"text/plain\")))
      \"Testing simple application\")
 "
 
