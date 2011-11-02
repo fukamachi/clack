@@ -145,6 +145,8 @@ Clack.Handler.Apache is a Clack handler for Apache2 + mod_lisp. This handler dep
 
 You should make sure Apache server and [mod_lisp](http://www.fractalconcept.com/asp/html/mod_lisp.html) installed on your machine. The configuration of Apache might be like this.
 
+    LoadModule lisp_module /usr/libexec/apache2/mod_lisp2.so
+    ...
     Listen 12345
     NameVirtualHost *:12345
     <VirtualHost *:12345>
