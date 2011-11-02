@@ -64,8 +64,8 @@ This function is called on each request."
                    (flex:make-in-memory-input-stream
                     (flex:string-to-octets it))
                    :external-format :utf-8))
-      :content-length (parse-integer (ml:header-value command :content-length)
-                                     :junk-allowed t)
+      :content-length (awhen (ml:header-value command :content-length)
+                        (parse-integer it :junk-allowed t))
       :content-type (ml:header-value command :content-type)
       :server-name server-name
       :server-port (parse-integer server-port :junk-allowed t)
