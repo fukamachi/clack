@@ -11,7 +11,8 @@
         :anaphora
         :metabang-bind)
   (:import-from :alexandria
-                :when-let)
+                :when-let
+                :make-keyword)
   (:import-from :flexi-streams
                 :make-external-format
                 :make-flexi-stream)
@@ -153,7 +154,7 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
          (external-format
           (flex:make-external-format
            (if charset
-               (intern (string-upcase charset) :keyword)
+               (make-keyword (string-upcase charset))
                :utf-8)
            :eol-style :lf)))
     (cond
@@ -231,7 +232,7 @@ on an original raw-body."
   "Convert parameters into plist. The `params' must be a string."
   (loop for kv in (ppcre:split delimiter params)
         for (k v) = (ppcre:split "=" kv)
-        append (list (intern k :keyword)
+        append (list (make-keyword k)
                      ;; KLUDGE: calls `ignore-errors'.
                      (or (ignore-errors (clack.util.hunchentoot:url-decode v)) v))))
 
@@ -242,7 +243,7 @@ on an original raw-body."
     (values
      (or type "application")
      (or subtype "octet-stream")
-     (awhen params
+     (when params
        (aand (nth-value 1 (ppcre:scan-to-strings
                            "charset=([^; ]+)" params))
              (aref it 0))))))

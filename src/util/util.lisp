@@ -11,6 +11,8 @@
   (:use :cl)
   (:import-from :cl-ppcre
                 :regex-replace-all)
+  (:import-from :alexandria
+                :make-keyword)
   (:import-from :ironclad
                 :byte-array-to-hex-string
                 :digest-sequence
@@ -33,9 +35,8 @@ This may be useful for 'one-package-per-one-file' style."
 (defun normalize-key (name)
   "key must be a keyword."
   (etypecase name
-    (string (intern name :keyword))
     (keyword name)
-    (symbol (intern (symbol-name name) :keyword))))
+    ((or string symbol) (make-keyword name))))
 
 @export
 (defmacro getf* (place key)

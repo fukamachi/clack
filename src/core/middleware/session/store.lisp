@@ -9,6 +9,7 @@
 (clack.util:namespace clack.session.store
   (:use :cl)
   (:import-from :alexandria
+                :make-keyword
                 :remove-from-plistf)
   (:import-from :clack.util :getf*))
 
@@ -26,7 +27,8 @@
 
 @export
 (defmethod store-session ((this <clack-session-store>) sid session)
-  (setf (getf* (stash this) (intern sid :keyword)) session))
+  (setf (getf* (stash this) (make-keyword sid))
+        session))
 
 @export
 (defmethod remove-session ((this <clack-session-store>) sid)

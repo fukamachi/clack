@@ -12,6 +12,8 @@
         :metabang-bind
         :split-sequence
         :anaphora)
+  (:import-from :alexandria
+                :make-keyword)
   (:import-from :clack.component :call)
   (:import-from :clack.util.hunchentoot
                 :url-decode))
@@ -79,8 +81,9 @@ This function is called on each request."
 
      ;; NOTE: this code almost same thing of Clack.Handler.Hunchentoot's
      (loop for (k . v) in command
-           unless (member k '(:request-method :script-name :path-info :server-name :server-port :server-protocol :request-uri :remote-addr :remote-port :query-string :content-length :content-type :accept :connection))
-             append (list (intern (concatenate 'string "HTTP-" (string-upcase k)) :keyword) v)))))
+           unless (find k '(:request-method :script-name :path-info :server-name :server-port :server-protocol :request-uri :remote-addr :remote-port :query-string :content-length :content-type :accept :connection))
+             append (list (make-keyword (format nil "HTTP-~:@(~A~)" k))
+                          v)))))
 
 (defun handle-response (res)
   "Function for managing response. Take response and output it to `ml:*modlisp-socket*'."

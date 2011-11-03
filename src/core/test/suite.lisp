@@ -217,13 +217,13 @@ you would call like this: `(run-server-tests :foo)'."
   (lambda (env)
     `(200
       (:content-type "text/plain")
-      (,(apply #'concatenate 'string
-               (loop for h in '(:request-method
-                                :path-info
-                                :query-string
-                                :server-name
-                                :server-port)
-                     collect (format nil "~A:~A~%" h (getf env h)))))))
+      (,(with-output-to-string (str)
+          (loop for h in '(:request-method
+                           :path-info
+                           :query-string
+                           :server-name
+                           :server-port)
+                do (format str "~A:~A~%" h (getf env h)))))))
   (lambda ()
     (multiple-value-bind (body status headers)
         (http-request (localhost "foo/?ediweitz=weitzedi"))

@@ -62,8 +62,9 @@
   "Useful syntax sugar to build applications."
   (let ((urlmap (gensym "URLMAP")))
     `(let ((,urlmap (make-instance '<clack-app-urlmap>)))
-       ,@(loop for app in apps
-               collect `(mount ,urlmap ,@app))
+       ,@(mapcar
+          (lambda (app) `(mount ,urlmap ,@app))
+          apps)
        ,urlmap)))
 
 (doc:start)

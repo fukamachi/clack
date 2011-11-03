@@ -13,7 +13,9 @@
                 :scan-to-strings
                 :regex-replace-all
                 :split
-                :quote-meta-chars))
+                :quote-meta-chars)
+  (:import-from :alexandria
+                :make-keyword))
 (in-package :clack.util.route)
 
 (cl-annot:enable-annot-syntax)
@@ -66,7 +68,7 @@
           and collect "(.*?)" into re
           and collect "~A" into cs
         else if name
-          collect (intern (string-upcase name) :keyword) into names
+          collect (make-keyword (string-upcase name)) into names
           and collect "([^/?#]+)" into re
           and collect "~A" into cs
         finally
