@@ -16,7 +16,7 @@
   (:import-from :alexandria :hash-table-plist))
 #.(rename-package :clack.session.state :clack.session.state '(state))
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 @export
 (defclass <clack-middleware-session> (<middleware>)

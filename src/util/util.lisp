@@ -21,7 +21,7 @@
                 :string-to-octets))
 (in-package :clack.util)
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 @export
 (defmacro namespace (name &rest body)

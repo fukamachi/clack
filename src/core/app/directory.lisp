@@ -21,7 +21,7 @@
                 :directory-pathname-p
                 :list-directory))
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 @export
 (defclass <clack-app-directory> (<clack-app-file>) ())

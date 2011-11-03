@@ -22,7 +22,8 @@
   :author "Eitarow Fukamachi"
   :license "LLGPL"
   :depends-on (:clack
-               :cl-annot
+               :cl-syntax
+               :cl-syntax-annot
                :rucksack)
   :components ((:file "src/contrib/middleware/rucksack"))
   :description "Middleware for Rucksack connection management")

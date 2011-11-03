@@ -18,7 +18,7 @@
   (:import-from :flexi-streams
                 :make-external-format))
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 (defun initialize ()
   (setf *hunchentoot-default-external-format*

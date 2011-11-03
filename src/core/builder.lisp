@@ -17,7 +17,7 @@
   (:import-from :clack.middleware.conditional
                 :<clack-middleware-conditional>))
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 @export
 (defvar *builder-lazy-p* nil

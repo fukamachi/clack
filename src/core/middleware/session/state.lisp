@@ -16,7 +16,7 @@
            :sid-generator
            :sid-validator))
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 @export
 (defclass <clack-session-state> ()

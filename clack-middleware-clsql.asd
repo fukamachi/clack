@@ -22,7 +22,8 @@
   :author "Eitarow Fukamachi"
   :license "LLGPL"
   :depends-on (:clack
-               :cl-annot
+               :cl-syntax
+               :cl-syntax-annot
                :clsql)
   :components ((:file "src/contrib/middleware/clsql"))
   :description "Middleware for CLSQL connection management")

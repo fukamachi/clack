@@ -22,7 +22,8 @@
   :author "Eitarow Fukamachi"
   :license "LLGPL"
   :depends-on (:clack
-               :cl-annot
+               :cl-syntax
+               :cl-syntax-annot
                :anaphora)
   :components ((:file "src/contrib/middleware/csrf"))
   :description "Middleware for easy CSRF protection"

@@ -14,7 +14,7 @@
                 :<clack-logger-base>
                 :output))
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 @export
 (defclass <clack-logger-stream> (<clack-logger-base>)

@@ -27,7 +27,8 @@
                :anaphora
                :arnesi
                :split-sequence
-               :cl-annot
+               :cl-syntax
+               :cl-syntax-annot
                :closer-mop
                ;; Server
                :hunchentoot

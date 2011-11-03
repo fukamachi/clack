@@ -24,7 +24,7 @@
                 :find-system
                 :component-pathname))
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 @export
 (defvar *clack-test-access-port* *clack-test-port*

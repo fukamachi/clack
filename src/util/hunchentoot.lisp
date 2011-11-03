@@ -39,7 +39,7 @@
         :rfc2388))
 (in-package :clack.util.hunchentoot)
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 (defparameter *mime-type-list* '(("application/andrew-inset" "ez")
                                  ("application/cu-seeme" "cu")

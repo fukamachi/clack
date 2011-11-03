@@ -19,7 +19,7 @@
   (:import-from :clack.logger.base :output)
   (:import-from :clack.logger.stream :<clack-logger-stream>))
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 @export
 (defclass <clack-middleware-logger> (<middleware>)

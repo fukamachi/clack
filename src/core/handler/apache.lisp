@@ -18,7 +18,7 @@
   (:import-from :clack.util.hunchentoot
                 :url-decode))
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 @export
 (defun run (app &key debug (port 3000))

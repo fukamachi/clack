@@ -16,7 +16,7 @@
   (:import-from :clack.util
                 :generate-random-id))
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 @export
 (defclass <clack-middleware-csrf> (<middleware>)

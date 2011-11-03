@@ -11,7 +11,7 @@
   (:use :cl :trivial-gray-streams))
 (in-package :clack.util.stream)
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 (deftype octet () '(unsigned-byte 8))
 

@@ -22,7 +22,7 @@
                 :universal-to-timestamp)
   (:export :status))
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 @export
 (defclass <response> ()

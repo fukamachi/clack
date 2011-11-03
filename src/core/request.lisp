@@ -48,7 +48,7 @@
            :user-agent
            :uploads))
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 @export
 (defclass <request> ()

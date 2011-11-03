@@ -3,15 +3,17 @@
 # To use clbuild2, just copy this file to your clbuild2 base directory
 # and run following commands.
 #
-#     $ clbuild install-from-upstream clack cl-annot cl-test-more
+#     $ clbuild install-from-upstream clack cl-annot cl-syntax cl-test-more
 #     $ clbuild quickload clack
 #
 
 clack get_git git://github.com/fukamachi/clack.git
 cl-annot get_git git://github.com/arielnetworks/cl-annot.git
+cl-syntax get_git git://github.com/m2ym/cl-syntax.git
 cl-test-more get_git git://github.com/fukamachi/cl-test-more.git
 
 # for developers
 #clack get_git git@github.com:fukamachi/clack.git
 #cl-annot get_git git@github.com:arielnetworks/cl-annot.git
+#cl-syntax get_git git@github.com:m2ym/cl-syntax.git
 #cl-test-more get_git git@github.com:fukamachi/cl-test-more.git

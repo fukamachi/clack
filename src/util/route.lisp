@@ -18,7 +18,7 @@
                 :make-keyword))
 (in-package :clack.util.route)
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 @export
 (defclass <url-rule> ()

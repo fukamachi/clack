@@ -24,7 +24,7 @@
                 :make-url-rule
                 :match))
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 @eval-always
 @doc "

@@ -14,7 +14,7 @@
   (:import-from :clack.util.localtime
                 :now))
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 @export
 (defvar *logger-output* (make-string-output-stream)

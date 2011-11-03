@@ -13,7 +13,7 @@
                 :connect
                 :disconnect))
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 @export
 (defclass <clack-middleware-clsql> (<middleware>)

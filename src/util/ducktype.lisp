@@ -11,7 +11,7 @@
   (:use :cl))
 (in-package :clack.util.ducktype)
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 (defvar *previous-readtables* nil
   "Stack of readtables for duck-typing reader.")

@@ -30,7 +30,7 @@
            :make-app
            :wrap))
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 @doc "
 Easy way to run Clack Application.

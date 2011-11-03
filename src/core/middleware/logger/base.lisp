@@ -9,7 +9,7 @@
 (clack.util:namespace clack.logger.base
   (:use :cl))
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 @export
 (defclass <clack-logger-base> () ()

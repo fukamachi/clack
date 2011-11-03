@@ -22,7 +22,8 @@
   :author "Eitarow Fukamachi"
   :license "LLGPL"
   :depends-on (:clack
-               :cl-annot
+               :cl-syntax
+               :cl-syntax-annot
                :cl-oauth
                :anaphora
                :metabang-bind)

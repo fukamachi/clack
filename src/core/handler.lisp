@@ -11,7 +11,7 @@
   (:import-from :clack.util
                 :find-handler))
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 @export
 (defclass <handler> ()

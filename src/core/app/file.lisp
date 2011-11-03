@@ -21,7 +21,7 @@
                 :file-exists-p
                 :directory-exists-p))
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 @export
 (defclass <clack-app-file> (<component>)

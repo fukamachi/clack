@@ -16,7 +16,7 @@
                 :generic-function-lambda-list))
 (in-package :clack.util.doc)
 
-(cl-annot:enable-annot-syntax)
+(cl-syntax:use-syntax :annot)
 
 @export
 '#.(defvar *section-plist*
