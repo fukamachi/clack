@@ -177,19 +177,6 @@ And you should get following response in time.
     Hello, Clack Middleware!
     Hello, Clack!
 
-## Dependency
-
-* cl-annot
-* CL-PPCRE
-* CL-FAD
-* Alexandria
-* SPLIT-SEQUENCE
-* Anaphora
-* metabang-bind
-* Hunchentoot
-* modlisp
-* cl-oauth
-
 ## Author
 
 * Eitarow Fukamachi (e.arrows@gmail.com)
