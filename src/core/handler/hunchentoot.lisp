@@ -22,7 +22,8 @@
   (setf *hunchentoot-default-external-format*
         (flex:make-external-format :utf-8 :eol-style :lf)
         *handle-http-errors-p* nil
-        *default-content-type* "text/html; charset=utf-8"))
+        *default-content-type* "text/html; charset=utf-8"
+        *catch-errors-p* nil))
 
 @export
 (defun run (app &key debug (port 5000))
@@ -44,22 +45,14 @@
                            '(500 nil nil))))))))
   (start (make-instance '<debuggable-acceptor>
             :port port
-            :request-dispatcher 'clack-request-dispatcher)))
+            :access-log-destination nil
+            :error-template-directory nil)))
 
 @export
 (defun stop (acceptor)
   "Stop Hunchentoot server.
 If no acceptor given, try to stop `*acceptor*' by default."
   (hunchentoot:stop acceptor))
-
-(defun clack-request-dispatcher (request)
-  "Hunchentoot request dispatcher for Clack. Most of this is same as
-list-request-dispatcher, default one in Hunchentoot, except for convert
-Request instance into just a plist before pass to Clack application."
-  (loop for dispatcher in *dispatch-table*
-        for action = (funcall dispatcher (request->plist request))
-        when action :return (funcall action)
-        finally (setf (return-code *reply*) +http-not-found+)))
 
 (defun handle-response (res)
   "Convert Response from Clack application into a string
@@ -157,6 +150,15 @@ before pass to Clack application."
     (lambda (request)
       (handler-bind ((error #'invoke-debugger))
         (funcall dispatcher request)))))
+
+(defmethod acceptor-dispatch-request ((this <debuggable-acceptor>) request)
+  "Hunchentoot request dispatcher for Clack. Most of this is same as
+list-request-dispatcher, default one in Hunchentoot, except for convert
+Request instance into just a plist before pass to Clack application."
+  (loop for dispatcher in *dispatch-table*
+        for action = (funcall dispatcher (request->plist request))
+        when action :return (funcall action)
+        finally (setf (return-code *reply*) +http-not-found+)))
 
 (doc:start)
 
