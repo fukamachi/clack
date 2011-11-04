@@ -160,6 +160,11 @@ Request instance into just a plist before pass to Clack application."
         when action :return (funcall action)
         finally (setf (return-code *reply*) +http-not-found+)))
 
+(defmethod acceptor-status-message ((this <debuggable-acceptor>) http-status-code &rest args &key)
+  "Disable generating error HTML."
+  (declare (ignore http-status-code args))
+  nil)
+
 (doc:start)
 
 @doc:NAME "
