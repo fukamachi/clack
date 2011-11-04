@@ -69,7 +69,7 @@ you would call like this: `(run-server-tests :foo)'."
 (define-app-test |SCRIPT-NAME|
   (lambda (env)
     `(200
-      (:content-type "text/plain")
+      (:content-type "text/plain; charset=utf-8")
       (,(getf env :script-name))))
   (lambda ()
     (is (http-request (localhost)) nil)))
@@ -77,21 +77,21 @@ you would call like this: `(run-server-tests :foo)'."
 (define-app-test |GET|
   (lambda (env)
     `(200
-      (:content-type "text/plain")
+      (:content-type "text/plain; charset=utf-8")
       (,(format nil "Hello, ~A" (getf env :query-string)))))
   (lambda ()
     (multiple-value-bind (body status headers)
         (http-request (localhost "?name=fukamachi"))
       (is status 200)
       (is (get-header headers :content-type)
-          "text/plain")
+          "text/plain; charset=utf-8")
       (is body "Hello, name=fukamachi"))))
 
 (define-app-test |POST|
   (lambda (env)
     (let ((body (read-line (getf env :raw-body))))
       `(200
-        (:content-type "text/plain"
+        (:content-type "text/plain; charset=utf-8"
          :client-content-length ,(getf env :content-length)
          :client-content-type ,(getf env :content-type))
         (,(format nil "Hello, ~A" body)))))
@@ -111,7 +111,7 @@ you would call like this: `(run-server-tests :foo)'."
            (make-array (getf env :content-length))))
       (read-sequence body (getf env :raw-body))
       `(200
-        (:content-type "text/plain"
+        (:content-type "text/plain; charset=utf-8"
          :client-content-length ,(getf env :content-length)
          :client-content-type ,(getf env :content-type))
         (,(coerce body 'string)))))
@@ -135,26 +135,26 @@ you would call like this: `(run-server-tests :foo)'."
 (define-app-test |url-scheme|
   (lambda (env)
     `(200
-      (:content-type "text/plain")
+      (:content-type "text/plain; charset=utf-8")
       (,(getf env :url-scheme))))
   (lambda ()
     (multiple-value-bind (body status headers)
         (http-request (localhost) :method :post)
       (is status 200)
-      (is (get-header headers :content-type) "text/plain")
+      (is (get-header headers :content-type) "text/plain; charset=utf-8")
       (is body "HTTP"))))
 
 (define-app-test |return pathname|
   (lambda (env)
     @ignore env
     `(200
-      (:content-type "text/plain")
+      (:content-type "text/plain; charset=utf-8")
       ,(merge-pathnames #p"tmp/file.txt" *clack-pathname*)))
   (lambda ()
       (multiple-value-bind (body status headers)
           (http-request (localhost))
         (is status 200)
-        (is (get-header headers :content-type) "text/plain")
+        (is (get-header headers :content-type) "text/plain; charset=utf-8")
         (like body "This is a text for test."))))
 
 (define-app-test |binary file|
@@ -190,33 +190,33 @@ you would call like this: `(run-server-tests :foo)'."
 (define-app-test |handle HTTP-Header|
   (lambda (env)
     `(200
-      (:content-type "text/plain")
+      (:content-type "text/plain; charset=utf-8")
       (,(getf env :http-foo))))
   (lambda ()
     (multiple-value-bind (body status headers)
         (http-request (localhost "foo/?ediweitz=weitzedi")
                       :additional-headers '(("Foo" . "Bar")))
       (is status 200)
-      (is (get-header headers :content-type) "text/plain")
+      (is (get-header headers :content-type) "text/plain; charset=utf-8")
       (is body "Bar"))))
 
 (define-app-test |handler HTTP-Cookie|
   (lambda (env)
     `(200
-      (:content-type "text/plain")
+      (:content-type "text/plain; charset=utf-8")
       (,(getf env :http-cookie))))
   (lambda ()
     (multiple-value-bind (body status headers)
         (http-request (localhost "foo/?ediweitz=weitzedi")
                       :additional-headers '(("Cookie" . "foo")))
       (is status 200)
-      (is (get-header headers :content-type) "text/plain")
+      (is (get-header headers :content-type) "text/plain; charset=utf-8")
       (is body "foo"))))
 
 (define-app-test |validate env|
   (lambda (env)
     `(200
-      (:content-type "text/plain")
+      (:content-type "text/plain; charset=utf-8")
       (,(apply #'concatenate 'string
                (loop for h in '(:request-method
                                 :path-info
@@ -228,7 +228,7 @@ you would call like this: `(run-server-tests :foo)'."
     (multiple-value-bind (body status headers)
         (http-request (localhost "foo/?ediweitz=weitzedi"))
       (is status 200)
-      (is (get-header headers :content-type) "text/plain")
+      (is (get-header headers :content-type) "text/plain; charset=utf-8")
       (is body (format nil "~{~A~%~}"
                        `("REQUEST-METHOD:GET"
                          "PATH-INFO:/foo/"
@@ -239,7 +239,7 @@ you would call like this: `(run-server-tests :foo)'."
 (define-app-test |% encoding in PATH-INFO|
   (lambda (env)
     `(200
-      (:content-type "text/plain")
+      (:content-type "text/plain; charset=utf-8")
       (,(getf env :path-info))))
   (lambda ()
     (is (http-request (localhost "foo/bar%2cbaz")) "/foo/bar,baz")))
@@ -247,7 +247,7 @@ you would call like this: `(run-server-tests :foo)'."
 (define-app-test |% double encoding in PATH-INFO|
   (lambda (env)
     `(200
-      (:content-type "text/plain")
+      (:content-type "text/plain; charset=utf-8")
       (,(getf env :path-info))))
   (lambda ()
     (is (http-request (localhost "foo/bar%252cbaz")) "/foo/bar%2cbaz")))
@@ -255,29 +255,33 @@ you would call like this: `(run-server-tests :foo)'."
 (define-app-test |% encoding in PATH-INFO (outside of URI characters)|
   (lambda (env)
     `(200
-      (:content-type "text/plain")
+      (:content-type "text/plain; charset=utf-8")
       (,(getf env :path-info))))
   (lambda ()
-    (is (http-request (localhost "foo%E3%81%82"))
-        (format nil "/foo~A"
-                (flex:octets-to-string #(#xE3 #x81 #x82) :external-format :utf-8)))))
+    ;; XXX: Though URI must not include non-ASCII chars,
+    ;;      PURI decodes PATH automatically.
+    (let ((uri (puri:parse-uri (localhost "foo%E3%81%82"))))
+      (setf (slot-value uri 'puri::path) "/foo%E3%81%82")
+      (is (http-request uri)
+          (format nil "/foo~A"
+                  (flex:octets-to-string #(#xE3 #x81 #x82) :external-format :utf-8))))))
 
 (define-app-test |SERVER-PROTOCOL is required|
   (lambda (env)
     `(200
-      (:content-type "text/plain")
+      (:content-type "text/plain; charset=utf-8")
       (,(getf env :server-protocol))))
   (lambda ()
     (multiple-value-bind (body status headers)
         (http-request (localhost "foo/?ediweitz=weitzedi"))
       (is status 200)
-      (is (get-header headers :content-type) "text/plain")
+      (is (get-header headers :content-type) "text/plain; charset=utf-8")
       (like body "^HTTP/1\\.[01]$"))))
 
 (define-app-test |SCRIPT-NAME should not be nil|
   (lambda (env)
     `(200
-      (:content-type "text/plain")
+      (:content-type "text/plain; charset=utf-8")
       (,(not (null (getf env :script-name))))))
   (lambda ()
     (is (http-request (localhost "foo/?ediweitz=weitzedi"))
@@ -296,7 +300,7 @@ you would call like this: `(run-server-tests :foo)'."
 (define-app-test |multi headers (request)|
   (lambda (env)
     `(200
-      (:content-type "text/plain")
+      (:content-type "text/plain; charset=utf-8")
       (,(getf env :http-foo))))
   (lambda ()
     (like
@@ -309,7 +313,7 @@ you would call like this: `(run-server-tests :foo)'."
   (lambda (env)
     @ignore env
     `(200
-      (:content-type "text/plain"
+      (:content-type "text/plain; charset=utf-8"
        :x-foo "foo"
        :x-foo "bar, baz")
       ("hi")))
@@ -320,7 +324,7 @@ you would call like this: `(run-server-tests :foo)'."
 (define-app-test |Do not set COOKIE|
   (lambda (env)
     `(200
-      (:content-type "text/plain"
+      (:content-type "text/plain; charset=utf-8"
        :x-cookie ,(not (null (getf env :cookie))))
       (,(getf env :http-cookie))))
   (lambda ()
@@ -352,7 +356,7 @@ you would call like this: `(run-server-tests :foo)'."
 (define-app-test |REQUEST-URI is set|
   (lambda (env)
     `(200
-      (:content-type "text/plain")
+      (:content-type "text/plain; charset=utf-8")
       (,(getf env :request-uri))))
   (lambda ()
     (let ((uri (puri:parse-uri (localhost "foo/bar%20baz%73?x=a"))))
@@ -362,7 +366,7 @@ you would call like this: `(run-server-tests :foo)'."
 (define-app-test |a big header value > 128 bytes|
   (lambda (env)
     `(200
-      (:content-type "text/plain")
+      (:content-type "text/plain; charset=utf-8")
       (,(getf env :http-x-foo))))
   (lambda ()
     (let ((chunk
@@ -379,7 +383,7 @@ you would call like this: `(run-server-tests :foo)'."
   (lambda (env)
     @ignore env
     `(200
-      (:content-type "text/plain")
+      (:content-type "text/plain; charset=utf-8")
       (,(format nil "Foo: Bar~A~A~A~AHello World"
                 #\Return #\NewLine #\Return #\NewLine))))
   (lambda ()
@@ -393,8 +397,8 @@ you would call like this: `(run-server-tests :foo)'."
 (define-app-test |test 404|
   (lambda (env)
     @ignore env
-    `(404
-      (:content-type "text/plain")
+    '(404
+      (:content-type "text/plain; charset=utf-8")
       ("Not Found")))
   (lambda ()
     (multiple-value-bind (body status)
@@ -405,7 +409,7 @@ you would call like this: `(run-server-tests :foo)'."
 (define-app-test |request -> input seekable|
   (lambda (env)
     `(200
-      (:content-type "text/plain")
+      (:content-type "text/plain; charset=utf-8")
       (,(read-line (getf env :raw-body)))))
   (lambda ()
     (is (http-request (localhost)
@@ -429,7 +433,7 @@ you would call like this: `(run-server-tests :foo)'."
 (define-app-test |handle Authorization header|
   (lambda (env)
     `(200
-      (:content-type "text/plain"
+      (:content-type "text/plain; charset=utf-8"
        :x-authorization ,(not (null (getf env :http-authorization))))
       (,(or (getf env :http-authorization) ""))))
   (lambda ()
@@ -449,13 +453,13 @@ you would call like this: `(run-server-tests :foo)'."
 (define-app-test |repeated slashes|
   (lambda (env)
     `(200
-      (:content-type "text/plain")
+      (:content-type "text/plain; charset=utf-8")
       (,(getf env :path-info))))
   (lambda ()
     (multiple-value-bind (body status headers)
         (http-request (localhost "foo///bar/baz"))
       (is status 200)
-      (is (get-header headers :content-type) "text/plain")
+      (is (get-header headers :content-type) "text/plain; charset=utf-8")
       (is body "/foo///bar/baz"))))
 
 (cl-test-more::remove-exit-hook)
