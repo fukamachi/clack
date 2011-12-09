@@ -18,7 +18,7 @@
                 :call-next
                 :wrap)
   (:import-from :clack.handler
-                :<clack-handler>
+                :<handler>
                 :stop)
   (:import-from :clack.util
                 :find-handler
@@ -48,7 +48,7 @@ Example:
 (defun clackup (app &key (server :hunchentoot) (port 5000) (debug t))
   (prog1
     (let ((handler-package (find-handler server)))
-      (make-instance '<clack-handler>
+      (make-instance '<handler>
          :server-name server
          :acceptor
          (funcall (intern "RUN" handler-package)
