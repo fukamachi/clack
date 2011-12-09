@@ -32,8 +32,6 @@
                :closer-mop
                ;; Server
                :hunchentoot
-               #+(or allegro cmu lispworks sbcl)
-               :modlisp
                ;; for Other purpose
                :cl-ppcre
                :cl-fad
@@ -63,9 +61,7 @@
                     :pathname "handler"
                     :depends-on ("component")
                     :components
-                    ((:file "hunchentoot")
-                     #+(or allegro cmu lispworks sbcl)
-                     (:file "apache")))
+                    ((:file "hunchentoot")))
                    (:file "test")
                    (:file "test/suite" :depends-on ("test"))
                    (:module "app"
