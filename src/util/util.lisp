@@ -92,16 +92,25 @@ Example:
 
 @export
 (defun find-handler (server)
-  "Return a handler package. `server' must be a symbol or a keyword, not containing \"Clack.Handler.\" as a prefix.
+  "Return a handler package. `server` must be a symbol or a keyword, not containing \"Clack.Handler.\" as a prefix.
 
 Example:
   (find-handler :hunchentoot)"
   (let ((handler-name (concatenate 'string
                                     "CLACK.HANDLER."
                                     (symbol-name server))))
-    (or (find-package handler-name)
-        (error "Handler package is not found. Forgot to load it?: ~A"
-               handler-name))))
+    (find-package handler-name)))
+
+@export
+(defun load-handler (server)
+  "Load a handler system in run-time. `server` must be a symbol or a keyword.
+
+Example:
+  (load-handler :hunchentoot)"
+  (let ((system
+         (make-keyword (format nil "clack-handler-~(~A~)" server))))
+    #+quicklisp (ql:quickload system :verbose nil)
+    #-quicklisp (asdf:load-system system :verbose nil)))
 
 @export
 (defun generate-random-id ()
