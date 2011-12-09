@@ -14,7 +14,7 @@
 (cl-syntax:use-syntax :annot)
 
 @export
-(defclass <handler> ()
+(defclass <clack-handler> ()
      ((server-name :type keyword
                    :initarg :server-name
                    :accessor server-name)
@@ -22,7 +22,7 @@
                 :accessor acceptor)))
 
 @export
-(defmethod stop ((this <handler>))
+(defmethod stop ((this <clack-handler>))
   "Stop Clack server. Currently works only Hunchentoot."
   (let ((handler-package (find-handler (server-name this))))
     (funcall (intern "STOP" handler-package) (acceptor this))))

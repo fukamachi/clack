@@ -18,7 +18,7 @@
                 :call-next
                 :wrap)
   (:import-from :clack.handler
-                :<handler>
+                :<clack-handler>
                 :stop)
   (:import-from :clack.util
                 :find-handler
@@ -55,7 +55,7 @@ Example:
                   (error "Handler package is not found. Forgot to load it?: ~A"
                          server))))
 
-      (make-instance '<handler>
+      (make-instance '<clack-handler>
          :server-name server
          :acceptor
          (funcall (intern "RUN" handler-package)
