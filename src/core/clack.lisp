@@ -48,13 +48,6 @@ Example:
 (defun clackup (app &key (server :hunchentoot) (port 5000) (debug t))
   (prog1
     (let ((handler-package (find-handler server)))
-      (unless handler-package
-        (load-handler server)
-        (setf handler-package
-              (or (find-handler server)
-                  (error "Handler package is not found. Forgot to load it?: ~A"
-                         server))))
-
       (make-instance '<clack-handler>
          :server-name server
          :acceptor

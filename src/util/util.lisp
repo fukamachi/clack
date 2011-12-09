@@ -91,15 +91,21 @@ Example:
   p2)
 
 @export
-(defun find-handler (server)
+(defun find-handler (server &key (force t))
   "Return a handler package. `server` must be a symbol or a keyword, not containing \"Clack.Handler.\" as a prefix.
 
 Example:
   (find-handler :hunchentoot)"
-  (let ((handler-name (concatenate 'string
+  (let* ((handler-name (concatenate 'string
                                     "CLACK.HANDLER."
-                                    (symbol-name server))))
-    (find-package handler-name)))
+                                    (symbol-name server)))
+         (pkg (find-package handler-name)))
+    (when (and (not pkg) force)
+      (load-handler server)
+      (setf pkg (find-handler server :force nil)))
+    (or pkg
+        (error "Handler package is not found. Forgot to load it?: ~A"
+               server))))
 
 @export
 (defun load-handler (server)
