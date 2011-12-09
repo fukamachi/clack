@@ -30,14 +30,13 @@
                :cl-syntax
                :cl-syntax-annot
                :closer-mop
-               ;; Server
-               :hunchentoot
                ;; for Other purpose
                :cl-ppcre
                :cl-fad
                :cl-test-more
                :ironclad
                :cl-base64
+               :rfc2388
                :drakma
                :local-time)
   :components ((:module "src"
@@ -57,11 +56,6 @@
                    (:file "component")
                    (:file "middleware" :depends-on ("component"))
                    (:file "handler")
-                   (:module "handlers"
-                    :pathname "handler"
-                    :depends-on ("component")
-                    :components
-                    ((:file "hunchentoot")))
                    (:file "test")
                    (:file "test/suite" :depends-on ("test"))
                    (:module "app"
