@@ -17,6 +17,7 @@
   (:use :cl :asdf))
 (in-package :clack-handler-apache-asd)
 
+#+(or allegro cmu lispworks sbcl)
 (defsystem clack-handler-apache
   :version "11.12"
   :author "Eitarow Fukamachi"
@@ -24,10 +25,11 @@
   :depends-on (:clack
                :cl-syntax
                :cl-syntax-annot
-               #+(or allegro cmu lispworks sbcl)
                :modlisp
                :split-sequence
                :metabang-bind
                :anaphora)
   :components ((:file "src/core/handler/apache"))
   :description "Clack handler for Apache2 + mod_lisp.")
+#-(or allegro cmu lispworks sbcl)
+(error "Clack.Handler.Apache isn't supported your CL implementation.")
