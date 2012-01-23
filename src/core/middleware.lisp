@@ -9,6 +9,7 @@
 (clack.util:namespace clack.middleware
   (:use :cl)
   (:import-from :clack.component
+                :component-designator
                 :<component>
                 :call))
 
@@ -16,7 +17,7 @@
 
 @export
 (defclass <middleware> (<component>)
-     ((app :type (or <component> function null)
+     ((app :type component-designator
            :initarg :app
            :reader app))
   (:documentation "Class for Clack Middleware."))

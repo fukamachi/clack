@@ -8,15 +8,17 @@
 
 (clack.util:namespace clack.middleware.conditional
   (:use :cl
-        :clack))
+        :clack)
+  (:import-from :clack.component
+                :component-designator))
 
 (cl-syntax:use-syntax :annot)
 
 @export
 (defclass <clack-middleware-conditional> (<middleware>)
-     ((condition :type (or function <component>)
+     ((condition :type component-designator
                  :initarg :condition)
-      (builder :type (or function <component> symbol list)
+      (builder :type (or component-designator symbol list)
                :initarg :builder)
       (middleware :type (or function <component>))))
 

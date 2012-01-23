@@ -12,6 +12,12 @@
 (cl-syntax:use-syntax :annot)
 
 @export
+(deftype component-designator ()
+  "A designator for a `<component>` which can be `clack.component:call`able."
+  '(or function
+       <component>))
+
+@export
 (defclass <component> () ()
   (:documentation
    "Base Class for Clack Component shared between <middleware> and Clack Application."))

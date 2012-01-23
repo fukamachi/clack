@@ -10,6 +10,8 @@
   (:use :cl
         :clack
         :anaphora)
+  (:import-from :clack.component
+                :component-designator)
   (:import-from :clack.request
                 :make-request
                 :body-parameter)
@@ -21,7 +23,7 @@
 @export
 (defclass <clack-middleware-csrf> (<middleware>)
      ((block-app :initarg :block-app
-                 :type (or function <component>)
+                 :type component-designator
                  :initform #'return-400
                  :accessor block-app)
       (one-time-p :initarg :one-time-p
