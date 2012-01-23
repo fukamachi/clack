@@ -22,6 +22,7 @@
   :author "Eitarow Fukamachi"
   :license "LLGPL"
   :depends-on (;; Utility
+               :trivial-types
                :alexandria
                :metabang-bind
                :anaphora

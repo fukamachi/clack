@@ -10,6 +10,8 @@
   (:use :cl
         :anaphora
         :metabang-bind)
+  (:import-from :trivial-types
+                :property-list)
   (:import-from :alexandria
                 :when-let
                 :make-keyword)
@@ -127,9 +129,9 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
                    :initarg :http-cookie
                    :initform nil)
 
-      (body-parameters :type list
+      (body-parameters :type property-list
                        :initform nil)
-      (query-parameters :type list
+      (query-parameters :type property-list
                         :initform nil)
       (uploads :type list
                :initarg :clack.uploads

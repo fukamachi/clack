@@ -9,6 +9,8 @@
 (clack.util:namespace clack.response
   (:use :cl
         :anaphora)
+  (:import-from :trivial-types
+                :property-list)
   (:import-from :alexandria
                 :ensure-list
                 :doplist)
@@ -30,7 +32,7 @@
               :initarg :status
               :initform nil
               :accessor status)
-      (headers :type list
+      (headers :type property-list
                :initarg :headers
                :initform nil)
       (body :type (or list pathname)
