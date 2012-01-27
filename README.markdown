@@ -36,7 +36,7 @@ There are some middlewares bundled with Clack. You can find them at more below c
 
 ## Installation
 
-Clack is now available on [Quicklisp](https://www.quicklisp.org/beta/).
+Clack is now available on [Quicklisp](http://www.quicklisp.org/beta/).
 
     (ql:quickload :clack)
 
