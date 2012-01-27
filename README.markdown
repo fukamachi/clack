@@ -75,8 +75,8 @@ Example: http://localhost:4242/sns/member?id=3
      :request-uri "/sns/member?id=3"
      :server-protocol :HTTP/1.1
      :http-user-agent "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-US) ..."
-     :http-remote-addr "127.0.0.1"
-     :http-remote-port 26077
+     :remote-addr "127.0.0.1"
+     :remote-port 26077
      :http-referer nil
      :http-host "localhost:4242"
      :http-cookies nil
