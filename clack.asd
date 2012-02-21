@@ -94,7 +94,6 @@
                   ((:file "doc")
                    (:file "util")
                    (:file "stream")
-                   (:file "ducktype")
                    (:file "localtime")
                    (:file "hunchentoot")
                    (:file "route"))))))
