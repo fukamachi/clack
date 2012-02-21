@@ -27,7 +27,6 @@
                :cl-syntax-annot
                :modlisp
                :split-sequence
-               :metabang-bind
                :anaphora)
   :components ((:file "src/core/handler/apache"))
   :description "Clack handler for Apache2 + mod_lisp.")

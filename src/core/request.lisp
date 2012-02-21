@@ -8,8 +8,7 @@
 
 (clack.util:namespace clack.request
   (:use :cl
-        :anaphora
-        :metabang-bind)
+        :anaphora)
   (:import-from :trivial-types
                 :property-list)
   (:import-from :alexandria
@@ -149,27 +148,27 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
         (parameters->plist (query-string this)))
 
   ;; POST parameters
-  (bind ((body (raw-body this))
-         ((:values type subtype charset)
-          (parse-content-type (content-type this)))
-         (content-type (concatenate 'string type "/" subtype))
-         (external-format
-          (flex:make-external-format
-           (if charset
-               (make-keyword (string-upcase charset))
-               :utf-8)
-           :eol-style :lf)))
-    (cond
-      ((string= content-type "application/x-www-form-urlencoded")
-       (setf (slot-value this 'body-parameters)
-             (parameters->plist (read-line (ensure-character-input-stream body) nil ""))))
-      ((and (string= content-type "multipart/form-data")
-            (not (uploads this))) ;; not set yet.
-       (setf (uploads this)
-             (clack.util.hunchentoot:parse-rfc2388-form-data
-              (flex:make-flexi-stream body)
-              content-type
-              external-format))))))
+  (multiple-value-bind (type subtype charset)
+      (parse-content-type (content-type this))
+    (let ((body (raw-body this))
+          (content-type (concatenate 'string type "/" subtype))
+          (external-format
+           (flex:make-external-format
+            (if charset
+                (make-keyword (string-upcase charset))
+                :utf-8)
+            :eol-style :lf)))
+      (cond
+        ((string= content-type "application/x-www-form-urlencoded")
+         (setf (slot-value this 'body-parameters)
+               (parameters->plist (read-line (ensure-character-input-stream body) nil ""))))
+        ((and (string= content-type "multipart/form-data")
+              (not (uploads this))) ;; not set yet.
+         (setf (uploads this)
+               (clack.util.hunchentoot:parse-rfc2388-form-data
+                (flex:make-flexi-stream body)
+                content-type
+                external-format)))))))
 
 @export
 (defun shared-raw-body (env)

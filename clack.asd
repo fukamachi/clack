@@ -24,7 +24,6 @@
   :depends-on (;; Utility
                :trivial-types
                :alexandria
-               :metabang-bind
                :anaphora
                :arnesi
                :split-sequence

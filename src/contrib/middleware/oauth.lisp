@@ -10,7 +10,6 @@
   (:use :cl
         :clack
         :anaphora
-        :metabang-bind
         :clack.request
         :clack.response))
 
@@ -58,10 +57,11 @@
     req-token))
 
 (defmethod obtain-request-token ((this <clack-middleware-oauth>) req)
-  (bind ((oauth-token (query-parameter req "oauth_token"))
-         ((req-token time) (gethash oauth-token (oauth-state this))))
-    @ignore time
-    req-token))
+  (let ((oauth-token (query-parameter req "oauth_token")))
+    (destructuring-bind (req-token time)
+        (gethash oauth-token (oauth-state this))
+      @ignore time
+      req-token)))
 
 (defmethod obtain-access-token ((this <clack-middleware-oauth>) req-token)
   (cl-oauth:obtain-access-token (oauth-access-token-uri this) req-token))

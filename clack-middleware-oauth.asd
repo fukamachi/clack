@@ -25,7 +25,6 @@
                :cl-syntax
                :cl-syntax-annot
                :cl-oauth
-               :anaphora
-               :metabang-bind)
+               :anaphora)
   :components ((:file "src/contrib/middleware/oauth"))
   :description "Supports authorization mechanism by OAuth")

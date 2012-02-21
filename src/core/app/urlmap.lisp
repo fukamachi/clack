@@ -9,8 +9,7 @@
 (clack.util:namespace clack.app.urlmap
   (:use :cl
         :clack
-        :anaphora
-        :metabang-bind)
+        :anaphora)
   (:import-from :cl-ppcre
                 :scan
                 :scan-to-strings
@@ -27,12 +26,11 @@
 @export
 (defmethod mount ((this <clack-app-urlmap>) location app)
   "Regist an `app' to the `location'."
-  (bind ((#(host location)
-           (aif (nth-value
-                 1
-                 (scan-to-strings "^https?://(.*?)(/.*)" location))
-                it
-                `#(nil ,location))))
+  (destructuring-bind (host location)
+      (aif (nth-value 1
+                      (scan-to-strings "^https?://(.*?)(/.*)" location))
+           (coerce it 'list)
+           (list nil location))
     (unless (char= #\/ (aref location 0))
       (error "Paths need to start with /"))
     (push (list host location app)
