@@ -33,8 +33,6 @@
        (:file "response")
        (:file "request")
        (:file "handler/hunchentoot")
-       #+(or alisp cmucl sbcl lispworks)
-       (:file "handler/apache")
        (:file "app/file")
        (:file "app/urlmap")
        (:file "middleware/static")
