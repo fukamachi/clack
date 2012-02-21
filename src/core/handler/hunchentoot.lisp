@@ -117,7 +117,9 @@ before pass to Clack application."
                               (hunchentoot::parse-content-type (header-in* :content-type req))
                             (when (and (string= type "multipart")
                                        (string= subtype "form-data"))
-                              (hunchentoot::parse-multipart-form-data req (flex:make-external-format :utf-8 :eol-style :lf)))))
+                              (prog1
+                                (hunchentoot::parse-multipart-form-data req (flex:make-external-format :utf-8 :eol-style :lf))
+                                (setf (slot-value req 'hunchentoot::raw-post-data) t)))))
       :clack-handler :hunchentoot)
 
      (loop for (k . v) in (hunchentoot:headers-in* req)

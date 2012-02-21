@@ -26,7 +26,7 @@
                          #(110 97 109 101 61 230 183 177 231 148 186 232 139 177 229 164 170 233 131 142))
                         :external-format :utf-8))))
 
-(plan 15)
+(plan 17)
 
 (is (content-type req)
     "application/x-www-form-urlencoded; charset=utf-8"
@@ -96,8 +96,19 @@
                                :content-type "image/jpeg"
                                :filename "jellyfish.jpg")))
      (is status 200)
+     (is body "jellyfish.jpg"))
+
+   (multiple-value-bind (body status)
+       (http-request "http://localhost:4242/"
+                     :method :post
+                     :parameters
+                     `(("file" ,(merge-pathnames #p"tmp/jellyfish.jpg" *clack-pathname*)
+                               :content-type "image/jpeg"
+                               :filename "jellyfish.jpg"))
+                     :content-length t)
+     (is status 200)
      (is body "jellyfish.jpg"))))
 #-thread-support
-(skip 2 "because your lisp doesn't support threads")
+(skip 4 "because your lisp doesn't support threads")
 
 (finalize)
