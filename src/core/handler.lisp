@@ -25,7 +25,7 @@
 (defmethod stop ((this <handler>))
   "Stop Clack server. Currently works only Hunchentoot."
   (let ((handler-package (find-handler (server-name this))))
-    (funcall (intern "STOP" handler-package) (acceptor this))))
+    (funcall (intern (string '#:stop) handler-package) (acceptor this))))
 
 (doc:start)
 

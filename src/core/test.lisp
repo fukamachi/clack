@@ -31,14 +31,14 @@
 (defun test-app (app client &optional desc)
   "Test Clack Application."
   (let* ((handler (find-handler *clack-test-handler*))
-         (acceptor (funcall (intern "RUN" handler)
+         (acceptor (funcall (intern (string '#:run) handler)
                             app
                             :port *clack-test-port*
                             :debug *enable-debug-p*)))
     (when desc (diag desc))
     (unwind-protect
         (funcall client)
-      (funcall (intern "STOP" handler) acceptor))))
+      (funcall (intern (string '#:stop) handler) acceptor))))
 
 @export
 (defmacro define-app-test (desc app client &optional (enable-debug-p *enable-debug-p*))

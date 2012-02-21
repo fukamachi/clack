@@ -51,7 +51,7 @@ Example:
       (make-instance '<handler>
          :server-name server
          :acceptor
-         (funcall (intern "RUN" handler-package)
+         (funcall (intern (string '#:run) handler-package)
                   app
                   :port port
                   :debug debug)))
