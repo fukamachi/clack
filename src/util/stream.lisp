@@ -71,7 +71,10 @@
          :eof)))
 
 (defmethod stream-read-char ((this replay-input-stream))
-  (code-char (stream-read-byte this)))
+  (let ((byte (stream-read-byte this)))
+    (if (eq byte :eof)
+        byte
+        (code-char byte))))
 
 (defmethod stream-listen ((this replay-input-stream))
   (with-slots (buffer position) this
