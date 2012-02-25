@@ -111,15 +111,6 @@ before pass to Clack application."
       :content-length (awhen (header-in* :content-length req)
                         (parse-integer it :junk-allowed t))
       :content-type (header-in* :content-type req)
-      :clack.uploads (and (eq (request-method* req) :post)
-                          (header-in* :content-type req)
-                          (multiple-value-bind (type subtype)
-                              (hunchentoot::parse-content-type (header-in* :content-type req))
-                            (when (and (string= type "multipart")
-                                       (string= subtype "form-data"))
-                              (prog1
-                                (hunchentoot::parse-multipart-form-data req (flex:make-external-format :utf-8 :eol-style :lf))
-                                (setf (slot-value req 'hunchentoot::raw-post-data) t)))))
       :clack-handler :hunchentoot)
 
      (loop for (k . v) in (hunchentoot:headers-in* req)

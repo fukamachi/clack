@@ -86,7 +86,8 @@
 #+thread-support
 (test-app
  (lambda (env)
-   `(200 nil (,(caddar (uploads (make-request env))))))
+   (make-request env)
+   `(200 nil (,(cadr (body-parameter (make-request env) :|file|)))))
  (lambda ()
    (multiple-value-bind (body status)
        (http-request "http://localhost:4242/"

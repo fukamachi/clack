@@ -70,6 +70,9 @@
            (incf position))
          :eof)))
 
+(defmethod stream-read-char ((this replay-input-stream))
+  (code-char (stream-read-byte this)))
+
 (defmethod stream-listen ((this replay-input-stream))
   (with-slots (buffer position) this
      (< position (length buffer))))
@@ -113,4 +116,8 @@ Clack.Util.Stream - Useul streams
 
 @doc:AUTHOR "
 * Tomohiro Matsuyama (tomo@cx4a.org)
+"
+
+@doc:CONTRIBUTORS "
+* Eitarow Fukamachi (e.arrows@gmail.com)
 "

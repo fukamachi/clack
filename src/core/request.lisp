@@ -25,6 +25,8 @@
                 :getf-all
                 :merge-plist
                 :nappend)
+  (:import-from :clack.util.hunchentoot
+                :parse-rfc2388-form-data)
   (:import-from :clack.util.stream
                 :ensure-character-input-stream
                 :make-replay-buffer
@@ -46,8 +48,7 @@
            :clack-handler
 
            :referer
-           :user-agent
-           :uploads))
+           :user-agent))
 
 (cl-syntax:use-syntax :annot)
 
@@ -131,11 +132,7 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
       (body-parameters :type property-list
                        :initform nil)
       (query-parameters :type property-list
-                        :initform nil)
-      (uploads :type list
-               :initarg :clack.uploads
-               :initform nil
-               :accessor uploads))
+                        :initform nil))
   (:documentation "Portable HTTP Request object for Clack Request."))
 
 (defmethod initialize-instance :after ((this <request>) &key)
@@ -162,13 +159,16 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
         ((string= content-type "application/x-www-form-urlencoded")
          (setf (slot-value this 'body-parameters)
                (parameters->plist (read-line (ensure-character-input-stream body) nil ""))))
-        ((and (string= content-type "multipart/form-data")
-              (not (uploads this))) ;; not set yet.
-         (setf (uploads this)
-               (clack.util.hunchentoot:parse-rfc2388-form-data
-                (flex:make-flexi-stream body)
-                content-type
-                external-format)))))))
+        ((string= content-type "multipart/form-data")
+         (let (;; parsed param (alist)
+               (params (clack.util.hunchentoot:parse-rfc2388-form-data
+                        body
+                        (content-type this)
+                        external-format)))
+           (setf (slot-value this 'body-parameters)
+                 ;; convert alist into plist
+                 (loop for (key . values) in params
+                       append (list (make-keyword key) values)))))))))
 
 @export
 (defun shared-raw-body (env)
