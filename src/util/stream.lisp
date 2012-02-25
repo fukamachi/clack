@@ -91,9 +91,10 @@
   (replay-stream-position this))
 
 (defmethod (setf stream-file-position) (position-spec (this replay-input-stream))
-  (typecase position-spec
-    ((eql :start) 0)
-    (integer position-spec)))
+  (setf (replay-stream-position this)
+        (typecase position-spec
+          ((eql :start) 0)
+          (integer position-spec))))
 
 @export
 (defun make-replay-buffer ()
