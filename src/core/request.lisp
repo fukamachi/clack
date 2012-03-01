@@ -217,8 +217,8 @@ on an original raw-body."
 @export
 (defmethod parameter ((req <request>) &optional name)
   "Returns request parameters containing (merged) GET and POST parameters. If optional `name' is specified, returns the value corresponds to it."
-  (let ((params (merge-plist (query-parameter req)
-                             (body-parameter req))))
+  (let ((params (append (query-parameter req)
+                        (body-parameter req))))
     (if name
         (getf-all params name)
         params)))
