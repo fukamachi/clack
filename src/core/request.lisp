@@ -24,9 +24,9 @@
   (:import-from :circular-streams
                 :make-circular-input-stream
                 :circular-stream-buffer)
+  (:import-from :multival-plist
+                :getf-all)
   (:import-from :clack.util
-                :getf-all
-                :merge-plist
                 :nappend)
   (:import-from :clack.util.hunchentoot
                 :parse-rfc2388-form-data)

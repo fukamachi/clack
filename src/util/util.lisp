@@ -44,22 +44,6 @@ This may be useful for 'one-package-per-one-file' style."
   `(getf ,place (normalize-key ,key)))
 
 @export
-(defun getf-all (plist key)
-  "This is a version of `getf' enabled to manage multiple keys. If the `plist' has two or more pairs that they have given `key' as a key, returns the values of each pairs as one list."
-  (loop with params = nil
-        for (k v) on plist by #'cddr
-        if (string= k key)
-          do (push v params)
-        finally (return (if (cdr params)
-                            (nreverse params)
-                            (car params)))))
-
-@export
-(defun (setf getf-all) (val plist key)
-  @ignore (val plist key)
-  (error "TODO"))
-
-@export
 (defmacro remf* (place key)
   "Similar to `remf` but allows many types for the `key', String,
 Keyword or Symbol."

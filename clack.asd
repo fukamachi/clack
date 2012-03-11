@@ -37,7 +37,8 @@
                :rfc2388
                :flexi-streams
                :local-time
-               :circular-streams)
+               :circular-streams
+               :multival-plist)
   :components ((:module "src"
                 :components
                 ((:module "core"
