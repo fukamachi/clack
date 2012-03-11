@@ -35,7 +35,6 @@
                :cl-fad
                :cl-test-more
                :ironclad
-               :cl-base64
                :rfc2388
                :drakma
                :local-time)
@@ -85,8 +84,7 @@
                       ((:file "state")
                        (:file "state/cookie")
                        (:file "store")
-                       (:file "session")))
-                     (:file "auth/basic")))))
+                       (:file "session")))))))
                  (:module "util"
                   :serial t
                   :components
