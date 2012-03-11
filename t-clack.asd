@@ -19,6 +19,7 @@
 
 (defsystem t-clack
   :depends-on (:clack
+               :clack-test
                :cl-test-more
                :bordeaux-threads
                :drakma)

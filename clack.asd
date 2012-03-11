@@ -33,10 +33,9 @@
                ;; for Other purpose
                :cl-ppcre
                :cl-fad
-               :cl-test-more
                :ironclad
                :rfc2388
-               :drakma
+               :flexi-streams
                :local-time)
   :components ((:module "src"
                 :components
@@ -55,8 +54,6 @@
                    (:file "component")
                    (:file "middleware" :depends-on ("component"))
                    (:file "handler")
-                   (:file "test")
-                   (:file "test/suite" :depends-on ("test"))
                    (:module "app"
                     :depends-on ("clack")
                     :components

@@ -166,10 +166,10 @@ Clack.Handler.Hunchentoot - Clack handler for Hunchentoot.
 "
 
 @doc:SYNOPSIS "
-    (defpackage clack-test
+    (defpackage clack-sample
       (:use :cl
             :clack.handler.hunchentoot))
-    (in-package :clack-test)
+    (in-package :clack-sample)
     
     ;; Start Server
     (run (lambda (env)
