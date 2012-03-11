@@ -21,6 +21,9 @@
                 :split
                 :scan-to-strings
                 :register-groups-bind)
+  (:import-from :circular-streams
+                :make-circular-input-stream
+                :circular-stream-buffer)
   (:import-from :clack.util
                 :getf-all
                 :merge-plist
@@ -28,9 +31,7 @@
   (:import-from :clack.util.hunchentoot
                 :parse-rfc2388-form-data)
   (:import-from :clack.util.stream
-                :ensure-character-input-stream
-                :make-replay-buffer
-                :make-replay-input-stream)
+                :ensure-character-input-stream)
   (:export :request-method
            :script-name
            :path-info
@@ -177,11 +178,11 @@ empty. This function modifies REQ to share raw-body among the
 instances of <request>."
   (when-let ((body (getf env :raw-body)))
     (let ((buffer (getf env :raw-body-buffer)))
-      (unless buffer
-        ;; Raw-body is fresh and nothing has been read.
-        (setf buffer (make-replay-buffer))
-        (nappend env `(:raw-body-buffer ,buffer)))
-      (make-replay-input-stream body :buffer buffer))))
+      (if buffer
+          (make-circular-input-stream body :buffer buffer)
+          (let ((stream (make-circular-input-stream body)))
+            (nappend env `(:raw-body-buffer ,(circular-stream-buffer stream)))
+            stream)))))
 
 @export
 ;; constructor

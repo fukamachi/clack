@@ -36,7 +36,8 @@
                :ironclad
                :rfc2388
                :flexi-streams
-               :local-time)
+               :local-time
+               :circular-streams)
   :components ((:module "src"
                 :components
                 ((:module "core"
