@@ -1,4 +1,4 @@
-(clack.util:namespace clack-test.middleware.session
+(clack.util:namespace t.clack.middleware.session
   (:use :cl
         :anaphora
         :cl-test-more

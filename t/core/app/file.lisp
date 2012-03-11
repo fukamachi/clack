@@ -1,14 +1,12 @@
 (in-package :cl-user)
-
-(defpackage clack-test.app.file
+(defpackage t.clack.app.file
   (:use :cl
         :asdf
         :cl-test-more
         :clack.test
         :clack.app.file
         :drakma))
-
-(in-package :clack-test.app.file)
+(in-package :t.clack.app.file)
 
 (plan 12)
 

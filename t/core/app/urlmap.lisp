@@ -1,4 +1,4 @@
-(clack.util:namespace clack-test.app.urlmap
+(clack.util:namespace t.clack.app.urlmap
   (:use :cl
         :clack
         :clack.app.urlmap

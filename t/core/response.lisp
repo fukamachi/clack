@@ -1,14 +1,12 @@
 (in-package :cl-user)
-
-(defpackage clack-test.response
+(defpackage t.clack.response
   (:use :cl
         :cl-test-more
         :clack.response)
   (:shadowing-import-from
    :clack.response
    :finalize))
-
-(in-package :clack-test.response)
+(in-package :t.clack.response)
 
 (defvar res nil)
 

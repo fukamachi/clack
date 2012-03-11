@@ -1,4 +1,4 @@
-(clack.util:namespace clack-test.util.route
+(clack.util:namespace t.clack.util.route
   (:use :cl
         :clack.util.route
         :cl-test-more))

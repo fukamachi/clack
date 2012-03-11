@@ -1,12 +1,10 @@
 (in-package :cl-user)
-
-(defpackage clack-test.middleware
+(defpackage t.clack.middleware
   (:use :cl
         :cl-test-more
         :clack.component
         :clack.middleware))
-
-(in-package :clack-test.middleware)
+(in-package :t.clack.middleware)
 
 (plan 5)
 

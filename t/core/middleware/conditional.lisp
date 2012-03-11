@@ -1,4 +1,4 @@
-(clack.util:namespace clack-test.middleware.conditional
+(clack.util:namespace t.clack.middleware.conditional
   (:use :cl
         :clack
         :clack.builder

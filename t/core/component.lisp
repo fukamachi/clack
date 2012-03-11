@@ -1,11 +1,9 @@
 (in-package :cl-user)
-
-(defpackage clack-test.component
+(defpackage t.clack.component
   (:use :cl
         :cl-test-more
         :clack.component))
-
-(in-package :clack-test.component)
+(in-package :t.clack.component)
 
 (plan 5)
 

@@ -1,6 +1,5 @@
 (in-package :cl-user)
-
-(defpackage clack-test.request
+(defpackage t.clack.request
   (:use :cl
         :asdf
         :cl-test-more
@@ -8,8 +7,7 @@
         :clack.request
         :clack.test
         :drakma))
-
-(in-package :clack-test.request)
+(in-package :t.clack.request)
 
 (defvar req nil)
 

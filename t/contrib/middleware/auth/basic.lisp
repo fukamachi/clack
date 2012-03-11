@@ -1,4 +1,4 @@
-(clack.util:namespace clack-test.middleware.auth.basic
+(clack.util:namespace t.clack.middleware.auth.basic
   (:use :cl
         :cl-test-more
         :clack.test

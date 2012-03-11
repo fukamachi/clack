@@ -1,4 +1,4 @@
-(clack.util:namespace clack-test.logger
+(clack.util:namespace t.clack.logger
   (:use :cl
         :cl-test-more
         :clack.logger))

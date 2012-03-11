@@ -1,10 +1,8 @@
 (in-package :cl-user)
-
-(defpackage clack-test.handler.hunchentoot
+(defpackage t.clack.handler.hunchentoot
   (:use :cl
         :clack.test.suite))
-
-(in-package :clack-test.handler.hunchentoot)
+(in-package :t.clack.handler.hunchentoot)
 
 #+thread-support
 (clack.test.suite:run-server-tests :hunchentoot)

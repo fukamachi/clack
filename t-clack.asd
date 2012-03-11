@@ -13,11 +13,11 @@
 |#
 
 (in-package :cl-user)
-(defpackage clack-test-asd
+(defpackage t-clack-asd
   (:use :cl :asdf))
-(in-package :clack-test-asd)
+(in-package :t-clack-asd)
 
-(defsystem clack-test
+(defsystem t-clack
   :depends-on (:clack
                :cl-test-more
                :bordeaux-threads

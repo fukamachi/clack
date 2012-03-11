@@ -1,12 +1,10 @@
 (in-package :cl-user)
-
-(defpackage clack-test.builder
+(defpackage t.clack.builder
   (:use :cl
         :cl-test-more
         :clack.builder
         :clack.middleware))
-
-(in-package :clack-test.builder)
+(in-package :t.clack.builder)
 
 ;; initialize
 

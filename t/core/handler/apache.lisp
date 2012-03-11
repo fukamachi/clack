@@ -1,10 +1,8 @@
 (in-package :cl-user)
-
-(defpackage clack-test.handler.apache
+(defpackage t.clack.handler.apache
   (:use :cl
         :clack.test.suite))
-
-(in-package :clack-test.handler.apache)
+(in-package :t.clack.handler.apache)
 
 #+thread-support
 (clack.test.suite:run-server-tests :apache)

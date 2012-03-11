@@ -1,6 +1,5 @@
 (in-package :cl-user)
-
-(defpackage clack-test.middleware.static
+(defpackage t.clack.middleware.static
   (:use :cl
         :asdf
         :cl-test-more
@@ -8,8 +7,7 @@
         :clack.builder
         :clack.middleware.static
         :drakma))
-
-(in-package :clack-test.middleware.static)
+(in-package :t.clack.middleware.static)
 
 (plan 8)
 
