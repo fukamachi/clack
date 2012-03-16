@@ -32,7 +32,8 @@
                 :parse-rfc2388-form-data)
   (:import-from :clack.util.stream
                 :ensure-character-input-stream)
-  (:export :request-method
+  (:export :env
+           :request-method
            :script-name
            :path-info
            :server-name
@@ -55,7 +56,11 @@
 
 @export
 (defclass <request> ()
-     ((request-method :type keyword
+     ((env :type property-list
+           :initarg :env
+           :reader env
+           :documentation "Raw env")
+      (request-method :type keyword
                       :initarg :request-method
                       :reader request-method
                       :documentation "The HTTP request method.
@@ -136,7 +141,10 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
                         :initform nil))
   (:documentation "Portable HTTP Request object for Clack Request."))
 
-(defmethod initialize-instance :after ((this <request>) &key)
+(defmethod initialize-instance :after ((this <request>) &rest env)
+  (remf env :allow-other-keys)
+  (setf (slot-value this 'env) env)
+
   ;; cookies
   (swhen (slot-value this 'http-cookie)
     (setf it (parameters->plist it :delimiter "\\s*[,;]\\s*")))

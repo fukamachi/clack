@@ -24,7 +24,9 @@
                          #(110 97 109 101 61 230 183 177 231 148 186 232 139 177 229 164 170 233 131 142))
                         :external-format :utf-8))))
 
-(plan 17)
+(plan 18)
+
+(ok (env req) "env")
 
 (is (content-type req)
     "application/x-www-form-urlencoded; charset=utf-8"
