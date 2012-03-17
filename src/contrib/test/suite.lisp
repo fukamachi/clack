@@ -72,7 +72,7 @@ you would call like this: `(run-server-tests :foo)'."
       (:content-type "text/plain; charset=utf-8")
       (,(getf env :script-name))))
   (lambda ()
-    (is (http-request (localhost)) nil)))
+    (ok (member (http-request (localhost)) '(nil "") :test #'equal))))
 
 (define-app-test |GET|
   (lambda (env)
@@ -108,13 +108,14 @@ you would call like this: `(run-server-tests :foo)'."
 (define-app-test |big POST|
   (lambda (env)
     (let ((body
-           (make-array (getf env :content-length))))
+           (make-array (getf env :content-length)
+                       :element-type 'octet)))
       (read-sequence body (getf env :raw-body))
       `(200
         (:content-type "text/plain; charset=utf-8"
          :client-content-length ,(getf env :content-length)
          :client-content-type ,(getf env :content-type))
-        (,(coerce body 'string)))))
+        (,(flex:octets-to-string body)))))
   (lambda ()
     (let* ((chunk
             (with-output-to-string (chunk)
@@ -376,8 +377,13 @@ you would call like this: `(run-server-tests :foo)'."
       (multiple-value-bind (body status)
           (http-request (localhost)
                         :additional-headers `(("X-Foo" . ,chunk)))
-        (is status 200)
-        (is body chunk)))))
+        (if (eq :fcgi *clack-test-handler*)
+            (progn
+              (is status 400)
+              (like body "400 Request Header Or Cookie Too Large"))
+            (progn
+              (is status 200)
+              (is body chunk)))))))
 
 (define-app-test |CRLF output|
   (lambda (env)
@@ -448,7 +454,7 @@ you would call like this: `(run-server-tests :foo)'."
         (http-request (localhost))
       (is status 200)
       (is (get-header headers :x-authorization) nil)
-      (is body nil :test #'eq))))
+      (ok (member body '(nil "") :test #'equal)))))
 
 (define-app-test |repeated slashes|
   (lambda (env)
