@@ -42,16 +42,17 @@
             (lambda ()
               (cl-fastcgi::server-on-fd
                #'(lambda (req)
-                   (let ((env (request->plist req)))
-                     (handle-response
-                      req
-                      (if debug (call app env)
-                          (aif (handler-case (call app env)
-                                 (condition (error)
-                                   @ignore error
-                                   nil))
-                               it
-                               '(500 nil nil))))))
+                   (let* ((env (request->plist req))
+                          (res (if debug (call app env)
+                                   (aif (handler-case (call app env)
+                                          (condition (error)
+                                            @ignore error
+                                            nil))
+                                        it
+                                        '(500 nil nil)))))
+                     (etypecase res
+                       (list (handle-response req res))
+                       (function (funcall res (lambda (res) (handle-response req res)))))))
                (cl-fastcgi::usocket-to-fd sock)))))))
 
 @export
@@ -59,7 +60,7 @@
   (usocket:socket-close acceptor))
 
 (defun handle-response (req res)
-  (destructuring-bind (status headers body) res
+  (destructuring-bind (status headers &optional body) res
     (fcgx-puts req (format nil "Status: ~D ~A~%" status (gethash status *http-status*)))
     (loop for (k v) on headers by #'cddr
           with hash = (make-hash-table :test #'eq)
@@ -74,6 +75,15 @@
                do (fcgx-puts req (format nil "~:(~A~): ~A~%" k v))))
     (fcgx-puts req #.(format nil "~%"))
     (etypecase body
+      (null
+       ;; TODO: This should return a object which can write & close.
+       ;;   Currently returns a function only for writing.
+       (lambda (body)
+         (fcgx-puts req body)
+         ;; XXX: cl-fastcgi doesn't provide `fcgx-flush' now.
+         (cffi:foreign-funcall "FCGX_FFlush"
+          :pointer (cffi:foreign-slot-value req 'cl-fastcgi::fcgx-request 'cl-fastcgi::out)
+          :int)))
       (pathname
        (with-open-file (in body
                            :direction :input
