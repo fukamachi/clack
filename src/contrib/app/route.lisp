@@ -68,15 +68,14 @@ Example:
          (or ,@(loop for (method path form) in routes
                      collect `(when (string= ,request-method ',method)
                                 (multiple-value-bind (,matched ,params)
-                                    (match (make-url-rule ,path) ,request-path)
+                                    (match (make-url-rule ,path :method ,request-method) ,request-method ,request-path)
                                   (declare (ignorable ,params))
                                   (when ,matched
-                                    ,(if params
-                                         `(let (,@(loop for (k v) on params by #'cddr
-                                                        collect (list (intern (string k)) v)))
-                                            (declare (ignorable ,@(loop for k in params by #'cddr collect k)))
-                                            (call ,form ,env))
-                                         `(call ,form ,env))))))
+                                    (if ,params
+                                        (call ,form
+                                              (append ,env
+                                                      (list :route.parameters ,params)))
+                                        (call ,form ,env))))))
              ,(if otherwise
                   `(call ,(cadr otherwise) ,env)
                   '(list 404 nil nil)))))))
@@ -94,7 +93,7 @@ Clack.App.Route - URL dispatcher.
             :clack.app.route))
     (in-package :clack-sample)
     
-    (defroutes app (env)
+    (defroutes app
       (GET \"/\" #'index)
       (GET \"/login\" #'login)
       (POST \"/login\" #'authorize)
@@ -104,7 +103,34 @@ Clack.App.Route - URL dispatcher.
 "
 
 @doc:DESCRIPTION "
-Clack.App.Route provides an URL based dispacher, inspired by Ruby's Sinatra.
+Clack.App.Route provides an URL based dispacher, inspired by Ruby's Sinatra. Each routing rules contains three elements, REQUEST-METHOD, URI rule and Clack Application.
+
+Clack Application is a function or Clack.Component which takes exact one argument. It is a property list represents Environment.
+
+    (defroutes app
+      (GET \"/\"
+           (lambda (env)
+             '(200
+               (:content-type \"text/plain\")
+               (\"Hello. This is an index page.\")))))
+
+Routing URI rules are also allowed to contain named parameters or wild cards. Then, Clack.App.Route adds `:route.parameters` to `env`.
+
+    (defroutes app
+      (GET \"/member/:id\"
+           (lambda (env)
+             (destructuring-bind (&key id &allow-other-keys)
+                 (getf env :route.parameters)
+               `(200
+                 (:content-type \"text/plain\")
+                 (,(format nil \"Your member ID is ~D\" id))))))
+      (GET \"/say/*/to/*\"
+           (lambda (env)
+             (destructuring-bind (who what)
+                 (getf (getf env :route.parameters) :splat)
+               `(200
+                 (:content-type \"text/plain\")
+                 (,(format nil \"You're saying ~A to ~A\" what who)))))))
 
 This package is using Clack.Util.Route to parse rule strings.
 
