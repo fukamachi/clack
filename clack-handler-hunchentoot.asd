@@ -18,7 +18,7 @@
 (in-package :clack-handler-hunchentoot-asd)
 
 (defsystem clack-handler-hunchentoot
-  :version "11.12"
+  :version "12.03"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
   :depends-on (:clack
