@@ -100,7 +100,7 @@
 
 (defun request->plist (req)
   "Convert Request from server into a plist
-before pass to Clack application."
+before passing to Clack application."
   (let ((env
          (loop with env-hash = (make-hash-table)
                for (k . v) in (fcgx-getenv req)
@@ -207,7 +207,7 @@ Clack.Handler.Fcgi - Clack handler for FastCGI.
 "
 
 @doc:DESCRIPTION "
-Clack.Handler.Fcgi is a Clack handler to run any Clack applications as a FastCGI application. This handler depends on a library \"cl-fastcgi\", so only works on SBCL, CMUCL, GNU CLISP, Clozure CL, LispWorks and ECL.
+Clack.Handler.Fcgi is a Clack handler to run any Clack application as a FastCGI application. This handler depends on the library \"cl-fastcgi\", so it only works on SBCL, CMUCL, GNU CLISP, Clozure CL, LispWorks and ECL.
 
 Here's an example using Nginx.
 
@@ -229,7 +229,7 @@ Here's an example using Nginx.
         }
     }
 
-This configuration means to open port 8080 to web browsers, and listening Lisp process on port 9000.
+This configuration to opens port 8080 to web browsers, and listens for the Lisp process on port 9000.
 
 Run Clack application by `clackup`.
 
@@ -237,7 +237,7 @@ Run Clack application by `clackup`.
       :server :fcgi
       :port 9000)
 
-Now, you can access [http://localhost:8080/](http://localhost:8080/) and Clack may show you \"Hello, FastCGI!\".
+Now, you can access [http://localhost:8080/](http://localhost:8080/) and Clack should show you \"Hello, FastCGI!\".
 "
 
 @doc:AUTHOR "
