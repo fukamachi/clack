@@ -91,6 +91,7 @@
                    (:file "util")
                    (:file "stream")
                    (:file "localtime")
+                   (:file "rfc2388")
                    (:file "hunchentoot")
                    (:file "route"))))))
   :description "Web application environment for Common Lisp"
