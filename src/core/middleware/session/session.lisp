@@ -103,11 +103,11 @@ Clack.Middleware.Session - Middleware for session management.
 "
 
 @doc:DESCRIPTION "
-Clack.Middleware.Session provides you session interface. By default this will use cookies to keep session state and store data in memory.
+Clack.Middleware.Session provides a session interface. By default this will use cookies to keep session state and store data in memory.
 
-You can change this behavior to inherit `<clack-session-state>' and `<clack-session-store>'.
+You can change this behavior by inheriting `<clack-session-state>' and `<clack-session-store>'.
 
-Note the `:clack.session' is a hash table, not a plist, because plist cannot keep state between functions.
+Note the `:clack.session' is a hash table, not a plist, because plists cannot keep state between functions.
 "
 
 @doc:AUTHOR "

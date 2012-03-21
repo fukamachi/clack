@@ -75,9 +75,9 @@ Clack main package just for convenience.
 @doc:DESCRIPTION "
 Contrary to your expectations, this package is not so significant. Just exporting symbols imported from Clack.Component and Clack.Middleware.
 
-To avoid confusion, especially for beginner, why this package is. Most of peaple expect that there is a package that has the same as asdf:system.
+This package is mostly just here to avoid confusion, especially for beginners. Most peaple expect there to be a package that has the same as asdf:system.
 
-Worthy of special mention is `clackup'. It provides easy way to run Clack Applications.
+Worthy of special mention is `clackup'. It provides an easy way to run Clack Applications.
 "
 
 @doc:AUTHOR "

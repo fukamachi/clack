@@ -91,7 +91,7 @@ tr, td { white-space: nowrap; }
           body))
 
 (defun file-size (path)
-  "Return a file size of `path'. If `path' is a directory, this will return nil."
+  "Return the size of the file at `path'. If `path' is a directory, this will return nil."
   (unless (directory-pathname-p path)
     (with-open-file (in path :direction :input
                         :element-type 'unsigned-byte)

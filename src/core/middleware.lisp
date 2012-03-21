@@ -29,8 +29,8 @@
 
 @export
 (defmethod wrap ((this <middleware>) app-or-middleware)
-  "Compose this and given application or middleware instance into one function.
-The function takes request plist."
+  "Compose `this' and the given application or middleware instance into one function.
+This function takes a request plist."
   (setf (slot-value this 'app) app-or-middleware)
   #'(lambda (env) (call this env)))
 

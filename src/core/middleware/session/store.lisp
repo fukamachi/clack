@@ -41,7 +41,7 @@ Clack.Session.Store - Basic in-memory session store.
 "
 
 @doc:DESCRIPTION "
-Clack.Session.Store is basic in-memory session data store. This is volatile storage and not recommended for multiprocessing environments. However this is very useful for development and testing.
+Clack.Session.Store is a basic in-memory session data store. This is volatile storage and not recommended for multiprocessing environments. However, this is very useful for development and testing.
 "
 
 @doc:AUTHOR "

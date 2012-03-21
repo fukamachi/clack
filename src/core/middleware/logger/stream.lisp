@@ -44,9 +44,9 @@ Clack.Logger.Stream - Output log messages to stream.
 "
 
 @doc:DESCRIPTION "
-Clack.Logger.Stream is a logger outputs log messages to stream, `*standard-output*' for default.
+Clack.Logger.Stream is a logger the outputs log messages to a stream, using `*standard-output*' as the default.
 
-This logger is used in Clack.Middleware.Logger as a default logger.
+This logger is used in Clack.Middleware.Logger as the default logger.
 "
 
 @doc:AUTHOR "

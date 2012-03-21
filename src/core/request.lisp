@@ -74,7 +74,7 @@ This may be an empty string if the application corresponds to the server's root 
                  :initarg :path-info
                  :reader path-info
                  :documentation "The remainder of the request URL's path.
-This may be an empty string if the request URL targets the application root and does no have a trailing slash.")
+This may be an empty string if the request URL targets the application root and does not have a trailing slash.")
       (server-name :type string
                    :initarg :server-name
                    :reader server-name
@@ -210,22 +210,22 @@ on an original raw-body."
 
 @export
 (defmethod cookies ((req <request>) &optional name)
-  "Returns cookies as a plist. If optional `name' is specified, returns the value corresponds to it."
+  "Returns cookies as a plist. If optional `name' is specified, returns the value that corresponds to it."
   (get-whole-or-specified req 'http-cookie name))
 
 @export
 (defmethod body-parameter ((req <request>) &optional name)
-  "Return POST parameters as a plist. If optional `name' is specified, returns the value corresponds to it."
+  "Return POST parameters as a plist. If optional `name' is specified, returns the value that corresponds to it."
   (get-whole-or-specified req 'body-parameters name))
 
 @export
 (defmethod query-parameter ((req <request>) &optional name)
-  "Returns GET parameters as a plist. If optional `name' is specified, returns the value corresponds to it."
+  "Returns GET parameters as a plist. If optional `name' is specified, returns the value that corresponds to it."
   (get-whole-or-specified req 'query-parameters name))
 
 @export
 (defmethod parameter ((req <request>) &optional name)
-  "Returns request parameters containing (merged) GET and POST parameters. If optional `name' is specified, returns the value corresponds to it."
+  "Returns request parameters containing (merged) GET and POST parameters. If optional `name' is specified, returns the value that corresponds to it."
   (let ((params (append (query-parameter req)
                         (body-parameter req))))
     (if name

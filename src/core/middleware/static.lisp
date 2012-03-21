@@ -88,7 +88,7 @@ Notice. Don't forget to add slush \"/\" to the end.
 "
 
 @doc:EXAMPLE "
-Following example code would serve */public/foo.jpg* from */static-files/foo.jpg*.
+The following example code would serve */public/foo.jpg* from */static-files/foo.jpg*.
 
     (run
       (builder
@@ -97,7 +97,7 @@ Following example code would serve */public/foo.jpg* from */static-files/foo.jpg
         :root #p\"/static-files/\")
        app))
 
-You can set any function that returns mapped filename, for <code>:path</code>. Above example is able to be rewritten as following code.
+You can set any function that returns a mapped filename as <code>:path</code>. The above example can be rewritten as following code.
 
     (run
       (builder
