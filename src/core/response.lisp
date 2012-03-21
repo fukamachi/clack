@@ -59,7 +59,7 @@ Create a <response> instance."
 
 @export
 (defmethod headers ((res <response>) &optional name)
-  "Get whole of headers or header value of given name.
+  "Get all included headers, or the header value that corresponds to `name'.
 
 Example:
   (headers res)
@@ -134,7 +134,7 @@ Example:
 
 @export
 (defmethod finalize ((res <response>))
-  "Return a Clack response list containing three values, status, headers and body."
+  "Return a Clack response list containing three values: status, headers, and body."
   (finalize-cookies res)
   (list (status res)
         (headers res)
