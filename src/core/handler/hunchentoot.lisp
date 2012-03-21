@@ -51,12 +51,12 @@
 @export
 (defun stop (acceptor)
   "Stop Hunchentoot server.
-If no acceptor given, try to stop `*acceptor*' by default."
+If no acceptor is given, try to stop `*acceptor*' by default."
   (hunchentoot:stop acceptor))
 
 (defun handle-response (res)
   "Convert Response from Clack application into a string
-before pass to Hunchentoot."
+before passing to Hunchentoot."
   (destructuring-bind (status headers body) res
     (setf (return-code*) status)
     (loop for (k v) on headers by #'cddr
@@ -89,7 +89,7 @@ before pass to Hunchentoot."
 
 (defun request->plist (req)
   "Convert Request from server into a plist
-before pass to Clack application."
+before passing to Clack application."
   (destructuring-bind (server-name &optional (server-port "80"))
       (split-sequence #\: (host req) :from-end t)
     (append
@@ -146,9 +146,9 @@ before pass to Clack application."
         (funcall dispatcher request)))))
 
 (defmethod acceptor-dispatch-request ((this <debuggable-acceptor>) request)
-  "Hunchentoot request dispatcher for Clack. Most of this is same as
-list-request-dispatcher, default one in Hunchentoot, except for convert
-Request instance into just a plist before pass to Clack application."
+  "Hunchentoot request dispatcher for Clack. Most of this is the same as
+list-request-dispatcher, the default one in Hunchentoot, except for converting
+Request instances into a plist before passing to Clack application."
   (loop for dispatcher in *dispatch-table*
         for action = (funcall dispatcher (request->plist request))
         when action :return (funcall action)
@@ -178,7 +178,7 @@ Clack.Handler.Hunchentoot - Clack handler for Hunchentoot.
 "
 
 @doc:DESCRIPTION "
-Clack.Handler.Hunchentoot is a Clack handler for Hunchentoot, Lisp web server. This package exports `run' and `stop'.
+Clack.Handler.Hunchentoot is a Clack handler for the Lisp web server Hunchentoot. This package exports `run' and `stop'.
 "
 
 @doc:AUTHOR "
