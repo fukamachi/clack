@@ -143,9 +143,9 @@ Clack.Handler.Apache - Clack handler for Apache2 + mod_lisp.
 "
 
 @doc:DESCRIPTION "
-Clack.Handler.Apache is a Clack handler for Apache2 + mod_lisp. This handler depends on a library \"cl-modlisp\", so only works on CMUCL, SBCL, AllegroCL and LispWorks.
+Clack.Handler.Apache is a Clack handler for Apache2 + mod_lisp. This handler depends on the library \"cl-modlisp\", so it only works on CMUCL, SBCL, AllegroCL and LispWorks.
 
-You should make sure Apache server and [mod_lisp](http://www.fractalconcept.com/asp/html/mod_lisp.html) installed on your machine. The configuration of Apache might be like this.
+You should make sure the Apache server and [mod_lisp](http://www.fractalconcept.com/asp/html/mod_lisp.html) are installed on your machine. The configuration of Apache might be like this.
 
     LoadModule lisp_module /usr/libexec/apache2/mod_lisp2.so
     ...
@@ -159,7 +159,7 @@ You should make sure Apache server and [mod_lisp](http://www.fractalconcept.com/
       </Location>
     </VirtualHost>
 
-This configuration means to open port 12345 to web browsers, and listening Lisp process on port 3000.
+This configuration opens port 12345 to web browsers, and listens for the Lisp process on port 3000.
 "
 
 @doc:AUTHOR "
