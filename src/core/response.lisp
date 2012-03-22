@@ -35,7 +35,7 @@
       (headers :type property-list
                :initarg :headers
                :initform nil)
-      (body :type (or list pathname)
+      (body :type (or list pathname function)
             :initarg :body
             :initform nil
             :reader body)
@@ -94,8 +94,7 @@ Example: (push-header res :content-type \"text/html\")"
   (setf (slot-value res 'body)
         (etypecase value
           (string (ensure-list value))
-          (list value)
-          (pathname value))))
+          ((or list pathname function) value))))
 
 @export
 (defmethod set-cookies ((res <response>) &optional name)

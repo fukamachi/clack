@@ -10,7 +10,7 @@
 
 (defvar res nil)
 
-(plan 15)
+(plan 16)
 
 (setq res (make-response 200))
 
@@ -20,6 +20,8 @@
 (is (headers res :content-type) "text/html" "content-type 2")
 
 (is (body res) nil "body")
+(setf (body res) (lambda ()))
+(is-type (body res) 'function)
 (setf (body res) "aiueo")
 (is (body res) '("aiueo") "body 2")
 
