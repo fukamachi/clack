@@ -47,7 +47,7 @@ you would call like this: `(run-server-tests :foo)'."
         (plan nil)
         (run-test name))
       (progn
-        (plan 71)
+        (plan 74)
         (run-test-all))))
 
 (defun get-header (headers key)
@@ -224,18 +224,39 @@ you would call like this: `(run-server-tests :foo)'."
                            :query-string
                            :server-name
                            :server-port)
-                do (format str "~A:~A~%" h (getf env h)))))))
+                do (format str "~A:~S~%" h (getf env h)))))))
   (lambda ()
     (multiple-value-bind (body status headers)
         (http-request (localhost "foo/?ediweitz=weitzedi"))
       (is status 200)
       (is (get-header headers :content-type) "text/plain; charset=utf-8")
       (is body (format nil "~{~A~%~}"
-                       `("REQUEST-METHOD:GET"
-                         "PATH-INFO:/foo/"
-                         "QUERY-STRING:ediweitz=weitzedi"
-                         "SERVER-NAME:localhost"
+                       `("REQUEST-METHOD::GET"
+                         "PATH-INFO:\"/foo/\""
+                         "QUERY-STRING:\"ediweitz=weitzedi\""
+                         "SERVER-NAME:\"localhost\""
                          ,(format nil "SERVER-PORT:~D" *clack-test-access-port*)))))))
+
+(define-app-test |validate env (must be integer)|
+  (lambda (env)
+    `(200
+      (:content-type "text/plain; charset=utf-8")
+      (,(with-output-to-string (str)
+          (loop for h in '(:server-port
+                           :remote-port
+                           :content-length)
+                do (format str "~A:~A~%" h (typep (getf env h) 'integer)))))))
+  (lambda ()
+    (multiple-value-bind (body status headers)
+        (http-request (localhost)
+                      :method :post
+                      :parameters '(("name" . "eitarow")))
+      (is status 200)
+      (is (get-header headers :content-type) "text/plain; charset=utf-8")
+      (is body (format nil "~{~A~%~}"
+                       `("SERVER-PORT:T"
+                         "REMOTE-PORT:T"
+                         "CONTENT-LENGTH:T"))))))
 
 (define-app-test |% encoding in PATH-INFO|
   (lambda (env)
@@ -271,13 +292,13 @@ you would call like this: `(run-server-tests :foo)'."
   (lambda (env)
     `(200
       (:content-type "text/plain; charset=utf-8")
-      (,(getf env :server-protocol))))
+      (,(prin1-to-string (getf env :server-protocol)))))
   (lambda ()
     (multiple-value-bind (body status headers)
         (http-request (localhost "foo/?ediweitz=weitzedi"))
       (is status 200)
       (is (get-header headers :content-type) "text/plain; charset=utf-8")
-      (like body "^HTTP/1\\.[01]$"))))
+      (like body "^:HTTP/1\\.[01]$"))))
 
 (define-app-test |SCRIPT-NAME should not be nil|
   (lambda (env)
