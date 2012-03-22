@@ -29,6 +29,12 @@ Clack is available on [Quicklisp](http://www.quicklisp.org/beta/).
 - [Tutorial](http://clacklisp.org/tutorial/)
 - [API Reference](http://clacklisp.org/doc/)
 
+## Server
+
+* [Hunchentoot](http://weitz.de/hunchentoot/)
+* Apache2 ([mod_lisp2](http://www.fractalconcept.com/asp/69t3/sdataQvWkQvUi-GrHDM==/asdataQuvY9x3g$ecX))
+* [FastCGI](http://www.fastcgi.com/)
+
 ## Middleware
 
 Middleware is one of the Clack Component. It takes another Application and runs it.
@@ -38,14 +44,15 @@ Middleware is one of the Clack Component. It takes another Application and runs 
 * Clack.Middleware.Static - Serves static files.
 * Clack.Middleware.Logger - Logging in Clack Application or Middleware.
 * Clack.Middleware.Session - Session management.
-* Clack.Middleware.Auth.Basic - Basic Authentication Middleware.
 
 ### Contrib Middleware
 
-* Clack.Middleware.OAuth - Authorization by OAuth.
+* Clack.Middleware.Dbi - Middleware for CL-DBI connection management.
 * Clack.Middleware.Csrf - Provides easy way to protect from CSRF.
+* Clack.Middleware.Auth.Basic - Basic Authentication Middleware.
 * Clack.Middleware.Clsql - For CLSQL connection management.
 * Clack.Middleware.Rucksack - For wrapping Rucksack transaction.
+* Clack.Middleware.OAuth - Authorization by OAuth.
 
 ## Author
 
