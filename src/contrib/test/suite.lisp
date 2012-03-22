@@ -47,7 +47,7 @@ you would call like this: `(run-server-tests :foo)'."
         (plan nil)
         (run-test name))
       (progn
-        (plan 74)
+        (plan 76)
         (run-test-all))))
 
 (defun get-header (headers key)
@@ -171,6 +171,7 @@ you would call like this: `(run-server-tests :foo)'."
         (http-request (localhost "redhat.png"))
       (is status 200)
       (is (get-header headers :content-type) "image/png")
+      (ok (get-header headers :content-length))
       (is (length body) 12155))))
 
 (define-app-test |bigger file|
@@ -186,6 +187,7 @@ you would call like this: `(run-server-tests :foo)'."
         (http-request (localhost "jellyfish.jpg"))
       (is status 200)
       (is (get-header headers :content-type) "image/jpeg")
+      (ok (get-header headers :content-length))
       (is (length body) 139616))))
 
 (define-app-test |handle HTTP-Header|
