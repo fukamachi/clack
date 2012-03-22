@@ -17,14 +17,14 @@
                       :http-referer "http://github.com/fukamachi/clack"
                       :http-user-agent "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-US)"
                       :http-cookie "hoge=1;fuga=semi;colon"
-                      :query-string "ediweitz=weitzedi&q=C%2B%2B"
+                      :query-string "ediweitz=weitzedi&name=eitarow&q=C%2B%2B"
                       :raw-body
                       ,(flex:make-flexi-stream
                         (flex:make-in-memory-input-stream
                          #(110 97 109 101 61 230 183 177 231 148 186 232 139 177 229 164 170 233 131 142))
                         :external-format :utf-8))))
 
-(plan 18)
+(plan 19)
 
 (ok (env req) "env")
 
@@ -43,7 +43,7 @@
     "user-agent")
 
 (is (query-parameter req)
-    '(:|ediweitz| "weitzedi" :|q| "C++")
+    '(:|ediweitz| "weitzedi" :|name| "eitarow" :|q| "C++")
     "query-parameter")
 
 (is (query-parameter req "q")
@@ -72,6 +72,15 @@
   (is (body-parameter req2 "foo")
       "bar"
       "body-parameter (confirm sharing)"))
+
+(is (parameter req)
+    `(:|ediweitz| "weitzedi"
+      :|name| "eitarow"
+      :\q "C++"
+      :|name| ,(flex:octets-to-string
+                #(230 183 177 231 148 186 232 139 177 229 164 170 233 131 142)
+                :external-format :utf-8))
+    "parameter")
 
 (is-type (make-request '(:hoge "a")) '<request> "<request> allow other keys")
 
