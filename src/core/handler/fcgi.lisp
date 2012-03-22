@@ -109,6 +109,8 @@ before passing to Clack application."
                         (format nil "~A~:[~;~:*, ~A~]" v (gethash key env-hash)))
                finally (return (alexandria:hash-table-plist env-hash)))))
 
+    (setf (getf env :clack.streaming) t)
+
     (loop for key in '(:content-length
                        :server-port
                        :remote-port)
