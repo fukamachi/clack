@@ -24,7 +24,7 @@
 
 @export
 (defgeneric call (comp env)
-  (:documentation "Invoke component. Designed to override in subclasses."))
+  (:documentation "Invoke component. Designed to be overriden in subclasses."))
 
 @export
 (defmethod call ((app function) env)
@@ -58,7 +58,7 @@ Clack.Component - Base Class for Clack Component.
 @doc:DESCRIPTION "
 Clack.Component is the base class shared between Clack.Middleware and Clack Application.
 
-You must implement `clack.component:call' as a method which is called when HTTP request coming and returns a response.
+You must implement `clack.component:call' as a method which is called when an HTTP request comes in and returns a response.
 "
 
 @doc:AUTHOR "

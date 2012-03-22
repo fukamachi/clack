@@ -25,7 +25,7 @@
 
 @export
 (defmethod mount ((this <clack-app-urlmap>) location app)
-  "Regist an `app' to the `location'."
+  "Register an `app' to the `location'."
   (destructuring-bind (host location)
       (aif (nth-value 1
                       (scan-to-strings "^https?://(.*?)(/.*)" location))
@@ -57,7 +57,7 @@
 
 @export
 (defmacro builder-urlmap (&rest apps)
-  "Useful syntax sugar to build applications."
+  "Useful syntax sugar for building applications."
   (let ((urlmap (gensym "URLMAP")))
     `(let ((,urlmap (make-instance '<clack-app-urlmap>)))
        ,@(mapcar

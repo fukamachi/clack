@@ -23,7 +23,7 @@
 
 @export
 (defmethod stop ((this <handler>))
-  "Stop Clack server. Currently works only Hunchentoot."
+  "Stop the Clack server. Currently only works with Hunchentoot."
   (let ((handler-package (find-handler (server-name this))))
     (funcall (intern (string '#:stop) handler-package) (acceptor this))))
 

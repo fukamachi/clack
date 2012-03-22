@@ -28,7 +28,7 @@
               :initform (make-instance '<clack-logger-stream>)
               :accessor logger
               :documentation "Logger instance, inherits `<clack-logger-base>'.
-If unspecified, `<clack-logger-stream>' will be used by default, and output logs to `*standard-output*'.
+If unspecified, `<clack-logger-stream>' will be used by default, and will output logs to `*standard-output*'.
 If nil, won't output any logs.")
       (min-level :type (or keyword null)
                  :initarg :min-level
@@ -84,9 +84,9 @@ Clack.Middleware.Logger - Clack Middleware for logging.
 "
 
 @doc:DESCRIPTION "
-Clack.Middleware.Logger allows you logging message without stopping process. You can customize minimum level to log, format of messages, and where to output them.
+Clack.Middleware.Logger allows you to logg messages without stopping the Lisp process. You can customize the minimum level, format, and output destination of log messages.
 
-Currently, Clack.Middleware.Logger can have only one logger. Sorry to the uncovinient.
+Currently, Clack.Middleware.Logger can have only one logger. Sorry for the inconvenience.
 "
 
 @doc:AUTHOR "

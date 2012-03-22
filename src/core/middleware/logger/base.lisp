@@ -17,7 +17,7 @@
 
 @export
 (defgeneric output (logger)
-  (:documentation "Output log messages by each loggers' way. All logger must implement this method."))
+  (:documentation "Output log messages. All loggers must implement this method."))
 
 (doc:start)
 
@@ -26,7 +26,7 @@ Clack.Logger.Base - Base class for Clack loggers.
 "
 
 @doc:DESCRIPTION "
-Clack.Logger.Base is base class for Clack loggers to pass to Clack.Middleware.Logger. All you have to do is to inherit `<clack-logger-base>' and then implement a method `output'.
+Clack.Logger.Base is base class for Clack loggers to pass to Clack.Middleware.Logger. All you have to do is to inherit `<clack-logger-base>' and then implement the method `output'.
 "
 
 @doc:AUTHOR "

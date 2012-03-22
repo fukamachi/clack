@@ -25,7 +25,7 @@ To get all log messages as one string: (get-output-stream-string *logger-output*
 (defvar *logger-time-format*
     '((:DAY 2) #\/ :SHORT-MONTH #\/ (:YEAR 4) #\:
       (:HOUR 2) #\: (:MIN 2) #\: (:SEC 2) #\Space :GMT-OFFSET-OR-Z)
-  "Format list of timestamp in log messages. This is same as LOCAL-TIME.
+  "Format list of timestamp in log messages. This is the same as LOCAL-TIME.
 Default:
   11/Feb/2011:03:37:39 +09:00")
 
@@ -68,7 +68,7 @@ Example:
     (keyword (keyword->loglevel level))))
 
 (defun keyword->loglevel (key)
-  "Convert keyword represents log level into a number.
+  "Convert a keyword that represents a log level into a number.
 Example:
   (keyword->loglevel :notice \"Hello, Clack!\")
   ;;=> 2"
