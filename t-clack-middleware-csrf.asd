@@ -13,11 +13,11 @@
 |#
 
 (in-package :cl-user)
-(defpackage clack-middleware-csrf-test-asd
+(defpackage t-clack-middleware-csrf-asd
   (:use :cl :asdf))
-(in-package :clack-middleware-csrf-test-asd)
+(in-package :t-clack-middleware-csrf-asd)
 
-(defsystem clack-middleware-csrf-test
+(defsystem t-clack-middleware-csrf
   :depends-on (:clack
                :clack-middleware-csrf
                :cl-test-more
