@@ -1,9 +1,12 @@
 #|
-  This file is a part of hatenastamp project.
-  Copyright (c) 2012 nitro_idiot (nitro_idiot@hatena.ne.jp)
+  This file is a part of Clack package.
+  URL: http://github.com/fukamachi/clack
+  Copyright (c) 2011 Eitarow Fukamachi <e.arrows@gmail.com>
+
+  Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace caveman.middleware.dbi
+(clack.util:namespace clack.middleware.dbi
   (:use :cl
         :clack)
   (:import-from :dbi
@@ -16,13 +19,13 @@
 (defvar *db* nil)
 
 @export
-(defclass <caveman-middleware-dbi> (<middleware>)
+(defclass <clack-middleware-dbi> (<middleware>)
      ((driver-name :initarg :driver-name
                    :accessor driver-name)
       (args :initarg :args
             :accessor args)))
 
-(defmethod call ((this <caveman-middleware-dbi>) env)
+(defmethod call ((this <clack-middleware-dbi>) env)
   (let ((*db* (apply #'dbi:connect (driver-name this)
                      (loop for (k v) on (args this) by #'cddr
                            when v

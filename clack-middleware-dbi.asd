@@ -24,6 +24,6 @@
   :depends-on (:clack
                :cl-syntax
                :cl-syntax-annot
-               :cl-dbi)
+               :dbi)
   :components ((:file "src/contrib/middleware/dbi"))
   :description "Middleware for CL-DBI connection management.")
