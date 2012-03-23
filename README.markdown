@@ -27,7 +27,7 @@ Clack is available on [Quicklisp](http://www.quicklisp.org/beta/).
 ## Documentation
 
 - [Tutorial](http://clacklisp.org/tutorial/)
-- [API Reference](http://clacklisp.org/doc/)
+- [API Reference](http://clacklisp.org/doc/#api)
 
 ## Server
 
