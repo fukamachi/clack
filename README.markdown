@@ -14,9 +14,9 @@ Clack is a web application environment for Common Lisp inspired by Python's WSGI
           #'(lambda (env)
               '(200 (:content-type "text/plain") ("Hello, Clack!")))))
 
-Now access [http://localhost:5000/](http://localhost:5000/) and Clack may show you "Hello, Clack!".
+Now access [http://localhost:5000/](http://localhost:5000/) and Clack should show you "Hello, Clack!".
 
-To stop the server, call `(clack:stop *handler*)`.
+To stop the server, execute `(clack:stop *handler*)`.
 
 ## Installation
 
@@ -41,18 +41,18 @@ Middleware is one of the Clack Component. It takes another Application and runs 
 
 ### Bundle Middleware
 
-* Clack.Middleware.Static - Serves static files.
-* Clack.Middleware.Logger - Logging in Clack Application or Middleware.
-* Clack.Middleware.Session - Session management.
+* [Clack.Middleware.Static](http://clacklisp.org/doc/clack.middleware.static.html) - Serves static files.
+* [Clack.Middleware.Logger](http://clacklisp.org/doc/clack.middleware.logger.html) - Logging in Clack Application or Middleware.
+* [Clack.Middleware.Session](http://clacklisp.org/doc/clack.middleware.session.html) - Session management.
 
 ### Contrib Middleware
 
-* Clack.Middleware.Dbi - Middleware for CL-DBI connection management.
-* Clack.Middleware.Csrf - Provides easy way to protect from CSRF.
-* Clack.Middleware.Auth.Basic - Basic Authentication Middleware.
-* Clack.Middleware.Clsql - For CLSQL connection management.
-* Clack.Middleware.Rucksack - For wrapping Rucksack transaction.
-* Clack.Middleware.OAuth - Authorization by OAuth.
+* [Clack.Middleware.Dbi](http://clacklisp.org/doc/clack.middleware.dbi.html) - Middleware for CL-DBI connection management.
+* [Clack.Middleware.Csrf](http://clacklisp.org/doc/clack.middleware.csrf.html) - Provides easy way to protect from CSRF.
+* [Clack.Middleware.Auth.Basic](http://clacklisp.org/doc/clack.middleware.auth.basic.html) - Basic Authentication Middleware.
+* [Clack.Middleware.Clsql](http://clacklisp.org/doc/clack.middleware.clsql.html) - For CLSQL connection management.
+* [Clack.Middleware.Rucksack](http://clacklisp.org/doc/clack.middleware.rucksack.html) - For wrapping Rucksack transaction.
+* [Clack.Middleware.OAuth](http://clacklisp.org/doc/clack.middleware.oauth.html) - Authorization by OAuth.
 
 ## Author
 
