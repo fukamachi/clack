@@ -7,9 +7,7 @@
 |#
 
 (clack.util:namespace clack.logger.file
-  (:use :cl
-        :anaphora)
-  (:import-from :clack.logger :*logger-output*)
+  (:use :cl)
   (:import-from :clack.logger.base
                 :<clack-logger-base>
                 :output))
@@ -24,14 +22,13 @@
                    :accessor output-file
                    :documentation "Where to output log messages.")))
 
-(defmethod output ((this <clack-logger-file>))
+(defmethod output ((this <clack-logger-file>) message)
   "Output log messages to 'output-file' in this slot."
   (with-open-file (stream (output-file this)
                           :direction :output
                           :if-exists :append
                           :if-does-not-exist :create)
-    (awhen (get-output-stream-string *logger-output*)
-      (write-string it stream))))
+    (write-string message stream)))
 
 (doc:start)
 

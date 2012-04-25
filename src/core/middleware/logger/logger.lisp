@@ -12,7 +12,7 @@
         :clack.middleware
         :anaphora)
   (:import-from :clack.logger
-                :*logger-output*
+                :*logger-output-hook*
                 :*logger-format-string*
                 :*logger-time-format*
                 :*logger-min-level*)
@@ -23,7 +23,7 @@
 
 @export
 (defclass <clack-middleware-logger> (<middleware>)
-     ((logger :type (or <clack-logger-base> null)
+     ((logger :type (or function <clack-logger-base>)
               :initarg :logger
               :initform (make-instance '<clack-logger-stream>)
               :accessor logger
@@ -57,8 +57,15 @@ If nil, won't output any logs.")
 
 (defmethod call ((this <clack-middleware-logger>) env)
   "Output log messages."
-  (prog1 (call-next this env)
-         (awhen (logger this) (output it))))
+  (let* ((hook *logger-output-hook*)
+         (logger-fn (if (functionp (logger this))
+                        (logger this)
+                        #'(lambda (message) (output (logger this) message))))
+         (*logger-output-hook*
+          #'(lambda (message)
+              (funcall hook message)
+              (funcall logger-fn message))))
+    (call-next this env)))
 
 (doc:start)
 

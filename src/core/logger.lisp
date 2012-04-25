@@ -18,8 +18,12 @@
 
 @export
 (defvar *logger-output* (make-string-output-stream)
-  "Output stream for logger.
-To get all log messages as one string: (get-output-stream-string *logger-output*)")
+  "DEPRECATED: use *logger-output-hook* for instead.
+Output broadcast stream for loggers.")
+
+@export
+(defvar *logger-output-hook* #'(lambda (message) message)
+  "Callback function which will be invoked when logging.")
 
 @export
 (defvar *logger-time-format*
@@ -55,11 +59,14 @@ Example:
 (defun log-message (level format-control &rest format-args)
   @type string format-control
   (when (>= (normalize-loglevel level) *logger-min-level*)
-    (format *logger-output*
-            *logger-format-string*
-            (format-timestring nil (now) :format *logger-time-format*)
-            level
-            (apply #'format nil format-control format-args))))
+    (let ((message
+           (format nil
+                   *logger-format-string*
+                   (format-timestring nil (now) :format *logger-time-format*)
+                   level
+                   (apply #'format nil format-control format-args))))
+      (write-string message *logger-output*)
+      (funcall *logger-output-hook* message))))
 
 (defun normalize-loglevel (level)
   "Log level is an integer or a keyword."

@@ -16,7 +16,7 @@
   (:documentation "Base class for Clack loggers."))
 
 @export
-(defgeneric output (logger)
+(defgeneric output (logger message)
   (:documentation "Output log messages. All loggers must implement this method."))
 
 (doc:start)

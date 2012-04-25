@@ -7,9 +7,7 @@
 |#
 
 (clack.util:namespace clack.logger.stream
-  (:use :cl
-        :anaphora)
-  (:import-from :clack.logger :*logger-output*)
+  (:use :cl)
   (:import-from :clack.logger.base
                 :<clack-logger-base>
                 :output))
@@ -23,10 +21,9 @@
                      :initform *standard-output*
                      :accessor output-stream)))
 
-(defmethod output ((this <clack-logger-stream>))
+(defmethod output ((this <clack-logger-stream>) message)
   "Output log messages to 'output-stream' in this slot."
-  (awhen (get-output-stream-string *logger-output*)
-    (write-string it (output-stream this))))
+  (write-string message (output-stream this)))
 
 (doc:start)
 
