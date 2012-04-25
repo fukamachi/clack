@@ -150,6 +150,16 @@ Example:
                  return pathname)))
       tmp-file-name)))
 
+@export
+(defun apply-middleware (app mw-class-name mw-package &rest args)
+  "Apply a middleware to the `app'. This function is for resolving symbol packages in run-time."
+  (funcall (intern (symbol-name :wrap)
+                   (find-package :clack.middleware))
+           (apply #'make-instance
+                  (intern (symbol-name mw-class-name) mw-package)
+                  args)
+           app))
+
 (doc:start)
 
 @doc:NAME "

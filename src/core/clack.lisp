@@ -22,7 +22,8 @@
                 :stop)
   (:import-from :clack.util
                 :find-handler
-                :load-handler)
+                :load-handler
+                :apply-middleware)
   (:export :stop
            :<component>
            :<middleware>
@@ -32,6 +33,10 @@
            :wrap))
 
 (cl-syntax:use-syntax :annot)
+
+@export
+(defvar *clack-output* *standard-output*
+  "Standard output for a Clack running process. This variable will be used in `<clack-middleware-stdout>'.")
 
 @doc "
 Easy way to run Clack Application.
@@ -52,7 +57,10 @@ Example:
          :server-name server
          :acceptor
          (funcall (intern (string '#:run) handler-package)
-                  app
+                  (apply-middleware app
+                                    :<clack-middleware-stdout>
+                                    :clack.middleware.stdout
+                                    :standard-output '*clack-output*)
                   :port port
                   :debug debug)))
     (format t "~&~:(~A~) server is started.~

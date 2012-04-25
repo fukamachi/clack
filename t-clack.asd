@@ -39,7 +39,8 @@
        (:file "middleware/static")
        (:file "middleware/conditional")
        (:file "middleware/session")
-       (:file "middleware/logger")))
+       (:file "middleware/logger")
+       (:file "middleware/stdout")))
      (:module "util"
       :components
       ((:file "route"))))))

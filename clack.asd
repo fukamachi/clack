@@ -47,8 +47,7 @@
                   ((:file "clack"
                     :depends-on ("component"
                                  "middleware"
-                                 "handler"
-                                 "middleware/logger"))
+                                 "handler"))
                    (:file "builder"
                     :depends-on ("component" "middleware" "mw"))
                    (:file "request")
@@ -83,7 +82,8 @@
                       ((:file "state")
                        (:file "state/cookie")
                        (:file "store")
-                       (:file "session")))))))
+                       (:file "session")))
+                     (:file "stdout")))))
                  (:module "util"
                   :serial t
                   :components
