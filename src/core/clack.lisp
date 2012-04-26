@@ -11,6 +11,7 @@
         :cl-annot.doc)
   (:import-from :clack.component
                 :<component>
+                :component-designator
                 :call
                 :make-app)
   (:import-from :clack.middleware
@@ -24,6 +25,8 @@
                 :find-handler
                 :load-handler
                 :apply-middleware)
+  (:import-from :clack.util.stream
+                :slurp-stream-to-string)
   (:export :stop
            :<component>
            :<middleware>
@@ -48,23 +51,37 @@ Example:
              '(200 nil (\"ok\")))
            :port 5000
            :debug t)
+
+  (clackup #p\"app.lisp\"
+           :server :fcgi
+           :port 8080
+           :debug nil)
 "
 @export
-(defun clackup (app &key (server :hunchentoot) (port 5000) (debug t))
-  (prog1
-    (let ((handler-package (find-handler server)))
-      (make-instance '<handler>
-         :server-name server
-         :acceptor
-         (funcall (intern (string '#:run) handler-package)
-                  (apply-middleware app
-                                    :<clack-middleware-stdout>
-                                    :clack.middleware.stdout
-                                    :standard-output '*clack-output*)
-                  :port port
-                  :debug debug)))
-    (format t "~&~:(~A~) server is started.~
-             ~%Listening on localhost:~A.~%" server port)))
+(defun clackup (app &rest args &key (server :hunchentoot) (port 5000) (debug t))
+  (etypecase app
+    (pathname
+     (apply #'clackup
+            (eval (read-from-string
+                   (format nil "(progn ~A)"
+                           (with-open-file (in app :element-type '(unsigned-byte 8))
+                             (clack.util.stream:slurp-stream-to-string in)))))
+            args))
+    (component-designator
+     (prog1
+       (let ((handler-package (find-handler server)))
+         (make-instance '<handler>
+            :server-name server
+            :acceptor
+            (funcall (intern (string '#:run) handler-package)
+                     (apply-middleware app
+                                       :<clack-middleware-stdout>
+                                       :clack.middleware.stdout
+                                       :standard-output '*clack-output*)
+                     :port port
+                     :debug debug)))
+       (format t "~&~:(~A~) server is started.~
+             ~%Listening on localhost:~A.~%" server port)))))
 
 (doc:start)
 
@@ -78,6 +95,11 @@ Clack main package just for convenience.
                '(200 nil (\"Hello, Clack!\")))
              :port 5000
              :debug t)
+    
+    (clackup #p\"app.lisp\"
+             :server :fcgi
+             :port 8080
+             :debug nil)
 "
 
 @doc:DESCRIPTION "
