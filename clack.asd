@@ -38,7 +38,8 @@
                :flexi-streams
                :local-time
                :circular-streams
-               :multival-plist)
+               :multival-plist
+               :bordeaux-threads)
   :components ((:module "src"
                 :components
                 ((:module "core"

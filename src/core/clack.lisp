@@ -27,6 +27,11 @@
                 :apply-middleware)
   (:import-from :clack.util.stream
                 :slurp-stream-to-string)
+  (:import-from :trivial-types
+                :pathname-designator)
+  (:import-from :bordeaux-threads
+                :make-thread
+                :thread-alive-p)
   (:export :stop
            :<component>
            :<middleware>
@@ -60,12 +65,9 @@ Example:
 @export
 (defun clackup (app &rest args &key (server :hunchentoot) (port 5000) (debug t))
   (etypecase app
-    (pathname
+    (pathname-designator
      (apply #'clackup
-            (eval (read-from-string
-                   (format nil "(progn ~A)"
-                           (with-open-file (in app :element-type '(unsigned-byte 8))
-                             (clack.util.stream:slurp-stream-to-string in)))))
+            (eval-file app)
             args))
     (component-designator
      (prog1
@@ -82,6 +84,20 @@ Example:
                      :debug debug)))
        (format t "~&~:(~A~) server is started.~
              ~%Listening on localhost:~A.~%" server port)))))
+
+(defun eval-file (file)
+  "Safer way to read and eval a file content. This function returns the last value."
+  (check-type file pathname-designator)
+  (loop with retval = nil
+        with content = (with-open-file (in file :element-type '(unsigned-byte 8))
+                         (clack.util.stream:slurp-stream-to-string in))
+        with thread = (bt:make-thread
+                       (lambda ()
+                         (setf retval (eval (with-standard-io-syntax
+                                              (read-from-string
+                                               (format nil "(progn ~A)" content)))))))
+        while (bt:thread-alive-p thread)
+        finally (return retval)))
 
 (doc:start)
 
