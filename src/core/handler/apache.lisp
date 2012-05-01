@@ -55,7 +55,8 @@ This function is called on each request."
                         :from-end t)
       (append
        (list
-        :request-method (ml:header-value command :method)
+        :request-method (make-keyword
+                         (ml:header-value command :method))
         :script-name ""
         :path-info (awhen (subseq url 0 pos)
                      (url-decode it))
@@ -70,12 +71,15 @@ This function is called on each request."
         :content-type (ml:header-value command :content-type)
         :server-name server-name
         :server-port (parse-integer server-port :junk-allowed t)
-        :server-protocol (ml:header-value command :server-protocol)
+        :server-protocol (make-keyword
+                          (ml:header-value command :server-protocol))
         :request-uri url
         ;; FIXME: always return :http
         :url-scheme :http
         :remote-addr (ml:header-value command :remote-ip-addr)
-        :remote-port (ml:header-value command :remote-ip-port)
+        :remote-port (parse-integer
+                      (ml:header-value command :remote-ip-port)
+                      :junk-allowed t)
         :http-server :modlisp)
 
        ;; NOTE: this code almost same thing of Clack.Handler.Hunchentoot's
