@@ -26,6 +26,13 @@
 @export
 (defclass <clack-app-directory> (<clack-app-file>) ())
 
+@export
+(defun start-server (&key (root (truename ".")) (port 5000))
+  (clack:clackup
+   (make-instance '<clack-app-directory>
+      :root root)
+   :port port))
+
 (defmethod should-handle ((this <clack-app-directory>) file)
   (file-exists-p file))
 
@@ -112,6 +119,11 @@ Clack.App.Directory - Server static files from document root with directory inde
      (make-instance '<clack-app-directory>
         :root #p\"/var/www/\")
      :port 5000)
+    
+    ;; save as above
+    (clack.app.directory:start-server
+       :root #p\"/var/www/\"
+       :port 5000)
 "
 
 @doc:AUTHOR "
