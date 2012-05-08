@@ -86,7 +86,7 @@
 @export
 (defmethod serve-path ((this <clack-app-file>) env file encoding)
   (let ((content-type (or (clack.util.hunchentoot:mime-type file)
-                          "application/octet-stream"))
+                          "text/plain"))
         (univ-time (or (file-write-date file)
                        (get-universal-time))))
     (when (text-file-p content-type)
