@@ -17,6 +17,14 @@
   (:use :cl :asdf))
 (in-package :t-clack-asd)
 
+(defclass asdf::test-file (asdf:cl-source-file) ())
+(defmethod asdf:perform ((op asdf:load-op) (c asdf::test-file))
+  ;; do nothing
+  )
+(defmethod asdf:perform ((op asdf:test-op) (c asdf::test-file))
+  (asdf:perform (make-instance 'asdf:load-op)
+   (change-class c 'asdf:cl-source-file)))
+
 (defsystem t-clack
   :depends-on (:clack
                :clack-test
@@ -28,20 +36,20 @@
     :components
     ((:module "core"
       :components
-      ((:file "component")
-       (:file "middleware")
-       (:file "builder")
-       (:file "response")
-       (:file "request")
-       (:file "handler/hunchentoot")
-       (:file "app/file")
-       (:file "app/urlmap")
-       (:file "middleware/static")
-       (:file "middleware/conditional")
-       (:file "middleware/session")
-       (:file "middleware/logger")
-       (:file "middleware/stdout")))
+      ((:test-file "component")
+       (:test-file "middleware")
+       (:test-file "builder")
+       (:test-file "response")
+       (:test-file "request")
+       (:test-file "handler/hunchentoot")
+       (:test-file "app/file")
+       (:test-file "app/urlmap")
+       (:test-file "middleware/static")
+       (:test-file "middleware/conditional")
+       (:test-file "middleware/session")
+       (:test-file "middleware/logger")
+       (:test-file "middleware/stdout")))
      (:module "util"
       :components
-      ((:file "route"))))))
-  :perform (load-op :after (op c) (asdf:clear-system c)))
+      ((:test-file "route")))))))
+
