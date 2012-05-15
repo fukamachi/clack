@@ -26,6 +26,8 @@
 
 (cl-syntax:use-syntax :annot)
 
+(plan 29)
+
 @export
 (defvar *clack-test-access-port* *clack-test-port*
   "Port of localhost to request.
@@ -40,15 +42,11 @@ Use if you want to set another port. The default is `*clack-test-port*`.")
 Handler name is a keyword and doesn't include the clack.handler prefix.
 For example, if you have a handler `clack.handler.foo',
 you would call like this: `(run-server-tests :foo)'."
-  (setq *drakma-default-external-format* :utf-8)
-  (setf *clack-test-handler* handler-name)
-  (if name
-      (progn
-        (plan nil)
-        (run-test name))
-      (progn
-        (plan 76)
-        (run-test-all))))
+  (let ((*drakma-default-external-format* :utf-8)
+        (*clack-test-handler* handler-name))
+    (if name
+        (run-test name)
+        (run-test-package :clack.test.suite))))
 
 (defun get-header (headers key)
   (let ((val (assoc key headers)))
