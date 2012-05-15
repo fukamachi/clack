@@ -29,7 +29,6 @@
                :split-sequence
                :cl-syntax
                :cl-syntax-annot
-               :closer-mop
                ;; for Other purpose
                :cl-ppcre
                :cl-fad

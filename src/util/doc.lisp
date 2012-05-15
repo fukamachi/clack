@@ -10,10 +10,7 @@
 (defpackage clack.util.doc
   (:nicknames :doc)
   (:use :cl
-        :split-sequence)
-  (:import-from :closer-mop
-                :generic-function-methods
-                :generic-function-lambda-list))
+        :split-sequence))
 (in-package :clack.util.doc)
 
 (cl-syntax:use-syntax :annot)
