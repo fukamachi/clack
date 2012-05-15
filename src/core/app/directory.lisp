@@ -120,7 +120,7 @@ Clack.App.Directory - Server static files from document root with directory inde
         :root #p\"/var/www/\")
      :port 5000)
     
-    ;; save as above
+    ;; same as above
     (clack.app.directory:start-server
        :root #p\"/var/www/\"
        :port 5000)
