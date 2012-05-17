@@ -25,7 +25,6 @@
                :trivial-types
                :alexandria
                :anaphora
-               :arnesi
                :split-sequence
                :cl-syntax
                :cl-syntax-annot
