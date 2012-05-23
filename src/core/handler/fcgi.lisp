@@ -9,14 +9,13 @@
 (clack.util:namespace clack.handler.fcgi
   (:use :cl
         :cl-fastcgi
-        :anaphora
-        :split-sequence)
+        :anaphora)
   (:import-from :clack.component
                 :call)
   (:import-from :clack.util.hunchentoot
                 :url-decode)
   (:import-from :alexandria
-                :alist-plist)
+                :make-keyword)
   (:import-from :bordeaux-threads
                 :make-thread)
   (:import-from :flexi-streams
@@ -64,10 +63,10 @@
     (fcgx-puts req (format nil "Status: ~D ~A~%" status (gethash status *http-status*)))
     (loop for (k v) on headers by #'cddr
           with hash = (make-hash-table :test #'eq)
-          if (gethash k hash)
-            do (setf (gethash k hash)
-                     (format nil "~:[~;~:*~A, ~]~A" (gethash k hash) v))
-          else do (setf (gethash k hash) v)
+          do (setf (gethash k hash)
+                   (aif (gethash k hash)
+                        (concatenate 'string it ", " v)
+                        v))
           finally
        (loop for k being the hash-keys in hash
              using (hash-value v)
@@ -102,11 +101,16 @@
   "Convert Request from server into a plist
 before passing to Clack application."
   (let ((env
-         (loop with env-hash = (make-hash-table)
+         (loop with env-hash = (make-hash-table :test #'eq)
                for (k . v) in (fcgx-getenv req)
-               for key = (intern (ppcre:regex-replace-all "_" (string k) "-") :keyword)
+               for key = (make-keyword
+                          (with-output-to-string (out)
+                            (loop for char across (string k)
+                                  do (princ (if (char= #\_ char) #\- char) out))))
                do (setf (gethash key env-hash)
-                        (format nil "~A~:[~;~:*, ~A~]" v (gethash key env-hash)))
+                        (aif (gethash key env-hash)
+                             (concatenate 'string it ", " v)
+                             v))
                finally (return (alexandria:hash-table-plist env-hash)))))
 
     (setf (getf env :clack.streaming) t)
@@ -121,7 +125,7 @@ before passing to Clack application."
     (loop for key in '(:server-protocol
                        :request-method)
           do (setf (getf env key)
-                   (intern (getf env key) :keyword)))
+                   (make-keyword (getf env key))))
 
     (when (string= (getf env :script-name) "/")
       (setf (getf env :script-name) ""))
@@ -143,12 +147,16 @@ before passing to Clack application."
 
     (setf (getf env :path-info)
           (clack.util.hunchentoot:url-decode
-           (car (split-sequence #\? (getf env :request-uri)))))
+           (let ((request-uri (getf env :request-uri)))
+             (subseq request-uri
+                     0
+                     (position #\? (getf env :request-uri)
+                               :test #'char=)))))
 
     env))
 
 ;; TODO: these code should be a part of Clack core package.
-(defvar *http-status* (make-hash-table))
+(defvar *http-status* (make-hash-table :test #'eql))
 (setf (gethash 100 *http-status*) "Continue")
 (setf (gethash 101 *http-status*) "Switching Protocols")
 (setf (gethash 200 *http-status*) "OK")
