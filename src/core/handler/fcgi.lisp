@@ -45,7 +45,7 @@
                           (res (if debug (call app env)
                                    (aif (handler-case (call app env)
                                           (condition (error)
-                                            @ignore error
+                                            (princ error *error-output*)
                                             nil))
                                         it
                                         '(500 nil nil)))))
