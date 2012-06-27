@@ -66,10 +66,13 @@ the environment with the key :clack.postmodern.databases."))
 			   :pooled-p pooled-p
 			   :use-ssl use-ssl)
       (let* ((old-dbs (getf env :databases))
-	     (new-dbs (acons database *database* old-dbs))
-	     (new-env (copy-list env)))
-	(setf (getf new-env :clack.postmodern.databases) new-dbs)
-	(call-next this new-env)))))
+	     (new-dbs (acons database *database* old-dbs)))
+	;; store the databases in env
+	(setf (getf env :clack.postmodern.databases) new-dbs)
+	(let ((res (call-next this env)))
+	  ;; reset env to the former state
+	  (setf (getf env :clack.postmodern.databases) old-dbs)
+	  res)))))
 
 @export 
 (defun get-connection (db-name env)
