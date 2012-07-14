@@ -37,7 +37,8 @@
                :local-time
                :circular-streams
                :multival-plist
-               :bordeaux-threads)
+               :bordeaux-threads
+               :yason)
   :components ((:module "src"
                 :components
                 ((:module "core"
