@@ -91,7 +91,7 @@
                        (get-universal-time))))
     (when (text-file-p content-type)
       (setf content-type
-            (format nil "~A ;charset=~A"
+            (format nil "~A;charset=~A"
                     content-type encoding)))
     (with-open-file (stream file
                      :direction :input
