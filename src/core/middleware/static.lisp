@@ -103,7 +103,7 @@ You can set any function that returns a mapped filename as <code>:path</code>. T
       (builder
        (<clack-middleware-static>
         :path (lambda (path)
-                (when (ppcre:scan path \"^/public/\")
+                (when (ppcre:scan \"^/public/\" path)
                   (subseq path 7)))
         :root #p\"/static-files/\")
        app))
