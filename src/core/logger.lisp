@@ -77,7 +77,7 @@ Example:
 (defun keyword->loglevel (key)
   "Convert a keyword that represents a log level into a number.
 Example:
-  (keyword->loglevel :notice \"Hello, Clack!\")
+  (keyword->loglevel :notice)
   ;;=> 2"
   (ccase key
     (:debug +debug+)
