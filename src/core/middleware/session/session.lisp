@@ -34,7 +34,7 @@
 
 (defmethod call ((this <clack-middleware-session>) env)
   (multiple-value-bind (id session) (extract this env)
-    (setf (getf env :clack.session) session)
+    (setf (getf env :clack.session) (or session (make-hash-table :test 'equal)))
     (let ((options (make-hash-table :test #'equal)))
       (setf (gethash :id options) id)
       (setf (getf env :clack.session.options) options))
@@ -48,7 +48,7 @@
          (session (when id
                     (fetch (store this) id))))
     (values (or id (generate-id (state this) env))
-            (or session (make-hash-table :test #'equal)))))
+            session)))
 
 (defmethod finalize ((this <clack-middleware-session>) env res)
   (let ((options (getf env :clack.session.options)))

@@ -14,11 +14,13 @@
   (:import-from :alexandria
                 :make-keyword)
   (:import-from :ironclad
+                :ascii-string-to-byte-array
                 :byte-array-to-hex-string
                 :digest-sequence
-                :make-digest)
-  (:import-from :flexi-streams
-                :string-to-octets))
+                :make-digest
+                :make-hmac
+                :update-hmac
+                :hmac-digest))
 (in-package :clack.util)
 
 (cl-syntax:use-syntax :annot)
@@ -103,12 +105,18 @@ Example:
     #-quicklisp (asdf:load-system system :verbose nil)))
 
 @export
+(defun hmac-sha1-hex-string (string secret)
+  (let ((hmac (make-hmac (ascii-string-to-byte-array secret) :sha1)))
+    (update-hmac hmac (ascii-string-to-byte-array string))
+    (byte-array-to-hex-string (hmac-digest hmac))))
+
+@export
 (defun generate-random-id ()
   "Generate a random token."
   (byte-array-to-hex-string
    (digest-sequence
     (make-digest :SHA1)
-    (flex:string-to-octets
+    (ascii-string-to-byte-array
      (format nil "~A~A"
       (random 1.0) (get-universal-time))))))
 

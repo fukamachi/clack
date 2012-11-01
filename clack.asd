@@ -38,7 +38,9 @@
                :circular-streams
                :multival-plist
                :bordeaux-threads
-               :yason)
+               :yason
+               :cl-base64
+               :marshal)
   :components ((:module "src"
                 :components
                 ((:module "core"
@@ -82,7 +84,8 @@
                       ((:file "state")
                        (:file "state/cookie")
                        (:file "store")
-                       (:file "session")))
+                       (:file "session")
+                       (:file "cookie")))
                      (:file "stdout")))))
                  (:module "util"
                   :serial t
