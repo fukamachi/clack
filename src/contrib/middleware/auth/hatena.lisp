@@ -12,7 +12,7 @@
                 :octets-to-string)
   (:import-from :drakma
                 :http-request)
-  (:import-from :json
+  (:import-from :yason
                 :decode-json))
 
 (cl-annot:enable-annot-syntax)
@@ -96,4 +96,4 @@
           (drakma:http-request (api-uri this `(:|api_key|
                                                ,(consumer-key this)
                                                :|cert| ,cert)))))
-    (json:decode-json s)))
+    (decode-json s)))

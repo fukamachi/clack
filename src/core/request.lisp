@@ -9,6 +9,8 @@
 (clack.util:namespace clack.request
   (:use :cl
         :anaphora)
+  (:import-from :yason
+                :parse)
   (:import-from :trivial-types
                 :property-list)
   (:import-from :alexandria
@@ -170,7 +172,7 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
                (parameters->plist (read-line (ensure-character-input-stream body) nil ""))))
         ((string= content-type "application/json")
          (setf (slot-value this 'body-parameters)
-               (list :json (json:parse (ensure-character-input-stream body)))))
+               (list :json (yason:parse (ensure-character-input-stream body)))))
         ((string= content-type "multipart/form-data")
          (let (;; parsed param (alist)
                (params (clack.util.hunchentoot:parse-rfc2388-form-data
