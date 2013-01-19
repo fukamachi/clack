@@ -67,7 +67,7 @@
           and collect "~A" into cs
         else if name
           collect (read-from-string (concatenate 'string ":" name)) into names
-          and collect "([^/?#]+)" into re
+          and collect "([^/?]+)" into re
           and collect "~A" into cs
         finally
      (setf (regex this) (format nil "^~{~A~}$" re)
