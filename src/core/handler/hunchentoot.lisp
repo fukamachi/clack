@@ -69,12 +69,14 @@ before passing to Hunchentoot."
        (loop for k being the hash-keys in hash
              using (hash-value v)
              do (setf (header-out k) v)))
-    (etypecase body
-      (pathname
-       (hunchentoot:handle-static-file body (getf headers :content-type)))
-      (list
-       (with-output-to-string (s)
-         (format s "~{~A~^~%~}" body))))))
+    (if (string-equal (getf headers :transfer-encoding) "chunked")
+        (funcall body (send-headers))
+        (etypecase body
+          (pathname
+           (hunchentoot:handle-static-file body (getf headers :content-type)))
+          (list
+           (with-output-to-string (s)
+             (format s "~{~A~^~%~}" body)))))))
 
 (defun cookie->plist (cookie)
   "Convert Hunchentoot's cookie class into just a plist."
