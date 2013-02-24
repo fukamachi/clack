@@ -38,8 +38,8 @@
                  (handle-response
                   (if debug (call app env)
                       (aif (handler-case (call app env)
-                             (condition (error)
-                               @ignore error
+                             (error (error)
+                               (princ error *error-output*)
                                nil))
                            it
                            '(500 nil nil))))))))

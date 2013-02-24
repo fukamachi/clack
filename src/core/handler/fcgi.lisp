@@ -44,7 +44,7 @@
                    (let* ((env (request->plist req))
                           (res (if debug (call app env)
                                    (aif (handler-case (call app env)
-                                          (condition (error)
+                                          (error (error)
                                             (princ error *error-output*)
                                             nil))
                                         it
