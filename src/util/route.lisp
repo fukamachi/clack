@@ -81,15 +81,15 @@
       ((string= enc char) (ppcre:quote-meta-chars enc))
       (t enc))))
 
-(defmethod match-method-p ((this <url-rule>) method &key allow-head-p)
+(defmethod match-method-p ((this <url-rule>) method &key allow-head)
   (or (string= :ANY (request-method this))
       (string= method (request-method this))
       (and (eq method :head)
-           allow-head-p
+           allow-head
            (string= :get (request-method this)))))
 
 @export
-(defmethod match ((this <url-rule>) method url-string &key allow-head-p)
+(defmethod match ((this <url-rule>) method url-string &key allow-head)
   "Check whether the `url-string` matches to `this`. This method is for `<url-rule>`.
 Return two values, matched URL and Rule parameters as a plist.
 If the url-rule is containing Wildcard rules, they will be collected as :splat.
@@ -104,7 +104,7 @@ Example:
         (:SPLAT (\"hello\" \"world\"))
 "
   @type string url-string
-  (when (match-method-p this method :allow-head-p allow-head-p)
+  (when (match-method-p this method :allow-head allow-head)
     (multiple-value-bind (matchp values)
         (scan-to-strings (regex this) url-string)
       (when matchp
@@ -121,7 +121,7 @@ Example:
                                result))))))))
 
 @export
-(defmethod match ((this <regex-url-rule>) method url-string &key allow-head-p)
+(defmethod match ((this <regex-url-rule>) method url-string &key allow-head)
   "Check whether the `url-string` matches to `this`. This method is for `<regex-url-rule>`.
 Return two values, matched URL and Rule parameters as a plist.
 Captured strings in `url-string` are collected as :captures.
@@ -132,7 +132,7 @@ Example:
     ;=> \"/hello/world\"
         (:CAPTURES (\"world\"))
 "
-  (when (match-method-p this method :allow-head-p allow-head-p)
+  (when (match-method-p this method :allow-head allow-head)
     (multiple-value-bind (matchp values)
         (scan-to-strings (regex this) url-string)
       (when matchp
