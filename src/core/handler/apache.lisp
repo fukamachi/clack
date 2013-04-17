@@ -129,7 +129,11 @@ This function is called on each request."
           (write-sequence (flex:string-to-octets
                            (format nil "~{~A~^~%~}" body)
                            :external-format :utf-8)
-           ml:*modlisp-socket*)))))))
+           ml:*modlisp-socket*)))
+        ((vector (unsigned-byte 8))
+         (ml::write-response (:headers headers)
+                             (write-sequence body
+                                             ml:*modlisp-socket*)))))))
 
 (doc:start)
 
