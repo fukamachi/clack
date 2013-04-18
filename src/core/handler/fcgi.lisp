@@ -95,7 +95,9 @@
        (fcgx-puts req
                   (flex:string-to-octets
                    (format nil "~{~A~^~%~}" body)
-                   :external-format :utf-8))))))
+                   :external-format :utf-8)))
+      ((vector (unsigned-byte 8))
+       (fcgx-puts req body)))))
 
 (defun request->plist (req)
   "Convert Request from server into a plist
