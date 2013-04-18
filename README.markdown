@@ -27,7 +27,7 @@ Clack is available on [Quicklisp](http://www.quicklisp.org/beta/).
 ## Documentation
 
 - [Tutorial](http://clacklisp.org/tutorial/)
-- [API Reference](http://clacklisp.org/doc/#api)
+- [Quickdocs Page](http://quickdocs.org/clack/)
 
 ## Server
 
@@ -41,18 +41,18 @@ Middleware is one of the Clack Component. It takes another Application and runs 
 
 ### Bundle Middleware
 
-* [Clack.Middleware.Static](http://clacklisp.org/doc/clack.middleware.static.html) - Serves static files.
-* [Clack.Middleware.Logger](http://clacklisp.org/doc/clack.middleware.logger.html) - Logging in Clack Application or Middleware.
-* [Clack.Middleware.Session](http://clacklisp.org/doc/clack.middleware.session.html) - Session management.
+* [Clack.Middleware.Static](http://quickdocs.org/clack/api#package-CLACK.MIDDLEWARE.STATIC) - Serves static files.
+* [Clack.Middleware.Logger](http://quickdocs.org/clack/api#package-CLACK.MIDDLEWARE.LOGGER) - Logging in Clack Application or Middleware.
+* [Clack.Middleware.Session](http://quickdocs.org/clack/api#package-CLACK.MIDDLEWARE.SESSION) - Session management.
 
 ### Contrib Middleware
 
-* [Clack.Middleware.Dbi](http://clacklisp.org/doc/clack.middleware.dbi.html) - Middleware for CL-DBI connection management.
-* [Clack.Middleware.Csrf](http://clacklisp.org/doc/clack.middleware.csrf.html) - Provides easy way to protect from CSRF.
-* [Clack.Middleware.Auth.Basic](http://clacklisp.org/doc/clack.middleware.auth.basic.html) - Basic Authentication Middleware.
-* [Clack.Middleware.Clsql](http://clacklisp.org/doc/clack.middleware.clsql.html) - For CLSQL connection management.
-* [Clack.Middleware.Rucksack](http://clacklisp.org/doc/clack.middleware.rucksack.html) - For wrapping Rucksack transaction.
-* [Clack.Middleware.OAuth](http://clacklisp.org/doc/clack.middleware.oauth.html) - Authorization by OAuth.
+* [Clack.Middleware.Dbi](http://quickdocs.org/clack/api#system-clack-middleware-dbi) - Middleware for CL-DBI connection management.
+* [Clack.Middleware.Csrf](http://quickdocs.org/clack/api#system-clack-middleware-csrf) - Provides easy way to protect from CSRF.
+* [Clack.Middleware.Auth.Basic](http://quickdocs.org/clack/api#system-clack-middleware-auth-basic) - Basic Authentication Middleware.
+* [Clack.Middleware.Clsql](http://quickdocs.org/clack/api#system-clack-middleware-clsql) - For CLSQL connection management.
+* [Clack.Middleware.Rucksack](http://quickdocs.org/clack/api#system-clack-middleware-rucksack) - For wrapping Rucksack transaction.
+* [Clack.Middleware.OAuth](http://quickdocs.org/clack/api#system-clack-middleware-oauth) - Authorization by OAuth.
 
 ## Author
 
