@@ -51,6 +51,7 @@ Middleware is one of the Clack Component. It takes another Application and runs 
 * [Clack.Middleware.Csrf](http://quickdocs.org/clack/api#system-clack-middleware-csrf) - Provides easy way to protect from CSRF.
 * [Clack.Middleware.Auth.Basic](http://quickdocs.org/clack/api#system-clack-middleware-auth-basic) - Basic Authentication Middleware.
 * [Clack.Middleware.Clsql](http://quickdocs.org/clack/api#system-clack-middleware-clsql) - For CLSQL connection management.
+* [Clack.Middleware.Postmodern](http://quickdocs.org/clack/api#system-clack-middleware-postmodern) - Middleware for POSTMODERN connection management.
 * [Clack.Middleware.Rucksack](http://quickdocs.org/clack/api#system-clack-middleware-rucksack) - For wrapping Rucksack transaction.
 * [Clack.Middleware.OAuth](http://quickdocs.org/clack/api#system-clack-middleware-oauth) - Authorization by OAuth.
 
@@ -64,8 +65,7 @@ Copyright (c) 2011 Eitarow Fukamachi
 
 ## Contributors
 
-* Tomohiro Matsuyama (tomo@cx4a.org)
-* Norihisa Fujita (n.fujita@ariel-networks.com)
+* https://github.com/fukamachi/clack/graphs/contributors
 
 ## License
 
