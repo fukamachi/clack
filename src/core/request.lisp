@@ -167,13 +167,13 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
                 :utf-8)
             :eol-style :lf)))
       (cond
-        ((string= content-type "application/x-www-form-urlencoded")
+        ((string-equal content-type "application/x-www-form-urlencoded")
          (setf (slot-value this 'body-parameters)
                (parameters->plist (read-line (ensure-character-input-stream body) nil ""))))
-        ((string= content-type "application/json")
+        ((string-equal content-type "application/json")
          (setf (slot-value this 'body-parameters)
                (list :json (yason:parse (ensure-character-input-stream body)))))
-        ((string= content-type "multipart/form-data")
+        ((string-equal content-type "multipart/form-data")
          (let (;; parsed param (alist)
                (params (clack.util.hunchentoot:parse-rfc2388-form-data
                         body
