@@ -6,7 +6,7 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack-middleware-json-preprocessor
+(clack.util:namespace clack.middleware.json
   (:use :cl
         :clack)
   (:import-from :clack.util.stream
@@ -19,10 +19,10 @@
 (cl-syntax:use-syntax :annot)
 
 @export
-(defclass <clack-middleware-json-preprocessor> (<middleware>)
+(defclass <clack-middleware-json> (<middleware>)
   ())
 
-(defmethod call ((this <clack-middleware-json-preprocessor>) env)
+(defmethod call ((this <clack-middleware-json>) env)
   (when (string-equal (getf env :content-type) "application/json")
     (setf (getf env :body-parameters)
           (list :json (yason:parse (ensure-character-input-stream

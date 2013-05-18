@@ -80,8 +80,8 @@ Example:
                                           :<clack-middleware-stdout>
                                           :clack.middleware.stdout
                                           :standard-output '*clack-output*)
-                                       :<clack-middleware-json-preprocessor>
-                                       :clack-middleware-json-preprocessor)
+                                       :<clack-middleware-json>
+                                       :clack.middleware.json)
                      :port port
                      :debug debug)))
        (format t "~&~:(~A~) server is started.~
