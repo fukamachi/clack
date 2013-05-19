@@ -76,10 +76,12 @@ Example:
             :server-name server
             :acceptor
             (funcall (intern (string '#:run) handler-package)
-                     (apply-middleware app
-                                       :<clack-middleware-stdout>
-                                       :clack.middleware.stdout
-                                       :standard-output '*clack-output*)
+                     (apply-middleware (apply-middleware app
+                                          :<clack-middleware-stdout>
+                                          :clack.middleware.stdout
+                                          :standard-output '*clack-output*)
+                                       :<clack-middleware-json>
+                                       :clack.middleware.json)
                      :port port
                      :debug debug)))
        (format t "~&~:(~A~) server is started.~
@@ -111,7 +113,7 @@ Clack main package just for convenience.
                '(200 nil (\"Hello, Clack!\")))
              :port 5000
              :debug t)
-    
+
     (clackup #p\"app.lisp\"
              :server :fcgi
              :port 8080
