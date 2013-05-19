@@ -9,8 +9,6 @@
 (clack.util:namespace clack.request
   (:use :cl
         :anaphora)
-  (:import-from :yason
-                :parse)
   (:import-from :trivial-types
                 :property-list)
   (:import-from :alexandria
