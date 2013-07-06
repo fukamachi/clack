@@ -15,9 +15,7 @@
   (:import-from :cl-annot.doc
                 :doc)
   (:import-from :cl-ppcre
-                :scan-to-strings
-                :split
-                :quote-meta-chars)
+                :split)
   (:import-from :alexandria
                 :with-gensyms)
   (:import-from :clack.util.route
