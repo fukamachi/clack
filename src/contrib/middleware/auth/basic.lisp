@@ -40,11 +40,16 @@
 
   (destructuring-bind (user &optional (pass ""))
       (parse-user-and-pass (getf env :http-authorization))
-    (if (and user
-             (funcall (authenticator this) user pass))
-        (progn
-          (setf (getf env :remote-user) user)
-          (call-next this env))
+    (if user
+        (multiple-value-bind (result returned-user)
+            (funcall (authenticator this) user pass)
+          (if result
+              (progn
+                (setf (getf env :remote-user)
+                      (or returned-user
+                          user))
+                (call-next this env))
+              (unauthorized this)))
         (unauthorized this))))
 
 (defmethod unauthorized ((this <clack-middleware-auth-basic>))
