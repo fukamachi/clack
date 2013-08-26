@@ -21,7 +21,6 @@
 (defun initialize ()
   (setf *hunchentoot-default-external-format*
         (flex:make-external-format :utf-8 :eol-style :lf)
-        *handle-http-errors-p* nil
         *default-content-type* "text/html; charset=utf-8"
         *catch-errors-p* nil))
 
@@ -82,7 +81,7 @@ before passing to Hunchentoot."
            ;; and not sure how to handle same way in other method so comment out
            ;;(setf (content-length*) (length body))
            (let ((out (send-headers)))
-             (write-sequence body out :end chunk-size)
+             (write-sequence body out)
              (finish-output out)))))))
 
 (defun cookie->plist (cookie)
@@ -142,7 +141,8 @@ before passing to Clack application."
   ;; HTTP browsers usually leave the connection open for futher requests,
   ;; and Hunchentoot respects this but sets a timeout so that old connections
   ;; are cleaned up.
-  (let ((*debugging-p* t))
+  (let ((*debugging-p* t)) ;; Is this still needed?
+    (declare (ignorable *debugging-p*))
     (handler-case (call-next-method)
       #+sbcl (sb-sys:io-timeout (condition) (values nil condition))
       (error (condition) (invoke-debugger condition)))))
