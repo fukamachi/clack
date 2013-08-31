@@ -41,7 +41,7 @@
   (let ((cookie (session-id (state this) env)))
     (multiple-value-bind (val pos) (split-sequence #\: cookie :count 2)
       (values (or (car val) (generate-id (state this) env))
-              (let ((base64 (cadr val))
+              (let ((base64 (or (cadr val) ""))
                     (signature (subseq cookie pos)))
                 (when (string= (signature this base64)
                                signature)
@@ -51,7 +51,8 @@
                       (base64-string-to-string base64))))))))))
 
 (defmethod signature ((this <clack-middleware-session-cookie>) base64)
-  (hmac-sha1-hex-string base64 (secret this)))
+  (hmac-sha1-hex-string base64
+                        (or (secret this) "")))
 
 (defmethod save-state ((this <clack-middleware-session-cookie>) id res env)
   (let ((cookie (serialize this id (getf env :clack.session))))
