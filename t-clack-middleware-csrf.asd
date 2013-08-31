@@ -19,6 +19,7 @@
 
 (defsystem t-clack-middleware-csrf
   :depends-on (:clack
+               :clack-test
                :clack-middleware-csrf
                :cl-test-more
                :drakma)
