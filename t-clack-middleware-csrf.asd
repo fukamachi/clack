@@ -24,5 +24,9 @@
                :cl-test-more
                :drakma)
   :components
-  ((:file "t/contrib/middleware/csrf"))
-  :perform (load-op :after (op c) (asdf:clear-system c)))
+  ((:test-file "t/contrib/middleware/csrf"))
+
+  :defsystem-depends-on (:cl-test-more)
+  :perform (test-op :after (op c)
+                    (funcall (intern #. (string :run-test-system) :cl-test-more)
+                             c)))

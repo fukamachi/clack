@@ -111,4 +111,5 @@
                                :fill-pointer t)))
           (setf (fill-pointer seq) (read-sequence seq stream))
           seq)))
-  :in-order-to ((test-op (test-op t-clack))))
+  :in-order-to ((test-op (test-op t-clack)
+                         (test-op t-clack-middleware-csrf))))

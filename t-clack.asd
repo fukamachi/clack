@@ -17,35 +17,7 @@
   (:use :cl :asdf))
 (in-package :t-clack-asd)
 
-(defclass asdf::test-file (asdf:cl-source-file) ())
-(defclass run-test-op (asdf:test-op) ())
-
-(defmethod asdf:operation-done-p ((op run-test-op) c)
-  (declare (ignorable op c))
-  nil)
-(defmethod asdf::mark-operation-done ((op run-test-op) c)
-  (declare (ignorable op c))
-  nil)
-
-#+asdf3
-(defmethod component-depends-on ((o run-test-op) (c module))
-  `((,o ,@(component-children c)) ,@(call-next-method)))
-
-(defmethod asdf:perform ((op asdf:load-op) (c asdf::test-file))
-  ;; do nothing
-  )
-(defmethod asdf:perform ((op asdf:compile-op) (c asdf::test-file))
-  ;; do nothing
-  )
-(defmethod asdf:perform ((op asdf:test-op) (c asdf::test-file))
-  (let ((class (class-of op)))
-    (change-class c 'asdf:cl-source-file)
-    (asdf:perform (make-instance 'asdf:compile-op) c)
-    (asdf:perform (make-instance 'asdf:load-op) c)
-    (change-class c class)))
-
 (defsystem t-clack
-  :in-order-to ((test-op (run-test-op t-clack)))
   :depends-on (:clack
                :clack-test
                :cl-test-more
@@ -71,4 +43,9 @@
        (:test-file "middleware/stdout")))
      (:module "util"
       :components
-      ((:test-file "route")))))))
+      ((:test-file "route"))))))
+
+  :defsystem-depends-on (:cl-test-more)
+  :perform (test-op :after (op c)
+                    (funcall (intern #. (string :run-test-system) :cl-test-more)
+                             c)))
