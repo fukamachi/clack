@@ -124,7 +124,8 @@
  #'(lambda ()
      (multiple-value-bind (body status headers)
          (http-request "http://localhost:4242/"
-                       :method :post)
+                       :method :post
+                       :redirect nil)
        (is status 302 "Status is 302")
        (is (cdr (assoc :location headers)) "http://en.wikipedia.org/wiki/CSRF")
        (is body nil))))
