@@ -14,8 +14,8 @@
 
 (ok comp "can create")
 (is-error (call comp nil)
-          #+ccl ccl::no-applicable-method-exists
-          #-ccl simple-error
+          #+ccl-1.9 ccl::no-applicable-method-exists
+          #-ccl-1.9 simple-error
           "simple-error if call it")
 
 ;; implement `call'.
