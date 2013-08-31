@@ -14,7 +14,10 @@
 (defvar mw (make-instance '<test-middleware>))
 
 (ok mw "can create")
-(is-error (call mw nil) simple-error "simple-error if call it")
+(is-error (call mw nil)
+          #+ccl ccl:no-applicable-method-exists
+          #-ccl simple-error
+          "simple-error if call it")
 
 ;; implement `call'.
 (defmethod call ((this <test-middleware>) env)

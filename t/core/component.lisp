@@ -13,7 +13,10 @@
 (defvar comp (make-instance '<test-component>))
 
 (ok comp "can create")
-(is-error (call comp nil) simple-error "simple-error if call it")
+(is-error (call comp nil)
+          #+ccl ccl:no-applicable-method-exists
+          #-ccl simple-error
+          "simple-error if call it")
 
 ;; implement `call'.
 (defmethod call ((this <test-component>) env)
