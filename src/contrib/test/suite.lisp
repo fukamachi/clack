@@ -26,8 +26,6 @@
 
 (cl-syntax:use-syntax :annot)
 
-(plan 29)
-
 @export
 (defvar *clack-test-access-port* *clack-test-port*
   "Port of localhost to request.
@@ -46,7 +44,9 @@ you would call like this: `(run-server-tests :foo)'."
         (*clack-test-handler* handler-name))
     (if name
         (run-test name)
-        (run-test-package :clack.test.suite))))
+        (progn
+          (plan 29)
+          (run-test-package :clack.test.suite)))))
 
 (defun get-header (headers key)
   (let ((val (assoc key headers)))
