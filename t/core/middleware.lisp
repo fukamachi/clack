@@ -15,7 +15,7 @@
 
 (ok mw "can create")
 (is-error (call mw nil)
-          #+ccl ccl:no-applicable-method-exists
+          #+ccl ccl::no-applicable-method-exists
           #-ccl simple-error
           "simple-error if call it")
 
