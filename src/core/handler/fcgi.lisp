@@ -15,7 +15,8 @@
   (:import-from :clack.util.hunchentoot
                 :url-decode)
   (:import-from :alexandria
-                :make-keyword)
+                :make-keyword
+                :when-let)
   (:import-from :bordeaux-threads
                 :make-thread)
   (:import-from :flexi-streams
@@ -25,38 +26,67 @@
   (:import-from :cl-ppcre
                 :regex-replace-all)
   (:import-from :usocket
+                :stream-server-usocket
                 :socket-listen
                 :socket-close))
 
 (cl-syntax:use-syntax :annot)
 
+(defclass <fcgi-acceptor> ()
+  ((port :type integer
+         :initarg :port
+         :reader acceptor-port)
+   (socket :type (or null 'usocket:stream-server-usocket)
+           :initarg :socket
+           :initform nil
+           :accessor acceptor-socket)
+   (file-descriptor :type (or null integer)
+                    :initarg :file-descriptor
+                    :initform nil
+                    :accessor acceptor-file-descriptor)))
+
+(defmethod initialize-instance :after ((acceptor <fcgi-acceptor>) &rest args)
+  (declare (ignore args))
+  (unless (acceptor-file-descriptor acceptor)
+    (let ((socket (usocket:socket-listen "0.0.0.0"
+                                         (acceptor-port acceptor)
+                                         :reuse-address t
+                                         :backlog 128)))
+      (setf (acceptor-socket acceptor)
+            socket)
+      (setf (acceptor-file-descriptor acceptor)
+            (cl-fastcgi::usocket-to-fd socket)))))
+
 @export
-(defun run (app &key (debug t) (port 9000))
+(defun run (app &key (debug t) (port 9000) fd)
   "Start FastCGI server."
-  (let ((sock (usocket:socket-listen "0.0.0.0" port
-               :reuse-address t
-               :backlog 128)))
-    (prog1 sock
-           (bordeaux-threads:make-thread
-            (lambda ()
-              (cl-fastcgi::server-on-fd
-               #'(lambda (req)
-                   (let* ((env (request->plist req))
-                          (res (if debug (call app env)
-                                   (aif (handler-case (call app env)
-                                          (error (error)
-                                            (princ error *error-output*)
-                                            nil))
-                                        it
-                                        '(500 nil nil)))))
-                     (etypecase res
-                       (list (handle-response req res))
-                       (function (funcall res (lambda (res) (handle-response req res)))))))
-               (cl-fastcgi::usocket-to-fd sock)))))))
+  (flet ((main-loop (req)
+           (let* ((env (request->plist req))
+                  (res (if debug (call app env)
+                           (aif (handler-case (call app env)
+                                  (error (error)
+                                    (princ error *error-output*)
+                                    nil))
+                                it
+                                '(500 nil nil)))))
+             (etypecase res
+               (list (handle-response req res))
+               (function (funcall res (lambda (res) (handle-response req res))))))))
+    (let ((acceptor
+            (make-instance '<fcgi-acceptor>
+                           :port port
+                           :file-descriptor fd)))
+      (bt:make-thread
+       #'(lambda ()
+           (cl-fastcgi::server-on-fd
+            #'main-loop
+            (acceptor-file-descriptor acceptor))))
+      acceptor)))
 
 @export
 (defun stop (acceptor)
-  (usocket:socket-close acceptor))
+  (when-let (socket (acceptor-socket acceptor))
+    (usocket:socket-close socket)))
 
 (defun handle-response (req res)
   (destructuring-bind (status headers &optional body) res
