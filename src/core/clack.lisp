@@ -27,6 +27,8 @@
                 :apply-middleware)
   (:import-from :clack.util.stream
                 :slurp-stream-to-string)
+  (:import-from :alexandria
+                :delete-from-plist)
   (:import-from :trivial-types
                 :pathname-designator)
   (:import-from :bordeaux-threads
@@ -63,7 +65,7 @@ Example:
            :debug nil)
 "
 @export
-(defun clackup (app &rest args &key (server :hunchentoot) (port 5000) (debug t))
+(defun clackup (app &rest args &key (server :hunchentoot) (port 5000) (debug t) &allow-other-keys)
   (etypecase app
     (pathname-designator
      (apply #'clackup
@@ -71,19 +73,20 @@ Example:
             args))
     (component-designator
      (prog1
-       (let ((handler-package (find-handler server)))
-         (make-instance '<handler>
-            :server-name server
-            :acceptor
-            (funcall (intern (string '#:run) handler-package)
-                     (apply-middleware (apply-middleware app
-                                          :<clack-middleware-stdout>
-                                          :clack.middleware.stdout
-                                          :standard-output '*clack-output*)
-                                       :<clack-middleware-json>
-                                       :clack.middleware.json)
-                     :port port
-                     :debug debug)))
+         (let ((handler-package (find-handler server)))
+           (make-instance '<handler>
+                          :server-name server
+                          :acceptor
+                          (apply (intern (string '#:run) handler-package)
+                                 (apply-middleware (apply-middleware app
+                                                                     :<clack-middleware-stdout>
+                                                                     :clack.middleware.stdout
+                                                                     :standard-output '*clack-output*)
+                                                   :<clack-middleware-json>
+                                                   :clack.middleware.json)
+                                 :port port
+                                 :debug debug
+                                 (delete-from-plist args :server :port :debug))))
        (format t "~&~:(~A~) server is started.~
              ~%Listening on localhost:~A.~%" server port)))))
 
