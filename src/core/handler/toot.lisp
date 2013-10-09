@@ -37,8 +37,8 @@
 (defun handle-request (req)
   "Convert Request from server into a plist
 before pass to Clack application."
-  (let ((content-length (and (content-length req)
-                             (parse-integer (content-length req) :junk-allowed t))))
+  (let ((content-length (and (request-header :content-length req)
+                             (parse-integer (request-header :content-length req) :junk-allowed t))))
     (append
      (list
       :request-method (request-method req)
@@ -48,13 +48,13 @@ before pass to Clack application."
       :server-port (request-port req)
       :server-protocol (server-protocol req)
       :request-uri (request-uri req)
-      :url-scheme (request-scheme req)
+      :url-scheme :HTTP;(request-scheme req)
       :remote-addr (remote-addr req)
       :remote-port (remote-port req)
       :query-string (request-query req)
       :content-length content-length
-      :raw-body (let ((stream (flex:make-flexi-stream (toot::content-stream req)
-                               :external-format toot::+latin-1+)))
+      :content-type (request-header :content-type req)
+      :raw-body (let ((stream (toot::request-body-stream req)))
                   ;(when content-length
                     ;(setf (flex:flexi-stream-bound stream) content-length))
                   stream)
@@ -90,11 +90,14 @@ before pass to Clack application."
           (loop for k being the hash-keys in hash
                 using (hash-value v)
                 do (setf (response-header k req) v)))
-       (with-output-to-string (s)
-         (format s "~{~A~^~%~}" body))))))
+       (toot::send-response req (with-output-to-string (s)
+	  (format s "~{~A~^~%~}" body)))))))
 
 (defun parse-charset (content-type)
   (multiple-value-bind (start end reg1 reg2)
       (ppcre:scan "(;\\s*?charset=([-_a-zA-Z0-9]+))" content-type)
-    (values (subseq content-type 0 (aref reg1 0))
-            (subseq content-type (aref reg1 1) (aref reg2 1)))))
+    (if start
+	(values (subseq content-type 0 (aref reg1 0))
+		(subseq content-type (aref reg1 1) (aref reg2 1)))
+	;; there is no ";charset="
+	(values content-type toot::*default-charset*))))
