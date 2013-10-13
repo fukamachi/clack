@@ -22,16 +22,16 @@
 (defclass <clack-middleware-dbi> (<middleware>)
      ((driver-name :initarg :driver-name
                    :accessor driver-name)
-      (args :initarg :args
-            :accessor args)))
+      (connect-args :initarg :connect-args
+                    :accessor connect-args)))
 
 (defmethod call ((this <clack-middleware-dbi>) env)
   (let ((*db* (apply #'dbi:connect (driver-name this)
-                     (loop for (k v) on (args this) by #'cddr
+                     (loop for (k v) on (connect-args this) by #'cddr
                            when v
                              append (list k v)))))
-    (prog1 (call-next this env)
-           (dbi:disconnect *db*))))
+    (unwind-protect (call-next this env)
+      (dbi:disconnect *db*))))
 
 (doc:start)
 
@@ -43,9 +43,9 @@ Clack.Middleware.Dbi - Middleware for CL-DBI connection management.
     (builder
      (<clack-middleware-dbi>
       :driver-name :mysql
-      :database-name \"dbname\"
-      :username \"fukamachi\"
-      :password \"password\")
+      :connect-args '(:database-name \"dbname\"
+                      :username \"fukamachi\"
+                      :password \"password\"))
      app)
 "
 
@@ -55,9 +55,9 @@ This is a Clack Middleware component for managing CL-DBI's connections.
 ## Slots
 
 * driver-name (Required, Keyword)
-* database-name (Required, String)
+* connect-args (Required, List)
 
-Other parameters (`:username`, `:password` and so on) will be passed to `dbi:connect` as keyword parameters.
+`connect-args` parameters (`:username`, `:password` and so on) will be passed to `dbi:connect` as keyword parameters.
 "
 
 @doc:AUTHOR "
