@@ -25,15 +25,10 @@
                 :find-handler
                 :load-handler
                 :apply-middleware)
-  (:import-from :clack.util.stream
-                :slurp-stream-to-string)
   (:import-from :alexandria
                 :delete-from-plist)
   (:import-from :trivial-types
                 :pathname-designator)
-  (:import-from :bordeaux-threads
-                :make-thread
-                :thread-alive-p)
   (:export :stop
            :<component>
            :<middleware>
@@ -66,43 +61,47 @@ Example:
 "
 @export
 (defun clackup (app &rest args &key (server :hunchentoot) (port 5000) (debug t) &allow-other-keys)
-  (etypecase app
-    (pathname-designator
-     (apply #'clackup
-            (eval-file app)
-            args))
-    (component-designator
-     (prog1
-         (let ((handler-package (find-handler server)))
-           (make-instance '<handler>
-                          :server-name server
-                          :acceptor
-                          (apply (intern (string '#:run) handler-package)
-                                 (apply-middleware (apply-middleware app
-                                                                     :<clack-middleware-stdout>
-                                                                     :clack.middleware.stdout
-                                                                     :standard-output '*clack-output*)
-                                                   :<clack-middleware-json>
-                                                   :clack.middleware.json)
-                                 :port port
-                                 :debug debug
-                                 (delete-from-plist args :server :port :debug))))
-       (format t "~&~:(~A~) server is started.~
-             ~%Listening on localhost:~A.~%" server port)))))
+  (labels ((buildapp (app)
+             (apply-middleware (apply-middleware app
+                                                 :<clack-middleware-stdout>
+                                                 :clack.middleware.stdout
+                                                 :standard-output '*clack-output*)
+                               :<clack-middleware-json>
+                               :clack.middleware.json)))
+    (etypecase app
+      (pathname-designator
+       (apply #'clackup
+              (buildapp (eval-file app))
+              args))
+      (component-designator
+       (prog1
+           (let ((handler-package (find-handler server)))
+             (make-instance '<handler>
+                            :server-name server
+                            :acceptor
+                            (apply (intern (string '#:run) handler-package)
+                                   (buildapp app)
+                                   :port port
+                                   :debug debug
+                                   (delete-from-plist args :server :port :debug))))
+         (format t "~&~:(~A~) server is started.~
+             ~%Listening on localhost:~A.~%" server port))))))
 
 (defun eval-file (file)
   "Safer way to read and eval a file content. This function returns the last value."
   (check-type file pathname-designator)
-  (loop with retval = nil
-        with content = (with-open-file (in file :element-type '(unsigned-byte 8))
-                         (clack.util.stream:slurp-stream-to-string in))
-        with thread = (bt:make-thread
-                       (lambda ()
-                         (setf retval (eval (with-standard-io-syntax
-                                              (read-from-string
-                                               (format nil "(progn ~A)" content)))))))
-        while (bt:thread-alive-p thread)
-        finally (return retval)))
+  (with-open-file (in file)
+    (let ((*package* *package*)
+          (*readtable* *readtable*)
+          (*load-pathname* nil)
+          (*load-truename* nil))
+      (loop with results
+            with eof = '#:eof
+            for form = (read in nil eof)
+            until (eq form eof)
+            do (setf results (multiple-value-list (eval form)))
+            finally
+               (return (apply #'values results))))))
 
 (doc:start)
 

@@ -37,7 +37,6 @@
                :local-time
                :circular-streams
                :multival-plist
-               :bordeaux-threads
                :yason
                :cl-base64
                :marshal)
