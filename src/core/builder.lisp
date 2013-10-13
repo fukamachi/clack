@@ -32,9 +32,13 @@ This is useful in development phase.")
                          for (class . args) = (ensure-list item)
                          if (eq class :condition)
                            collect `(make-instance '<clack-middleware-conditional>
-                                       :condition ,@args)
+                                       :condition ,@args) into mw
+                         else if (and (symbolp class) (find-class class nil))
+                           collect `(make-instance ',class ,@args) into mw
                          else
-                           collect `(make-instance ',class ,@args)))
+                           collect `(,class ,@args) into mw
+                         finally
+                         (return (delete nil mw :test #'eq))))
            :initial-value ,(car (last app-or-middleware))
            :from-end t))
 

@@ -28,7 +28,7 @@
 
 ;; Tests
 
-(plan 3)
+(plan 4)
 
 (is-type (builder <simple-middleware> app) 'function "builder")
 (is-type (builder-lazy <simple-middleware> app) 'function "builder-lazy")
@@ -38,5 +38,13 @@
           app)
          'function
          "builder with args")
+
+(is-type (builder
+          (if t
+              (make-instance '<simple-middleware>)
+              nil)
+          app)
+         'function
+         "CL code can be embed")
 
 (finalize)
