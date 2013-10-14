@@ -86,7 +86,7 @@
                        (:file "store")
                        (:file "session")
                        (:file "cookie")))
-                     (:file "stdout")))))
+                     (:file "let")))))
                  (:module "util"
                   :serial t
                   :components

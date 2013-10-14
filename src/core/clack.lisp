@@ -41,7 +41,11 @@
 
 @export
 (defvar *clack-output* *standard-output*
-  "Standard output for a Clack running process. This variable will be used in `<clack-middleware-stdout>'.")
+  "Standard output for a Clack running process.")
+
+@export
+(defvar *clack-error-output* *error-output*
+  "Standard error output for a Clack running process.")
 
 @doc "
 Easy way to run Clack Application.
@@ -63,9 +67,10 @@ Example:
 (defun clackup (app &rest args &key (server :hunchentoot) (port 5000) (debug t) &allow-other-keys)
   (labels ((buildapp (app)
              (apply-middleware (apply-middleware app
-                                                 :<clack-middleware-stdout>
-                                                 :clack.middleware.stdout
-                                                 :standard-output '*clack-output*)
+                                                 :<clack-middleware-let>
+                                                 :clack.middleware.let
+                                                 :bindings '((*standard-output* *clack-output*)
+                                                             (*error-output* *clack-error-output*)))
                                :<clack-middleware-json>
                                :clack.middleware.json)))
     (etypecase app
