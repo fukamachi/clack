@@ -39,7 +39,8 @@
                :multival-plist
                :yason
                :cl-base64
-               :marshal)
+               :marshal
+               :trivial-backtrace)
   :components ((:module "src"
                 :components
                 ((:module "core"
@@ -86,7 +87,8 @@
                        (:file "store")
                        (:file "session")
                        (:file "cookie")))
-                     (:file "let")))))
+                     (:file "let")
+                     (:file "backtrace")))))
                  (:module "util"
                   :serial t
                   :components

@@ -66,13 +66,16 @@ Example:
 @export
 (defun clackup (app &rest args &key (server :hunchentoot) (port 5000) (debug t) &allow-other-keys)
   (labels ((buildapp (app)
-             (apply-middleware (apply-middleware app
-                                                 :<clack-middleware-let>
-                                                 :clack.middleware.let
-                                                 :bindings '((*standard-output* *clack-output*)
-                                                             (*error-output* *clack-error-output*)))
-                               :<clack-middleware-json>
-                               :clack.middleware.json)))
+             (reduce #'(lambda (app args)
+                         (apply #'apply-middleware app args))
+                     `(,app
+                       ,@(if debug
+                             nil
+                             '((:<clack-middleware-backtrace> :clack.middleware.backtrace)))
+                       (:<clack-middleware-let> :clack.middleware.let
+                        :bindings ((*standard-output* *clack-output*)
+                                   (*error-output* *clack-error-output*)))
+                       (:<clack-middleware-json> :clack.middleware.json)))))
     (etypecase app
       (pathname-designator
        (apply #'clackup
