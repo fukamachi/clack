@@ -28,17 +28,17 @@ This is useful in development phase.")
 (defun %builder (&rest app-or-middleware)
   "Wrap Clack application with middlewares and return it as one function."
   `(reduce #'wrap
-           (list ,@(loop for item in (butlast app-or-middleware)
-                         for (class . args) = (ensure-list item)
-                         if (eq class :condition)
-                           collect `(make-instance '<clack-middleware-conditional>
-                                       :condition ,@args) into mw
-                         else if (and (symbolp class) (find-class class nil))
-                           collect `(make-instance ',class ,@args) into mw
-                         else
-                           collect `(,class ,@args) into mw
-                         finally
-                         (return (delete nil mw :test #'eq))))
+           (delete nil
+                   (list ,@(loop for item in (butlast app-or-middleware)
+                                 for (class . args) = (ensure-list item)
+                                 if (eq class :condition)
+                                   collect `(make-instance '<clack-middleware-conditional>
+                                                           :condition ,@args)
+                                 else if (and (symbolp class) (find-class class nil))
+                                        collect `(make-instance ',class ,@args)
+                                 else
+                                   collect `(,class ,@args)))
+                   :test #'eq)
            :initial-value ,(car (last app-or-middleware))
            :from-end t))
 
