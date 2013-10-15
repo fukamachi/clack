@@ -39,8 +39,7 @@
        (:test-file "middleware/static")
        (:test-file "middleware/conditional")
        (:test-file "middleware/session")
-       (:test-file "middleware/logger")
-       (:test-file "middleware/stdout")))
+       (:test-file "middleware/logger")))
      (:module "util"
       :components
       ((:test-file "route"))))))
