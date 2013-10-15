@@ -71,7 +71,8 @@ Example:
                      `(,app
                        ,@(if debug
                              nil
-                             '((:<clack-middleware-backtrace> :clack.middleware.backtrace)))
+                             '((:<clack-middleware-backtrace> :clack.middleware.backtrace
+                                :result-on-error (500 () ("Internal Server Error")))))
                        (:<clack-middleware-let> :clack.middleware.let
                         :bindings ((*standard-output* *clack-output*)
                                    (*error-output* *clack-error-output*)))
