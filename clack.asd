@@ -57,6 +57,7 @@
                    (:file "component")
                    (:file "middleware" :depends-on ("component"))
                    (:file "handler")
+                   (:file "http-status")
                    (:module "app"
                     :depends-on ("clack")
                     :components

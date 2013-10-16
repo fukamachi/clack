@@ -12,6 +12,8 @@
         :anaphora)
   (:import-from :clack.component
                 :call)
+  (:import-from :clack.http-status
+                :http-status-reason)
   (:import-from :clack.util.hunchentoot
                 :url-decode)
   (:import-from :alexandria
@@ -90,7 +92,7 @@
 
 (defun handle-response (req res)
   (destructuring-bind (status headers &optional body) res
-    (fcgx-puts req (format nil "Status: ~D ~A~%" status (gethash status *http-status*)))
+    (fcgx-puts req (format nil "Status: ~D ~A~%" status (http-status-reason status)))
     (loop for (k v) on headers by #'cddr
           with hash = (make-hash-table :test #'eq)
           do (setf (gethash k hash)
@@ -186,48 +188,6 @@ before passing to Clack application."
                                :test #'char=)))))
 
     env))
-
-;; TODO: these code should be a part of Clack core package.
-(defvar *http-status* (make-hash-table :test #'eql))
-(setf (gethash 100 *http-status*) "Continue")
-(setf (gethash 101 *http-status*) "Switching Protocols")
-(setf (gethash 200 *http-status*) "OK")
-(setf (gethash 201 *http-status*) "Created")
-(setf (gethash 202 *http-status*) "Accepted")
-(setf (gethash 203 *http-status*) "Non-Authoritative Information")
-(setf (gethash 205 *http-status*) "Reset Content")
-(setf (gethash 206 *http-status*) "Partial Content")
-(setf (gethash 207 *http-status*) "Multi-Status")
-(setf (gethash 300 *http-status*) "Multiple Choices")
-(setf (gethash 301 *http-status*) "Moved Permanently")
-(setf (gethash 302 *http-status*) "Moved Temporarily")
-(setf (gethash 303 *http-status*) "See Other")
-(setf (gethash 304 *http-status*) "Not Modified")
-(setf (gethash 305 *http-status*) "Use Proxy")
-(setf (gethash 307 *http-status*) "Temporary Redirect")
-(setf (gethash 400 *http-status*) "Bad Request")
-(setf (gethash 401 *http-status*) "Authorization Required")
-(setf (gethash 402 *http-status*) "Payment Required")
-(setf (gethash 403 *http-status*) "Forbidden")
-(setf (gethash 404 *http-status*) "Not Found")
-(setf (gethash 405 *http-status*) "Method Not Allowed")
-(setf (gethash 406 *http-status*) "Not Acceptable")
-(setf (gethash 407 *http-status*) "Proxy Authentication Required")
-(setf (gethash 409 *http-status*) "Conflict")
-(setf (gethash 410 *http-status*) "Gone")
-(setf (gethash 411 *http-status*) "Length Required")
-(setf (gethash 412 *http-status*) "Precondition Failed")
-(setf (gethash 413 *http-status*) "Request Entity Too Large")
-(setf (gethash 414 *http-status*) "Request-URI Too Large")
-(setf (gethash 415 *http-status*) "Unsupported Media Type")
-(setf (gethash 416 *http-status*) "Requested range not satisfiable")
-(setf (gethash 424 *http-status*) "Failed Dependency")
-(setf (gethash 500 *http-status*) "Internal Server Error")
-(setf (gethash 501 *http-status*) "Not Implemented")
-(setf (gethash 502 *http-status*) "Bad Gateway")
-(setf (gethash 503 *http-status*) "Service Unavailable")
-(setf (gethash 504 *http-status*) "Gateway Time-out")
-(setf (gethash 505 *http-status*) "Version not supported")
 
 (doc:start)
 
