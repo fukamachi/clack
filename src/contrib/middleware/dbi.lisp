@@ -26,10 +26,8 @@
                     :accessor connect-args)))
 
 (defmethod call ((this <clack-middleware-dbi>) env)
-  (let ((*db* (apply #'dbi:connect (driver-name this)
-                     (loop for (k v) on (connect-args this) by #'cddr
-                           when v
-                             append (list k v)))))
+  (let ((*db* (apply #'dbi:connect (cons (driver-name this)
+                                         (connect-args this)))))
     (unwind-protect (call-next this env)
       (dbi:disconnect *db*))))
 
