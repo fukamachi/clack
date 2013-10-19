@@ -6,3 +6,6 @@
 *.x86f
 *.fas
 *.lib
+
+# editor backup/temp files
+*~
