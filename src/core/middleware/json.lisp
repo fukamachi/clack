@@ -23,10 +23,8 @@
   ())
 
 (defmethod call ((this <clack-middleware-json>) env)
-  (when (= (search "application/json"
-		   (getf env :content-type)
-		   :test #'equalp)
-	   0)
+  (when (= (search "application/json" (getf env :content-type) :test #'equalp)
+           0)
     (setf (getf env :body-parameters)
           (list :json (yason:parse (ensure-character-input-stream
                                     (getf env :raw-body))))))
