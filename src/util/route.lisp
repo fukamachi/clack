@@ -113,7 +113,7 @@ Example:
                       for val across values
                       if (eq key :splat)
                         collect val into splat
-                      else
+                      else if val
                         append (list key val) into result
                       finally
                    (return (if splat
@@ -211,10 +211,10 @@ Clack.Util.Route provides a Sinatra-compatible routing class.
         (:FOO \"hello\" :BAR \"world\")
     (match (make-url-rule \"/?:foo?/?:bar?\") :GET \"/hello\")
     ;=> \"/hello\"
-        (:FOO \"hello\" :BAR NIL)
+        (:FOO \"hello\")
     (match (make-url-rule \"/?:foo?/?:bar?\") :GET \"/\")
     ;=> \"/\"
-        (:FOO NIL :BAR NIL)
+        NIL
 
 ### Regular Expression
 

@@ -3,7 +3,7 @@
         :clack.util.route
         :cl-test-more))
 
-(plan 24)
+(plan 25)
 
 (defun %is-match (url-rule req-url &optional params comment)
   (is (multiple-value-list (match url-rule :get req-url))
@@ -69,8 +69,9 @@
 (diag "optional parameter")
 
 (is-match "/?:foo?/?:bar?" "/hello/world" '("/hello/world" (:foo "hello" :bar "world")))
-(is-match "/?:foo?/?:bar?" "/hello" '("/hello" (:foo "hello" :bar nil)))
-(is-match "/?:foo?/?:bar?" "/" '("/" (:foo nil :bar nil)))
+(is-match "/?:foo?/?:bar?" "/hello" '("/hello" (:foo "hello")))
+(is-match "/?:foo?/?:bar?" "/" '("/" nil))
+(is-match "/hello/?:name?" "/hello" '("/hello" nil))
 
 (diag "splat and normal case")
 
