@@ -127,8 +127,8 @@ Return two values, matched URL and Rule parameters as a plist.
 Captured strings in `url-string` are collected as :captures.
 
 Example:
-    (match (make-url-rule \"/hello([\\w]+)\" :regexp t)
-           \"/hello/world\")
+    (match (make-url-rule \"/hello/([\\w]+)\" :regexp t)
+           :GET \"/hello/world\")
     ;=> \"/hello/world\"
         (:CAPTURES (\"world\"))
 "
@@ -180,7 +180,7 @@ Clack.Util.Route - Class for Sinatra-compatible URL rule.
 @doc:SYNOPSIS "
     (defvar *url-rule* (make-url-rule \"/hello/:name\"))
     
-    (match *url-rule* \"/hello/fukamachi\")
+    (match *url-rule* :GET \"/hello/fukamachi\")
     ;=> (NAME \"fukamachi\")
     (match *url-rule* \"/bye/fukamachi\")
     ;=> NIL
@@ -194,32 +194,32 @@ Clack.Util.Route provides a Sinatra-compatible routing class.
 
 ### Named Parameter
 
-    (match (make-url-rule \"/hello/:name\") \"/hello/fukamachi\")
+    (match (make-url-rule \"/hello/:name\") :GET \"/hello/fukamachi\")
     ;=> \"/hello/fukamachi\"
         (:NAME \"fukamachi\")
 
 ### Wildcard Parameter
 
-    (match (make-url-rule \"/say/*/to/*\") \"/say/hello/to/world\")
+    (match (make-url-rule \"/say/*/to/*\") :GET \"/say/hello/to/world\")
     ;=> \"/say/hello/to/world\"
         (:SPLAT (\"hello\" \"world\"))
 
 ### Optional Parameter
 
-    (match (make-url-rule \"/?:foo?/?:bar?\") \"/hello/world\")
+    (match (make-url-rule \"/?:foo?/?:bar?\") :GET \"/hello/world\")
     ;=> \"/hello/world\"
         (:FOO \"hello\" :BAR \"world\")
-    (match (make-url-rule \"/?:foo?/?:bar?\") \"/hello\")
+    (match (make-url-rule \"/?:foo?/?:bar?\") :GET \"/hello\")
     ;=> \"/hello\"
         (:FOO \"hello\" :BAR NIL)
-    (match (make-url-rule \"/?:foo?/?:bar?\") \"/\")
+    (match (make-url-rule \"/?:foo?/?:bar?\") :GET \"/\")
     ;=> \"/\"
         (:FOO NIL :BAR NIL)
 
 ### Regular Expression
 
     (match (make-url-rule \"/hello([\\w]+)\" :regexp t)
-           \"/hello/world\")
+           :GET \"/hello/world\")
     ;=> \"/hello/world\"
         (:CAPTURES (\"world\"))
 "
