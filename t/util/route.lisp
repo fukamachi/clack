@@ -3,7 +3,7 @@
         :clack.util.route
         :cl-test-more))
 
-(plan 25)
+(plan 31)
 
 (defun %is-match (url-rule req-url &optional params comment)
   (is (multiple-value-list (match url-rule :get req-url))
@@ -32,6 +32,26 @@
 
 (is-match "/hello" "/hello" '("/hello" nil) "'/hello' matches '/hello'")
 (is-match "/hello" "/bye" '(nil) "'/hello' doesn't match '/bye'")
+
+(diag "method")
+(is (multiple-value-list (match (make-url-rule "/hello" :method :get) :get "/hello"))
+    '("/hello" nil)
+    "GET")
+(is (multiple-value-list (match (make-url-rule "/hello" :method :get) :head "/hello" :allow-head t))
+    '("/hello" nil)
+    "HEAD is allowed for GET rule")
+(is (multiple-value-list (match (make-url-rule "/new" :method :post) :post "/new"))
+    '("/new" nil)
+    "POST")
+(is (multiple-value-list (match (make-url-rule "/new" :method :post) :get "/new"))
+    '(nil)
+    "GET fails for POST rule")
+(is (multiple-value-list (match (make-url-rule "/new" :method '(:get :post)) :get "/new"))
+    '("/new" nil)
+    "GET or POST")
+(is (multiple-value-list (match (make-url-rule "/new" :method '(:get :post)) :post "/new"))
+    '("/new" nil)
+    "GET or POST")
 
 (diag "with named parameter")
 

@@ -8,7 +8,8 @@
 
 (in-package :cl-user)
 (defpackage clack.util.route
-  (:use :cl)
+  (:use :cl
+        :trivial-types)
   (:import-from :cl-ppcre
                 :scan-to-strings
                 :regex-replace-all
@@ -20,20 +21,21 @@
 
 @export
 (defclass <url-rule> ()
-     ((request-method :type symbol
-                      :initarg :method
-                      :initform :get
-                      :accessor request-method)
-      (url :type string
-           :initarg :url
-           :accessor url)
-      (regex :type string
-             :initarg :regex
-             :accessor regex)
-      (format-string :type string
-                     :accessor format-string)
-      (param-keys :type list
-                  :accessor param-keys)))
+  ((request-method :type (or symbol
+                             (proper-list symbol))
+                   :initarg :method
+                   :initform :get
+                   :accessor request-method)
+   (url :type string
+        :initarg :url
+        :accessor url)
+   (regex :type string
+          :initarg :regex
+          :accessor regex)
+   (format-string :type string
+                  :accessor format-string)
+   (param-keys :type list
+               :accessor param-keys)))
 
 (defclass <regex-url-rule> (<url-rule>) ())
 
@@ -82,11 +84,15 @@
       (t enc))))
 
 (defmethod match-method-p ((this <url-rule>) method &key allow-head)
-  (or (string= :ANY (request-method this))
-      (string= method (request-method this))
-      (and (eq method :head)
-           allow-head
-           (string= :get (request-method this)))))
+  (flet ((method-equal (rule-method)
+           (or (string= :ANY rule-method)
+               (string= method rule-method)
+               (and (eq method :head)
+                    allow-head
+                    (string= :get rule-method)))))
+    (typecase (request-method this)
+      (list (some #'method-equal (request-method this)))
+      (T (method-equal (request-method this))))))
 
 @export
 (defmethod match ((this <url-rule>) method url-string &key allow-head)
