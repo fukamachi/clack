@@ -73,7 +73,8 @@
           and collect "~A" into cs
         finally
      (setf (regex this) (format nil "^~{~A~}$" re)
-           (format-string this) (format nil "~{~A~}" cs)
+           (format-string this) (ppcre:regex-replace-all "~A\\?" (format nil "~{~A~}" cs)
+                                                         "~:[~;~:*~A~]")
            (param-keys this) names)))
 
 (defun escape-special-char (char)
@@ -146,7 +147,7 @@ Example:
                 `(:captures ,(coerce values 'list)))))))
 
 @export
-(defmethod url-for ((this <url-rule>) params)
+(defmethod url-for ((url-rule <url-rule>) params)
   "Return an URL from a rule and parameters.
 
 Example:
@@ -154,18 +155,21 @@ Example:
              '(:name \"fukamachi\"))
     ;=> \"/hello/fukamachi\"
 "
-  (values
-   (apply #'format nil (format-string this)
-          (loop for key in (param-keys this)
-                if (eq key :splat)
-                  collect (pop (getf params key))
-                else
-                  collect (getf params key)
-                  and do (remf params key)))
-   params))
+  (let ((url (apply #'format nil (format-string url-rule)
+                    (loop for key in (param-keys url-rule)
+                          if (eq key :splat)
+                            collect (pop (getf params key))
+                          else
+                            collect (getf params key)
+                            and do (remf params key)))))
+    (values
+     (ppcre:regex-replace-all
+      "\\?"
+      (ppcre:regex-replace-all "(.\\?)+$" url "") "")
+     params)))
 
 @export
-(defmethod url-for ((this <regex-url-rule>) params)
+(defmethod url-for ((url-rule <regex-url-rule>) params)
   "Return an URL from a rule and parameters.
 
 Example:
@@ -173,7 +177,7 @@ Example:
              '(:name \"fukamachi\"))
     ;=> \"/hello/fukamachi\"
 "
-  (values (apply #'format nil (format-string this)
+  (values (apply #'format nil (format-string url-rule)
                  (getf params :captures))
           (and (remf params :captures) params)))
 
