@@ -3,7 +3,7 @@
         :clack.util.route
         :cl-test-more))
 
-(plan 33)
+(plan 34)
 
 (defun %is-match (url-rule req-url &optional params comment)
   (is (multiple-value-list (match url-rule :get req-url))
@@ -68,6 +68,8 @@
     "/hello/Eitarow")
 (is (url-for (make-url-rule "/hello/?:name?") nil)
     "/hello")
+(is (url-for (make-url-rule "/hello/?:name?") '(:name "Eitarow Fukamachi"))
+    "/hello/Eitarow%20Fukamachi")
 
 (diag "with multiple named parameter")
 

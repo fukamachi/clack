@@ -10,6 +10,8 @@
 (defpackage clack.util.route
   (:use :cl
         :trivial-types)
+  (:import-from :clack.util.hunchentoot
+                :url-encode)
   (:import-from :cl-ppcre
                 :scan-to-strings
                 :regex-replace-all
@@ -160,7 +162,7 @@ Example:
                           if (eq key :splat)
                             collect (pop (getf params key))
                           else
-                            collect (getf params key)
+                            collect (url-encode (getf params key))
                             and do (remf params key)))))
     (values
      (ppcre:regex-replace-all
