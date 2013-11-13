@@ -161,9 +161,11 @@ Example:
                     (loop for key in (param-keys url-rule)
                           if (eq key :splat)
                             collect (pop (getf params key))
-                          else
+                          else if (getf params key)
                             collect (url-encode (getf params key))
-                            and do (remf params key)))))
+                            and do (remf params key)
+                          else
+                            collect ""))))
     (values
      (ppcre:regex-replace-all
       "\\?"
