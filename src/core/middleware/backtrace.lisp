@@ -23,26 +23,29 @@
            :accessor output)
    (result-on-error :type (or function t)
                     :initarg :result-on-error
-                    :initform #'invoke-debugger
                     :accessor result-on-error)))
 
 (defmethod call ((this <clack-middleware-backtrace>) env)
-  (let ((*debugger-hook* #'(lambda (condition hook)
-                             (declare (ignore hook))
-                             (etypecase (output this)
-                               (symbol (print-error condition env (symbol-value (output this))))
-                               (stream (print-error condition env (output this)))
-                               (pathname (with-open-file (out (output this)
-                                                              :direction :output
-                                                              :external-format :utf-8
-                                                              :if-exists :append
-                                                              :if-does-not-exist :create)
-                                           (print-error condition env out))))
-                             (prog1
-                                 (if (functionp (result-on-error this))
-                                     (funcall (result-on-error this) condition)
-                                     (result-on-error this))
-                               (abort condition)))))
+  (if (slot-boundp this 'result-on-error)
+      (handler-case (call-with-backtrace this env)
+        (error (condition)
+          (if (functionp (result-on-error this))
+              (funcall (result-on-error this) condition)
+              (result-on-error this))))
+      (call-with-backtrace this env)))
+
+(defmethod call-with-backtrace ((this <clack-middleware-backtrace>) env)
+  (handler-bind ((error
+                   #'(lambda (condition)
+                       (etypecase (output this)
+                         (symbol (print-error condition env (symbol-value (output this))))
+                         (stream (print-error condition env (output this)))
+                         (pathname (with-open-file (out (output this)
+                                                        :direction :output
+                                                        :external-format :utf-8
+                                                        :if-exists :append
+                                                        :if-does-not-exist :create)
+                                     (print-error condition env out)))))))
     (call-next this env)))
 
 (defun print-error (error env &optional (stream *error-output*))
