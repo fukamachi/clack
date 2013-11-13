@@ -23,24 +23,27 @@
            :accessor output)
    (result-on-error :type (or function t)
                     :initarg :result-on-error
-                    :initform #'(lambda (e) (signal e))
+                    :initform #'invoke-debugger
                     :accessor result-on-error)))
 
 (defmethod call ((this <clack-middleware-backtrace>) env)
-  (handler-case (call-next this env)
-    (error (e)
-      (etypecase (output this)
-        (symbol (print-error e env (symbol-value (output this))))
-        (stream (print-error e env (output this)))
-        (pathname (with-open-file (out (output this)
-                                       :direction :output
-                                       :external-format :utf-8
-                                       :if-exists :append
-                                       :if-does-not-exist :create)
-                    (print-error e env out))))
-      (if (functionp (result-on-error this))
-          (funcall (result-on-error this) e)
-          (result-on-error this)))))
+  (let ((*debugger-hook #'(lambda (condition hook)
+                            (declare (ignore hook))
+                            (etypecase (output this)
+                              (symbol (print-error e env (symbol-value (output this))))
+                              (stream (print-error e env (output this)))
+                              (pathname (with-open-file (out (output this)
+                                                             :direction :output
+                                                             :external-format :utf-8
+                                                             :if-exists :append
+                                                             :if-does-not-exist :create)
+                                          (print-error e env out))))
+                            (prog1
+                                (if (functionp (result-on-error this))
+                                    (funcall (result-on-error this) e)
+                                    (result-on-error this))
+                              (abort condition)))))
+    (call-next this env)))
 
 (defun print-error (error env &optional (stream *error-output*))
   (format stream "~3&")
