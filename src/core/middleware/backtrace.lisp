@@ -27,22 +27,22 @@
                     :accessor result-on-error)))
 
 (defmethod call ((this <clack-middleware-backtrace>) env)
-  (let ((*debugger-hook #'(lambda (condition hook)
-                            (declare (ignore hook))
-                            (etypecase (output this)
-                              (symbol (print-error e env (symbol-value (output this))))
-                              (stream (print-error e env (output this)))
-                              (pathname (with-open-file (out (output this)
-                                                             :direction :output
-                                                             :external-format :utf-8
-                                                             :if-exists :append
-                                                             :if-does-not-exist :create)
-                                          (print-error e env out))))
-                            (prog1
-                                (if (functionp (result-on-error this))
-                                    (funcall (result-on-error this) e)
-                                    (result-on-error this))
-                              (abort condition)))))
+  (let ((*debugger-hook* #'(lambda (condition hook)
+                             (declare (ignore hook))
+                             (etypecase (output this)
+                               (symbol (print-error condition env (symbol-value (output this))))
+                               (stream (print-error condition env (output this)))
+                               (pathname (with-open-file (out (output this)
+                                                              :direction :output
+                                                              :external-format :utf-8
+                                                              :if-exists :append
+                                                              :if-does-not-exist :create)
+                                           (print-error condition env out))))
+                             (prog1
+                                 (if (functionp (result-on-error this))
+                                     (funcall (result-on-error this) condition)
+                                     (result-on-error this))
+                               (abort condition)))))
     (call-next this env)))
 
 (defun print-error (error env &optional (stream *error-output*))
