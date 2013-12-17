@@ -30,11 +30,10 @@
                req
                (if debug (call app (handle-request req))
 		   (aif (handler-case (call app (handle-request req))
-			  (condition (error)
-			    @ignore error
-			    nil))
+			  (condition () nil))
 			it
 			'(500 nil nil)))))
+   
    :port port))
 
 
