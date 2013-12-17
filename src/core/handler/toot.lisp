@@ -45,33 +45,34 @@
 (defun handle-request (req)
   "Convert Request from server into a plist
 before pass to Clack application."
-  (let ((content-length (and (request-header :content-length req)
-                             (parse-integer (request-header :content-length req) :junk-allowed t)))
+  (let ((content-length (aif (request-header :content-length req)
+			     (parse-integer it :junk-allowed t)
+			     (setf (slot-value req 'request-headers) (acons :content-length "" (slot-value req 'request-headers)))))
 	(port-and-host (get-port-and-host req)))
     (append
      (list
       :request-method (request-method req)
       :script-name ""
-      :path-info (url-decode (request-path req))
+      :path-info (clack.util.hunchentoot:url-decode (request-path req))
       :server-name (car port-and-host)
       :server-port (cdr port-and-host)
       :server-protocol (server-protocol req)
       :request-uri (request-uri req)
-      :url-scheme :HTTP;(request-scheme req)
+      :url-scheme :HTTP			;(request-scheme req)
       :remote-addr (remote-addr req)
       :remote-port (remote-port req)
       :query-string (request-query req)
       :content-length content-length
       :content-type (request-header :content-type req)
       :raw-body (let ((stream (toot::request-body-stream req)))
-                  ;(when content-length
-                    ;(setf (flex:flexi-stream-bound stream) content-length))
-                  stream)
+					;(when content-length
+					;(setf (flex:flexi-stream-bound stream) content-length))
+		  stream)
       :clack.uploads nil
       :clack.handler :toot)
 
      (loop for (k . v) in (toot::request-headers req)
-           unless (find k '(:request-method :script-name :path-info :server-name :server-port :server-protocol :request-uri :remote-addr :remote-port :query-string :content-length :content-type :accept :connection))
+	unless (find k '(:request-method :script-name :path-info :server-name :server-port :server-protocol :request-uri :remote-addr :remote-port :query-string :content-length :content-type :accept :connection))
              append (list (intern (format nil "HTTP-~:@(~A~)" k) :keyword)
                           v)))))
 
@@ -116,49 +117,3 @@ before pass to Clack application."
       (split-sequence #\: (cdr (assoc :host (request-headers req))))
     (cons server-name (parse-integer server-port))))
 
-(defun url-decode (string &optional (external-format toot::*default-charset*))
-  "Decodes a URL-encoded string which is assumed to be encoded using the
-external format EXTERNAL-FORMAT, i.e. this is the inverse of
-URL-ENCODE. It is assumed that you'll rarely need this function, if
-ever. But just in case - here it is. The default for EXTERNAL-FORMAT is
-the value of *default-charset*."
-  (when (zerop (length string))
-    (return-from url-decode ""))
-  (let ((vector (make-array (length string) :element-type 'octet :fill-pointer 0))
-        (i 0)
-        unicodep)
-    (loop
-      (unless (< i (length string))
-        (return))
-      (let ((char (aref string i)))
-       (labels ((decode-hex (length)
-                  (prog1
-                      (parse-integer string :start i :end (+ i length) :radix 16)
-                    (incf i length)))
-                (push-integer (integer)
-                  (vector-push integer vector))
-                (peek ()
-                  (aref string i))
-                (advance ()
-                  (setq char (peek))
-                  (incf i)))
-         (cond
-          ((char= #\% char)
-           (advance)
-           (cond
-            ((char= #\u (peek))
-             (unless unicodep
-               (setq unicodep t)
-               (upgrade-vector vector '(integer 0 65535)))
-             (advance)
-             (push-integer (decode-hex 4)))
-            (t
-             (push-integer (decode-hex 2)))))
-          (t
-           (push-integer (char-code (case char
-                                      ((#\+) #\Space)
-                                      (otherwise char))))
-           (advance))))))
-    (cond (unicodep
-           (upgrade-vector vector 'character :converter #'code-char))
-          (t (octets-to-string vector :external-format external-format)))))
