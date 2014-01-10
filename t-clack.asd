@@ -34,6 +34,7 @@
        (:test-file "response")
        (:test-file "request")
        (:test-file "handler/hunchentoot")
+       (:test-file "handler/toot")
        (:test-file "app/file")
        (:test-file "app/urlmap")
        (:test-file "middleware/static")
