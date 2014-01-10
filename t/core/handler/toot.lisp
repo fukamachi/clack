@@ -7,4 +7,5 @@
 (in-package :clack-test.handler.toot)
 
 #+thread-support
-(clack.test.suite:run-server-tests :toot)
+(let ((*error-output* (make-broadcast-stream)))
+  (clack.test.suite:run-server-tests :toot))
