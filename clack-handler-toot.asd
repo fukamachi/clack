@@ -10,6 +10,7 @@
   Clack.Handler.Toot - Clack handler for Toot.
 
   Author: Eitarow Fukamachi (e.arrows@gmail.com)
+  Author: κeen
 |#
 
 (in-package :cl-user)
