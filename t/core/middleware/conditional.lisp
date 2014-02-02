@@ -1,4 +1,5 @@
-(clack.util:namespace t.clack.middleware.conditional
+(in-package :cl-user)
+(defpackage t.clack.middleware.conditional
   (:use :cl
         :clack
         :clack.builder
@@ -6,6 +7,7 @@
         :clack.middleware.conditional
         :clack.middleware.static
         :cl-ppcre))
+(in-package :t.clack.middleware.conditional)
 
 (plan 5)
 

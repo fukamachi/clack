@@ -6,7 +6,8 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.test.suite
+(in-package :cl-user)
+(defpackage clack.test.suite
   (:use :cl
         :anaphora
         :cl-test-more)
@@ -23,6 +24,7 @@
   (:import-from :asdf
                 :find-system
                 :component-pathname))
+(in-package :clack.test.suite)
 
 (cl-syntax:use-syntax :annot)
 

@@ -6,7 +6,8 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.middleware.logger
+(in-package :cl-user)
+(defpackage clack.middleware.logger
   (:use :cl
         :clack.component
         :clack.middleware
@@ -18,6 +19,7 @@
                 :*logger-min-level*)
   (:import-from :clack.logger.base :output)
   (:import-from :clack.logger.stream :<clack-logger-stream>))
+(in-package :clack.middleware.logger)
 
 (cl-syntax:use-syntax :annot)
 

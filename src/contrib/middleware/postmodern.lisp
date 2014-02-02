@@ -1,11 +1,13 @@
 
 
-(clack.util:namespace clack.middleware.postmodern
+(in-package :cl-user)
+(defpackage clack.middleware.postmodern
   (:use #:cl
 	#:clack)
   (:import-from #:postmodern
 		#:with-connection
 		#:*database*))
+(in-package :clack.middleware.postmodern)
 
 
 (cl-syntax:use-syntax :annot)

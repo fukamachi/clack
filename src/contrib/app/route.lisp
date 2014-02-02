@@ -7,7 +7,8 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.app.route
+(in-package :cl-user)
+(defpackage clack.app.route
   (:use :cl
         :clack)
   (:import-from :cl-annot.eval-when
@@ -21,6 +22,7 @@
   (:import-from :clack.util.route
                 :make-url-rule
                 :match))
+(in-package :clack.app.route)
 
 (cl-syntax:use-syntax :annot)
 

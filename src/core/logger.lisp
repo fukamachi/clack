@@ -6,13 +6,15 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.logger
+(in-package :cl-user)
+(defpackage clack.logger
   (:use :cl
         :cl-annot.doc)
   (:import-from :local-time
                 :format-timestring)
   (:import-from :clack.util.localtime
                 :now))
+(in-package :clack.logger)
 
 (cl-syntax:use-syntax :annot)
 

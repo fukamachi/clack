@@ -1,8 +1,10 @@
-(clack.util:namespace t.clack.app.urlmap
+(in-package :cl-user)
+(defpackage t.clack.app.urlmap
   (:use :cl
         :clack
         :clack.app.urlmap
         :cl-test-more))
+(in-package :t.clack.app.urlmap)
 
 (plan 4)
 

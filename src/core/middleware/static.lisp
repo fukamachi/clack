@@ -6,7 +6,8 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.middleware.static
+(in-package :cl-user)
+(defpackage clack.middleware.static
   (:use :cl
         :clack
         :anaphora)
@@ -14,6 +15,7 @@
                 :<clack-app-file>)
   (:import-from :alexandria
                 :starts-with-subseq))
+(in-package :clack.middleware.static)
 
 (cl-syntax:use-syntax :annot)
 

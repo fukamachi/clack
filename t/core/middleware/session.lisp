@@ -1,4 +1,5 @@
-(clack.util:namespace t.clack.middleware.session
+(in-package :cl-user)
+(defpackage t.clack.middleware.session
   (:use :cl
         :anaphora
         :cl-test-more
@@ -9,6 +10,7 @@
         :clack.session.state.cookie
         :drakma)
   (:shadowing-import-from :cl-test-more :finalize))
+(in-package :t.clack.middleware.session)
 
 (plan 8)
 

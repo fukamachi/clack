@@ -6,8 +6,10 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.http-status
+(in-package :cl-user)
+(defpackage clack.http-status
   (:use :cl))
+(in-package :clack.http-status)
 
 (cl-syntax:use-syntax :annot)
 

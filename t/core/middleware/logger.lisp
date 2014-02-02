@@ -1,4 +1,5 @@
-(clack.util:namespace t.clack.middleware.logger
+(in-package :cl-user)
+(defpackage t.clack.middleware.logger
   (:use :cl
         :cl-test-more
         :clack.test
@@ -10,6 +11,7 @@
         :drakma)
   (:import-from :cl-fad
                 :file-exists-p))
+(in-package :t.clack.middleware.logger)
 
 (plan 6)
 

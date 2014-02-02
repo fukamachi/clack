@@ -6,12 +6,14 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.middleware.rucksack
+(in-package :cl-user)
+(defpackage clack.middleware.rucksack
   (:use :cl
         :clack)
   (:import-from :rucksack
                 :with-transaction
                 :current-rucksack))
+(in-package :clack.middleware.rucksack)
 
 (cl-syntax:use-syntax :annot)
 

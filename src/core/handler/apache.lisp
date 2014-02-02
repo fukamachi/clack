@@ -6,7 +6,8 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.handler.apache
+(in-package :cl-user)
+(defpackage clack.handler.apache
   (:use :cl
         :modlisp
         :split-sequence
@@ -16,6 +17,7 @@
   (:import-from :clack.component :call)
   (:import-from :clack.util.hunchentoot
                 :url-decode))
+(in-package :clack.handler.apache)
 
 (cl-syntax:use-syntax :annot)
 

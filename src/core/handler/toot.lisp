@@ -6,7 +6,8 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.handler.toot
+(in-package :cl-user)
+(defpackage clack.handler.toot
   (:use :cl
         :toot
         :anaphora
@@ -17,7 +18,8 @@
                 :<component>
                 :call)
   (:import-from :flexi-streams
-		:octets-to-string))
+                :octets-to-string))
+(in-package :clack.handler.toot)
 
 (cl-syntax:use-syntax :annot)
 

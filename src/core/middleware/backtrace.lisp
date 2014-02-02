@@ -6,12 +6,14 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.middleware.backtrace
+(in-package :cl-user)
+(defpackage clack.middleware.backtrace
   (:use :cl
         :clack.component
         :clack.middleware)
   (:import-from :trivial-backtrace
                 :print-backtrace))
+(in-package :clack.middleware.backtrace)
 
 (cl-syntax:use-syntax :annot)
 

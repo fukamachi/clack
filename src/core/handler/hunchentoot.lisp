@@ -6,7 +6,8 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.handler.hunchentoot
+(in-package :cl-user)
+(defpackage clack.handler.hunchentoot
   (:use :cl
         :hunchentoot
         :anaphora
@@ -15,6 +16,7 @@
   (:import-from :clack.component :call)
   (:import-from :flexi-streams
                 :make-external-format))
+(in-package :clack.handler.hunchentoot)
 
 (cl-syntax:use-syntax :annot)
 

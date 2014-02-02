@@ -6,12 +6,14 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.session.store
+(in-package :cl-user)
+(defpackage clack.session.store
   (:use :cl)
   (:import-from :alexandria
                 :make-keyword
                 :remove-from-plistf)
   (:import-from :clack.util :getf*))
+(in-package :clack.session.store)
 
 (cl-syntax:use-syntax :annot)
 

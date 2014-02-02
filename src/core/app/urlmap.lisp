@@ -6,7 +6,8 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.app.urlmap
+(in-package :cl-user)
+(defpackage clack.app.urlmap
   (:use :cl
         :clack
         :anaphora)
@@ -14,6 +15,7 @@
                 :scan
                 :scan-to-strings
                 :regex-replace))
+(in-package :clack.app.urlmap)
 
 (cl-syntax:use-syntax :annot)
 

@@ -6,7 +6,8 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.builder
+(in-package :cl-user)
+(defpackage clack.builder
   (:use :cl)
   (:import-from :alexandria
                 :ensure-list)
@@ -16,6 +17,7 @@
                 :wrap)
   (:import-from :clack.middleware.conditional
                 :<clack-middleware-conditional>))
+(in-package :clack.builder)
 
 (cl-syntax:use-syntax :annot)
 

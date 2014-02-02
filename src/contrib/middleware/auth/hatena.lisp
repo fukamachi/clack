@@ -1,4 +1,5 @@
-(clack.util:namespace clack.middleware.auth.hatena
+(in-package :cl-user)
+(defpackage clack.middleware.auth.hatena
   (:use :cl
         :clack
         :anaphora)
@@ -14,6 +15,7 @@
                 :http-request)
   (:import-from :yason
                 :decode-json))
+(in-package :clack.middleware.auth.hatena)
 
 (cl-annot:enable-annot-syntax)
 

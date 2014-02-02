@@ -6,12 +6,14 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.middleware.clsql
+(in-package :cl-user)
+(defpackage clack.middleware.clsql
   (:use :cl
         :clack)
   (:import-from :clsql
                 :connect
                 :disconnect))
+(in-package :clack.middleware.clsql)
 
 (cl-syntax:use-syntax :annot)
 

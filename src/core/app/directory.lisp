@@ -6,7 +6,8 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.app.directory
+(in-package :cl-user)
+(defpackage clack.app.directory
   (:use :cl
         :clack)
   (:import-from :clack.util
@@ -20,6 +21,7 @@
                 :directory-exists-p
                 :directory-pathname-p
                 :list-directory))
+(in-package :clack.app.directory)
 
 (cl-syntax:use-syntax :annot)
 

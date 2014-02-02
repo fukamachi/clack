@@ -6,12 +6,14 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.middleware.oauth
+(in-package :cl-user)
+(defpackage clack.middleware.oauth
   (:use :cl
         :clack
         :anaphora
         :clack.request
         :clack.response))
+(in-package :clack.middleware.oauth)
 
 (cl-syntax:use-syntax :annot)
 

@@ -1,7 +1,9 @@
-(clack.util:namespace t.clack.logger
+(in-package :cl-user)
+(defpackage t.clack.logger
   (:use :cl
         :cl-test-more
         :clack.logger))
+(in-package :t.clack.logger)
 
 (plan nil)
 (setf *logger-min-level* clack.logger:+warning+)

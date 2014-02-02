@@ -6,7 +6,8 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.response
+(in-package :cl-user)
+(defpackage clack.response
   (:use :cl
         :anaphora)
   (:import-from :trivial-types
@@ -23,6 +24,7 @@
   (:import-from :local-time
                 :universal-to-timestamp)
   (:export :status))
+(in-package :clack.response)
 
 (cl-syntax:use-syntax :annot)
 

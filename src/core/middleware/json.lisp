@@ -6,15 +6,16 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.middleware.json
+(in-package :cl-user)
+(defpackage clack.middleware.json
   (:use :cl
         :clack)
   (:import-from :clack.util.stream
                 :ensure-character-input-stream)
   (:import-from :alexandria :hash-table-plist)
   (:import-from :yason :parse)
-  (:shadow :finalize :expire)
-)
+  (:shadow :finalize :expire))
+(in-package :clack.middleware.json)
 
 (cl-syntax:use-syntax :annot)
 

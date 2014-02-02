@@ -6,7 +6,8 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.request
+(in-package :cl-user)
+(defpackage clack.request
   (:use :cl
         :anaphora)
   (:import-from :trivial-types
@@ -51,6 +52,7 @@
 
            :referer
            :user-agent))
+(in-package :clack.request)
 
 (cl-syntax:use-syntax :annot)
 

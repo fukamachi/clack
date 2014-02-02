@@ -6,7 +6,8 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.middleware.session.cookie
+(in-package :cl-user)
+(defpackage clack.middleware.session.cookie
   (:use :cl
         :clack.session.state
         :split-sequence)
@@ -26,6 +27,7 @@
                 :string-to-base64-string)
   (:import-from :alexandria
                 :hash-table-plist))
+(in-package :clack.middleware.session.cookie)
 
 (cl-syntax:use-syntax :annot)
 

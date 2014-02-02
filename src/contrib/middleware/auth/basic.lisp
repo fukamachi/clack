@@ -6,7 +6,8 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.middleware.auth.basic
+(in-package :cl-user)
+(defpackage clack.middleware.auth.basic
   (:use :cl
         :clack
         :split-sequence)
@@ -17,6 +18,7 @@
   (:import-from :arnesi
                 :aand
                 :it))
+(in-package :clack.middleware.auth.basic)
 
 (cl-syntax:use-syntax :annot)
 

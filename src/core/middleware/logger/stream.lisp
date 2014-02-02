@@ -6,11 +6,13 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.logger.stream
+(in-package :cl-user)
+(defpackage clack.logger.stream
   (:use :cl)
   (:import-from :clack.logger.base
                 :<clack-logger-base>
                 :output))
+(in-package :clack.logger.stream)
 
 (cl-syntax:use-syntax :annot)
 

@@ -1,7 +1,9 @@
-(clack.util:namespace t.clack.util.route
+(in-package :cl-user)
+(defpackage t.clack.util.route
   (:use :cl
         :clack.util.route
         :cl-test-more))
+(in-package :t.clack.util.route)
 
 (plan 34)
 

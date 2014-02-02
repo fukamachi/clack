@@ -1,10 +1,12 @@
-(clack.util:namespace t.clack.middleware.auth.basic
+(in-package :cl-user)
+(defpackage t.clack.middleware.auth.basic
   (:use :cl
         :cl-test-more
         :clack.test
         :clack.builder
         :clack.middleware.auth.basic
         :drakma))
+(in-package :t.clack.middleware.auth.basic)
 
 (plan 4)
 

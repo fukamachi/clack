@@ -25,15 +25,6 @@
 
 (cl-syntax:use-syntax :annot)
 
-@export
-(defmacro namespace (name &rest body)
-  "Similar to `defpackage', but the difference is ensure to be in :CL-USER before and to be in the new package after.
-This may be useful for 'one-package-per-one-file' style."
-  `(progn
-     (in-package :cl-user)
-     (defpackage ,(symbol-name name) ,@body)
-     (in-package ,(symbol-name name))))
-
 (defun normalize-key (name)
   "key must be a keyword."
   (etypecase name

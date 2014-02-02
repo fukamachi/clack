@@ -6,8 +6,10 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.component
+(in-package :cl-user)
+(defpackage clack.component
   (:use :cl))
+(in-package :clack.component)
 
 (cl-syntax:use-syntax :annot)
 

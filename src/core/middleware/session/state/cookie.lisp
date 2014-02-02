@@ -6,7 +6,8 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.session.state.cookie
+(in-package :cl-user)
+(defpackage clack.session.state.cookie
   (:use :cl
         :clack.session.state)
   (:import-from :clack.request
@@ -29,6 +30,7 @@
            :valid-sid-p
            :extract-id
            :generate-id))
+(in-package :clack.session.state.cookie)
 
 (cl-syntax:use-syntax :annot)
 

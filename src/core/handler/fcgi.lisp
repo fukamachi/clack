@@ -6,7 +6,8 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.handler.fcgi
+(in-package :cl-user)
+(defpackage clack.handler.fcgi
   (:use :cl
         :cl-fastcgi
         :anaphora)
@@ -31,6 +32,7 @@
                 :stream-server-usocket
                 :socket-listen
                 :socket-close))
+(in-package :clack.handler.fcgi)
 
 (cl-syntax:use-syntax :annot)
 

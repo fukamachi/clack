@@ -6,13 +6,15 @@
   Clack is freely distributable under the LLGPL License.
 |#
 
-(clack.util:namespace clack.test
+(in-package :cl-user)
+(defpackage clack.test
   (:use :cl)
   (:import-from :cl-test-more
                 :diag
                 :deftest)
   (:import-from :clack.util
                 :find-handler))
+(in-package :clack.test)
 
 (cl-syntax:use-syntax :annot)
 
