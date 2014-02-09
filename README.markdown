@@ -14,9 +14,9 @@ Clack is a web application environment for Common Lisp inspired by Python's WSGI
           #'(lambda (env)
               '(200 (:content-type "text/plain") ("Hello, Clack!")))))
 
-Now access [http://localhost:5000/](http://localhost:5000/) and Clack should show you "Hello, Clack!".
+Open your web browser and go to [http://localhost:5000/](http://localhost:5000/). You should get "Hello, Clack!".
 
-To stop the server, execute `(clack:stop *handler*)`.
+To stop the server, use `(clack:stop *handler*)`.
 
 ## Installation
 
@@ -38,23 +38,25 @@ Clack is available on [Quicklisp](http://www.quicklisp.org/beta/).
 
 ## Middleware
 
-Middleware is one of the Clack Component. It takes another Application and runs it.
+Middleware is a type of Clack components, which modifies the behavior of a Clack application without modifing the Clack application's code.
 
 ### Bundle Middleware
 
-* [Clack.Middleware.Static](http://quickdocs.org/clack/api#package-CLACK.MIDDLEWARE.STATIC) - Serves static files.
-* [Clack.Middleware.Logger](http://quickdocs.org/clack/api#package-CLACK.MIDDLEWARE.LOGGER) - Logging in Clack Application or Middleware.
-* [Clack.Middleware.Session](http://quickdocs.org/clack/api#package-CLACK.MIDDLEWARE.SESSION) - Session management.
+* [Clack.Middleware.Static](http://quickdocs.org/clack/api#package-CLACK.MIDDLEWARE.STATIC) - returns static files
+* [Clack.Middleware.Logger](http://quickdocs.org/clack/api#package-CLACK.MIDDLEWARE.LOGGER) - logs messages
+* [Clack.Middleware.Session](http://quickdocs.org/clack/api#package-CLACK.MIDDLEWARE.SESSION) - manages sessions
+* [Clack.Middleware.Conditional](http://quickdocs.org/clack/api#package-CLACK.MIDDLEWARE.CONDITIONAL) - enables a middleware to conditionally wraps components
+* [Clack.Middleware.Auth.Basic](http://quickdocs.org/clack/api#package-CLACK.MIDDLEWARE.AUTH.BASIC) - provides basic authentication
+
 
 ### Contrib Middleware
 
-* [Clack.Middleware.Dbi](http://quickdocs.org/clack/api#system-clack-middleware-dbi) - Middleware for CL-DBI connection management.
-* [Clack.Middleware.Csrf](http://quickdocs.org/clack/api#system-clack-middleware-csrf) - Provides easy way to protect from CSRF.
-* [Clack.Middleware.Auth.Basic](http://quickdocs.org/clack/api#system-clack-middleware-auth-basic) - Basic Authentication Middleware.
-* [Clack.Middleware.Clsql](http://quickdocs.org/clack/api#system-clack-middleware-clsql) - For CLSQL connection management.
-* [Clack.Middleware.Postmodern](http://quickdocs.org/clack/api#system-clack-middleware-postmodern) - Middleware for POSTMODERN connection management.
-* [Clack.Middleware.Rucksack](http://quickdocs.org/clack/api#system-clack-middleware-rucksack) - For wrapping Rucksack transaction.
-* [Clack.Middleware.OAuth](http://quickdocs.org/clack/api#system-clack-middleware-oauth) - Authorization by OAuth.
+* [Clack.Middleware.Dbi](http://quickdocs.org/clack/api#system-clack-middleware-dbi) - manages CL-DBI connections
+* [Clack.Middleware.Csrf](http://quickdocs.org/clack/api#system-clack-middleware-csrf) - provides an easy way to protect an application from CSRF attacks
+* [Clack.Middleware.Clsql](http://quickdocs.org/clack/api#system-clack-middleware-clsql) - manages CLSQL connections
+* [Clack.Middleware.Postmodern](http://quickdocs.org/clack/api#system-clack-middleware-postmodern) - manages POSTMODERN connections
+* [Clack.Middleware.Rucksack](http://quickdocs.org/clack/api#system-clack-middleware-rucksack) - wraps Rucksack transaction.
+* [Clack.Middleware.OAuth](http://quickdocs.org/clack/api#system-clack-middleware-oauth) - provides OAuth authorization
 
 ## Author
 
@@ -62,7 +64,7 @@ Middleware is one of the Clack Component. It takes another Application and runs 
 
 ## Copyright
 
-Copyright (c) 2011 Eitarow Fukamachi
+Copyright (c) 2011-2014 Eitarow Fukamachi
 
 ## Contributors
 
