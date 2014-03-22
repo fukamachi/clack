@@ -156,31 +156,34 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
         (parameters->plist (query-string this)))
 
   ;; POST parameters
-  (multiple-value-bind (type subtype charset)
-      (parse-content-type (content-type this))
-    (let ((body (raw-body this))
-          (content-type (concatenate 'string type "/" subtype))
-          (external-format
-           (flex:make-external-format
-            (if charset
-                (make-keyword (string-upcase charset))
-                :utf-8)
-            :eol-style :lf)))
-      (cond
-        ((string-equal content-type "application/x-www-form-urlencoded")
-         (setf (slot-value this 'body-parameters)
-               (parameters->plist (read-line (ensure-character-input-stream body) nil ""))))
+  (if (getf env :body-parameters)
+      (setf (slot-value this 'body-parameters)
+            (getf env :body-parameters))
+      (multiple-value-bind (type subtype charset)
+          (parse-content-type (content-type this))
+        (let ((body (raw-body this))
+              (content-type (concatenate 'string type "/" subtype))
+              (external-format
+                (flex:make-external-format
+                 (if charset
+                     (make-keyword (string-upcase charset))
+                     :utf-8)
+                 :eol-style :lf)))
+          (cond
+            ((string-equal content-type "application/x-www-form-urlencoded")
+             (setf (slot-value this 'body-parameters)
+                   (parameters->plist (read-line (ensure-character-input-stream body) nil ""))))
 
-        ((string-equal content-type "multipart/form-data")
-         (let (;; parsed param (alist)
-               (params (clack.util.hunchentoot:parse-rfc2388-form-data
-                        body
-                        (content-type this)
-                        external-format)))
-           (setf (slot-value this 'body-parameters)
-                 ;; convert alist into plist
-                 (loop for (key . values) in params
-                       append (list (make-keyword key) values)))))))))
+            ((string-equal content-type "multipart/form-data")
+             (let (;; parsed param (alist)
+                   (params (clack.util.hunchentoot:parse-rfc2388-form-data
+                            body
+                            (content-type this)
+                            external-format)))
+               (setf (slot-value this 'body-parameters)
+                     ;; convert alist into plist
+                     (loop for (key . values) in params
+                           append (list (make-keyword key) values))))))))))
 
 @export
 (defun shared-raw-body (env)
