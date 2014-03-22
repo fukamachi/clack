@@ -26,25 +26,24 @@
 (cl-syntax:use-syntax :annot)
 
 (defun normalize-key (name)
-  "key must be a keyword."
+  "Returns a keyword of NAME."
   (etypecase name
     (keyword name)
     ((or string symbol) (make-keyword name))))
 
 @export
 (defmacro getf* (place key)
-  "Similar to `getf' but allows many types for the `key', String, Keyword or Symbol."
+  "Similar to `getf', but accepts a string, a keyword, or a symbol as KEY."
   `(getf ,place (normalize-key ,key)))
 
 @export
 (defmacro remf* (place key)
-  "Similar to `remf` but allows many types for the `key', String,
-Keyword or Symbol."
+  "Similar to `remf', but accepts a string, a keyword, or a symbol as KEY."
   `(remf ,place (normalize-key ,key)))
 
 @export
 (defun nappend (&rest list-of-list)
-  "Similar to `nconc` but assures `list` to be rewritten with the result."
+  "Similar to `nconc', but assures LIST-OF-LIST to be overwritten with the result."
   (loop with res = (pop list-of-list)
         for list in list-of-list
         do (rplacd (last res) list)
@@ -52,8 +51,8 @@ Keyword or Symbol."
 
 @export
 (defun merge-plist (p1 p2)
-  "Merge two plist into one plist.
-If same keys in two plist, second one will be adopted.
+  "Merges two plists into one plist.
+If there are same keys in the two plists, the one in P2 is adopted.
 
 Example:
   (merge-plist '(:apple 1 :grape 2) '(:banana 3 :apple 4))
@@ -69,7 +68,7 @@ Example:
 
 @export
 (defun find-handler (server &key (force t))
-  "Return a handler package. `server` must be a symbol or a keyword, not containing \"Clack.Handler.\" as a prefix.
+  "Returns a handler package. SERVER must be a symbol or a keyword without \"Clack.Handler.\" prefix.
 
 Example:
   (find-handler :hunchentoot)"
@@ -86,7 +85,7 @@ Example:
 
 @export
 (defun load-handler (server)
-  "Load a handler system in run-time. `server` must be a symbol or a keyword.
+  "Loads a handler system in run-time. SERVER must be a symbol or a keyword.
 
 Example:
   (load-handler :hunchentoot)"
@@ -103,7 +102,7 @@ Example:
 
 @export
 (defun generate-random-id ()
-  "Generate a random token."
+  "Generates a random token."
   (byte-array-to-hex-string
    (digest-sequence
     (make-digest :SHA1)
@@ -151,7 +150,7 @@ Example:
 
 @export
 (defun apply-middleware (app mw-class-name mw-package &rest args)
-  "Apply a middleware to the `app'. This function is for resolving symbol packages in run-time."
+  "Applys a middleware to the `app'. This function is for resolving symbol packages in run-time."
   (funcall (intern (symbol-name :wrap)
                    (find-package :clack.middleware))
            (apply #'make-instance
@@ -162,13 +161,13 @@ Example:
 (doc:start)
 
 @doc:NAME "
-Clack.Util - Utilities for Clack core or middleware development.
+Clack.Util - Utilities for Clack core and middleware development.
 "
 
 @doc:DESCRIPTION "
-Most of time, Clack uses other utility libraries (ex. Alexandria), but I realized they were not enough for Clack.
+Most of the time, Clack uses other utility libraries such as Alexandria, but I realized they were not sufficient for Clack.
 
-See each description of these functions for detail.
+See each description of these functions for the details.
 "
 
 @doc:AUTHOR "
