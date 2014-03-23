@@ -12,7 +12,13 @@
         :clack)
   (:import-from :clack.util.stream
                 :ensure-character-input-stream)
-  (:import-from :alexandria :hash-table-plist)
+  (:import-from :ppcre
+                :scan-to-strings)
+  (:import-from :flexi-streams
+                :octets-to-string)
+  (:import-from :alexandria
+                :hash-table-plist
+                :make-keyword)
   (:import-from :yason :parse)
   (:shadow :finalize :expire))
 (in-package :clack.middleware.json)
@@ -23,12 +29,23 @@
 (defclass <clack-middleware-json> (<middleware>)
   ())
 
+(defun parse-charset (content-type)
+  (let ((charset (aref (nth-value 1 (ppcre:scan-to-strings "^.+?/[^;]+;?(?:\\s*charset=([^; ]+)|$)"
+                                                           content-type))
+                       0)))
+    (and charset
+         (make-keyword (string-upcase charset)))))
+
 (defmethod call ((this <clack-middleware-json>) env)
-  (when (eql (search "application/json" (getf env :content-type) :test #'equalp)
-             0)
-    (let ((json-string (clack.util.stream:slurp-stream (ensure-character-input-stream
-                                                        (getf env :raw-body)))))
-      (unless (string= "" json-string)
-        (setf (getf env :body-parameters)
-              (list :json (yason:parse json-string))))))
+  (when (and (eql (search "application/json" (getf env :content-type) :test #'equalp)
+                  0)
+             (not (getf (getf env :body-parameters) :json)))
+    (let ((json-octets (make-array (getf env :content-length) :element-type '(unsigned-byte 8)))
+          (charset (parse-charset (getf env :content-type))))
+      (read-sequence json-octets (ensure-character-input-stream
+                                  (getf env :raw-body)))
+      (let ((json-string (flex:octets-to-string json-octets :external-format (or charset :utf-8))))
+        (unless (string= "" json-string)
+          (setf (getf env :body-parameters)
+                (list :json (yason:parse json-string)))))))
   (call-next this env))

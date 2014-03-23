@@ -19,7 +19,7 @@
 
 @export
 (defun slurp-stream (stream)
-  (flex:with-output-to-sequence (out :element-type (stream-element-type stream))
+  (flex:with-output-to-sequence (out)
     (alexandria:copy-stream stream out :finish-output t)))
 
 @export
