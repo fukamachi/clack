@@ -65,19 +65,26 @@
   (let ((req (make-request env)))
     (aand (gethash :csrf-token
                    (getf env :clack.session))
-          (string= it (body-parameter req :|_csrf_token|)))))
+          (or (string= it (body-parameter req :|_csrf_token|))
+              (and (hash-table-p (body-parameter req :json))
+                   (string= it (gethash "_csrf_token" (body-parameter req :json))))))))
+
+@export
+(defun csrf-token (session)
+  "Return a random CSRF token."
+  (sunless (gethash :csrf-token session)
+    (setf it (generate-random-id)))
+  (gethash :csrf-token session))
 
 @export
 (defun csrf-html-tag (session)
   "Return an 'input' tag containing random CSRF token.
 Note this has a side-effect, natually. This function stores the generated id into the current session when called."
   @type hash-table session
-  (sunless (gethash :csrf-token session)
-    (setf it (generate-random-id)))
   (concatenate
    'string
    "<input type=\"hidden\" name=\"_csrf_token\" value=\""
-   (gethash :csrf-token session)
+   (csrf-token session)
    "\" />"))
 
 (doc:start)
