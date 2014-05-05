@@ -3,6 +3,7 @@
   (:use :cl
         :cl-test-more
         :clack.builder
+        :clack.component
         :clack.middleware))
 (in-package :t.clack.builder)
 
