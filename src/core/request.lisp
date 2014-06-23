@@ -248,7 +248,7 @@ on an original raw-body."
   "Convert parameters into plist. The `params' must be a string."
   (loop for kv in (ppcre:split delimiter params)
         for (k v) = (ppcre:split "=" kv)
-        append (list (make-keyword k)
+        append (list (make-keyword (or (ignore-errors (clack.util.hunchentoot:url-decode k)) k))
                      ;; KLUDGE: calls `ignore-errors'.
                      (or (ignore-errors (clack.util.hunchentoot:url-decode v)) v))))
 
