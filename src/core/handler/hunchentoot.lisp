@@ -123,7 +123,7 @@ before passing to Clack application."
       :content-type (header-in* :content-type req))
 
      (loop for (k . v) in (hunchentoot:headers-in* req)
-           unless (find k '(:request-method :script-name :path-info :server-name :server-port :server-protocol :request-uri :remote-addr :remote-port :query-string :content-length :content-type :accept :connection))
+           unless (find k '(:request-method :script-name :path-info :server-name :server-port :server-protocol :request-uri :remote-addr :remote-port :query-string :content-length :content-type :connection))
              append (list (intern (format nil "HTTP-~:@(~A~)" k) :keyword)
                           v)))))
 
