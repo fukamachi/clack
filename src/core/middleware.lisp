@@ -36,6 +36,10 @@ This function takes a request plist."
   (setf (slot-value this 'app) app-or-middleware)
   #'(lambda (env) (call this env)))
 
+@export
+(defmethod wrap ((this function) app-or-middleware)
+  (funcall this app-or-middleware))
+
 (doc:start)
 
 @doc:NAME "
