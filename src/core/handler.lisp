@@ -9,6 +9,8 @@
 (in-package :cl-user)
 (defpackage clack.handler
   (:use :cl)
+  (:import-from :clack.file-watcher
+                :stop-watching)
   (:import-from :clack.util
                 :find-handler))
 (in-package :clack.handler)
@@ -27,6 +29,7 @@
 (defmethod stop ((this <handler>))
   "Stop the Clack server. Currently only works with Hunchentoot."
   (let ((handler-package (find-handler (server-name this))))
+    (stop-watching this)
     (funcall (intern (string '#:stop) handler-package) (acceptor this))))
 
 (doc:start)

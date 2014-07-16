@@ -9,7 +9,8 @@
 (in-package :cl-user)
 (defpackage clack
   (:use :cl
-        :cl-annot.doc)
+        :cl-annot.doc
+        :split-sequence)
   (:import-from :clack.component
                 :<component>
                 :component-designator
@@ -22,6 +23,8 @@
   (:import-from :clack.handler
                 :<handler>
                 :stop)
+  (:import-from :clack.file-watcher
+                :watch-systems)
   (:import-from :clack.util
                 :find-handler
                 :load-handler
@@ -66,7 +69,7 @@ Example:
            :debug nil)
 "
 @export
-(defun clackup (app &rest args &key (server :hunchentoot) (port 5000) (debug t) (use-cl-debugger t) &allow-other-keys)
+(defun clackup (app &rest args &key (server :hunchentoot) (port 5000) (debug t) watch (use-cl-debugger t) &allow-other-keys)
   #+shelly (setf use-cl-debugger nil)
   (unless use-cl-debugger
     #+quicklisp (ql:quickload :clack-errors)
@@ -90,18 +93,22 @@ Example:
               (buildapp (eval-file app))
               args))
       (component-designator
-       (prog1
-           (let ((handler-package (find-handler server)))
-             (make-instance '<handler>
-                            :server-name server
-                            :acceptor
-                            (apply (intern (string '#:run) handler-package)
-                                   (buildapp app)
-                                   :port port
-                                   :debug debug
-                                   (delete-from-plist args :server :port :debug :use-cl-debugger))))
+       (let* ((handler-package (find-handler server))
+              (handler (make-instance '<handler>
+                                      :server-name server
+                                      :acceptor
+                                      (apply (intern (string '#:run) handler-package)
+                                             (buildapp app)
+                                             :port port
+                                             :debug debug
+                                             (delete-from-plist args :server :port :debug :watch :use-cl-debugger)))))
          (format t "~&~:(~A~) server is started.~
-             ~%Listening on localhost:~A.~%" server port))))))
+             ~%Listening on localhost:~A.~%" server port)
+         (when watch
+           (when (stringp watch)
+             (setf watch (split-sequence #\, watch)))
+           (watch-systems handler watch))
+         handler)))))
 
 (defun eval-file (file)
   "Safer way to read and eval a file content. This function returns the last value."

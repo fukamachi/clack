@@ -49,14 +49,15 @@
                   ((:file "clack"
                     :depends-on ("component"
                                  "middleware"
-                                 "handler"))
+                                 "handler"
+                                 "file-watcher"))
                    (:file "builder"
                     :depends-on ("component" "middleware" "mw"))
                    (:file "request")
                    (:file "response")
                    (:file "component")
                    (:file "middleware" :depends-on ("component"))
-                   (:file "handler")
+                   (:file "handler" :depends-on ("file-watcher"))
                    (:file "http-status")
                    (:module "app"
                     :depends-on ("clack")
@@ -64,6 +65,7 @@
                     ((:file "file")
                      (:file "directory" :depends-on ("file"))
                      (:file "urlmap")))
+                   (:file "file-watcher")
                    (:file "logger")
                    (:module "middleware/logger"
                     :depends-on ("logger" "middleware")
