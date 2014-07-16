@@ -66,15 +66,20 @@ Example:
            :debug nil)
 "
 @export
-(defun clackup (app &rest args &key (server :hunchentoot) (port 5000) (debug t) &allow-other-keys)
+(defun clackup (app &rest args &key (server :hunchentoot) (port 5000) (debug t) (use-cl-debugger t) &allow-other-keys)
+  #+shelly (setf use-cl-debugger nil)
+  (unless use-cl-debugger
+    #+quicklisp (ql:quickload :clack-errors)
+    #-quicklisp (asdf:load-system :clack-errors))
   (labels ((buildapp (app)
              (reduce #'(lambda (app args)
                          (apply #'apply-middleware app args))
                      `(,app
-                       ,@(if debug
-                             nil
-                             '((:<clack-middleware-backtrace> :clack.middleware.backtrace
-                                :result-on-error (500 () ("Internal Server Error")))))
+                       ,@(cond
+                           ((and debug use-cl-debugger) nil)
+                           (debug '((:<clack-error-middleware> :clack-errors)))
+                           (T '((:<clack-middleware-backtrace> :clack.middleware.backtrace
+                                :result-on-error (500 () ("Internal Server Error"))))))
                        (:<clack-middleware-let> :clack.middleware.let
                         :bindings ((*standard-output* *clack-output*)
                                    (*error-output* *clack-error-output*)))
@@ -94,7 +99,7 @@ Example:
                                    (buildapp app)
                                    :port port
                                    :debug debug
-                                   (delete-from-plist args :server :port :debug))))
+                                   (delete-from-plist args :server :port :debug :use-cl-debugger))))
          (format t "~&~:(~A~) server is started.~
              ~%Listening on localhost:~A.~%" server port))))))
 
