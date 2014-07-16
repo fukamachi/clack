@@ -45,11 +45,11 @@
 (cl-syntax:use-syntax :annot)
 
 @export
-(defvar *clack-output* *standard-output*
+(defvar *clack-output* '*standard-output*
   "Standard output for a Clack running process.")
 
 @export
-(defvar *clack-error-output* *error-output*
+(defvar *clack-error-output* '*error-output*
   "Standard error output for a Clack running process.")
 
 @doc "
@@ -84,8 +84,12 @@ Example:
                            (T '((:<clack-middleware-backtrace> :clack.middleware.backtrace
                                 :result-on-error (500 () ("Internal Server Error"))))))
                        (:<clack-middleware-let> :clack.middleware.let
-                        :bindings ((*standard-output* *clack-output*)
-                                   (*error-output* *clack-error-output*)))
+                        :bindings ((*standard-output* ,(if (symbolp *clack-output*)
+                                                           (symbol-value *clack-output*)
+                                                           *clack-output*))
+                                   (*error-output* ,(if (symbolp *clack-error-output*)
+                                                        (symbol-value *clack-error-output*)
+                                                        *clack-error-output*))))
                        (:<clack-middleware-json> :clack.middleware.json)))))
     (etypecase app
       (pathname-designator

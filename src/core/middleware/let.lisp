@@ -32,7 +32,7 @@ Clack.Middleware.Let
 
 @doc:SYNOPSIS "
     (clackup (builder
-              (<clack-middleware-let> :bindings '((*standard-output* *clack-output*)))
+              (<clack-middleware-let> :bindings `((*standard-output* ,*clack-output*)))
               (lambda (env)
                 (format t \"You've got an access!~%\")
                 '(200 nil (\"Hi!\")))))
