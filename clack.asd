@@ -40,7 +40,8 @@
                :yason
                :cl-base64
                :marshal
-               :trivial-backtrace)
+               :trivial-backtrace
+               :log4cl)
   :components ((:module "src"
                 :components
                 ((:module "core"
@@ -90,6 +91,7 @@
                        (:file "store")
                        (:file "session")
                        (:file "cookie")))
+                     (:file "accesslog")
                      (:file "let")
                      (:file "backtrace")))))
                  (:module "util"
