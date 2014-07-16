@@ -45,11 +45,13 @@
 (defun content-length (res)
   (destructuring-bind (status headers body)
       res
+    (declare (ignore status))
     (or (getf headers :content-length)
         (typecase body
-          (list (reduce #'+ body :key #'length))
+          (list (+ (reduce #'+ body :key #'length)
+                   (length body)))
           (pathname (clack.app.directory::file-size body))
-          ((vector (unsigned-byte 8)) (length body))))))
+          ((vector (unsigned-byte 8)) (1+ (length body)))))))
 
 @export
 (defclass <clack-middleware-accesslog> (<middleware>)
