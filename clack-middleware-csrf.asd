@@ -18,7 +18,7 @@
 (in-package :clack-middleware-csrf-asd)
 
 (defsystem clack-middleware-csrf
-  :version "11.09"
+  :version "0.2.0"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
   :depends-on (:clack

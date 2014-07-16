@@ -19,7 +19,7 @@
 (in-package :clack-handler-toot-asd)
 
 (defsystem clack-handler-toot
-  :version "11.12"
+  :version "0.1.0"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
   :depends-on (:clack

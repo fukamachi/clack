@@ -18,7 +18,7 @@
 (in-package :clack-middleware-dbi-asd)
 
 (defsystem clack-middleware-dbi
-  :version "12.03"
+  :version "0.2.0"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
   :depends-on (:clack

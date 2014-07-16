@@ -18,7 +18,7 @@
 (in-package :clack-test-asd)
 
 (defsystem clack-test
-  :version "12.03"
+  :version "0.1.2"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
   :depends-on (:clack

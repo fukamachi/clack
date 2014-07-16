@@ -18,7 +18,7 @@
 (in-package :clack-middleware-rucksack-asd)
 
 (defsystem clack-middleware-rucksack
-  :version "11.09"
+  :version "0.1.0"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
   :depends-on (:clack

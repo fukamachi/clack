@@ -18,7 +18,7 @@
 (in-package :clack-app-route-asd)
 
 (defsystem clack-app-route
-  :version "12.03"
+  :version "0.1.2"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
   :depends-on (:clack

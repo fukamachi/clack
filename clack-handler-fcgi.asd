@@ -18,7 +18,7 @@
 (in-package :clack-handler-fcgi-asd)
 
 (defsystem clack-handler-fcgi
-  :version "12.03"
+  :version "0.3.1"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
   :depends-on (:clack

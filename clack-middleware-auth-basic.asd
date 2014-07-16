@@ -18,7 +18,7 @@
 (in-package :clack-middleware-auth-basic-asd)
 
 (defsystem clack-middleware-auth-basic
-  :version "12.03"
+  :version "0.2.0"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
   :depends-on (:clack

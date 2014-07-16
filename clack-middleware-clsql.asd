@@ -18,7 +18,7 @@
 (in-package :clack-middleware-clsql-asd)
 
 (defsystem clack-middleware-clsql
-  :version "11.09"
+  :version "0.1.1"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
   :depends-on (:clack

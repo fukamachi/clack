@@ -19,7 +19,7 @@
 
 #+(or allegro cmu lispworks sbcl)
 (defsystem clack-handler-apache
-  :version "11.12"
+  :version "0.2.1"
   :author "Eitarow Fukamachi"
   :license "LLGPL"
   :depends-on (:clack
