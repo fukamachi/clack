@@ -1,7 +1,7 @@
 #|
   This file is a part of Clack package.
   URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitarow Fukamachi <e.arrows@gmail.com>
+  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
 
   Clack is freely distributable under the LLGPL License.
 |#
@@ -19,7 +19,7 @@
 
 @export
 (defclass <clack-middleware-oauth> (<middleware>)
-     ;; TODO: declare types for each slots. -- Eitarow Fukamachi
+     ;; TODO: declare types for each slots. -- Eitaro Fukamachi
      ((path :initarg :path :accessor oauth-path)
       (callback-base :initarg :callback-base :accessor oauth-callback-base)
       (callback-uri :initarg :callback-uri :initform nil :accessor oauth-callback-uri)

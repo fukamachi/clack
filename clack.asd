@@ -1,7 +1,7 @@
 #|
   This file is a part of Clack package.
   URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitarow Fukamachi <e.arrows@gmail.com>
+  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
 
   Clack is freely distributable under the LLGPL License.
 |#
@@ -9,7 +9,7 @@
 #|
   Clack is a Web server Interface for Common Lisp.
 
-  Author: Eitarow Fukamachi (e.arrows@gmail.com)
+  Author: Eitaro Fukamachi (e.arrows@gmail.com)
 |#
 
 (in-package :cl-user)
@@ -19,7 +19,7 @@
 
 (defsystem clack
   :version "0.9.4"
-  :author "Eitarow Fukamachi"
+  :author "Eitaro Fukamachi"
   :license "LLGPL"
   :depends-on (;; Utility
                :trivial-types

@@ -1,7 +1,7 @@
 #|
   This file is a part of Clack package.
   URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitarow Fukamachi <e.arrows@gmail.com>
+  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
 
   Clack is freely distributable under the LLGPL License.
 |#
@@ -9,7 +9,7 @@
 #|
   Clack.Handler.Toot - Clack handler for Toot.
 
-  Author: Eitarow Fukamachi (e.arrows@gmail.com)
+  Author: Eitaro Fukamachi (e.arrows@gmail.com)
   Author: κeen
 |#
 
@@ -20,7 +20,7 @@
 
 (defsystem clack-handler-toot
   :version "0.1.0"
-  :author "Eitarow Fukamachi"
+  :author "Eitaro Fukamachi"
   :license "LLGPL"
   :depends-on (:clack
                :cl-syntax

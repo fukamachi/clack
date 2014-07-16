@@ -17,7 +17,7 @@
                       :http-referer "http://github.com/fukamachi/clack"
                       :http-user-agent "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-US)"
                       :http-cookie "hoge=1;fuga=semi;colon"
-                      :query-string "ediweitz=weitzedi&name=eitarow&q=C%2B%2B"
+                      :query-string "ediweitz=weitzedi&name=eitaro&q=C%2B%2B"
                       :raw-body
                       ,(flex:make-flexi-stream
                         (flex:make-in-memory-input-stream
@@ -43,7 +43,7 @@
     "user-agent")
 
 (is (query-parameter req)
-    '(:|ediweitz| "weitzedi" :|name| "eitarow" :|q| "C++")
+    '(:|ediweitz| "weitzedi" :|name| "eitaro" :|q| "C++")
     "query-parameter")
 
 (is (query-parameter req "q")
@@ -75,7 +75,7 @@
 
 (is (parameter req)
     `(:|ediweitz| "weitzedi"
-      :|name| "eitarow"
+      :|name| "eitaro"
       :\q "C++"
       :|name| ,(flex:octets-to-string
                 #(230 183 177 231 148 186 232 139 177 229 164 170 233 131 142)

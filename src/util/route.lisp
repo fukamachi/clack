@@ -1,7 +1,7 @@
 #|
   This file is a part of Clack package.
   URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitarow Fukamachi <e.arrows@gmail.com>
+  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
 
   Clack is freely distributable under the LLGPL License.
 |#
@@ -239,7 +239,7 @@ Clack.Util.Route provides a Sinatra-compatible routing class.
 "
 
 @doc:AUTHOR "
-* Eitarow Fukamachi (e.arrows@gmail.com)
+* Eitaro Fukamachi (e.arrows@gmail.com)
 * Tomohiro Matsuyama (tomo@cx4a.org)
 
 Note: `compile-rule` was originally written by Tomohiro Matsuyama as `parse-url-rule` in Clack.App.Route.

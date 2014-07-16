@@ -1,7 +1,7 @@
 #|
   This file is a part of Clack package.
   URL: http://github.com/fukamachi/clack
-  Copyright (c) 2013 Eitarow Fukamachi <e.arrows@gmail.com>
+  Copyright (c) 2013 Eitaro Fukamachi <e.arrows@gmail.com>
 
   Clack is freely distributable under the LLGPL License.
 |#
@@ -84,5 +84,5 @@ Clack.Middleware.Backtrace catches all errors and outputs their backtraces to `*
 "
 
 @doc:AUTHOR "
-Eitarow Fukamachi (e.arrows@gmail.com)
+Eitaro Fukamachi (e.arrows@gmail.com)
 "

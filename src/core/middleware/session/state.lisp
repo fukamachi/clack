@@ -1,7 +1,7 @@
 #|
   This file is a part of Clack package.
   URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitarow Fukamachi <e.arrows@gmail.com>
+  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
 
   Clack is freely distributable under the LLGPL License.
 |#
@@ -79,7 +79,7 @@ Clack.Session.State maintains session state by passing the session through the r
 "
 
 @doc:AUTHOR "
-Eitarow Fukamachi (e.arrows@gmail.com)
+Eitaro Fukamachi (e.arrows@gmail.com)
 "
 
 @doc:SEE "

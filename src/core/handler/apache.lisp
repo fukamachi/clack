@@ -1,7 +1,7 @@
 #|
   This file is a part of Clack package.
   URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitarow Fukamachi <e.arrows@gmail.com>
+  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
 
   Clack is freely distributable under the LLGPL License.
 |#
@@ -173,5 +173,5 @@ This configuration opens port 12345 to web browsers, and listens for the Lisp pr
 "
 
 @doc:AUTHOR "
-Eitarow Fukamachi (e.arrows@gmail.com)
+Eitaro Fukamachi (e.arrows@gmail.com)
 "

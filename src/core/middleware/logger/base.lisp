@@ -1,7 +1,7 @@
 #|
   This file is a part of Clack package.
   URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitarow Fukamachi <e.arrows@gmail.com>
+  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
 
   Clack is freely distributable under the LLGPL License.
 |#
@@ -32,7 +32,7 @@ Clack.Logger.Base is base class for Clack loggers to pass to Clack.Middleware.Lo
 "
 
 @doc:AUTHOR "
-Eitarow Fukamachi (e.arrows@gmail.com)
+Eitaro Fukamachi (e.arrows@gmail.com)
 "
 
 @doc:SEE "

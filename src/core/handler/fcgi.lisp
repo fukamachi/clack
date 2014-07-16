@@ -1,7 +1,7 @@
 #|
   This file is a part of Clack package.
   URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitarow Fukamachi <e.arrows@gmail.com>
+  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
 
   Clack is freely distributable under the LLGPL License.
 |#
@@ -245,5 +245,5 @@ Now, you can access [http://localhost:8080/](http://localhost:8080/) and Clack s
 "
 
 @doc:AUTHOR "
-Eitarow Fukamachi (e.arrows@gmail.com)
+Eitaro Fukamachi (e.arrows@gmail.com)
 "

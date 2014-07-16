@@ -1,7 +1,7 @@
 #|
   This file is a part of Clack package.
   URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitarow Fukamachi <e.arrows@gmail.com>
+  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
   Copyright (c) 2011 Tomohiro Matsuyama <tomo@cx4a.org>
 
   Clack is freely distributable under the LLGPL License.
@@ -142,7 +142,7 @@ Note: Though `parse-url-rule` is provided from this package now, it is now depre
 "
 
 @doc:CONTRIBUTORS "
-* Eitarow Fukamachi (e.arrows@gmail.com)
+* Eitaro Fukamachi (e.arrows@gmail.com)
 "
 
 @doc:SEE "

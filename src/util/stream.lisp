@@ -46,5 +46,5 @@ Clack.Util.Stream - Useul streams
 "
 
 @doc:CONTRIBUTORS "
-* Eitarow Fukamachi (e.arrows@gmail.com)
+* Eitaro Fukamachi (e.arrows@gmail.com)
 "

@@ -60,11 +60,11 @@ Middleware is a type of Clack components, which modifies the behavior of a Clack
 
 ## Author
 
-* Eitarow Fukamachi (e.arrows@gmail.com)
+* Eitaro Fukamachi (e.arrows@gmail.com)
 
 ## Copyright
 
-Copyright (c) 2011-2014 Eitarow Fukamachi
+Copyright (c) 2011-2014 Eitaro Fukamachi
 
 ## Contributors
 

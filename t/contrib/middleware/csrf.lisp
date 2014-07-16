@@ -89,7 +89,7 @@
             1
             (http-request "http://localhost:4242/"
                           :method :post
-                          :parameters '(("name" . "Eitarow Fukamachi")
+                          :parameters '(("name" . "Eitaro Fukamachi")
                                         ("_csrf_token" . "wrongtokeniknow"))
                           :cookie-jar cookie-jar))
            400)
@@ -97,12 +97,12 @@
        (multiple-value-bind (body status headers)
            (http-request "http://localhost:4242/"
                          :method :post
-                         :parameters `(("name" . "Eitarow Fukamachi")
+                         :parameters `(("name" . "Eitaro Fukamachi")
                                        ("_csrf_token" . ,csrf-token))
                          :cookie-jar cookie-jar)
          (is status 200 "Status is 200")
          (is (cdr (assoc :content-type headers)) "text/html; charset=utf-8" "Content-Type is text/html")
-         (is body "Eitarow Fukamachi" "can read body-parameter")))))
+         (is body "Eitaro Fukamachi" "can read body-parameter")))))
 
 (setf app
       (builder <clack-middleware-session>
@@ -154,14 +154,14 @@
                               :cookie-jar cookie-jar)))
          (http-request "http://localhost:4242/"
                        :method :post
-                       :parameters `(("name" . "Eitarow Fukamachi")
+                       :parameters `(("name" . "Eitaro Fukamachi")
                                      ("_csrf_token" . ,csrf-token))
                        :cookie-jar cookie-jar)
          (diag "bad POST request with before token")
          (multiple-value-bind (body status headers)
              (http-request "http://localhost:4242/"
                            :method :post
-                           :parameters `(("name" . "Eitarow Fukamachi")
+                           :parameters `(("name" . "Eitaro Fukamachi")
                                          ("_csrf_token" . ,csrf-token))
                            :cookie-jar cookie-jar)
            (declare (ignore body))

@@ -59,19 +59,19 @@
 
 (is-match "/hello/:name" "/hello/fukamachi" '("/hello/fukamachi" (:name "fukamachi"))
           "match")
-(is-match "/hello/:name" "/hello/fukamachi/eitarow" '(nil)
+(is-match "/hello/:name" "/hello/fukamachi/eitaro" '(nil)
           "containing a slash")
 (is-match "/hello/:name" "/bye/fukamachi" '(nil)
           "not match")
 (is-match "/blog/:post-id" "/blog/10" '("/blog/10" (:post-id "10")))
 (is-match "/tag/:tag" "/tag/#lisp" '("/tag/#lisp" (:tag "#lisp")))
 
-(is (url-for (make-url-rule "/hello/?:name?") '(:name "Eitarow"))
-    "/hello/Eitarow")
+(is (url-for (make-url-rule "/hello/?:name?") '(:name "Eitaro"))
+    "/hello/Eitaro")
 (is (url-for (make-url-rule "/hello/?:name?") nil)
     "/hello")
-(is (url-for (make-url-rule "/hello/?:name?") '(:name "Eitarow Fukamachi"))
-    "/hello/Eitarow%20Fukamachi")
+(is (url-for (make-url-rule "/hello/?:name?") '(:name "Eitaro Fukamachi"))
+    "/hello/Eitaro%20Fukamachi")
 
 (diag "with multiple named parameter")
 

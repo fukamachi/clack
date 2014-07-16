@@ -1,7 +1,7 @@
 #|
   This file is a part of Clack package.
   URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitarow Fukamachi <e.arrows@gmail.com>
+  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
 
   Clack is freely distributable under the LLGPL License.
 |#
@@ -99,11 +99,11 @@ you would call like this: `(run-server-tests :foo)'."
     (multiple-value-bind (body status headers)
         (http-request (localhost)
                       :method :post
-                      :parameters '(("name" . "eitarow")))
+                      :parameters '(("name" . "eitaro")))
       (is status 200)
-      (is (get-header headers :client-content-length) "12")
+      (is (get-header headers :client-content-length) "11")
       (is (get-header headers :client-content-type) "application/x-www-form-urlencoded")
-      (is body "Hello, name=eitarow"))))
+      (is body "Hello, name=eitaro"))))
 
 (define-app-test |big POST|
   (lambda (env)
@@ -252,7 +252,7 @@ you would call like this: `(run-server-tests :foo)'."
     (multiple-value-bind (body status headers)
         (http-request (localhost)
                       :method :post
-                      :parameters '(("name" . "eitarow")))
+                      :parameters '(("name" . "eitaro")))
       (is status 200)
       (is (get-header headers :content-type) "text/plain; charset=utf-8")
       (is body (format nil "~{~A~%~}"
@@ -517,7 +517,7 @@ Your Lisp have to support multi-thread to run these tests.
 "
 
 @doc:AUTHOR "
-Eitarow Fukamachi (e.arrows@gmail.com)
+Eitaro Fukamachi (e.arrows@gmail.com)
 "
 
 @doc:SEE "
