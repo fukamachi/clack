@@ -27,7 +27,6 @@
                 :watch-systems)
   (:import-from :clack.util
                 :find-handler
-                :load-handler
                 :apply-middleware)
   (:import-from :alexandria
                 :delete-from-plist)
