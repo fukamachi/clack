@@ -47,6 +47,8 @@ Middleware is a type of Clack components, which modifies the behavior of a Clack
 * [Clack.Middleware.Session](http://quickdocs.org/clack/api#package-CLACK.MIDDLEWARE.SESSION) - manages sessions
 * [Clack.Middleware.Conditional](http://quickdocs.org/clack/api#package-CLACK.MIDDLEWARE.CONDITIONAL) - enables a middleware to conditionally wraps components
 * [Clack.Middleware.Auth.Basic](http://quickdocs.org/clack/api#package-CLACK.MIDDLEWARE.AUTH.BASIC) - provides basic authentication
+* [Clack.Middleware.Backtrace](http://quickdocs.org/clack/api#package-CLACK.MIDDLEWARE.BACKTRACE)
+* [Clack.Middleware.Accesslog](http://quickdocs.org/clack/api#package-CLACK.MIDDLEWARE.ACCESSLOG)
 
 
 ### Contrib Middleware
