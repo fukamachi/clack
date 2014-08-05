@@ -31,7 +31,8 @@
 @export
 (defun format-rfc1123-timestring (destination timestamp)
   (format-timestring destination timestamp
-                     :format +rfc-1123-format+
+                     :format '(:short-weekday ", " (:day 2) #\  :short-month #\  (:year 4) #\  (:hour 2) #\:
+                               (:min 2) #\: (:sec 2) " GMT")
                      :timezone +gmt-zone+))
 
 (doc:start)
