@@ -44,46 +44,51 @@
     (let ((res (call-next this env)))
       (finalize this env res))))
 
-(defmethod extract ((this <clack-middleware-session>) env)
-  "Extract session id and state."
-  (let* ((id (extract-id (state this) env))
-         (session (when id
-                    (fetch (store this) id))))
-    (values (or id (generate-id (state this) env))
-            session)))
+(defgeneric extract (mw env)
+  (:documentation "Extract session id and state.")
+  (:method ((this <clack-middleware-session>) env)
+    (let* ((id (extract-id (state this) env))
+           (session (when id
+                      (fetch (store this) id))))
+      (values (or id (generate-id (state this) env))
+              session))))
 
-(defmethod finalize ((this <clack-middleware-session>) env res)
-  (let ((options (getf env :clack.session.options)))
-    (unless (gethash :no-store options)
-      (commit this env))
-    (if (gethash :expire options)
-        (expire this (gethash :id options) res env)
-        (save-state this (gethash :id options) res env))))
+(defgeneric finalize (mw env res)
+  (:method ((this <clack-middleware-session>) env res)
+    (let ((options (getf env :clack.session.options)))
+      (unless (gethash :no-store options)
+        (commit this env))
+      (if (gethash :expire options)
+          (expire this (gethash :id options) res env)
+          (save-state this (gethash :id options) res env)))))
 
-(defmethod commit ((this <clack-middleware-session>) env)
-  (let ((session (getf env :clack.session))
-        (options (getf env :clack.session.options)))
-    (cond
-      ((gethash :expire options)
-       (remove-session (store this) (gethash :id session)))
-      ((gethash :change-id options)
-       (remove-session (store this) (gethash :id session))
-       (setf (gethash :id options) (generate-id (state this) env))
-       (store-session (store this) (gethash :id options) session))
-      (t
-       (store-session (store this) (gethash :id options) session)))))
+(defgeneric commit (mw env)
+  (:method ((this <clack-middleware-session>) env)
+    (let ((session (getf env :clack.session))
+          (options (getf env :clack.session.options)))
+      (cond
+        ((gethash :expire options)
+         (remove-session (store this) (gethash :id session)))
+        ((gethash :change-id options)
+         (remove-session (store this) (gethash :id session))
+         (setf (gethash :id options) (generate-id (state this) env))
+         (store-session (store this) (gethash :id options) session))
+        (t
+         (store-session (store this) (gethash :id options) session))))))
 
-(defmethod expire ((this <clack-middleware-session>) id res env)
-  (state:expire
-   (state this)
-   id res
-   (hash-table-plist (getf env :clack.session.options))))
+(defgeneric expire (mw id res env)
+  (:method ((this <clack-middleware-session>) id res env)
+    (state:expire
+     (state this)
+     id res
+     (hash-table-plist (getf env :clack.session.options)))))
 
-(defmethod save-state ((this <clack-middleware-session>) id res env)
-  (state:finalize
-   (state this)
-   id res
-   (hash-table-plist (getf env :clack.session.options))))
+(defgeneric save-state (mw id res env)
+  (:method ((this <clack-middleware-session>) id res env)
+    (state:finalize
+     (state this)
+     id res
+     (hash-table-plist (getf env :clack.session.options)))))
 
 (doc:start)
 

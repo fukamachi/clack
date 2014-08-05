@@ -34,9 +34,11 @@
   (funcall app env))
 
 @export
-(defmethod make-app ((comp <component>))
-  "Create a function to call this component."
-  #'(lambda (env) (call comp env)))
+(defgeneric make-app (comp)
+  (:documentation
+   "Create a function to call this component.")
+  (:method ((comp <component>))
+    #'(lambda (env) (call comp env))))
 
 (doc:start)
 

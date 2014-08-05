@@ -26,11 +26,13 @@
                 :accessor acceptor)))
 
 @export
-(defmethod stop ((this <handler>))
-  "Stop the Clack server. Currently only works with Hunchentoot."
-  (let ((handler-package (find-handler (server-name this))))
-    (stop-watching this)
-    (funcall (intern (string '#:stop) handler-package) (acceptor this))))
+(defgeneric stop (handler)
+  (:documentation
+   "Stop the Clack server. Currently only works with Hunchentoot.")
+  (:method ((this <handler>))
+    (let ((handler-package (find-handler (server-name this))))
+      (stop-watching this)
+      (funcall (intern (string '#:stop) handler-package) (acceptor this)))))
 
 (doc:start)
 

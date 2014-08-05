@@ -26,17 +26,18 @@
   (:documentation "Class to map multiple apps in different paths."))
 
 @export
-(defmethod mount ((this <clack-app-urlmap>) location app)
-  "Register an `app' to the `location'."
-  (destructuring-bind (host location)
-      (aif (nth-value 1
-                      (scan-to-strings "^https?://(.*?)(/.*)" location))
-           (coerce it 'list)
-           (list nil location))
-    (unless (char= #\/ (aref location 0))
-      (error "Paths need to start with /"))
-    (push (list host location app)
-          (slot-value this '%mapping))))
+(defgeneric mount (app-urlmap location app)
+  (:documentation "Register an `app' to the `location'.")
+  (:method ((this <clack-app-urlmap>) location app)
+    (destructuring-bind (host location)
+        (aif (nth-value 1
+                        (scan-to-strings "^https?://(.*?)(/.*)" location))
+             (coerce it 'list)
+             (list nil location))
+      (unless (char= #\/ (aref location 0))
+        (error "Paths need to start with /"))
+      (push (list host location app)
+            (slot-value this '%mapping)))))
 
 (defmethod call ((this <clack-app-urlmap>) env)
   (let ((http-host

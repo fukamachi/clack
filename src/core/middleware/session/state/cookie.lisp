@@ -57,16 +57,17 @@
                 :initform nil
                 :accessor httponly)))
 
-(defmethod merge-options ((this <clack-session-state-cookie>) options)
-  (setf options (remove-from-plist options :id))
-  (merge-plist
-   (list
-    :path (path this)
-    :domain (domain this)
-    :secure (secure this)
-    :httponly (httponly this)
-    :expires (+ (get-universal-time) (expires this)))
-   options))
+(defgeneric merge-options (state options)
+  (:method ((this <clack-session-state-cookie>) options)
+    (setf options (remove-from-plist options :id))
+    (merge-plist
+     (list
+      :path (path this)
+      :domain (domain this)
+      :secure (secure this)
+      :httponly (httponly this)
+      :expires (+ (get-universal-time) (expires this)))
+     options)))
 
 @export
 (defmethod expire ((this <clack-session-state-cookie>)
@@ -84,11 +85,12 @@
   (set-cookie this id res
               (merge-options this options)))
 
-(defmethod set-cookie ((this <clack-session-state-cookie>) id res options)
-  (let ((r (apply #'make-response res)))
-    (setf (set-cookies r (session-key this))
-          (append `(:value ,id) options))
-    (clack.response:finalize r)))
+(defgeneric set-cookie (state id res options)
+  (:method ((this <clack-session-state-cookie>) id res options)
+    (let ((r (apply #'make-response res)))
+      (setf (set-cookies r (session-key this))
+            (append `(:value ,id) options))
+      (clack.response:finalize r))))
 
 (doc:start)
 

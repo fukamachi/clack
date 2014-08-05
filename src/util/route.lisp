@@ -56,7 +56,8 @@
         (format-string this)
         (ppcre:regex-replace-all "\\(.+?\\)" (regex this) "~A")))
 
-(defmethod compile-rule ((this <url-rule>))
+(defun compile-rule (this)
+  (check-type this <url-rule>)
   (loop with list = (split "(?::([\\w-]+)|(\\*))" (url this)
                            :with-registers-p t :omit-unmatched-p t)
         for (prefix name) on list by #'cddr
@@ -86,7 +87,8 @@
       ((string= enc char) (ppcre:quote-meta-chars enc))
       (t enc))))
 
-(defmethod match-method-p ((this <url-rule>) method &key allow-head)
+(defun match-method-p (this method &key allow-head)
+  (check-type this <url-rule>)
   (flet ((method-equal (rule-method)
            (or (string= :ANY rule-method)
                (string= method rule-method)
@@ -96,6 +98,9 @@
     (typecase (request-method this)
       (list (some #'method-equal (request-method this)))
       (T (method-equal (request-method this))))))
+
+@export
+(defgeneric match (this method url-string &key allow-head))
 
 @export
 (defmethod match ((this <url-rule>) method url-string &key allow-head)
@@ -147,6 +152,9 @@ Example:
       (when matchp
         (values matchp
                 `(:captures ,(coerce values 'list)))))))
+
+@export
+(defgeneric url-for (url-rule params))
 
 @export
 (defmethod url-for ((url-rule <url-rule>) params)

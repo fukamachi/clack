@@ -24,17 +24,20 @@
              :accessor stash)))
 
 @export
-(defmethod fetch ((this <clack-session-store>) sid)
-  (getf* (stash this) sid))
+(defgeneric fetch (store sid)
+  (:method ((this <clack-session-store>) sid)
+    (getf* (stash this) sid)))
 
 @export
-(defmethod store-session ((this <clack-session-store>) sid session)
-  (setf (getf* (stash this) (make-keyword sid))
-        session))
+(defgeneric store-session (store sid session)
+  (:method ((this <clack-session-store>) sid session)
+    (setf (getf* (stash this) (make-keyword sid))
+          session)))
 
 @export
-(defmethod remove-session ((this <clack-session-store>) sid)
-  (remove-from-plistf (stash this) sid))
+(defgeneric remove-session (store sid)
+  (:method ((this <clack-session-store>) sid)
+    (remove-from-plistf (stash this) sid)))
 
 (doc:start)
 

@@ -25,20 +25,22 @@
   (:documentation "Class for Clack Middleware."))
 
 @export
-(defmethod call-next ((this <middleware>) env)
-  "Call next middleware or application."
-  (call (app this) env))
+(defgeneric call-next (mw env)
+  (:documentation
+   "Call next middleware or application.")
+  (:method ((this <middleware>) env)
+    (call (app this) env)))
 
 @export
-(defmethod wrap ((this <middleware>) app-or-middleware)
-  "Compose `this' and the given application or middleware instance into one function.
-This function takes a request plist."
-  (setf (slot-value this 'app) app-or-middleware)
-  #'(lambda (env) (call this env)))
-
-@export
-(defmethod wrap ((this function) app-or-middleware)
-  (funcall this app-or-middleware))
+(defgeneric wrap (mw app-or-middleware)
+  (:documentation
+   "Compose `this' and the given application or middleware instance into one function.
+This function takes a request plist.")
+  (:method ((this <middleware>) app-or-middleware)
+    (setf (slot-value this 'app) app-or-middleware)
+    #'(lambda (env) (call this env)))
+  (:method ((this function) app-or-middleware)
+    (funcall this app-or-middleware)))
 
 (doc:start)
 

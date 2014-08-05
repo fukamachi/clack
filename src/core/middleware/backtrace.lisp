@@ -36,19 +36,20 @@
               (result-on-error this))))
       (call-with-backtrace this env)))
 
-(defmethod call-with-backtrace ((this <clack-middleware-backtrace>) env)
+(defun call-with-backtrace (mw env)
+  (check-type mw <clack-middleware-backtrace>)
   (handler-bind ((error
                    #'(lambda (condition)
-                       (etypecase (output this)
-                         (symbol (print-error condition env (symbol-value (output this))))
-                         (stream (print-error condition env (output this)))
-                         (pathname (with-open-file (out (output this)
+                       (etypecase (output mw)
+                         (symbol (print-error condition env (symbol-value (output mw))))
+                         (stream (print-error condition env (output mw)))
+                         (pathname (with-open-file (out (output mw)
                                                         :direction :output
                                                         :external-format :utf-8
                                                         :if-exists :append
                                                         :if-does-not-exist :create)
                                      (print-error condition env out)))))))
-    (call-next this env)))
+    (call-next mw env)))
 
 (defun print-error (error env &optional (stream *error-output*))
   (format stream "~3&")

@@ -211,34 +211,44 @@ on an original raw-body."
          env))
 
 @export
-(defmethod securep ((req <request>))
-  (eq (uri-scheme req) :https))
+(defgeneric securep (req)
+  (:method ((req <request>))
+    (eq (uri-scheme req) :https)))
 
 @export
-(defmethod cookies ((req <request>) &optional name)
-  "Returns cookies as a plist. If optional `name' is specified, returns the value that corresponds to it."
-  (get-whole-or-specified req 'http-cookie name))
+(defgeneric cookies (req &optional name)
+  (:documentation
+   "Returns cookies as a plist. If optional `name' is specified, returns the value that corresponds to it.")
+  (:method ((req <request>) &optional name)
+    (get-whole-or-specified req 'http-cookie name)))
 
 @export
-(defmethod body-parameter ((req <request>) &optional name)
-  "Return POST parameters as a plist. If optional `name' is specified, returns the value that corresponds to it."
-  (get-whole-or-specified req 'body-parameters name))
+(defgeneric body-parameter (req &optional name)
+  (:documentation
+   "Return POST parameters as a plist. If optional `name' is specified, returns the value that corresponds to it.")
+  (:method ((req <request>) &optional name)
+    (get-whole-or-specified req 'body-parameters name)))
 
 @export
-(defmethod query-parameter ((req <request>) &optional name)
-  "Returns GET parameters as a plist. If optional `name' is specified, returns the value that corresponds to it."
-  (get-whole-or-specified req 'query-parameters name))
+(defgeneric query-parameter (req &optional name)
+  (:documentation
+   "Returns GET parameters as a plist. If optional `name' is specified, returns the value that corresponds to it.")
+  (:method ((req <request>) &optional name)
+    (get-whole-or-specified req 'query-parameters name)))
 
 @export
-(defmethod parameter ((req <request>) &optional name)
-  "Returns request parameters containing (merged) GET and POST parameters. If optional `name' is specified, returns the value that corresponds to it."
-  (let ((params (append (query-parameter req)
-                        (body-parameter req))))
-    (if name
-        (getf-all params name)
-        params)))
+(defgeneric parameter (req &optional name)
+  (:documentation
+   "Returns request parameters containing (merged) GET and POST parameters. If optional `name' is specified, returns the value that corresponds to it.")
+  (:method ((req <request>) &optional name)
+    (let ((params (append (query-parameter req)
+                          (body-parameter req))))
+      (if name
+          (getf-all params name)
+          params))))
 
-(defmethod get-whole-or-specified ((req <request>) key &optional name)
+(defun get-whole-or-specified (req key &optional name)
+  (check-type req <request>)
   (let ((params (slot-value req key)))
     (if name
         (getf-all params name)

@@ -41,32 +41,38 @@
                      :accessor sid-validator)))
 
 @export
-(defmethod expire ((this <clack-session-state>)
-                   id res &optional options)
-  @ignore (this id res options))
+(defgeneric expire (state id res &optional options)
+  (:method ((this <clack-session-state>)
+            id res &optional options)
+    @ignore (this id res options)))
 
 @export
-(defmethod session-id ((this <clack-session-state>) env)
-  (getf env (session-key this)))
+(defgeneric session-id (state env)
+  (:method ((this <clack-session-state>) env)
+    (getf env (session-key this))))
 
 @export
-(defmethod valid-sid-p ((this <clack-session-state>) id)
-  (funcall (sid-validator this) id))
+(defgeneric valid-sid-p (state id)
+  (:method ((this <clack-session-state>) id)
+    (funcall (sid-validator this) id)))
 
 @export
-(defmethod extract-id ((this <clack-session-state>) env)
-  (aand (session-id this env)
-        (valid-sid-p this it)
-        it))
+(defgeneric extract-id (state env)
+  (:method ((this <clack-session-state>) env)
+    (aand (session-id this env)
+          (valid-sid-p this it)
+          it)))
 
 @export
-(defmethod generate-id ((this <clack-session-state>) &rest args)
-  (apply (sid-generator this) args))
+(defgeneric generate-id (state &rest args)
+  (:method ((this <clack-session-state>) &rest args)
+    (apply (sid-generator this) args)))
 
 @export
-(defmethod finalize ((this <clack-session-state>) id res options)
-  @ignore (this id options)
-  res)
+(defgeneric finalize (state id res options)
+  (:method ((this <clack-session-state>) id res options)
+    @ignore (this id options)
+    res))
 
 (doc:start)
 

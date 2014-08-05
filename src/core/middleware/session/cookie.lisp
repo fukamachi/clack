@@ -52,6 +52,8 @@
                      (read-from-string
                       (base64-string-to-string base64))))))))))
 
+(defgeneric signature (mw base64))
+
 (defmethod signature ((this <clack-middleware-session-cookie>) base64)
   (hmac-sha1-hex-string base64
                         (or (secret this) "")))
@@ -66,6 +68,8 @@
 (defmethod commit ((this <clack-middleware-session-cookie>) env)
   ;; do nothing
   )
+
+(defgeneric serialize (mw id session))
 
 (defmethod serialize ((this <clack-middleware-session-cookie>) id session)
   (let ((base64 (string-to-base64-string

@@ -67,44 +67,47 @@
                 ("not found")))
 
 @export
-(defmethod should-handle ((this <clack-app-file>) file)
-  (and (file-exists-p file)
-       (not (directory-exists-p file))))
+(defgeneric should-handle (app file)
+  (:method ((this <clack-app-file>) file)
+    (and (file-exists-p file)
+         (not (directory-exists-p file)))))
 
 @export
-(defmethod locate-file ((this <clack-app-file>) path root)
-  (let ((file (merge-pathnames path root)))
-    (cond
-      ((position #\Null (namestring file)) return-400)
-      ((not (should-handle this file)) return-404)
+(defgeneric locate-file (app path root)
+  (:method ((this <clack-app-file>) path root)
+    (let ((file (merge-pathnames path root)))
+      (cond
+        ((position #\Null (namestring file)) return-400)
+        ((not (should-handle this file)) return-404)
 ;      ((not (find :user-read (file-permissions file)))
 ;       return-403)
-      (t file))))
+        (t file)))))
 
 (defun text-file-p (content-type)
   (aand (scan "^text" content-type)
         (= it 0)))
 
 @export
-(defmethod serve-path ((this <clack-app-file>) env file encoding)
-  (let ((content-type (or (clack.util.hunchentoot:mime-type file)
-                          "text/plain"))
-        (univ-time (or (file-write-date file)
-                       (get-universal-time))))
-    (when (text-file-p content-type)
-      (setf content-type
-            (format nil "~A;charset=~A"
-                    content-type encoding)))
-    (with-open-file (stream file
-                     :direction :input
-                     :if-does-not-exist nil)
-      `(200
-        (:content-type ,content-type
-         :content-length ,(file-length stream)
-         :last-modified
-         ,(format-rfc1123-timestring nil
-           (universal-to-timestamp univ-time)))
-        ,file))))
+(defgeneric serve-path (app env file encoding)
+  (:method ((this <clack-app-file>) env file encoding)
+    (let ((content-type (or (clack.util.hunchentoot:mime-type file)
+                            "text/plain"))
+          (univ-time (or (file-write-date file)
+                         (get-universal-time))))
+      (when (text-file-p content-type)
+        (setf content-type
+              (format nil "~A;charset=~A"
+                      content-type encoding)))
+      (with-open-file (stream file
+                              :direction :input
+                              :if-does-not-exist nil)
+        `(200
+          (:content-type ,content-type
+           :content-length ,(file-length stream)
+           :last-modified
+           ,(format-rfc1123-timestring nil
+                                       (universal-to-timestamp univ-time)))
+          ,file)))))
 
 (doc:start)
 

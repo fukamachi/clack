@@ -51,11 +51,12 @@
                   (call-app-file this env))
                 (call-next this env)))))))
 
-(defmethod call-app-file ((this <clack-middleware-static>) env)
+(defun call-app-file (mw env)
   "Call Clack.App.File."
+  (check-type mw <clack-middleware-static>)
   (clack.component:call
    (make-instance '<clack-app-file>
-      :root (static-root this))
+      :root (static-root mw))
    env))
 
 (doc:start)
