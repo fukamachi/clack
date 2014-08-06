@@ -2,7 +2,6 @@
 (defpackage clack.file-watcher
   (:use :cl)
   (:import-from :alexandria
-                :compose
                 :ensure-list)
   (:import-from :bordeaux-threads
                 :make-thread
@@ -14,22 +13,29 @@
 (defvar *system-component-pathnames*
   (make-hash-table :test 'equal))
 
-(defstruct (source-file (:constructor make-source-file (pathname
-                                                        &aux (mtime (if (probe-file pathname)
-                                                                        (file-write-date pathname)
-                                                                        0)))))
+(defvar *system-component-dependencies*
+  (make-hash-table :test 'equal))
+
+(defstruct (source-file (:constructor make-source-file (component
+                                                        &aux
+                                                          (pathname (asdf:component-pathname component))
+                                                          (mtime (if (probe-file pathname)
+                                                                     (file-write-date pathname)
+                                                                     0)))))
+  (component nil :type asdf:component)
   (mtime 0 :type integer)
   (pathname nil :type pathname))
 
-(defstruct (asd-file (:include source-file (mtime) (pathname))
-                     (:constructor make-asd-file (system pathname
-                                                  &aux (mtime (if (probe-file pathname)
-                                                                  (file-write-date pathname)
-                                                                  0)))))
-  (system nil :type asdf:system))
+(defstruct (asd-file (:include source-file (mtime) (pathname) (component))
+                     (:constructor make-asd-file (component
+                                                  &aux
+                                                    (pathname (asdf:system-source-file component))
+                                                    (mtime (if (probe-file pathname)
+                                                               (file-write-date pathname)
+                                                               0))))))
 
 (defun system-source-files (system)
-  (mapcar (compose #'make-source-file #'asdf:component-pathname)
+  (mapcar #'make-source-file
           (remove-if-not (lambda (comp)
                            (typep comp 'asdf:source-file))
                          (asdf::sub-components system))))
@@ -80,23 +86,45 @@
       (setf (gethash (slot-value system 'asdf::source-file)
                      *system-component-pathnames*)
             (cons
-             (make-asd-file system (slot-value system 'asdf::source-file))
-             new-source-files)))))
+             (make-asd-file system)
+             new-source-files))
+      (loop for source-file in source-files
+            do (remhash (asdf:component-pathname source-file) *system-component-pathnames*))
+      (let ((op (make-instance 'asdf:load-op)))
+        (loop for source-file in new-source-files
+              do (loop for dep in (cdr
+                                   (assoc op
+                                          (asdf:component-depends-on op (source-file-component source-file))))
+                       do (push (source-file-component source-file)
+                                (gethash (asdf:component-pathname dep) *system-component-dependencies* nil))))))))
 
 (defgeneric on-update (file)
   (:method ((file asd-file))
     (let ((*load-verbose* nil))
       (with-safety-loading (asd-file-pathname file)
-        (update-system-components (asd-file-system file)))))
+        (update-system-components (asd-file-component file)))))
   (:method ((file source-file))
-    (let ((*load-verbose* t))
-      (with-safety-loading (source-file-pathname file)))))
+    (labels ((load-component (comp)
+               (let ((*load-verbose* t))
+                 (with-safety-loading (asdf:component-pathname comp))))
+             (%component-dependencies (component)
+               (loop for comp in (gethash (asdf:component-pathname component)
+                                          *system-component-dependencies*)
+                     append (cons comp (%component-dependencies comp))))
+             (component-dependencies (component)
+               (delete-duplicates
+                (%component-dependencies component)
+                :key #'asdf:component-pathname
+                :test #'equal)))
+      (load-component (source-file-component file))
+      (loop for comp in (component-dependencies (source-file-component file))
+            do (load-component comp)))))
 
 (defgeneric on-delete (file)
   (:method ((file asd-file))
     (format *terminal-io*
             "~&; Stop watching \"~A\" because it has deleted.~%"
-            (asdf:component-name (asd-file-system file)))
+            (asdf:component-name (asd-file-component file)))
     (remhash (asd-file-pathname file)
              *system-component-pathnames*))
   (:method ((file source-file))
