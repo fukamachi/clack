@@ -69,7 +69,8 @@ Example:
 "
 @export
 (defun clackup (app &rest args &key (server :hunchentoot) (port 5000) (debug t) watch (use-cl-debugger t) &allow-other-keys)
-  #+shelly (setf use-cl-debugger nil)
+  (when (find :shelly *features* :test #'eq)
+    (setf use-cl-debugger nil))
   (unless use-cl-debugger
     #+quicklisp (ql:quickload :clack-errors)
     #-quicklisp (asdf:load-system :clack-errors))
