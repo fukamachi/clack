@@ -150,7 +150,7 @@
 (defvar *current-watcher* (make-hash-table :test 'eq))
 
 @export
-(defun watch-systems (identifier systems &key (use-thread t))
+(defun watch-systems (identifier systems &key (use-thread bt:*supports-threads-p*))
   (let ((systems (mapcar #'asdf:find-system (ensure-list systems)))
         (terminal-io *terminal-io*)
         (standard-output *standard-output*)
