@@ -147,6 +147,8 @@ before passing to Clack application."
     (declare (ignorable *debugging-p*))
     (handler-case (call-next-method)
       #+sbcl (sb-sys:io-timeout (condition) (values nil condition))
+      ;; preventing Connection reset by peer
+      #+sbcl (sb-int:simple-stream-error (condition) (values nil condition))
       (error (condition) (invoke-debugger condition)))))
 
 (defmethod acceptor-request-dispatcher ((*acceptor* <debuggable-acceptor>))
