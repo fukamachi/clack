@@ -80,7 +80,8 @@
             (make-instance '<fcgi-acceptor>
                            :port port
                            :file-descriptor fd)))
-      (bt:make-thread
+      (#+thread-support bt:make-thread
+       #-thread-support funcall
        #'(lambda ()
            (cl-fastcgi::server-on-fd
             #'main-loop
