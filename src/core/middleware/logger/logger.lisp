@@ -10,8 +10,7 @@
 (defpackage clack.middleware.logger
   (:use :cl
         :clack.component
-        :clack.middleware
-        :anaphora)
+        :clack.middleware)
   (:import-from :clack.logger
                 :*logger-output-hook*
                 :*logger-format-string*

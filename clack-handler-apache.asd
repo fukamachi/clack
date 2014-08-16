@@ -27,7 +27,7 @@
                :cl-syntax-annot
                :modlisp
                :split-sequence
-               :anaphora)
+               :alexandria)
   :components ((:file "src/core/handler/apache"))
   :description "Clack handler for Apache2 + mod_lisp.")
 #-(or allegro cmu lispworks sbcl)

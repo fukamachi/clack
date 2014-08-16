@@ -24,7 +24,7 @@
   :depends-on (:clack
                :cl-syntax
                :cl-syntax-annot
-               :anaphora)
+               :alexandria)
   :components ((:file "src/contrib/middleware/csrf"))
   :description "Middleware for easy CSRF protection"
   :in-order-to ((test-op (load-op clack-middleware-csrf-test))))

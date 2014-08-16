@@ -8,11 +8,13 @@
 
 (in-package :cl-user)
 (defpackage clack.session.state
-  (:use :cl
-        :anaphora)
+  (:use :cl)
   (:import-from :clack.util
                 :generate-random-id)
-  (:import-from :cl-ppcre :scan)
+  (:import-from :cl-ppcre
+                :scan)
+  (:import-from :alexandria
+                :when-let)
   (:export :session-key
            :sid-generator
            :sid-validator))
@@ -59,9 +61,9 @@
 @export
 (defgeneric extract-id (state env)
   (:method ((this <clack-session-state>) env)
-    (aand (session-id this env)
-          (valid-sid-p this it)
-          it)))
+    (when-let (sid (session-id this env))
+      (and (valid-sid-p this sid)
+           sid))))
 
 @export
 (defgeneric generate-id (state &rest args)

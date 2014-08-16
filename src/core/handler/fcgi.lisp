@@ -9,8 +9,7 @@
 (in-package :cl-user)
 (defpackage clack.handler.fcgi
   (:use :cl
-        :cl-fastcgi
-        :anaphora)
+        :cl-fastcgi)
   (:import-from :clack.component
                 :call)
   (:import-from :clack.http-status
@@ -19,7 +18,8 @@
                 :url-decode)
   (:import-from :alexandria
                 :make-keyword
-                :when-let)
+                :when-let
+                :if-let)
   (:import-from :bordeaux-threads
                 :make-thread)
   (:import-from :flexi-streams
@@ -67,12 +67,12 @@
   (flet ((main-loop (req)
            (let* ((env (request->plist req))
                   (res (if debug (call app env)
-                           (aif (handler-case (call app env)
-                                  (error (error)
-                                    (princ error *error-output*)
-                                    nil))
-                                it
-                                '(500 nil nil)))))
+                           (if-let (res (handler-case (call app env)
+                                          (error (error)
+                                            (princ error *error-output*)
+                                            nil)))
+                             res
+                             '(500 nil nil)))))
              (etypecase res
                (list (handle-response req res))
                (function (funcall res (lambda (res) (handle-response req res))))))))
@@ -98,10 +98,11 @@
     (fcgx-puts req (format nil "Status: ~D ~A~%" status (http-status-reason status)))
     (loop for (k v) on headers by #'cddr
           with hash = (make-hash-table :test #'eq)
-          do (setf (gethash k hash)
-                   (aif (gethash k hash)
-                        (concatenate 'string it ", " v)
-                        v))
+          if (gethash k hash)
+            do (setf (gethash k hash)
+                     (concatenate 'string (gethash k hash) ", " v))
+          else
+            do (setf (gethash k hash) v)
           finally
        (loop for k being the hash-keys in hash
              using (hash-value v)
@@ -144,10 +145,11 @@ before passing to Clack application."
                           (with-output-to-string (out)
                             (loop for char across (string k)
                                   do (princ (if (char= #\_ char) #\- char) out))))
-               do (setf (gethash key env-hash)
-                        (aif (gethash key env-hash)
-                             (concatenate 'string it ", " v)
-                             v))
+               if (gethash key env-hash)
+                 do (setf (gethash key env-hash)
+                          (concatenate 'string (gethash key env-hash) ", " v))
+               else
+                 do (setf (gethash key env-hash) v)
                finally (return (alexandria:hash-table-plist env-hash)))))
 
     (setf (getf env :clack.streaming) t)

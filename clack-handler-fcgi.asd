@@ -28,7 +28,6 @@
                :alexandria
                :bordeaux-threads
                :flexi-streams
-               :anaphora
                :cl-ppcre
                :split-sequence
                :usocket)

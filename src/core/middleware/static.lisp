@@ -9,12 +9,12 @@
 (in-package :cl-user)
 (defpackage clack.middleware.static
   (:use :cl
-        :clack
-        :anaphora)
+        :clack)
   (:import-from :clack.app.file
                 :<clack-app-file>)
   (:import-from :alexandria
-                :starts-with-subseq))
+                :starts-with-subseq
+                :if-let))
 (in-package :clack.middleware.static)
 
 (cl-syntax:use-syntax :annot)
@@ -45,11 +45,11 @@
                  (call-app-file this env))
                (call-next this env)))
           (function
-           (aif (funcall path path-info)
-                (progn
-                  (setf (getf env :path-info) it) ; rewrite :PATH-INFO
-                  (call-app-file this env))
-                (call-next this env)))))))
+           (if-let (new-path (funcall path path-info))
+             (progn
+               (setf (getf env :path-info) new-path) ; rewrite :PATH-INFO
+               (call-app-file this env))
+             (call-next this env)))))))
 
 (defun call-app-file (mw env)
   "Call Clack.App.File."

@@ -9,18 +9,20 @@
 (in-package :cl-user)
 (defpackage clack.app.file
   (:use :cl
-        :clack
-        :anaphora)
+        :clack)
   (:import-from :clack.util.localtime
                 :format-rfc1123-timestring)
   (:import-from :clack.util.hunchentoot
                 :mime-type)
-  (:import-from :cl-ppcre :scan)
+  (:import-from :cl-ppcre
+                :scan)
   (:import-from :local-time
                 :universal-to-timestamp)
   (:import-from :cl-fad
                 :file-exists-p
-                :directory-exists-p))
+                :directory-exists-p)
+  (:import-from :alexandria
+                :when-let))
 (in-package :clack.app.file)
 
 (cl-syntax:use-syntax :annot)
@@ -84,8 +86,8 @@
         (t file)))))
 
 (defun text-file-p (content-type)
-  (aand (scan "^text" content-type)
-        (= it 0)))
+  (when-let (pos (scan "^text" content-type))
+    (= pos 0)))
 
 @export
 (defgeneric serve-path (app env file encoding)

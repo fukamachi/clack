@@ -9,15 +9,16 @@
 (in-package :cl-user)
 (defpackage clack.middleware.csrf
   (:use :cl
-        :clack
-        :anaphora)
+        :clack)
   (:import-from :clack.component
                 :component-designator)
   (:import-from :clack.request
                 :make-request
                 :body-parameter)
   (:import-from :clack.util
-                :generate-random-id))
+                :generate-random-id)
+  (:import-from :alexandria
+                :when-let))
 (in-package :clack.middleware.csrf)
 
 (cl-syntax:use-syntax :annot)
@@ -63,17 +64,17 @@
 
 (defun valid-token-p (env)
   (let ((req (make-request env)))
-    (aand (gethash :csrf-token
-                   (getf env :clack.session))
-          (or (string= it (body-parameter req :|_csrf_token|))
-              (and (hash-table-p (body-parameter req :json))
-                   (string= it (gethash "_csrf_token" (body-parameter req :json))))))))
+    (when-let (csrf-token (gethash :csrf-token
+                                   (getf env :clack.session)))
+      (or (string= csrf-token (body-parameter req :|_csrf_token|))
+          (and (hash-table-p (body-parameter req :json))
+               (string= csrf-token (gethash "_csrf_token" (body-parameter req :json))))))))
 
 @export
 (defun csrf-token (session)
   "Return a random CSRF token."
-  (sunless (gethash :csrf-token session)
-    (setf it (generate-random-id)))
+  (unless (gethash :csrf-token session)
+    (setf (gethash :csrf-token session) (generate-random-id)))
   (gethash :csrf-token session))
 
 @export

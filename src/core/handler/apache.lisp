@@ -10,13 +10,13 @@
 (defpackage clack.handler.apache
   (:use :cl
         :modlisp
-        :split-sequence
-        :anaphora)
-  (:import-from :alexandria
-                :make-keyword)
+        :split-sequence)
   (:import-from :clack.component :call)
   (:import-from :clack.util.hunchentoot
-                :url-decode))
+                :url-decode)
+  (:import-from :alexandria
+                :make-keyword
+                :when-let))
 (in-package :clack.handler.apache)
 
 (cl-syntax:use-syntax :annot)
@@ -60,16 +60,16 @@ This function is called on each request."
         :request-method (make-keyword
                          (ml:header-value command :method))
         :script-name ""
-        :path-info (awhen (subseq url 0 pos)
-                     (url-decode it))
+        :path-info (when-let (path (subseq url 0 pos))
+                     (url-decode path))
         :query-string (subseq url (1+ (or pos 0)))
-        :raw-body (awhen (ml:header-value command :posted-content)
+        :raw-body (when-let (posted-content (ml:header-value command :posted-content))
                     (flex:make-flexi-stream
                      (flex:make-in-memory-input-stream
-                      (flex:string-to-octets it))
+                      (flex:string-to-octets posted-content))
                      :external-format :utf-8))
-        :content-length (awhen (ml:header-value command :content-length)
-                          (parse-integer it :junk-allowed t))
+        :content-length (when-let (content-length (ml:header-value command :content-length))
+                          (parse-integer content-length :junk-allowed t))
         :content-type (ml:header-value command :content-type)
         :server-name server-name
         :server-port (parse-integer server-port :junk-allowed t)

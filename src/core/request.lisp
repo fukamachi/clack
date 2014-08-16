@@ -8,8 +8,7 @@
 
 (in-package :cl-user)
 (defpackage clack.request
-  (:use :cl
-        :anaphora)
+  (:use :cl)
   (:import-from :trivial-types
                 :property-list)
   (:import-from :alexandria
@@ -148,8 +147,9 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
   (setf (slot-value this 'env) env)
 
   ;; cookies
-  (swhen (slot-value this 'http-cookie)
-    (setf it (parameters->plist it :delimiter "\\s*[,;]\\s*")))
+  (when (slot-value this 'http-cookie)
+    (setf (slot-value this 'http-cookie)
+          (parameters->plist (slot-value this 'http-cookie) :delimiter "\\s*[,;]\\s*")))
 
   ;; GET parameters
   (setf (slot-value this 'query-parameters)
@@ -270,9 +270,9 @@ on an original raw-body."
      (or type "application")
      (or subtype "octet-stream")
      (when params
-       (aand (nth-value 1 (ppcre:scan-to-strings
-                           "charset=([^; ]+)" params))
-             (aref it 0))))))
+       (when-let (matches (nth-value 1 (ppcre:scan-to-strings
+                                        "charset=([^; ]+)" params)))
+         (aref matches 0))))))
 
 (doc:start)
 

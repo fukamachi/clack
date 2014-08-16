@@ -27,6 +27,7 @@
                :cl-syntax-annot
                :toot
                :split-sequence
-               :cl-ppcre)
+               :cl-ppcre
+               :alexandria)
   :components ((:file "src/core/handler/toot"))
   :description "Clack handler for Toot.")

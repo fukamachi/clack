@@ -9,7 +9,6 @@
 (in-package :cl-user)
 (defpackage clack.test.suite
   (:use :cl
-        :anaphora
         :cl-test-more)
   (:import-from :flexi-streams
                 :octet

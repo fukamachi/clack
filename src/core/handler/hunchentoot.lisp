@@ -10,12 +10,15 @@
 (defpackage clack.handler.hunchentoot
   (:use :cl
         :hunchentoot
-        :anaphora
         :split-sequence)
   (:shadow :stop)
-  (:import-from :clack.component :call)
+  (:import-from :clack.component
+                :call)
   (:import-from :flexi-streams
-                :make-external-format))
+                :make-external-format)
+  (:import-from :alexandria
+                :when-let
+                :if-let))
 (in-package :clack.handler.hunchentoot)
 
 (cl-syntax:use-syntax :annot)
@@ -37,13 +40,14 @@
          #'(lambda (env)
              #'(lambda ()
                  (handle-response
-                  (if debug (call app env)
-                      (aif (handler-case (call app env)
-                             (error (error)
-                               (princ error *error-output*)
-                               nil))
-                           it
-                           '(500 nil nil))))))))
+                  (if debug
+                      (call app env)
+                      (if-let (res (handler-case (call app env)
+                                     (error (error)
+                                       (princ error *error-output*)
+                                       nil)))
+                        res
+                        '(500 nil nil))))))))
   (start (make-instance '<debuggable-acceptor>
             :port port
             :access-log-destination nil
@@ -118,8 +122,8 @@ before passing to Clack application."
       ;; Request params
       :query-string (or (query-string* req) "")
       :raw-body (raw-post-data :request req :want-stream t)
-      :content-length (awhen (header-in* :content-length req)
-                        (parse-integer it :junk-allowed t))
+      :content-length (when-let (content-length (header-in* :content-length req))
+                        (parse-integer content-length :junk-allowed t))
       :content-type (header-in* :content-type req))
 
      (loop for (k . v) in (hunchentoot:headers-in* req)

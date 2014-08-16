@@ -24,7 +24,6 @@
   :depends-on (:clack
                :cl-syntax
                :cl-syntax-annot
-               :cl-oauth
-               :anaphora)
+               :cl-oauth)
   :components ((:file "src/contrib/middleware/oauth"))
   :description "Supports authorization mechanism by OAuth")

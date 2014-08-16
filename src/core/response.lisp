@@ -8,13 +8,13 @@
 
 (in-package :cl-user)
 (defpackage clack.response
-  (:use :cl
-        :anaphora)
+  (:use :cl)
   (:import-from :trivial-types
                 :property-list)
   (:import-from :alexandria
                 :ensure-list
-                :doplist)
+                :doplist
+                :when-let)
   (:import-from :clack.util
                 :getf*)
   (:import-from :clack.util.localtime
@@ -171,14 +171,18 @@ Example:
 
   (let ((cookie `((,(url-encode (symbol-name k))
                    ,(url-encode (getf v :value))))))
-    (awhen (getf v :domain) (push `("domain" ,it) cookie))
-    (awhen (getf v :path) (push `("path" ,it) cookie))
-    (awhen (getf v :expires)
+    (when-let (domain (getf v :domain))
+      (push `("domain" ,domain) cookie))
+    (when-let (path (getf v :path))
+      (push `("path" ,path) cookie))
+    (when-let (expires (getf v :expires))
       (push `("expires"
               ,(format-rfc1123-timestring
-                nil (universal-to-timestamp it))) cookie))
-    (awhen (getf v :secure) (push '("secure") cookie))
-    (awhen (getf v :httponly) (push '("HttpOnly") cookie))
+                nil (universal-to-timestamp expires))) cookie))
+    (when (getf v :secure)
+      (push '("secure") cookie))
+    (when (getf v :httponly)
+      (push '("HttpOnly") cookie))
 
     (format nil
             "~{~{~A~^=~}~^; ~}"

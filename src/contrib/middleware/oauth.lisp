@@ -10,7 +10,6 @@
 (defpackage clack.middleware.oauth
   (:use :cl
         :clack
-        :anaphora
         :clack.request
         :clack.response))
 (in-package :clack.middleware.oauth)
@@ -77,10 +76,11 @@
             do (remhash k state))))
 
 (defmethod is-expired ((this <clack-middleware-oauth>) oauth-token)
-  (let ((now (get-universal-time)))
-    (not
-     (aand (gethash oauth-token (oauth-state this))
-           (< (- now (second it)) (oauth-state-expire this))))))
+  (let ((now (get-universal-time))
+        (oauth-token (gethash oauth-token (oauth-state this))))
+    (if oauth-token
+        (not (< (- now (second oauth-token)) (oauth-state-expire this)))
+        t)))
 
 (defmethod is-authorizing ((this <clack-middleware-oauth>) req)
   (let ((oauth-token (query-parameter req "oauth_token"))

@@ -1,7 +1,6 @@
 (in-package :cl-user)
 (defpackage t.clack.middleware.session
   (:use :cl
-        :anaphora
         :cl-test-more
         :clack.test
         :clack.builder
@@ -19,8 +18,8 @@
  (builder
   (<clack-middleware-session> :state (make-instance '<clack-session-state-cookie>))
   (lambda (env)
-    (sunless (gethash :counter (getf env :clack.session))
-      (setf it 0))
+    (unless (gethash :counter (getf env :clack.session))
+      (setf (gethash :counter (getf env :clack.session)) 0))
     `(200
       (:content-type "text/plain")
       (,(format nil "Hello, you've been here for ~Ath times!"
@@ -48,8 +47,8 @@
  (builder
   <clack-middleware-session-cookie>
   (lambda (env)
-    (sunless (gethash :counter (getf env :clack.session))
-      (setf it 0))
+    (unless (gethash :counter (getf env :clack.session))
+      (setf (gethash :counter (getf env :clack.session)) 0))
     `(200
       (:content-type "text/plain")
       (,(format nil "Hello, you've been here for ~Ath times!"

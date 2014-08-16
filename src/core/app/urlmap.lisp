@@ -9,12 +9,13 @@
 (in-package :cl-user)
 (defpackage clack.app.urlmap
   (:use :cl
-        :clack
-        :anaphora)
+        :clack)
   (:import-from :cl-ppcre
                 :scan
                 :scan-to-strings
-                :regex-replace))
+                :regex-replace)
+  (:import-from :alexandria
+                :if-let))
 (in-package :clack.app.urlmap)
 
 (cl-syntax:use-syntax :annot)
@@ -30,10 +31,10 @@
   (:documentation "Register an `app' to the `location'.")
   (:method ((this <clack-app-urlmap>) location app)
     (destructuring-bind (host location)
-        (aif (nth-value 1
-                        (scan-to-strings "^https?://(.*?)(/.*)" location))
-             (coerce it 'list)
-             (list nil location))
+        (if-let (matches (nth-value 1
+                                    (scan-to-strings "^https?://(.*?)(/.*)" location)))
+          (coerce matches 'list)
+          (list nil location))
       (unless (char= #\/ (aref location 0))
         (error "Paths need to start with /"))
       (push (list host location app)

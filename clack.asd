@@ -24,7 +24,6 @@
   :depends-on (;; Utility
                :trivial-types
                :alexandria
-               :anaphora
                :split-sequence
                :cl-syntax
                :cl-syntax-annot

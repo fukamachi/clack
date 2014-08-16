@@ -25,7 +25,7 @@
                :cl-syntax
                :cl-syntax-annot
                :hunchentoot
-               :anaphora
-               :split-sequence)
+               :split-sequence
+               :alexandria)
   :components ((:file "src/core/handler/hunchentoot"))
   :description "Clack handler for Hunchentoot.")
