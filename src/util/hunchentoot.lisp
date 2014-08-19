@@ -36,7 +36,9 @@
 (defpackage clack.util.hunchentoot
   (:use :cl
         :flexi-streams
-        :rfc2388))
+        :rfc2388)
+  (:shadowing-import-from :clack.util.rfc2388
+                          :parse-mime))
 (in-package :clack.util.hunchentoot)
 
 (cl-syntax:use-syntax :annot)
@@ -393,7 +395,7 @@ supposed to be of content type 'multipart/form-data'."
                              "BOUNDARY"
                              (rfc2388:header-parameters parsed-content-type-header)))
                        (return-from parse-rfc2388-form-data))))
-    (loop for part in (rfc2388:parse-mime stream boundary)
+    (loop for part in (parse-mime stream boundary)
           for headers = (rfc2388:mime-part-headers part)
           for content-disposition-header = (rfc2388:find-content-disposition-header headers)
           for name = (cdr (rfc2388:find-parameter
