@@ -159,7 +159,7 @@ before passing to Clack application."
                        :remote-port)
           do (setf (getf env key)
                    (parse-integer (getf env key)
-                         :junk-allowed t)))
+                                  :junk-allowed t)))
 
     (loop for key in '(:server-protocol
                        :request-method)
@@ -189,7 +189,7 @@ before passing to Clack application."
            (let ((request-uri (getf env :request-uri)))
              (subseq request-uri
                      0
-                     (position #\? (getf env :request-uri)
+                     (position #\? request-uri
                                :test #'char=)))))
 
     env))

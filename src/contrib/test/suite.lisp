@@ -46,7 +46,7 @@ you would call like this: `(run-server-tests :foo)'."
     (if name
         (run-test name)
         (progn
-          (plan 29)
+          (plan 30)
           (run-test-package :clack.test.suite)))))
 
 (defun get-header (headers key)
@@ -88,12 +88,13 @@ you would call like this: `(run-server-tests :foo)'."
 
 (define-app-test |POST|
   (lambda (env)
-    (let ((body (read-line (getf env :raw-body))))
+    (let ((body (make-array 11 :element-type '(unsigned-byte 8))))
+      (read-sequence body (getf env :raw-body))
       `(200
         (:content-type "text/plain; charset=utf-8"
          :client-content-length ,(getf env :content-length)
          :client-content-type ,(getf env :content-type))
-        (,(format nil "Hello, ~A" body)))))
+        (,(format nil "Hello, ~A" (babel:octets-to-string body))))))
   (lambda ()
     (multiple-value-bind (body status headers)
         (http-request (localhost)
@@ -170,7 +171,10 @@ you would call like this: `(run-server-tests :foo)'."
         (http-request (localhost "redhat.png"))
       (is status 200)
       (is (get-header headers :content-type) "image/png")
-      (ok (get-header headers :content-length))
+      (if (eq *clack-test-handler* :wookie)
+          (is (get-header headers :transfer-encoding) "chunked"
+            "Wookie always returns with Transfer-Encoding: chunked and no Content-Length.")
+          (ok (get-header headers :content-length)))
       (is (length body) 12155))))
 
 (define-app-test |bigger file|
@@ -186,7 +190,10 @@ you would call like this: `(run-server-tests :foo)'."
         (http-request (localhost "jellyfish.jpg"))
       (is status 200)
       (is (get-header headers :content-type) "image/jpeg")
-      (ok (get-header headers :content-length))
+      (if (eq *clack-test-handler* :wookie)
+          (is (get-header headers :transfer-encoding) "chunked"
+            "Wookie always returns with Transfer-Encoding: chunked and no Content-Length.")
+          (ok (get-header headers :content-length)))
       (is (length body) 139616))))
 
 (define-app-test |handle HTTP-Header|
@@ -246,7 +253,7 @@ you would call like this: `(run-server-tests :foo)'."
           (loop for h in '(:server-port
                            :remote-port
                            :content-length)
-                do (format str "~A:~A~%" h (typep (getf env h) 'integer)))))))
+                do (format str "~A:~A~%" h (typep (getf env h) '(or integer null))))))))
   (lambda ()
     (multiple-value-bind (body status headers)
         (http-request (localhost)
@@ -361,13 +368,15 @@ you would call like this: `(run-server-tests :foo)'."
 ;; NOTE: This may fail on Hunchentoot because it's bug.
 ;;   Hunchentoot returns Content-Type and Content-Length headers
 ;;   though 304 Not Modified.
+;; And Wookie also always returns Transfer-Encoding header.
 (define-app-test |no entity headers on 304|
   (lambda (env)
     @ignore env
     `(304 nil nil))
   (lambda ()
     (if (or (eq *clack-test-handler* :hunchentoot)
-            (eq *clack-test-handler* :toot))
+            (eq *clack-test-handler* :toot)
+            (eq *clack-test-handler* :wookie))
         (skip 5 (format nil "because of ~:(~A~)'s bug" *clack-test-handler*))
         (multiple-value-bind (body status headers)
             (http-request (localhost))
@@ -439,9 +448,11 @@ you would call like this: `(run-server-tests :foo)'."
 
 (define-app-test |request -> input seekable|
   (lambda (env)
-    `(200
-      (:content-type "text/plain; charset=utf-8")
-      (,(read-line (getf env :raw-body)))))
+    (let ((body (make-array 4 :element-type '(unsigned-byte 8))))
+      (read-sequence body (getf env :raw-body))
+      `(200
+        (:content-type "text/plain; charset=utf-8")
+        (,(babel:octets-to-string body)))))
   (lambda ()
     (is (http-request (localhost)
                       :method :post
@@ -459,7 +470,9 @@ you would call like this: `(run-server-tests :foo)'."
         (http-request (localhost))
       (is status 200)
       (is (get-header headers :client-transfer-encoding) nil)
-      (is body nil))))
+      (if (eq *clack-test-handler* :wookie)
+          (is body #() :test #'equalp)
+          (is body nil)))))
 
 (define-app-test |handle Authorization header|
   (lambda (env)
@@ -492,6 +505,28 @@ you would call like this: `(run-server-tests :foo)'."
       (is status 200)
       (is (get-header headers :content-type) "text/plain; charset=utf-8")
       (is body "/foo///bar/baz"))))
+
+(define-app-test |file upload|
+  (lambda (env)
+    (destructuring-bind (name tmpfile filename mime-type)
+        (car (clack.util.hunchentoot:parse-rfc2388-form-data
+              (clack.util.stream:ensure-character-input-stream (getf env :raw-body))
+              (getf env :content-type)
+              :utf-8))
+      (declare (ignore name tmpfile mime-type))
+      `(200
+        (:content-type "text/plain; charset=utf-8")
+        (,filename))))
+  (lambda ()
+    (multiple-value-bind (body status)
+        (http-request "http://localhost:4242/"
+                      :method :post
+                      :parameters
+                      `(("file" ,(merge-pathnames #p"tmp/file.txt" *clack-pathname*)
+                                :content-type "plain/text"
+                                :filename "file.txt")))
+      (is status 200)
+      (is body "file.txt"))))
 
 (cl-test-more::remove-exit-hook)
 
