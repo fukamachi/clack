@@ -117,10 +117,7 @@
          (fcgx-puts req body)
          (if close
              (fcgx-finish req)
-             ;; XXX: cl-fastcgi doesn't provide `fcgx-flush' now.
-             (cffi:foreign-funcall "FCGX_FFlush"
-              :pointer (cffi:foreign-slot-value req 'cl-fastcgi::fcgx-request 'cl-fastcgi::out)
-              :int))))
+             (fcgx-flush req))))
       (pathname
        (with-open-file (in body
                            :direction :input
