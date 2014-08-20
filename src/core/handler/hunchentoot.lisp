@@ -11,7 +11,8 @@
   (:use :cl
         :hunchentoot
         :split-sequence)
-  (:shadow :stop)
+  (:shadow :stop
+           :handle-request)
   (:import-from :clack.component
                 :call)
   (:import-from :flexi-streams
@@ -49,9 +50,9 @@
                         res
                         '(500 nil nil))))))))
   (start (make-instance '<debuggable-acceptor>
-            :port port
-            :access-log-destination nil
-            :error-template-directory nil)))
+                        :port port
+                        :access-log-destination nil
+                        :error-template-directory nil)))
 
 @export
 (defun stop (acceptor)
@@ -90,18 +91,7 @@ before passing to Hunchentoot."
              (write-sequence body out)
              (finish-output out)))))))
 
-(defun cookie->plist (cookie)
-  "Convert Hunchentoot's cookie class into just a plist."
-  (list
-   :name (cookie-name cookie)
-   :value (cookie-value cookie)
-   :expires (cookie-expires cookie)
-   :path (cookie-path cookie)
-   :domain (cookie-domain cookie)
-   :secure (cookie-secure cookie)
-   :http-only (cookie-http-only cookie)))
-
-(defun request->plist (req)
+(defun handle-request (req)
   "Convert Request from server into a plist
 before passing to Clack application."
   (destructuring-bind (server-name &optional (server-port "80"))
@@ -166,7 +156,7 @@ before passing to Clack application."
 list-request-dispatcher, the default one in Hunchentoot, except for converting
 Request instances into a plist before passing to Clack application."
   (loop for dispatcher in *dispatch-table*
-        for action = (funcall dispatcher (request->plist request))
+        for action = (funcall dispatcher (handle-request request))
         when action :return (funcall action)
         finally (setf (return-code *reply*) +http-not-found+)))
 

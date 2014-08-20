@@ -67,7 +67,7 @@
 (defun run (app &key (debug t) (port 9000) fd)
   "Start FastCGI server."
   (flet ((main-loop (req)
-           (let* ((env (request->plist req))
+           (let* ((env (handle-request req))
                   (res (if debug (call app env)
                            (if-let (res (handler-case (call app env)
                                           (error (error)
@@ -134,7 +134,7 @@
       ((vector (unsigned-byte 8))
        (fcgx-puts req body)))))
 
-(defun request->plist (req)
+(defun handle-request (req)
   "Convert Request from server into a plist
 before passing to Clack application."
   (let ((env
