@@ -115,7 +115,8 @@
              :content-length (getf headers :content-length)
              :content-type (getf headers :content-type)
              :clack.streaming t
-             :clack.nonblocking t)
+             :clack.nonblocking t
+             :clack.io (request-socket req))
 
        (loop with env-hash = (make-hash-table :test #'eq)
              for (key val) on headers by #'cddr
