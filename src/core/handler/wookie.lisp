@@ -152,7 +152,6 @@
                    (etypecase body
                      (null
                       (lambda (body &key (close nil))
-                        (declare (ignore close))
                         (if (and (not (stringp body))
                                  (vectorp body))
                             (write-sequence body stream)

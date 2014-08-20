@@ -137,13 +137,11 @@ before passing to Clack application."
   ;; HTTP browsers usually leave the connection open for futher requests,
   ;; and Hunchentoot respects this but sets a timeout so that old connections
   ;; are cleaned up.
-  (let ((*debugging-p* t)) ;; Is this still needed?
-    (declare (ignorable *debugging-p*))
-    (handler-case (call-next-method)
-      #+sbcl (sb-sys:io-timeout (condition) (values nil condition))
-      ;; preventing Connection reset by peer
-      #+sbcl (sb-int:simple-stream-error (condition) (values nil condition))
-      (error (condition) (invoke-debugger condition)))))
+  (handler-case (call-next-method)
+    #+sbcl (sb-sys:io-timeout (condition) (values nil condition))
+    ;; preventing Connection reset by peer
+    #+sbcl (sb-int:simple-stream-error (condition) (values nil condition))
+    (error (condition) (invoke-debugger condition))))
 
 (defmethod acceptor-request-dispatcher ((*acceptor* <debuggable-acceptor>))
   (let ((dispatcher (call-next-method)))
