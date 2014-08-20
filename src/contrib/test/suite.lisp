@@ -538,9 +538,10 @@ you would call like this: `(run-server-tests :foo)'."
                  (funcall writer (format nil "~S~%" i)))
         (funcall writer "" :close t))))
   (lambda ()
-    (if (or (eq *clack-test-handler* :hunchentoot)
-            (eq *clack-test-handler* :fcgi)
-            (eq *clack-test-handler* :wookie))
+    (if (find *clack-test-handler* '(:hunchentoot
+                                     :toot
+                                     :fcgi
+                                     :wookie))
         (multiple-value-bind (body status)
             (http-request (localhost))
           (is status 200)

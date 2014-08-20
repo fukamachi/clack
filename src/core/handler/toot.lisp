@@ -71,6 +71,7 @@ before pass to Clack application."
         :content-length content-length
         :content-type (request-header :content-type req)
         :raw-body (toot::request-body-stream req)
+        :clack.streaming t
         :clack.handler :toot)
 
        (loop for (k . v) in (toot::request-headers req)
@@ -79,31 +80,51 @@ before pass to Clack application."
                             v))))))
 
 (defun handle-response (req res)
-  (destructuring-bind (status headers body) res
-    (etypecase body
-      (pathname
-       (multiple-value-call #'serve-file
-         (values req body (parse-charset (getf headers :content-type)))))
-      (list
-       ;; XXX: almost same as Clack.Handler.Hunchentoot's one.
-       (setf (status-code req) status)
-       (loop for (k v) on headers by #'cddr
-             with hash = (make-hash-table :test #'eq)
-             if (gethash k hash)
-               do (setf (gethash k hash)
-                        (format nil "~:[~;~:*~A, ~]~A" (gethash k hash) v))
-             else if (eq k :content-type)
-               do (multiple-value-bind (v charset)
-                      (parse-charset v)
-                    (setf (gethash k hash) v)
-                    (setf (toot::response-charset req) charset))
-             else do (setf (gethash k hash) v)
-             finally
-          (loop for k being the hash-keys in hash
-                using (hash-value v)
-                do (setf (response-header k req) v)))
-       (toot::send-response req (with-output-to-string (s)
-                                  (format s "~{~A~^~%~}" body)))))))
+  (flet ((handle-normal-response (req res)
+           (destructuring-bind (status headers &optional body) res
+             (when (pathnamep body)
+               (multiple-value-call #'serve-file
+                 (values req body (parse-charset (getf headers :content-type))))
+               (return-from handle-normal-response))
+
+             (setf (status-code req) status)
+             (loop for (k v) on headers by #'cddr
+                   with hash = (make-hash-table :test #'eq)
+                   if (gethash k hash)
+                     do (setf (gethash k hash)
+                              (format nil "~:[~;~:*~A, ~]~A" (gethash k hash) v))
+                   else if (eq k :content-type)
+                          do (multiple-value-bind (v charset)
+                                 (parse-charset v)
+                               (setf (gethash k hash) v)
+                               (setf (toot::response-charset req) charset))
+                   else do (setf (gethash k hash) v)
+                   finally
+                      (loop for k being the hash-keys in hash
+                              using (hash-value v)
+                            do (setf (response-header k req) v)))
+             (toot::send-response-headers
+              req
+              (getf headers :content-length)
+              nil
+              (toot::response-charset req))
+             (let ((out (toot::content-stream req)))
+               (etypecase body
+                 (null
+                  (lambda (body &key (close nil))
+                    (declare (ignore close))
+                    (write-sequence (if (stringp body)
+                                        (flex:string-to-octets body :external-format toot::*default-charset*)
+                                        body)
+                                    out)))
+                 (list
+                  (write-sequence (flex:string-to-octets (format nil "~{~A~^~%~}" body)
+                                                         :external-format toot::*default-charset*)
+                                  out)))))))
+    (etypecase res
+      (list (handle-normal-response req res))
+      (function (funcall res (lambda (res)
+                               (handle-normal-response req res)))))))
 
 (defun parse-charset (content-type)
   (multiple-value-bind (start end reg1 reg2)
