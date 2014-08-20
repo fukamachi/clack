@@ -149,11 +149,11 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
   ;; cookies
   (when (slot-value this 'http-cookie)
     (setf (slot-value this 'http-cookie)
-          (parameters->plist (slot-value this 'http-cookie) :delimiter "\\s*[,;]\\s*")))
+          (parse-parameters (slot-value this 'http-cookie) :delimiter "\\s*[,;]\\s*")))
 
   ;; GET parameters
   (setf (slot-value this 'query-parameters)
-        (parameters->plist (query-string this)))
+        (parse-parameters (query-string this)))
 
   ;; POST parameters
   (if (getf env :body-parameters)
@@ -172,7 +172,7 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
           (cond
             ((string-equal content-type "application/x-www-form-urlencoded")
              (setf (slot-value this 'body-parameters)
-                   (parameters->plist (read-line (ensure-character-input-stream body) nil ""))))
+                   (parse-parameters (read-line (ensure-character-input-stream body) nil ""))))
 
             ((string-equal content-type "multipart/form-data")
              (let (;; parsed param (alist)
@@ -254,7 +254,7 @@ on an original raw-body."
         (getf-all params name)
         params)))
 
-(defun parameters->plist (params &key (delimiter "&"))
+(defun parse-parameters (params &key (delimiter "&"))
   "Convert parameters into plist. The `params' must be a string."
   (loop for kv in (ppcre:split delimiter params)
         for (k v) = (ppcre:split "=" kv)
