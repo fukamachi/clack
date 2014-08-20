@@ -16,7 +16,8 @@
   (:import-from :clack.component
                 :call)
   (:import-from :flexi-streams
-                :make-external-format)
+                :make-external-format
+                :string-to-octets)
   (:import-from :alexandria
                 :when-let
                 :if-let))
@@ -63,33 +64,46 @@ If no acceptor is given, try to stop `*acceptor*' by default."
 (defun handle-response (res)
   "Convert Response from Clack application into a string
 before passing to Hunchentoot."
-  (destructuring-bind (status headers body) res
-    (setf (return-code*) status)
-    (loop for (k v) on headers by #'cddr
-          with hash = (make-hash-table :test #'eq)
-          if (gethash k hash)
-            do (setf (gethash k hash)
-                     (format nil "~:[~;~:*~A, ~]~A" (gethash k hash) v))
-          else do (setf (gethash k hash) v)
-          finally
-       (loop for k being the hash-keys in hash
-             using (hash-value v)
-             do (setf (header-out k) v)))
-    (if (string-equal (getf headers :transfer-encoding) "chunked")
-        (funcall body (send-headers))
-        (etypecase body
-          (pathname
-           (hunchentoot:handle-static-file body (getf headers :content-type)))
-          (list
-           (with-output-to-string (s)
-             (format s "~{~A~^~%~}" body)))
-          ((vector (unsigned-byte 8))
-           ;; I'm not convinced with this header should be send automatically or not
-           ;; and not sure how to handle same way in other method so comment out
-           ;;(setf (content-length*) (length body))
-           (let ((out (send-headers)))
-             (write-sequence body out)
-             (finish-output out)))))))
+  (flet ((handle-normal-response (res)
+           (destructuring-bind (status headers &optional body) res
+             (setf (return-code*) status)
+             (loop for (k v) on headers by #'cddr
+                   with hash = (make-hash-table :test #'eq)
+                   if (gethash k hash)
+                     do (setf (gethash k hash)
+                              (format nil "~:[~;~:*~A, ~]~A" (gethash k hash) v))
+                   else do (setf (gethash k hash) v)
+                   finally
+                      (loop for k being the hash-keys in hash
+                              using (hash-value v)
+                            do (setf (header-out k) v)))
+
+             (etypecase body
+               (null
+                (let ((out (send-headers)))
+                  (lambda (body &key (close nil))
+                    (write-sequence
+                     (if (stringp body)
+                         (flex:string-to-octets body)
+                         body)
+                     out)
+                    (when close
+                      (finish-output out)))))
+               (pathname
+                (hunchentoot:handle-static-file body (getf headers :content-type)))
+               (list
+                (with-output-to-string (s)
+                  (format s "~{~A~^~%~}" body)))
+               ((vector (unsigned-byte 8))
+                ;; I'm not convinced with this header should be send automatically or not
+                ;; and not sure how to handle same way in other method so comment out
+                ;;(setf (content-length*) (length body))
+                (let ((out (send-headers)))
+                  (write-sequence body out)
+                  (finish-output out)))))))
+    (etypecase res
+      (list (handle-normal-response res))
+      (function (funcall res #'handle-normal-response)))))
 
 (defun handle-request (req)
   "Convert Request from server into a plist
@@ -114,7 +128,8 @@ before passing to Clack application."
       :raw-body (raw-post-data :request req :want-stream t)
       :content-length (when-let (content-length (header-in* :content-length req))
                         (parse-integer content-length :junk-allowed t))
-      :content-type (header-in* :content-type req))
+      :content-type (header-in* :content-type req)
+      :clack.streaming t)
 
      (loop for (k . v) in (hunchentoot:headers-in* req)
            unless (find k '(:request-method :script-name :path-info :server-name :server-port :server-protocol :request-uri :remote-addr :remote-port :query-string :content-length :content-type :connection))
