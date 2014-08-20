@@ -50,34 +50,33 @@
 before pass to Clack application."
   (let ((content-length (if-let (content-length (request-header :content-length req))
                           (parse-integer content-length :junk-allowed t)
-                          (setf (slot-value req 'request-headers) (acons :content-length "" (slot-value req 'request-headers)))))
-        (port-and-host (get-port-and-host req)))
-    (append
-     (list
-      :request-method (request-method req)
-      :script-name ""
-      :path-info (url-decode (request-path req))
-      :server-name (car port-and-host)
-      :server-port (cdr port-and-host)
-      :server-protocol (server-protocol req)
-      :request-uri (request-uri req)
-      :url-scheme :HTTP    ;(request-scheme req)
-      :remote-addr (remote-addr req)
-      :remote-port (remote-port req)
-      :query-string (request-query req)
-      :content-length content-length
-      :content-type (request-header :content-type req)
-      :raw-body (let ((stream (toot::request-body-stream req)))
-                  ;(when content-length
-                  ;  (setf (flex:flexi-stream-bound stream) content-length))
-                  stream)
-      :clack.uploads nil
-      :clack.handler :toot)
+                          (setf (slot-value req 'request-headers) (acons :content-length "" (slot-value req 'request-headers))))))
+    (destructuring-bind (server-name &optional server-port)
+        (split-sequence #\: (cdr (assoc :host (request-headers req))))
+      (append
+       (list
+        :request-method (request-method req)
+        :script-name ""
+        :path-info (url-decode (request-path req))
+        :server-name server-name
+        :server-port (if server-port
+                         (parse-integer server-port)
+                         80)
+        :server-protocol (server-protocol req)
+        :request-uri (request-uri req)
+        :url-scheme :HTTP    ;(request-scheme req)
+        :remote-addr (remote-addr req)
+        :remote-port (remote-port req)
+        :query-string (request-query req)
+        :content-length content-length
+        :content-type (request-header :content-type req)
+        :raw-body (toot::request-body-stream req)
+        :clack.handler :toot)
 
-     (loop for (k . v) in (toot::request-headers req)
-           unless (find k '(:request-method :script-name :path-info :server-name :server-port :server-protocol :request-uri :remote-addr :remote-port :query-string :content-length :content-type :accept :connection))
-             append (list (intern (format nil "HTTP-~:@(~A~)" k) :keyword)
-                          v)))))
+       (loop for (k . v) in (toot::request-headers req)
+             unless (find k '(:request-method :script-name :path-info :server-name :server-port :server-protocol :request-uri :remote-addr :remote-port :query-string :content-length :content-type :accept :connection))
+               append (list (intern (format nil "HTTP-~:@(~A~)" k) :keyword)
+                            v))))))
 
 (defun handle-response (req res)
   (destructuring-bind (status headers body) res
@@ -115,8 +114,3 @@ before pass to Clack application."
                 (subseq content-type (aref reg1 1) (aref reg2 1)))
         ;; there is no ";charset="
         (values content-type toot::*default-charset*))))
-
-(defun get-port-and-host (req)
-  (destructuring-bind (server-name &optional (server-port "80"))
-      (split-sequence #\: (cdr (assoc :host (request-headers req))))
-    (cons server-name (parse-integer server-port))))
