@@ -46,7 +46,7 @@ you would call like this: `(run-server-tests :foo)'."
     (if name
         (run-test name)
         (progn
-          (plan 30)
+          (plan 31)
           (run-test-package :clack.test.suite)))))
 
 (defun get-header (headers key)
@@ -519,7 +519,7 @@ you would call like this: `(run-server-tests :foo)'."
         (,filename))))
   (lambda ()
     (multiple-value-bind (body status)
-        (http-request "http://localhost:4242/"
+        (http-request (localhost)
                       :method :post
                       :parameters
                       `(("file" ,(merge-pathnames #p"tmp/file.txt" *clack-pathname*)
@@ -527,6 +527,24 @@ you would call like this: `(run-server-tests :foo)'."
                                 :filename "file.txt")))
       (is status 200)
       (is body "file.txt"))))
+
+(define-app-test |streaming|
+  (lambda (env)
+    (declare (ignore env))
+    (lambda (res)
+      (let ((writer (funcall res '(200 (:content-type "text/plain")))))
+        (loop for i from 0 to 2
+              do (sleep 1)
+                 (funcall writer (format nil "~S~%" i)))
+        (funcall writer "" :close t))))
+  (lambda ()
+    (if (or (eq *clack-test-handler* :fcgi)
+            (eq *clack-test-handler* :wookie))
+        (multiple-value-bind (body status)
+            (http-request (localhost))
+          (is status 200)
+          (is body (format nil "0~%1~%2~%")))
+        (skip 2 (format nil "because ~:(~A~) doesn't support streaming" *clack-test-handler*)))))
 
 (cl-test-more::remove-exit-hook)
 
