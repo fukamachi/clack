@@ -30,6 +30,7 @@
                :flexi-streams
                :cl-ppcre
                :split-sequence
-               :usocket)
+               :usocket
+               :do-urlencode)
   :components ((:file "src/core/handler/fcgi"))
   :description "Clack handler for FastCGI.")

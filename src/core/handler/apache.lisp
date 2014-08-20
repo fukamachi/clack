@@ -12,8 +12,8 @@
         :modlisp
         :split-sequence)
   (:import-from :clack.component :call)
-  (:import-from :clack.util.hunchentoot
-                :url-decode)
+  (:import-from :do-urlencode
+                :urldecode)
   (:import-from :alexandria
                 :make-keyword
                 :when-let))
@@ -61,7 +61,7 @@ This function is called on each request."
                          (ml:header-value command :method))
         :script-name ""
         :path-info (when-let (path (subseq url 0 pos))
-                     (url-decode path))
+                     (do-urlencode:urldecode path :lenientp t))
         :query-string (subseq url (1+ (or pos 0)))
         :raw-body (when-let (posted-content (ml:header-value command :posted-content))
                     (flex:make-flexi-stream

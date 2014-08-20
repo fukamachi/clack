@@ -26,6 +26,7 @@
                :cl-syntax
                :cl-syntax-annot
                :modlisp
+               :do-urlencode
                :split-sequence
                :alexandria)
   :components ((:file "src/core/handler/apache"))

@@ -33,6 +33,7 @@
                :ironclad
                :rfc2388
                :flexi-streams
+               :do-urlencode
                :local-time
                :circular-streams
                :multival-plist

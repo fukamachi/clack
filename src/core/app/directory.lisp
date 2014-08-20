@@ -20,7 +20,9 @@
                 :file-exists-p
                 :directory-exists-p
                 :directory-pathname-p
-                :list-directory))
+                :list-directory)
+  (:import-from :do-urlencode
+                :urlencode))
 (in-package :clack.app.directory)
 
 (cl-syntax:use-syntax :annot)
@@ -58,7 +60,7 @@
                       (car (last (pathname-directory file)))
                       (file-namestring file)))))
     (format nil "<tr><td class='name'><a href='~A~A'>~A~A</a></td><td class='size'>~:[--~;~:*~:D bytes~]</td><td class='type'>~A</td><td class='mtime'>~A</td></tr>"
-            (clack.util.hunchentoot:url-encode uri)
+            (do-urlencode:urlencode uri)
             (if dir-p "/" "")
             (clack.util:html-encode (or name uri))
             (if dir-p "/" "")

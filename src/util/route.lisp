@@ -10,8 +10,8 @@
 (defpackage clack.util.route
   (:use :cl
         :trivial-types)
-  (:import-from :clack.util.hunchentoot
-                :url-encode)
+  (:import-from :do-urlencode
+                :urlencode)
   (:import-from :cl-ppcre
                 :scan-to-strings
                 :regex-replace-all
@@ -81,7 +81,7 @@
            (param-keys this) names)))
 
 (defun escape-special-char (char)
-  (let ((enc (clack.util.hunchentoot:url-encode (string char))))
+  (let ((enc (urlencode (string char))))
     (cond
       ((string= char " ") (format nil "(?:~A|~A)" enc (escape-special-char #\+)))
       ((string= enc char) (ppcre:quote-meta-chars enc))
@@ -170,7 +170,7 @@ Example:
                           if (eq key :splat)
                             collect (pop (getf params key))
                           else if (getf params key)
-                            collect (url-encode (getf params key))
+                            collect (urlencode (getf params key))
                             and do (remf params key)
                           else
                             collect ""))))

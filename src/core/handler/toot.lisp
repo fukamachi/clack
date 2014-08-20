@@ -56,7 +56,7 @@ before pass to Clack application."
      (list
       :request-method (request-method req)
       :script-name ""
-      :path-info (clack.util.hunchentoot:url-decode (request-path req))
+      :path-info (url-decode (request-path req))
       :server-name (car port-and-host)
       :server-port (cdr port-and-host)
       :server-protocol (server-protocol req)

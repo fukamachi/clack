@@ -14,8 +14,8 @@
                 :call)
   (:import-from :clack.http-status
                 :http-status-reason)
-  (:import-from :clack.util.hunchentoot
-                :url-decode)
+  (:import-from :do-urlencode
+                :urldecode)
   (:import-from :alexandria
                 :make-keyword
                 :when-let
@@ -189,12 +189,13 @@ before passing to Clack application."
                 :external-format :utf-8))))
 
     (setf (getf env :path-info)
-          (clack.util.hunchentoot:url-decode
+          (do-urlencode:urldecode
            (let ((request-uri (getf env :request-uri)))
              (subseq request-uri
                      0
                      (position #\? request-uri
-                               :test #'char=)))))
+                               :test #'char=)))
+           :lenientp t))
 
     env))
 

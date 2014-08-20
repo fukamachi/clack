@@ -479,24 +479,6 @@ the external format EXTERNAL-FORMAT."
            (upgrade-vector vector 'character :converter #'code-char))
           (t (octets-to-string vector :external-format external-format)))))
 
-@export
-(defun url-encode (string &optional (external-format *default-external-format*))
-  "URL-encodes a string using the external format EXTERNAL-FORMAT."
-  (with-output-to-string (s)
-    (loop for c across string
-          for index from 0
-          do (cond ((or (char<= #\0 c #\9)
-                        (char<= #\a c #\z)
-                        (char<= #\A c #\Z)
-                        ;; note that there's no comma in there - because of cookies
-                        (find c "$-_.!*'()" :test #'char=))
-                     (write-char c s))
-                   (t (loop for octet across (string-to-octets string
-                                                               :start index
-                                                               :end (1+ index)
-                                                               :external-format external-format)
-                            do (format s "%~2,'0x" octet)))))))
-
 (doc:start)
 
 @doc:NAME "
