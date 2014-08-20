@@ -31,7 +31,9 @@
   (:import-from :usocket
                 :stream-server-usocket
                 :socket-listen
-                :socket-close))
+                :socket-close)
+  (:import-from :split-sequence
+                :split-sequence))
 (in-package :clack.handler.fcgi)
 
 (cl-syntax:use-syntax :annot)
@@ -147,10 +149,15 @@ before passing to Clack application."
                                   do (princ (if (char= #\_ char) #\- char) out))))
                if (gethash key env-hash)
                  do (setf (gethash key env-hash)
-                          (concatenate 'string (gethash key env-hash) ", " v))
+                          (concatenate 'string v ", " (gethash key env-hash)))
                else
                  do (setf (gethash key env-hash) v)
                finally (return (alexandria:hash-table-plist env-hash)))))
+
+    (destructuring-bind (server-name &optional server-port)
+        (split-sequence #\: (getf env :http-host) :from-end t)
+      (declare (ignore server-port))
+      (setf (getf env :server-name) server-name))
 
     (setf (getf env :clack.streaming) t)
 
