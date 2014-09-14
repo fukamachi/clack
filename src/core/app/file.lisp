@@ -77,6 +77,9 @@
 @export
 (defgeneric locate-file (app path root)
   (:method ((this <clack-app-file>) path root)
+    (when (find :up (pathname-directory path) :test #'eq)
+      (return-from locate-file return-400))
+
     (let ((file (merge-pathnames path root)))
       (cond
         ((position #\Null (namestring file)) return-400)
