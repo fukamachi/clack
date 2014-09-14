@@ -113,10 +113,10 @@
 
 (is-match "/te+st/" "/te%2Bst/" '("/te%2Bst/" nil) "escape +")
 (is-match "/te st/" "/te%20st/" '("/te%20st/" nil) "escape space")
-(is-match "/test$/" "/test$/" '("/test$/" nil) "escape $")
+(is-match "/test$/" "/test%24/" '("/test%24/" nil) "escape $")
 (is-match "/te.st/" "/te.st/" '("/te.st/" nil) "escape .")
 (is-match "/te.st/" "/te0st/" '(nil) "escape .")
-(is-match "/test(bar)/" "/test(bar)/" '("/test(bar)/" nil) "escape ()")
+(is-match "/test(bar)/" "/test%28bar%29/" '("/test%28bar%29/" nil) "escape ()")
 
 (is-link "/te.st/" nil "/te.st/")
 
