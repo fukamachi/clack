@@ -80,51 +80,55 @@ before pass to Clack application."
                             v))))))
 
 (defun handle-response (req res)
-  (flet ((handle-normal-response (req res)
-           (destructuring-bind (status headers &optional body) res
-             (when (pathnamep body)
-               (multiple-value-call #'serve-file
-                 (values req body (parse-charset (getf headers :content-type))))
-               (return-from handle-normal-response))
+  (let ((no-body '#:no-body))
+    (flet ((handle-normal-response (req res)
+             (destructuring-bind (status headers &optional (body no-body)) res
+               (when (pathnamep body)
+                 (multiple-value-call #'serve-file
+                   (values req body (parse-charset (getf headers :content-type))))
+                 (return-from handle-normal-response))
 
-             (setf (status-code req) status)
-             (loop for (k v) on headers by #'cddr
-                   with hash = (make-hash-table :test #'eq)
-                   if (gethash k hash)
-                     do (setf (gethash k hash)
-                              (format nil "~:[~;~:*~A, ~]~A" (gethash k hash) v))
-                   else if (eq k :content-type)
-                          do (multiple-value-bind (v charset)
-                                 (parse-charset v)
-                               (setf (gethash k hash) v)
-                               (setf (toot::response-charset req) charset))
-                   else do (setf (gethash k hash) v)
-                   finally
-                      (loop for k being the hash-keys in hash
-                              using (hash-value v)
-                            do (setf (response-header k req) v)))
-             (toot::send-response-headers
-              req
-              (getf headers :content-length)
-              nil
-              (toot::response-charset req))
-             (let ((out (toot::content-stream req)))
-               (etypecase body
-                 (null
-                  (lambda (body &key (close nil))
-                    (declare (ignore close))
-                    (write-sequence (if (stringp body)
-                                        (flex:string-to-octets body :external-format toot::*default-charset*)
-                                        body)
-                                    out)))
-                 (list
-                  (write-sequence (flex:string-to-octets (format nil "~{~A~^~%~}" body)
-                                                         :external-format toot::*default-charset*)
-                                  out)))))))
-    (etypecase res
-      (list (handle-normal-response req res))
-      (function (funcall res (lambda (res)
-                               (handle-normal-response req res)))))))
+               (setf (status-code req) status)
+               (loop for (k v) on headers by #'cddr
+                     with hash = (make-hash-table :test #'eq)
+                     if (gethash k hash)
+                       do (setf (gethash k hash)
+                                (format nil "~:[~;~:*~A, ~]~A" (gethash k hash) v))
+                     else if (eq k :content-type)
+                            do (multiple-value-bind (v charset)
+                                   (parse-charset v)
+                                 (setf (gethash k hash) v)
+                                 (setf (toot::response-charset req) charset))
+                     else do (setf (gethash k hash) v)
+                     finally
+                        (loop for k being the hash-keys in hash
+                                using (hash-value v)
+                              do (setf (response-header k req) v)))
+               (toot::send-response-headers
+                req
+                (getf headers :content-length)
+                nil
+                (toot::response-charset req))
+               (let ((out (toot::content-stream req)))
+                 (when (eq body no-body)
+                   (return-from handle-normal-response
+                     (lambda (body &key (close nil))
+                       (declare (ignore close))
+                       (write-sequence (if (stringp body)
+                                           (flex:string-to-octets body :external-format toot::*default-charset*)
+                                           body)
+                                       out))))
+
+                 (etypecase body
+                   (null) ;; nothing to response
+                   (list
+                    (write-sequence (flex:string-to-octets (format nil "~{~A~^~%~}" body)
+                                                           :external-format toot::*default-charset*)
+                                    out)))))))
+      (etypecase res
+        (list (handle-normal-response req res))
+        (function (funcall res (lambda (res)
+                                 (handle-normal-response req res))))))))
 
 (defun parse-charset (content-type)
   (multiple-value-bind (start end reg1 reg2)

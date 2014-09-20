@@ -64,46 +64,50 @@ If no acceptor is given, try to stop `*acceptor*' by default."
 (defun handle-response (res)
   "Convert Response from Clack application into a string
 before passing to Hunchentoot."
-  (flet ((handle-normal-response (res)
-           (destructuring-bind (status headers &optional body) res
-             (setf (return-code*) status)
-             (loop for (k v) on headers by #'cddr
-                   with hash = (make-hash-table :test #'eq)
-                   if (gethash k hash)
-                     do (setf (gethash k hash)
-                              (format nil "~:[~;~:*~A, ~]~A" (gethash k hash) v))
-                   else do (setf (gethash k hash) v)
-                   finally
-                      (loop for k being the hash-keys in hash
-                              using (hash-value v)
-                            do (setf (header-out k) v)))
+  (let ((no-body '#:no-body))
+    (flet ((handle-normal-response (res)
+             (destructuring-bind (status headers &optional (body no-body)) res
+               (setf (return-code*) status)
+               (loop for (k v) on headers by #'cddr
+                     with hash = (make-hash-table :test #'eq)
+                     if (gethash k hash)
+                       do (setf (gethash k hash)
+                                (format nil "~:[~;~:*~A, ~]~A" (gethash k hash) v))
+                     else do (setf (gethash k hash) v)
+                     finally
+                        (loop for k being the hash-keys in hash
+                                using (hash-value v)
+                              do (setf (header-out k) v)))
 
-             (etypecase body
-               (null
-                (let ((out (send-headers)))
-                  (lambda (body &key (close nil))
-                    (write-sequence
-                     (if (stringp body)
-                         (flex:string-to-octets body)
-                         body)
-                     out)
-                    (when close
-                      (finish-output out)))))
-               (pathname
-                (hunchentoot:handle-static-file body (getf headers :content-type)))
-               (list
-                (with-output-to-string (s)
-                  (format s "~{~A~^~%~}" body)))
-               ((vector (unsigned-byte 8))
-                ;; I'm not convinced with this header should be send automatically or not
-                ;; and not sure how to handle same way in other method so comment out
-                ;;(setf (content-length*) (length body))
-                (let ((out (send-headers)))
-                  (write-sequence body out)
-                  (finish-output out)))))))
-    (etypecase res
-      (list (handle-normal-response res))
-      (function (funcall res #'handle-normal-response)))))
+               (when (eq body no-body)
+                 (return-from handle-normal-response
+                   (let ((out (send-headers)))
+                     (lambda (body &key (close nil))
+                       (write-sequence
+                        (if (stringp body)
+                            (flex:string-to-octets body)
+                            body)
+                        out)
+                       (when close
+                         (finish-output out))))))
+
+               (etypecase body
+                 (null) ;; nothing to response
+                 (pathname
+                  (hunchentoot:handle-static-file body (getf headers :content-type)))
+                 (list
+                  (with-output-to-string (s)
+                    (format s "~{~A~^~%~}" body)))
+                 ((vector (unsigned-byte 8))
+                  ;; I'm not convinced with this header should be send automatically or not
+                  ;; and not sure how to handle same way in other method so comment out
+                  ;;(setf (content-length*) (length body))
+                  (let ((out (send-headers)))
+                    (write-sequence body out)
+                    (finish-output out)))))))
+      (etypecase res
+        (list (handle-normal-response res))
+        (function (funcall res #'handle-normal-response))))))
 
 (defun handle-request (req)
   "Convert Request from server into a plist

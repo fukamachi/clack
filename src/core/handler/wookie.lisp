@@ -148,38 +148,43 @@
                 (return (hash-table-plist env-hash)))))))
 
 (defun handle-response (res clack-res)
-  (flet ((handle-normal-response (res clack-res)
-           (destructuring-bind (status headers &optional body) clack-res
-             (let ((stream (start-response res
-                                           :status status
-                                           :headers headers)))
-               (prog1
-                   (etypecase body
-                     (null
-                      (lambda (body &key (close nil))
-                        (if (and (not (stringp body))
-                                 (vectorp body))
-                            (write-sequence body stream)
-                            (write-sequence (flex:string-to-octets body) stream))
-                        (if close
-                            (finish-response res)
-                            (force-output stream))))
-                     (pathname
-                      (with-open-file (in body
-                                          :direction :input
-                                          :element-type '(unsigned-byte 8))
-                        (let ((buf (make-array (file-length in) :element-type '(unsigned-byte 8))))
-                          (read-sequence buf in)
-                          (write-sequence buf stream))))
-                     (list
-                      (write-sequence
-                       (flex:string-to-octets (format nil "~{~A~^~%~}" body))
-                       stream))
-                     ((vector (unsigned-byte 8))
-                      (write-sequence body stream)))
+  (let ((no-body '#:no-body))
+    (flet ((handle-normal-response (res clack-res)
+             (destructuring-bind (status headers &optional (body no-body)) clack-res
+               (let ((stream (start-response res
+                                             :status status
+                                             :headers headers)))
 
-                 (finish-response res))))))
-    (etypecase clack-res
-      (list (handle-normal-response res clack-res))
-      (function (funcall clack-res (lambda (clack-res)
-                                     (handle-normal-response res clack-res)))))))
+                 ;; Returns a writer function for streaming response
+                 (when (eq body no-body)
+                   (return-from handle-normal-response
+                     (lambda (body &key (close nil))
+                       (if (and (not (stringp body))
+                                (vectorp body))
+                           (write-sequence body stream)
+                           (write-sequence (flex:string-to-octets body) stream))
+                       (if close
+                           (finish-response res)
+                           (force-output stream)))))
+
+                 (prog1
+                     (etypecase body
+                       (null) ;; nothing to response
+                       (pathname
+                        (with-open-file (in body
+                                            :direction :input
+                                            :element-type '(unsigned-byte 8))
+                          (let ((buf (make-array (file-length in) :element-type '(unsigned-byte 8))))
+                            (read-sequence buf in)
+                            (write-sequence buf stream))))
+                       (list
+                        (write-sequence
+                         (flex:string-to-octets (format nil "~{~A~^~%~}" body))
+                         stream))
+                       ((vector (unsigned-byte 8))
+                        (write-sequence body stream)))
+                   (finish-response res))))))
+      (etypecase clack-res
+        (list (handle-normal-response res clack-res))
+        (function (funcall clack-res (lambda (clack-res)
+                                       (handle-normal-response res clack-res))))))))
