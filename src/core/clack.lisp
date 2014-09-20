@@ -68,7 +68,15 @@ Example:
            :debug nil)
 "
 @export
-(defun clackup (app &rest args &key (server :hunchentoot) (port 5000) (debug t) watch (use-cl-debugger t) &allow-other-keys)
+(defun clackup (app &rest args
+                &key
+                  (server :hunchentoot)
+                  (port 5000)
+                  (debug t)
+                  watch
+                  (use-cl-debugger t)
+                  (use-default-middlewares t)
+                &allow-other-keys)
   (when (find :shelly *features* :test #'eq)
     (setf use-cl-debugger nil))
   (unless use-cl-debugger
@@ -93,16 +101,16 @@ Example:
                        (:<clack-middleware-json> :clack.middleware.json)))))
     (etypecase app
       (pathname-designator
-       (apply #'clackup
-              (buildapp (eval-file app))
-              args))
+       (apply #'clackup (eval-file app) args))
       (component-designator
        (let* ((handler-package (find-handler server))
               (handler (make-instance '<handler>
                                       :server-name server
                                       :acceptor
                                       (apply (intern (string '#:run) handler-package)
-                                             (buildapp app)
+                                             (if use-default-middlewares
+                                                 (buildapp app)
+                                                 app)
                                              :port port
                                              :debug debug
                                              (delete-from-plist args :server :port :debug :watch :use-cl-debugger)))))
