@@ -31,7 +31,10 @@
                 :async-io-stream)
   (:import-from :bordeaux-threads
                 :make-thread
-                :destroy-thread)
+                :destroy-thread
+                :make-lock
+                :acquire-lock
+                :release-lock)
   (:import-from :http-parse
                 :http-body
                 :http-store-body
@@ -59,32 +62,34 @@
 
 @export
 (defun run (app &key debug (port 5000))
-  (prog1
-      (#+thread-support bt:make-thread
-       #-thread-support funcall
-       #'(lambda ()
-           (let ((*state* (make-instance 'wookie:wookie-state)))
-             (add-hook :parsed-headers 'parsed-headers-hook :clack-handler-wookie-parsed-headers-hook)
-             (defroute (:* ".*" :chunk nil) (req res)
-               (let ((env (handle-request req)))
-                 (handle-response
-                  res
-                  (if debug
-                      (call app env)
-                      (if-let (res (handler-case (call app env)
-                                     (error (error)
-                                       (princ error *error-output*)
-                                       nil)))
-                        res
-                        '(500 nil nil))))))
-             (log:config :error)
-             (prog1
-                 (as:with-event-loop ()
-                   (start-server (make-instance 'wookie:listener
-                                                :port port)))
-               (log:config :info)))))
-    ;; XXX: Wait until the TCP server is ready.
-    (sleep 1)))
+  (let ((server-started-lock (bt:make-lock "server-started")))
+    (prog1
+        (#+thread-support bt:make-thread
+         #-thread-support funcall
+         #'(lambda ()
+             (bt:acquire-lock server-started-lock)
+             (let ((*state* (make-instance 'wookie:wookie-state)))
+               (add-hook :parsed-headers 'parsed-headers-hook :clack-handler-wookie-parsed-headers-hook)
+               (defroute (:* ".*" :chunk nil) (req res)
+                 (let ((env (handle-request req)))
+                   (handle-response
+                    res
+                    (if debug
+                        (call app env)
+                        (if-let (res (handler-case (call app env)
+                                       (error (error)
+                                         (princ error *error-output*)
+                                         nil)))
+                          res
+                          '(500 nil nil))))))
+               (log:config :error)
+               (prog1
+                   (as:with-event-loop ()
+                     (start-server (make-instance 'wookie:listener
+                                                  :port port))
+                     (bt:release-lock server-started-lock))
+                 (log:config :info)))))
+      (bt:acquire-lock server-started-lock t))))
 
 @export
 (defun stop (server)
