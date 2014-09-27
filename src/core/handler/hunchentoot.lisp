@@ -32,28 +32,38 @@
         *catch-errors-p* nil))
 
 @export
-(defun run (app &key debug (port 5000))
+(defun run (app &key debug (port 5000)
+                  ssl ssl-key-file ssl-cert-file ssl-key-password)
   "Start Hunchentoot server."
   (initialize)
-  (when debug
-    (setf *show-lisp-errors-p* t))
   (setf *dispatch-table*
         (list
-         #'(lambda (env)
-             #'(lambda ()
-                 (handle-response
-                  (if debug
-                      (call app env)
-                      (if-let (res (handler-case (call app env)
-                                     (error (error)
-                                       (princ error *error-output*)
-                                       nil)))
-                        res
-                        '(500 nil nil))))))))
-  (start (make-instance '<debuggable-acceptor>
-                        :port port
-                        :access-log-destination nil
-                        :error-template-directory nil)))
+         #'(lambda (req)
+             (let ((env (handle-request req :ssl ssl)))
+               #'(lambda ()
+                   (handle-response
+                    (if debug
+                        (call app env)
+                        (if-let (res (handler-case (call app env)
+                                       (error (error)
+                                         (princ error *error-output*)
+                                         nil)))
+                          res
+                          '(500 nil nil)))))))))
+  (let ((acceptor
+          (if ssl
+              (make-instance 'easy-ssl-acceptor
+                             :port port
+                             :ssl-certificate-file ssl-cert-file
+                             :ssl-privatekey-file ssl-key-file
+                             :ssl-privatekey-password ssl-key-password
+                             :access-log-destination nil
+                             :error-template-directory nil)
+              (make-instance 'easy-acceptor
+                             :port port
+                             :access-log-destination nil
+                             :error-template-directory nil))))
+    (start acceptor)))
 
 @export
 (defun stop (acceptor)
@@ -109,7 +119,7 @@ before passing to Hunchentoot."
         (list (handle-normal-response res))
         (function (funcall res #'handle-normal-response))))))
 
-(defun handle-request (req)
+(defun handle-request (req &key ssl)
   "Convert Request from server into a plist
 before passing to Clack application."
   (destructuring-bind (server-name &optional (server-port "80"))
@@ -123,8 +133,7 @@ before passing to Clack application."
       :server-port (parse-integer server-port :junk-allowed t)
       :server-protocol (server-protocol* req)
       :request-uri (request-uri* req)
-      ;; FIXME: This handler cannot connect with SSL now.
-      :url-scheme :http
+      :url-scheme (if ssl :https :http)
       :remote-addr (remote-addr* req)
       :remote-port (remote-port* req)
       ;; Request params
@@ -139,42 +148,6 @@ before passing to Clack application."
            unless (find k '(:request-method :script-name :path-info :server-name :server-port :server-protocol :request-uri :remote-addr :remote-port :query-string :content-length :content-type :connection))
              append (list (intern (format nil "HTTP-~:@(~A~)" k) :keyword)
                           v)))))
-
-;; for Debug
-
-;;; Acceptor that provides debugging from the REPL
-;;; Based on an email by Andreas Fruchs:
-;;; http://common-lisp.net/pipermail/tbnl-devel/2009-April/004688.html
-(defclass <debuggable-acceptor> (acceptor)
-     ()
-  (:documentation "An acceptor that handles errors by invoking the
-  debugger."))
-
-(defmethod process-connection ((*acceptor* <debuggable-acceptor>) (socket t))
-  (declare (ignore socket))
-  ;; Invoke the debugger on any errors except for SB-SYS:IO-TIMEOUT.
-  ;; HTTP browsers usually leave the connection open for futher requests,
-  ;; and Hunchentoot respects this but sets a timeout so that old connections
-  ;; are cleaned up.
-  (handler-case (call-next-method)
-    #+sbcl (sb-sys:io-timeout (condition) (values nil condition))
-    ;; preventing Connection reset by peer
-    #+sbcl (sb-int:simple-stream-error (condition) (values nil condition))
-    (error (condition) (invoke-debugger condition))))
-
-(defmethod acceptor-dispatch-request ((this <debuggable-acceptor>) request)
-  "Hunchentoot request dispatcher for Clack. Most of this is the same as
-list-request-dispatcher, the default one in Hunchentoot, except for converting
-Request instances into a plist before passing to Clack application."
-  (loop for dispatcher in *dispatch-table*
-        for action = (funcall dispatcher (handle-request request))
-        when action :return (funcall action)
-        finally (setf (return-code *reply*) +http-not-found+)))
-
-(defmethod acceptor-status-message ((this <debuggable-acceptor>) http-status-code &rest args &key)
-  "Disable generating error HTML."
-  (declare (ignore http-status-code args))
-  nil)
 
 (doc:start)
 
