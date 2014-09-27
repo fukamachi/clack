@@ -137,7 +137,7 @@ you would call like this: `(run-server-tests :foo)'."
   (lambda (env)
     `(200
       (:content-type "text/plain; charset=utf-8")
-      (,(getf env :url-scheme))))
+      (,(string (getf env :url-scheme)))))
   (lambda ()
     (multiple-value-bind (body status headers)
         (http-request (localhost) :method :post)
@@ -312,7 +312,7 @@ you would call like this: `(run-server-tests :foo)'."
   (lambda (env)
     `(200
       (:content-type "text/plain; charset=utf-8")
-      (,(not (null (getf env :script-name))))))
+      (,(princ-to-string (not (null (getf env :script-name)))))))
   (lambda ()
     (is (http-request (localhost "foo/?ediweitz=weitzedi"))
         "T"
