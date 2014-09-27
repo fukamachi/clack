@@ -45,13 +45,19 @@
   (:import-from :do-urlencode
                 :urldecode)
   (:import-from :flexi-streams
-                :make-in-memory-input-stream
+                :make-in-memory-input-stream)
+  (:import-from :babel
                 :string-to-octets)
+  (:import-from :fast-io
+                :with-fast-output
+                :fast-write-sequence
+                :fast-write-byte)
   (:import-from :split-sequence
                 :split-sequence)
   (:import-from :alexandria
                 :if-let
-                :hash-table-plist))
+                :hash-table-plist
+                :copy-stream))
 (in-package :clack.handler.wookie)
 
 (cl-syntax:use-syntax :annot)
@@ -123,7 +129,7 @@
              :clack.nonblocking t
              :clack.io (request-socket req))
 
-       (loop with env-hash = (make-hash-table :test #'eq)
+       (loop with env-hash = (make-hash-table :test 'eq)
              for (key val) on headers by #'cddr
              unless (find key '(:request-method
                                 :script-name
@@ -159,13 +165,11 @@
                  (when (eq body no-body)
                    (return-from handle-normal-response
                      (lambda (body &key (close nil))
-                       (if (and (not (stringp body))
-                                (vectorp body))
-                           (write-sequence body stream)
-                           (write-sequence (flex:string-to-octets body) stream))
-                       (if close
-                           (finish-response res)
-                           (force-output stream)))))
+                       (etypecase body
+                         (string (write-sequence (babel:string-to-octets body) stream))
+                         (vector (write-sequence body stream)))
+                       (when close
+                         (finish-response res)))))
 
                  (prog1
                      (etypecase body
@@ -174,12 +178,16 @@
                         (with-open-file (in body
                                             :direction :input
                                             :element-type '(unsigned-byte 8))
-                          (let ((buf (make-array (file-length in) :element-type '(unsigned-byte 8))))
-                            (read-sequence buf in)
-                            (write-sequence buf stream))))
+                          (copy-stream in stream)))
                        (list
                         (write-sequence
-                         (flex:string-to-octets (format nil "~{~A~^~%~}" body))
+                         (with-fast-output (buffer :vector)
+                           (let ((first t))
+                             (dolist (str body)
+                               (if first
+                                   (setf first nil)
+                                   (fast-write-byte #.(char-code #\Newline) buffer))
+                               (fast-write-sequence (babel:string-to-octets str) buffer))))
                          stream))
                        ((vector (unsigned-byte 8))
                         (write-sequence body stream)))

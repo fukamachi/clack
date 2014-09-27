@@ -31,6 +31,8 @@
                :puri
                :do-urlencode
                :flexi-streams
+               :babel
+               :fast-io
                :split-sequence
                :alexandria)
   :components ((:file "src/core/handler/wookie"))
