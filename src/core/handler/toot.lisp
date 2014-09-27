@@ -25,19 +25,26 @@
 (cl-syntax:use-syntax :annot)
 
 @export
-(defun run (app &key debug (port 5000))
+(defun run (app &key debug (port 5000)
+                  ssl ssl-key-file ssl-cert-file ssl-key-password)
   "Start Toot server."
-  (toot:start-server
-   :handler (lambda (req)
-              (handle-response
-               req
-               (if debug
-                   (call app (handle-request req))
-                   (if-let (res (handler-case (call app (handle-request req))
-                                  (condition () nil)))
-                     res
-                     '(500 nil nil)))))
-   :port port))
+  (apply #'toot:start-server
+         :handler (lambda (req)
+                    (let ((env (handle-request req :ssl ssl)))
+                      (handle-response
+                       req
+                       (if debug
+                           (call app env)
+                           (if-let (res (handler-case (call app env)
+                                          (condition () nil)))
+                             res
+                             '(500 nil nil))))))
+         :port port
+         (if ssl
+             (list :ssl-certificate-file ssl-cert-file
+                   :ssl-private-key-file ssl-key-file
+                   :ssl-private-key-password ssl-key-password)
+             '())))
 
 
 @export
@@ -45,7 +52,7 @@
   "Stop Toot server."
   (toot:stop-acceptor acceptor))
 
-(defun handle-request (req)
+(defun handle-request (req &key ssl)
   "Convert Request from server into a plist
 before pass to Clack application."
   (let ((content-length (if-let (content-length (request-header :content-length req))
@@ -64,7 +71,7 @@ before pass to Clack application."
                          80)
         :server-protocol (server-protocol req)
         :request-uri (request-uri req)
-        :url-scheme :HTTP    ;(request-scheme req)
+        :url-scheme (if ssl :https :http)
         :remote-addr (remote-addr req)
         :remote-port (remote-port req)
         :query-string (request-query req)
