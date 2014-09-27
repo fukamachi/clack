@@ -162,12 +162,6 @@ before passing to Clack application."
     #+sbcl (sb-int:simple-stream-error (condition) (values nil condition))
     (error (condition) (invoke-debugger condition))))
 
-(defmethod acceptor-request-dispatcher ((*acceptor* <debuggable-acceptor>))
-  (let ((dispatcher (call-next-method)))
-    (lambda (request)
-      (handler-bind ((error #'invoke-debugger))
-        (funcall dispatcher request)))))
-
 (defmethod acceptor-dispatch-request ((this <debuggable-acceptor>) request)
   "Hunchentoot request dispatcher for Clack. Most of this is the same as
 list-request-dispatcher, the default one in Hunchentoot, except for converting
