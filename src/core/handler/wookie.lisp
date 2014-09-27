@@ -18,6 +18,8 @@
                 :finish-response
                 :add-hook
                 :defroute
+                :listener
+                :ssl-listener
                 :start-server
                 :request-headers
                 :request-resource
@@ -67,7 +69,8 @@
   (setf (http-parse:http-store-body (request-http request)) t))
 
 @export
-(defun run (app &key debug (port 5000))
+(defun run (app &key debug (port 5000)
+                  ssl ssl-key-file ssl-cert-file ssl-key-password)
   (let ((server-started-lock (bt:make-lock "server-started")))
     (prog1
         (#+thread-support bt:make-thread
@@ -77,7 +80,7 @@
              (let ((*state* (make-instance 'wookie:wookie-state)))
                (add-hook :parsed-headers 'parsed-headers-hook :clack-handler-wookie-parsed-headers-hook)
                (defroute (:* ".*" :chunk nil) (req res)
-                 (let ((env (handle-request req)))
+                 (let ((env (handle-request req :ssl ssl)))
                    (handle-response
                     res
                     (if debug
@@ -91,8 +94,16 @@
                (log:config :error)
                (prog1
                    (as:with-event-loop ()
-                     (start-server (make-instance 'wookie:listener
-                                                  :port port))
+                     (let ((listener
+                             (if ssl
+                                 (make-instance 'wookie:ssl-listener
+                                                :port port
+                                                :key ssl-key-file
+                                                :certificate ssl-cert-file
+                                                :password ssl-key-password)
+                                 (make-instance 'wookie:listener
+                                                :port port))))
+                       (start-server listener))
                      (bt:release-lock server-started-lock))
                  (log:config :info)))))
       (bt:acquire-lock server-started-lock t))))
@@ -103,7 +114,7 @@
    #-thread-support as:close-tcp-server
    server))
 
-(defun handle-request (req)
+(defun handle-request (req &key ssl)
   (let ((puri (request-uri req))
         (http-version (http-version (request-http req)))
         (headers (request-headers req)))
@@ -120,7 +131,7 @@
                                       :keyword)
              :path-info (do-urlencode:urldecode (uri-path puri) :lenientp t)
              :query-string (uri-query puri)
-             :url-scheme :http
+             :url-scheme (if ssl :https :http)
              :request-uri (request-resource req)
              :raw-body (flex:make-in-memory-input-stream (http-parse:http-body (request-http req)))
              :content-length (getf headers :content-length)
