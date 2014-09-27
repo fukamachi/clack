@@ -120,6 +120,8 @@
         (headers (request-headers req)))
     (destructuring-bind (server-name &optional server-port)
         (split-sequence #\: (getf headers :host) :from-end t)
+      (setf (puri:uri-path puri)
+            (nth-value 3 (puri::parse-uri-string (request-resource req))))
       (nconc
        (list :request-method (request-method req)
              :script-name ""
