@@ -18,7 +18,7 @@
 (in-package :clack-handler-wookie-asd)
 
 (defsystem clack-handler-wookie
-  :version "0.1.0"
+  :version "0.2.0"
   :author "Eitaro Fukamachi"
   :license "LLGPL"
   :depends-on (:clack
