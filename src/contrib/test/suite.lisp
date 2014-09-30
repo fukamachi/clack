@@ -548,8 +548,6 @@ you would call like this: `(run-server-tests :foo)'."
           (is body (format nil "0~%1~%2~%")))
         (skip 2 (format nil "because ~:(~A~) doesn't support streaming" *clack-test-handler*)))))
 
-(cl-test-more::remove-exit-hook)
-
 (doc:start)
 
 @doc:NAME "
