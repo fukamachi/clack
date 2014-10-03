@@ -113,7 +113,8 @@ Example:
                                                  app)
                                              :port port
                                              :debug debug
-                                             (delete-from-plist args :server :port :debug :watch :use-cl-debugger)))))
+                                             (delete-from-plist args :server :port :debug :watch :use-cl-debugger
+                                                                :use-default-middlewares)))))
          (format t "~&~:(~A~) server is started.~
              ~%Listening on localhost:~A.~%" server port)
          (when watch
