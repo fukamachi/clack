@@ -168,55 +168,56 @@
                 (return (hash-table-plist env-hash)))))))
 
 (defun handle-response (res clack-res)
-  (let ((no-body '#:no-body))
-    (flet ((handle-normal-response (res clack-res)
-             (destructuring-bind (status headers &optional (body no-body)) clack-res
-               ;; Returns a writer function for streaming response
-               (when (eq body no-body)
-                 (let ((stream (start-response res
-                                               :status status
-                                               :headers headers)))
-                   (return-from handle-normal-response
-                     (lambda (body &key (close nil))
-                       (etypecase body
-                         (string (write-sequence (babel:string-to-octets body) stream))
-                         (vector (write-sequence body stream)))
-                       (when close
-                         (finish-response res))))))
+  (etypecase clack-res
+    (list (handle-normal-response res clack-res))
+    (function (funcall clack-res (lambda (clack-res)
+                                   (handler-case
+                                       (handle-normal-response res clack-res)
+                                     ;; Ignore when the socket is closed.
+                                     (as:socket-closed ())))))))
 
-               (etypecase body
-                 (null) ;; nothing to response
-                 (pathname
-                  (let ((stream (start-response res
-                                                :status status
-                                                :headers headers)))
-                    (with-open-file (in body
-                                        :direction :input
-                                        :element-type '(unsigned-byte 8))
-                      (copy-stream in stream))
-                    (finish-response res)))
-                 (list
-                  (send-response res
-                                 :status status
-                                 :headers headers
-                                 :body (with-fast-output (buffer :vector)
-                                         (let ((first t))
-                                           (dolist (str body)
-                                             (if first
-                                                 (setf first nil)
-                                                 (fast-write-byte #.(char-code #\Newline) buffer))
-                                             (fast-write-sequence (babel:string-to-octets str) buffer))))
-                                 :close t))
-                 ((vector (unsigned-byte 8))
-                  (send-response res
-                                 :status status
-                                 :headers headers
-                                 :body body
-                                 :close t))))))
-      (etypecase clack-res
-        (list (handle-normal-response res clack-res))
-        (function (funcall clack-res (lambda (clack-res)
-                                       (handler-case
-                                           (handle-normal-response res clack-res)
-                                         ;; Ignore when the socket is closed.
-                                         (as:socket-closed ())))))))))
+(defun handle-normal-response (res clack-res)
+  (let ((no-body '#:no-body))
+    (destructuring-bind (status headers &optional (body no-body)) clack-res
+      ;; Returns a writer function for streaming response
+      (when (eq body no-body)
+        (let ((stream (start-response res
+                                      :status status
+                                      :headers headers)))
+          (return-from handle-normal-response
+            (lambda (body &key (close nil))
+              (etypecase body
+                (string (write-sequence (babel:string-to-octets body) stream))
+                (vector (write-sequence body stream)))
+              (when close
+                (finish-response res))))))
+
+      (etypecase body
+        (null) ;; nothing to response
+        (pathname
+         (let ((stream (start-response res
+                                       :status status
+                                       :headers headers)))
+           (with-open-file (in body
+                               :direction :input
+                               :element-type '(unsigned-byte 8))
+             (copy-stream in stream))
+           (finish-response res)))
+        (list
+         (send-response res
+                        :status status
+                        :headers headers
+                        :body (with-fast-output (buffer :vector)
+                                (let ((first t))
+                                  (dolist (str body)
+                                    (if first
+                                        (setf first nil)
+                                        (fast-write-byte #.(char-code #\Newline) buffer))
+                                    (fast-write-sequence (babel:string-to-octets str) buffer))))
+                        :close t))
+        ((vector (unsigned-byte 8))
+         (send-response res
+                        :status status
+                        :headers headers
+                        :body body
+                        :close t))))))
