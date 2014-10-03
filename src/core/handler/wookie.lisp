@@ -207,13 +207,15 @@
          (send-response res
                         :status status
                         :headers headers
-                        :body (with-fast-output (buffer :vector)
-                                (let ((first t))
-                                  (dolist (str body)
-                                    (if first
-                                        (setf first nil)
-                                        (fast-write-byte #.(char-code #\Newline) buffer))
-                                    (fast-write-sequence (babel:string-to-octets str) buffer))))
+                        :body (if (null (cdr body))
+                                  (car body)
+                                  (with-fast-output (buffer :vector)
+                                    (let ((first t))
+                                      (dolist (str body)
+                                        (if first
+                                            (setf first nil)
+                                            (fast-write-byte #.(char-code #\Newline) buffer))
+                                        (fast-write-sequence (babel:string-to-octets str) buffer)))))
                         :close t))
         ((vector (unsigned-byte 8))
          (send-response res
