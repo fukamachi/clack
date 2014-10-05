@@ -120,7 +120,7 @@
         (http-version (http-version (request-http req)))
         (headers (request-headers req)))
     (destructuring-bind (server-name &optional server-port)
-        (split-sequence #\: (getf headers :host) :from-end t)
+        (split-sequence #\: (string (getf headers :host)) :from-end t :count 2)
       (setf (puri:uri-path puri)
             (nth-value 3 (puri::parse-uri-string (request-resource req))))
       (nconc
