@@ -470,9 +470,7 @@ you would call like this: `(run-server-tests :foo)'."
         (http-request (localhost))
       (is status 200)
       (is (get-header headers :client-transfer-encoding) nil)
-      (if (eq *clack-test-handler* :wookie)
-          (is body #() :test #'equalp)
-          (is body nil)))))
+      (is body nil))))
 
 (define-app-test |handle Authorization header|
   (lambda (env)
