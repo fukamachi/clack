@@ -200,7 +200,7 @@ you would call like this: `(run-server-tests :foo)'."
   (lambda (env)
     `(200
       (:content-type "text/plain; charset=utf-8")
-      (,(getf env :http-foo))))
+      (,(gethash "foo" (getf env :headers)))))
   (lambda ()
     (multiple-value-bind (body status headers)
         (http-request (localhost "foo/?ediweitz=weitzedi")
@@ -213,7 +213,7 @@ you would call like this: `(run-server-tests :foo)'."
   (lambda (env)
     `(200
       (:content-type "text/plain; charset=utf-8")
-      (,(getf env :http-cookie))))
+      (,(gethash "cookie" (getf env :headers)))))
   (lambda ()
     (multiple-value-bind (body status headers)
         (http-request (localhost "foo/?ediweitz=weitzedi")
@@ -331,7 +331,7 @@ you would call like this: `(run-server-tests :foo)'."
   (lambda (env)
     `(200
       (:content-type "text/plain; charset=utf-8")
-      (,(getf env :http-foo))))
+      (,(gethash "foo" (getf env :headers)))))
   (lambda ()
     (like
      (http-request (localhost)
@@ -356,7 +356,7 @@ you would call like this: `(run-server-tests :foo)'."
     `(200
       (:content-type "text/plain; charset=utf-8"
        :x-cookie ,(not (null (getf env :cookie))))
-      (,(getf env :http-cookie))))
+      (,(gethash "cookie" (getf env :headers)))))
   (lambda ()
     (multiple-value-bind (body status headers)
         (http-request (localhost)
@@ -402,7 +402,7 @@ you would call like this: `(run-server-tests :foo)'."
   (lambda (env)
     `(200
       (:content-type "text/plain; charset=utf-8")
-      (,(getf env :http-x-foo))))
+      (,(gethash "x-foo" (getf env :headers)))))
   (lambda ()
     (let ((chunk
            (with-output-to-string (chunk)
@@ -478,8 +478,8 @@ you would call like this: `(run-server-tests :foo)'."
   (lambda (env)
     `(200
       (:content-type "text/plain; charset=utf-8"
-       :x-authorization ,(not (null (getf env :http-authorization))))
-      (,(or (getf env :http-authorization) ""))))
+       :x-authorization ,(not (null (gethash "authorization" (getf env :headers)))))
+      (,(gethash "authorization" (getf env :headers) ""))))
   (lambda ()
     (multiple-value-bind (body status headers)
         (http-request (localhost)
