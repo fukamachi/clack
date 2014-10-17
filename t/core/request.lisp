@@ -14,15 +14,17 @@
 (setq req
       (make-request `(:content-type "application/x-www-form-urlencoded; charset=utf-8"
                       :uri-scheme :http
-                      :http-referer "http://github.com/fukamachi/clack"
-                      :http-user-agent "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-US)"
-                      :http-cookie "hoge=1;fuga=semi;colon"
                       :query-string "ediweitz=weitzedi&name=eitaro&q=C%2B%2B"
                       :raw-body
                       ,(flex:make-flexi-stream
                         (flex:make-in-memory-input-stream
                          #(110 97 109 101 61 230 183 177 231 148 186 232 139 177 229 164 170 233 131 142))
-                        :external-format :utf-8))))
+                        :external-format :utf-8)
+                      :headers ,(alexandria:plist-hash-table
+                                 (list "referer" "http://github.com/fukamachi/clack"
+                                       "user-agent" "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-US)"
+                                       "cookie" "hoge=1;fuga=semi;colon")
+                                 :test 'equal))))
 
 (plan 19)
 
