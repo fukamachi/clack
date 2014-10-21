@@ -50,7 +50,8 @@
         (typecase body
           (list (+ (reduce #'+ body :key #'length)
                    (length body)))
-          (pathname (clack.app.directory::file-size body))
+          (pathname (with-open-file (in body)
+                      (file-length in)))
           ((vector (unsigned-byte 8)) (1+ (length body)))))))
 
 @export

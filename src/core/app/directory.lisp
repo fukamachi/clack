@@ -64,7 +64,9 @@
             (if dir-p "/" "")
             (clack.util:html-encode (or name uri))
             (if dir-p "/" "")
-            (file-size file)
+            (unless dir-p
+              (with-open-file (in file)
+                (file-length in)))
             (if dir-p
                 "directory"
                 (or (clack.util.hunchentoot:mime-type file) "text/plain"))
@@ -100,16 +102,6 @@ tr, td { white-space: nowrap; }
 </body></html>"
           (clack.util:html-encode path-info)
           body))
-
-(defun file-size (path)
-  "Return the size of the file at `path'. If `path' is a directory, this will return nil."
-  (unless (directory-pathname-p path)
-    (with-open-file (in path :direction :input
-                        :element-type 'unsigned-byte)
-      (do ((size 0 (1+ size))
-           (byte (read-byte in nil nil)
-                 (read-byte in nil nil)))
-          ((null byte) size)))))
 
 (doc:start)
 
