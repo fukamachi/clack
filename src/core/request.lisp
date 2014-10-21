@@ -50,7 +50,8 @@
            :clack-handler
 
            :referer
-           :user-agent))
+           :user-agent
+           :headers))
 (in-package :clack.request)
 
 (cl-syntax:use-syntax :annot)
