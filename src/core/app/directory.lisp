@@ -21,6 +21,8 @@
                 :directory-exists-p
                 :directory-pathname-p
                 :list-directory)
+  (:import-from :trivial-mimes
+                :mime-lookup)
   (:import-from :do-urlencode
                 :urlencode))
 (in-package :clack.app.directory)
@@ -69,7 +71,7 @@
                 (file-length in)))
             (if dir-p
                 "directory"
-                (or (clack.util.hunchentoot:mime-type file) "text/plain"))
+                (or (mime-lookup file) "text/plain"))
             (clack.util.localtime:format-rfc1123-timestring nil
              (local-time:universal-to-timestamp (file-write-date file))))))
 

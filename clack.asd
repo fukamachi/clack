@@ -38,6 +38,7 @@
                :circular-streams
                :cl-base64
                :marshal
+               :trivial-mimes
                :trivial-backtrace
                :log4cl)
   :components ((:module "src"

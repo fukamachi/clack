@@ -12,8 +12,8 @@
         :clack)
   (:import-from :clack.util.localtime
                 :format-rfc1123-timestring)
-  (:import-from :clack.util.hunchentoot
-                :mime-type)
+  (:import-from :trivial-mimes
+                :mime-lookup)
   (:import-from :cl-ppcre
                 :scan)
   (:import-from :local-time
@@ -95,8 +95,7 @@
 @export
 (defgeneric serve-path (app env file encoding)
   (:method ((this <clack-app-file>) env file encoding)
-    (let ((content-type (or (clack.util.hunchentoot:mime-type file)
-                            "text/plain"))
+    (let ((content-type (or (mime-lookup file) "text/plain"))
           (univ-time (or (file-write-date file)
                          (get-universal-time))))
       (when (text-file-p content-type)
