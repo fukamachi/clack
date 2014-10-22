@@ -79,7 +79,6 @@
                     :depends-on ("clack" "component" "response" "request" "app")
                     :components
                     ((:file "static")
-                     (:file "json")
                      (:file "conditional")
                      (:module "session"
                       :serial t
