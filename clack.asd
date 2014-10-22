@@ -36,7 +36,6 @@
                :do-urlencode
                :local-time
                :circular-streams
-               :yason
                :cl-base64
                :marshal
                :trivial-backtrace
