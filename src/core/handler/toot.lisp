@@ -60,31 +60,31 @@ before pass to Clack application."
                           (setf (slot-value req 'request-headers) (acons :content-length "" (slot-value req 'request-headers))))))
     (destructuring-bind (server-name &optional server-port)
         (split-sequence #\: (cdr (assoc :host (request-headers req))))
-      (append
-       (list
-        :request-method (request-method req)
-        :script-name ""
-        :path-info (url-decode (request-path req))
-        :server-name server-name
-        :server-port (if server-port
-                         (parse-integer server-port)
-                         80)
-        :server-protocol (server-protocol req)
-        :request-uri (request-uri req)
-        :url-scheme (if ssl :https :http)
-        :remote-addr (remote-addr req)
-        :remote-port (remote-port req)
-        :query-string (request-query req)
-        :content-length content-length
-        :content-type (request-header :content-type req)
-        :raw-body (toot::request-body-stream req)
-        :clack.streaming t
-        :clack.handler :toot)
-
-       (loop for (k . v) in (toot::request-headers req)
-             unless (find k '(:request-method :script-name :path-info :server-name :server-port :server-protocol :request-uri :remote-addr :remote-port :query-string :content-length :content-type :accept :connection))
-               append (list (intern (format nil "HTTP-~:@(~A~)" k) :keyword)
-                            v))))))
+      (list
+       :request-method (request-method req)
+       :script-name ""
+       :path-info (url-decode (request-path req))
+       :server-name server-name
+       :server-port (if server-port
+                        (parse-integer server-port)
+                        80)
+       :server-protocol (server-protocol req)
+       :request-uri (request-uri req)
+       :url-scheme (if ssl :https :http)
+       :remote-addr (remote-addr req)
+       :remote-port (remote-port req)
+       :query-string (request-query req)
+       :content-length content-length
+       :content-type (request-header :content-type req)
+       :raw-body (toot::request-body-stream req)
+       :clack.streaming t
+       :clack.handler :toot
+       :headers (loop with headers = (make-hash-table :test 'equal)
+                      for (k . v) in (toot::request-headers req)
+                      unless (or (eq k :content-length)
+                                 (eq k :content-type))
+                        do (setf (gethash (string-downcase k) headers) v)
+                      finally (return headers))))))
 
 (defun handle-response (req res)
   (let ((no-body '#:no-body))

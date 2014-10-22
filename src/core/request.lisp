@@ -50,7 +50,8 @@
            :clack-handler
 
            :referer
-           :user-agent))
+           :user-agent
+           :headers))
 (in-package :clack.request)
 
 (cl-syntax:use-syntax :annot)
@@ -124,14 +125,11 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
                      :initarg :clack-handler
                      :reader clack-handler)
 
-      (http-referer :type (or string null)
-                    :initarg :http-referer
-                    :initform nil
-                    :reader referer)
-      (http-user-agent :type (or string null)
-                       :initarg :http-user-agent
-                       :initform nil
-                       :reader user-agent)
+      (headers :type hash-table
+               :initarg :headers
+               :initform (make-hash-table :test 'equal)
+               :reader headers)
+
       (http-cookie :type (or string list)
                    :initarg :http-cookie
                    :initform nil)
@@ -142,14 +140,22 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
                         :initform nil))
   (:documentation "Portable HTTP Request object for Clack Request."))
 
+(defgeneric referer (request)
+  (:method ((request <request>))
+    (gethash "referer" (headers request))))
+
+(defgeneric user-agent (request)
+  (:method ((request <request>))
+    (gethash "user-agent" (headers request))))
+
 (defmethod initialize-instance :after ((this <request>) &rest env)
   (remf env :allow-other-keys)
   (setf (slot-value this 'env) env)
 
   ;; cookies
-  (when (slot-value this 'http-cookie)
+  (when-let (cookie (gethash "cookie" (headers this)))
     (setf (slot-value this 'http-cookie)
-          (parse-parameters (slot-value this 'http-cookie) :delimiter "\\s*[,;]\\s*")))
+          (parse-parameters cookie :delimiter "\\s*[,;]\\s*")))
 
   ;; GET parameters
   (setf (slot-value this 'query-parameters)

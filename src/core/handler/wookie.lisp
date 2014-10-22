@@ -118,54 +118,48 @@
 (defun handle-request (req &key ssl)
   (let ((puri (request-uri req))
         (http-version (http-version (request-http req)))
-        (headers (request-headers req)))
+        (headers (make-hash-table :test 'equal))
+        content-length
+        content-type)
+    (loop for (key val) on (request-headers req) by #'cddr
+          if (eq key :content-length)
+            do (setf content-length val)
+          else if (eq key :content-type)
+            do (setf content-type val)
+          else
+            do (let ((key (string-downcase key)))
+                 (multiple-value-bind (current existsp)
+                     (gethash key headers)
+                   (setf (gethash key headers)
+                         (if existsp
+                             (format nil "~A, ~A" current val)
+                             val)))))
+
     (destructuring-bind (server-name &optional server-port)
-        (split-sequence #\: (string (getf headers :host)) :from-end t :count 2)
+        (split-sequence #\: (gethash "host" headers "") :from-end t :count 2)
       (setf (puri:uri-path puri)
             (nth-value 3 (puri::parse-uri-string (request-resource req))))
-      (nconc
-       (list :request-method (request-method req)
-             :script-name ""
-             :server-name server-name
-             :server-port (if server-port
-                              (parse-integer server-port :junk-allowed t)
-                              80)
-             :server-protocol (intern (format nil "HTTP/~A" http-version)
-                                      :keyword)
-             :path-info (do-urlencode:urldecode (uri-path puri) :lenientp t)
-             :query-string (uri-query puri)
-             :url-scheme (if ssl :https :http)
-             :request-uri (request-resource req)
-             :raw-body (flex:make-in-memory-input-stream (http-parse:http-body (request-http req)))
-             :content-length (getf headers :content-length)
-             :content-type (getf headers :content-type)
-             :clack.streaming t
-             :clack.nonblocking t
-             :clack.io (request-socket req))
-
-       (loop with env-hash = (make-hash-table :test 'eq)
-             for (key val) on headers by #'cddr
-             unless (find key '(:request-method
-                                :script-name
-                                :path-info
-                                :server-name
-                                :server-port
-                                :server-protocol
-                                :request-uri
-                                :remote-addr
-                                :remote-port
-                                :query-string
-                                :content-length
-                                :content-type
-                                :connection))
-               do
-                  (let ((key (intern (format nil "HTTP-~:@(~A~)" key) :keyword)))
-                    (if (gethash key env-hash)
-                        (setf (gethash key env-hash)
-                              (concatenate 'string (gethash key env-hash) ", " val))
-                        (setf (gethash key env-hash) val)))
-             finally
-                (return (hash-table-plist env-hash)))))))
+      (list :request-method (request-method req)
+            :script-name ""
+            :server-name server-name
+            :server-port (if server-port
+                             (parse-integer server-port :junk-allowed t)
+                             80)
+            :server-protocol (intern (format nil "HTTP/~A" http-version)
+                                     :keyword)
+            :path-info (do-urlencode:urldecode (uri-path puri) :lenientp t)
+            :query-string (uri-query puri)
+            :url-scheme (if ssl :https :http)
+            :request-uri (request-resource req)
+            :raw-body (flex:make-flexi-stream
+                       (flex:make-in-memory-input-stream (http-parse:http-body (request-http req)))
+                       :external-format :utf-8)
+            :content-length content-length
+            :content-type content-type
+            :clack.streaming t
+            :clack.nonblocking t
+            :clack.io (request-socket req)
+            :headers headers))))
 
 (defun handle-response (res clack-res)
   (etypecase clack-res

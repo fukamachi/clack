@@ -124,30 +124,31 @@ before passing to Hunchentoot."
 before passing to Clack application."
   (destructuring-bind (server-name &optional (server-port "80"))
       (split-sequence #\: (host req) :from-end t)
-    (append
-     (list
-      :request-method (request-method* req)
-      :script-name ""
-      :path-info (url-decode (script-name* req))
-      :server-name server-name
-      :server-port (parse-integer server-port :junk-allowed t)
-      :server-protocol (server-protocol* req)
-      :request-uri (request-uri* req)
-      :url-scheme (if ssl :https :http)
-      :remote-addr (remote-addr* req)
-      :remote-port (remote-port* req)
-      ;; Request params
-      :query-string (or (query-string* req) "")
-      :raw-body (raw-post-data :request req :want-stream t)
-      :content-length (when-let (content-length (header-in* :content-length req))
-                        (parse-integer content-length :junk-allowed t))
-      :content-type (header-in* :content-type req)
-      :clack.streaming t)
+    (list
+     :request-method (request-method* req)
+     :script-name ""
+     :path-info (url-decode (script-name* req))
+     :server-name server-name
+     :server-port (parse-integer server-port :junk-allowed t)
+     :server-protocol (server-protocol* req)
+     :request-uri (request-uri* req)
+     :url-scheme (if ssl :https :http)
+     :remote-addr (remote-addr* req)
+     :remote-port (remote-port* req)
+     ;; Request params
+     :query-string (or (query-string* req) "")
+     :raw-body (raw-post-data :request req :want-stream t)
+     :content-length (when-let (content-length (header-in* :content-length req))
+                       (parse-integer content-length :junk-allowed t))
+     :content-type (header-in* :content-type req)
+     :clack.streaming t
 
-     (loop for (k . v) in (hunchentoot:headers-in* req)
-           unless (find k '(:request-method :script-name :path-info :server-name :server-port :server-protocol :request-uri :remote-addr :remote-port :query-string :content-length :content-type :connection))
-             append (list (intern (format nil "HTTP-~:@(~A~)" k) :keyword)
-                          v)))))
+     :headers (loop with headers = (make-hash-table :test 'equal)
+                    for (k . v) in (hunchentoot:headers-in* req)
+                    unless (or (eq k :content-length)
+                               (eq k :content-type))
+                      do (setf (gethash (string-downcase k) headers) v)
+                    finally (return headers)))))
 
 (doc:start)
 

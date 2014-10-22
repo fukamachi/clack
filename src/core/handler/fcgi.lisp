@@ -144,67 +144,89 @@
 (defun handle-request (req)
   "Convert Request from server into a plist
 before passing to Clack application."
-  (let ((env
-         (loop with env-hash = (make-hash-table :test #'eq)
-               for (k . v) in (fcgx-getenv req)
-               for key = (make-keyword
-                          (with-output-to-string (out)
-                            (loop for char across (string k)
-                                  do (princ (if (char= #\_ char) #\- char) out))))
-               if (gethash key env-hash)
-                 do (setf (gethash key env-hash)
-                          (concatenate 'string v ", " (gethash key env-hash)))
-               else
-                 do (setf (gethash key env-hash) v)
-               finally (return (alexandria:hash-table-plist env-hash)))))
-
-    (destructuring-bind (server-name &optional server-port)
-        (split-sequence #\: (getf env :http-host) :from-end t)
-      (declare (ignore server-port))
-      (setf (getf env :server-name) server-name))
-
-    (setf (getf env :clack.streaming) t)
-
-    (loop for key in '(:content-length
-                       :server-port
-                       :remote-port)
-          do (setf (getf env key)
-                   (parse-integer (getf env key)
-                                  :junk-allowed t)))
-
-    (loop for key in '(:server-protocol
-                       :request-method)
-          do (setf (getf env key)
-                   (make-keyword (getf env key))))
-
-    (when (string= (getf env :script-name) "/")
-      (setf (getf env :script-name) ""))
-
-    ;; FIXME: This handler doesn't think about HTTPS.
-    (setf (getf env :url-scheme) :http)
-
-    (setf (getf env :raw-body)
-          (loop with buf = (make-array 0 :fill-pointer 0 :adjustable t)
-                for v in (cdr (fcgx-read-all req))
-                do (adjust-array buf (+ (length buf) (length v)))
-                   (loop for val across v
-                         do (vector-push val buf))
-                finally
-             (return
-               (flex:make-flexi-stream
-                (flex:make-in-memory-input-stream buf)
-                :external-format :utf-8))))
-
-    (setf (getf env :path-info)
-          (do-urlencode:urldecode
-           (let ((request-uri (getf env :request-uri)))
-             (subseq request-uri
-                     0
-                     (position #\? request-uri
-                               :test #'char=)))
-           :lenientp t))
-
-    env))
+  (let ((headers (make-hash-table :test 'equal)))
+    (flet ((canonicalize (field &key (start 0) (case :upcase))
+             (let* ((end (length field))
+                    (new (make-string (- end start))))
+               (do ((i start (1+ i))
+                    (j 0 (1+ j)))
+                   ((= i end) new)
+                 (let ((char (aref field i)))
+                   (cond
+                     ((char= #\_ char)
+                      (setf (aref new j) #\-))
+                     ((and (eq case :downcase)
+                           (upper-case-p char))
+                      (setf (aref new j) (code-char (+ (char-code char) 32))))
+                     ((and (eq case :upcase)
+                           (lower-case-p char))
+                      (setf (aref new j) (code-char (- (char-code char) 32))))
+                     (T
+                      (setf (aref new j) char)))))))
+           (set-header (k v)
+             (multiple-value-bind (current existsp)
+                 (gethash k headers)
+               (setf (gethash k headers)
+                     (if existsp
+                         (format nil "~A, ~A" v current)
+                         v)))))
+      (loop with request-uri = nil
+            for (k . v) in (fcgx-getenv req)
+            if (string= k "HTTP_" :end1 5)
+              do (set-header (canonicalize k :start 5 :case :downcase) v)
+            if (or (string= k "SERVER_NAME")
+                   (string= k "REMOTE_ADDR")
+                   (string= k "CONTENT_TYPE")
+                   (string= k "QUERY_STRING"))
+              append (list (make-keyword (canonicalize k)) v) into env
+            if (string= k "REQUEST_URI")
+              append (progn
+                       (setf request-uri v)
+                       (list (make-keyword (canonicalize k)) v)) into env
+            else
+              if (or (string= k "SERVER_PORT")
+                     (string= k "REMOTE_PORT")
+                     (string= k "CONTENT_LENGTH"))
+                append (list (make-keyword (canonicalize k))
+                             (ignore-errors (parse-integer v :junk-allowed t)))
+                  into env
+            else
+              if (or (string= k "SERVER_PROTOCOL")
+                     (string= k "REQUEST_METHOD"))
+                append (list (make-keyword (canonicalize k))
+                             (make-keyword v))
+                  into env
+            else
+              if (string= k "SCRIPT_NAME")
+                append (list :script-name
+                             (if (string= v "/")
+                                 ""
+                                 v))
+                  into env
+            finally
+               (return (nconc
+                        env
+                        (list :headers headers
+                              :path-info (let ((path-info (subseq request-uri
+                                                                  0
+                                                                  (position #\? request-uri
+                                                                            :test #'char=))))
+                                           (handler-case (do-urlencode:urldecode path-info
+                                                                                 :lenientp t)
+                                             (do-urlencode:urlencode-malformed-string ()
+                                               path-info)))
+                              :url-scheme :http
+                              :raw-body (loop with buf = (make-array 0 :fill-pointer 0 :adjustable t)
+                                              for v in (cdr (fcgx-read-all req))
+                                              do (adjust-array buf (+ (length buf) (length v)))
+                                                 (loop for val across v
+                                                       do (vector-push val buf))
+                                              finally
+                                                 (return
+                                                   (flex:make-flexi-stream
+                                                    (flex:make-in-memory-input-stream buf)
+                                                    :external-format :utf-8)))
+                              :clack.streaming t)))))))
 
 (doc:start)
 
