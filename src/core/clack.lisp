@@ -97,8 +97,7 @@ Example:
                                                            *clack-output*))
                                    (*error-output* ,(if (symbolp *clack-error-output*)
                                                         (symbol-value *clack-error-output*)
-                                                        *clack-error-output*))))
-                       (:<clack-middleware-json> :clack.middleware.json)))))
+                                                        *clack-error-output*))))))))
     (etypecase app
       (pathname-designator
        (apply #'clackup (eval-file app) args))

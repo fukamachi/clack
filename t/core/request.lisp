@@ -45,7 +45,7 @@
     "user-agent")
 
 (is (query-parameter req)
-    '(:|ediweitz| "weitzedi" :|name| "eitaro" :|q| "C++")
+    '(("ediweitz" . "weitzedi") ("name" . "eitaro") ("q" . "C++"))
     "query-parameter")
 
 (is (query-parameter req "q")
@@ -53,9 +53,9 @@
     "query-parameter (accessing each field)")
 
 (is (body-parameter req)
-    `(:|name| ,(flex:octets-to-string
-                #(230 183 177 231 148 186 232 139 177 229 164 170 233 131 142)
-                :external-format :utf-8))
+    `(("name" . ,(flex:octets-to-string
+                  #(230 183 177 231 148 186 232 139 177 229 164 170 233 131 142)
+                  :external-format :utf-8)))
     "body-parameter")
 
 (is (body-parameter req "name")
@@ -76,17 +76,17 @@
       "body-parameter (confirm sharing)"))
 
 (is (parameter req)
-    `(:|ediweitz| "weitzedi"
-      :|name| "eitaro"
-      :\q "C++"
-      :|name| ,(flex:octets-to-string
-                #(230 183 177 231 148 186 232 139 177 229 164 170 233 131 142)
-                :external-format :utf-8))
+    `(("ediweitz" . "weitzedi")
+      ("name" . "eitaro")
+      ("q" . "C++")
+      ("name" . ,(flex:octets-to-string
+                  #(230 183 177 231 148 186 232 139 177 229 164 170 233 131 142)
+                  :external-format :utf-8)))
     "parameter")
 
 (is-type (make-request '(:hoge "a")) '<request> "<request> allow other keys")
 
-(is (cookies req) '(:|hoge| "1" :|fuga| "semi" :|colon| "") "cookies")
+(is (cookies req) '(("hoge" . "1") ("fuga" . "semi") ("colon" . "")) "cookies")
 (is (cookies req "hoge") "1" "cookie value")
 
 (diag "file upload")
@@ -98,7 +98,7 @@
 (test-app
  (lambda (env)
    (make-request env)
-   `(200 nil (,(cadr (body-parameter (make-request env) :|file|)))))
+   `(200 nil (,(gethash "filename" (cadr (body-parameter (make-request env) :|file|))))))
  (lambda ()
    (multiple-value-bind (body status)
        (http-request "http://localhost:4242/"
