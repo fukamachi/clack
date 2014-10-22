@@ -10,10 +10,11 @@
 (defpackage clack.request
   (:use :cl)
   (:import-from :trivial-types
-                :property-list)
+                :association-list)
+  (:import-from :http-body
+                :parse)
   (:import-from :alexandria
-                :when-let
-                :make-keyword)
+                :when-let)
   (:import-from :flexi-streams
                 :make-external-format
                 :make-flexi-stream)
@@ -24,14 +25,8 @@
   (:import-from :circular-streams
                 :make-circular-input-stream
                 :circular-stream-buffer)
-  (:import-from :multival-plist
-                :getf-all)
   (:import-from :clack.util
                 :nappend)
-  (:import-from :clack.util.hunchentoot
-                :parse-rfc2388-form-data)
-  (:import-from :clack.util.stream
-                :ensure-character-input-stream)
   (:export :env
            :request-method
            :script-name
@@ -134,10 +129,10 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
                    :initarg :http-cookie
                    :initform nil)
 
-      (body-parameters :type property-list
-                       :initform nil)
-      (query-parameters :type property-list
-                        :initform nil))
+      (body-parameters :type association-list
+                       :initarg :body-parameters)
+      (query-parameters :type association-list
+                        :initarg :query-parameters))
   (:documentation "Portable HTTP Request object for Clack Request."))
 
 (defgeneric referer (request)
@@ -158,38 +153,15 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
           (parse-parameters cookie :delimiter "\\s*[,;]\\s*")))
 
   ;; GET parameters
-  (setf (slot-value this 'query-parameters)
-        (parse-parameters (query-string this)))
+  (unless (slot-boundp this 'query-parameters)
+    (setf (slot-value this 'query-parameters)
+          (parse-parameters (query-string this))))
 
   ;; POST parameters
-  (if (getf env :body-parameters)
-      (setf (slot-value this 'body-parameters)
-            (getf env :body-parameters))
-      (multiple-value-bind (type subtype charset)
-          (parse-content-type (content-type this))
-        (let ((body (raw-body this))
-              (content-type (concatenate 'string type "/" subtype))
-              (external-format
-                (flex:make-external-format
-                 (if charset
-                     (make-keyword (string-upcase charset))
-                     :utf-8)
-                 :eol-style :lf)))
-          (cond
-            ((string-equal content-type "application/x-www-form-urlencoded")
-             (setf (slot-value this 'body-parameters)
-                   (parse-parameters (read-line (ensure-character-input-stream body) nil ""))))
-
-            ((string-equal content-type "multipart/form-data")
-             (let (;; parsed param (alist)
-                   (params (clack.util.hunchentoot:parse-rfc2388-form-data
-                            body
-                            (content-type this)
-                            external-format)))
-               (setf (slot-value this 'body-parameters)
-                     ;; convert alist into plist
-                     (loop for (key . values) in params
-                           append (list (make-keyword key) values))))))))))
+  (when (and (not (slot-boundp this 'body-parameters))
+             (raw-body this))
+    (setf (slot-value this 'body-parameters)
+          (parse (content-type this) (raw-body this)))))
 
 @export
 (defun shared-raw-body (env)
@@ -197,9 +169,11 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
 empty. This function modifies REQ to share raw-body among the
 instances of <request>."
   (when-let ((body (getf env :raw-body)))
+    (assert (not (typep body 'circular-streams:circular-input-stream)))
     (let ((buffer (getf env :raw-body-buffer)))
       (if buffer
-          (make-circular-input-stream body :buffer buffer)
+          ;; FIXME: Return a circular stream
+          (flex:make-in-memory-input-stream buffer)
           (let ((stream (make-circular-input-stream body)))
             (nappend env `(:raw-body-buffer ,(circular-stream-buffer stream)))
             stream)))))
@@ -242,6 +216,15 @@ on an original raw-body."
   (:method ((req <request>) &optional name)
     (get-whole-or-specified req 'query-parameters name)))
 
+(defun assoc-value-multi (key params)
+  (let ((conses
+          (loop for (k . v) in params
+                when (string= k key)
+                  collect v)))
+    (if (null (cdr conses))
+        (car conses)
+        conses)))
+
 @export
 (defgeneric parameter (req &optional name)
   (:documentation
@@ -250,14 +233,14 @@ on an original raw-body."
     (let ((params (append (query-parameter req)
                           (body-parameter req))))
       (if name
-          (getf-all params name)
+          (assoc-value-multi name params)
           params))))
 
 (defun get-whole-or-specified (req key &optional name)
   (check-type req <request>)
   (let ((params (slot-value req key)))
     (if name
-        (getf-all params name)
+        (assoc-value-multi name params)
         params)))
 
 (defun parse-parameters (params &key (delimiter "&"))
@@ -265,20 +248,8 @@ on an original raw-body."
   (loop for kv in (ppcre:split delimiter params)
         for (k v) = (ppcre:split "=" kv)
         ;; KLUDGE: calls `ignore-errors'.
-        append (list (make-keyword (or (ignore-errors (clack.util.hunchentoot:url-decode k)) k))
-                     (or (ignore-errors (clack.util.hunchentoot:url-decode v)) v))))
-
-(defun parse-content-type (content-type)
-  "Parse Content-Type from Request header."
-  (ppcre:register-groups-bind (type subtype params)
-      ("^(.+?)/([^;]+);?(?:(.+)|$)" content-type)
-    (values
-     (or type "application")
-     (or subtype "octet-stream")
-     (when params
-       (when-let (matches (nth-value 1 (ppcre:scan-to-strings
-                                        "charset=([^; ]+)" params)))
-         (aref matches 0))))))
+        collect (cons (or (ignore-errors (clack.util.hunchentoot:url-decode k)) k)
+                      (or (ignore-errors (clack.util.hunchentoot:url-decode v)) v))))
 
 (doc:start)
 

@@ -31,12 +31,11 @@
                :cl-ppcre
                :cl-fad
                :ironclad
-               :rfc2388
+               :http-body
                :flexi-streams
                :do-urlencode
                :local-time
                :circular-streams
-               :multival-plist
                :yason
                :cl-base64
                :marshal
@@ -101,7 +100,6 @@
                    (:file "util")
                    (:file "stream")
                    (:file "localtime")
-                   (:file "rfc2388")
                    (:file "hunchentoot")
                    (:file "route"))))))
   :description "Web application environment for Common Lisp"

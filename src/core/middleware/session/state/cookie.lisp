@@ -78,7 +78,7 @@
 @export
 (defmethod session-id ((this <clack-session-state-cookie>) env)
   (let ((req (make-request env)))
-    (cookies req (session-key this))))
+    (cookies req (symbol-name (session-key this)))))
 
 @export
 (defmethod finalize ((this <clack-session-state-cookie>) id res options)
@@ -88,7 +88,7 @@
 (defgeneric set-cookie (state id res options)
   (:method ((this <clack-session-state-cookie>) id res options)
     (let ((r (apply #'make-response res)))
-      (setf (set-cookies r (session-key this))
+      (setf (set-cookies r (symbol-name (session-key this)))
             (append `(:value ,id) options))
       (clack.response:finalize r))))
 

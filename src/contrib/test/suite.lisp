@@ -506,15 +506,14 @@ you would call like this: `(run-server-tests :foo)'."
 
 (define-app-test |file upload|
   (lambda (env)
-    (destructuring-bind (name tmpfile filename mime-type)
-        (car (clack.util.hunchentoot:parse-rfc2388-form-data
-              (clack.util.stream:ensure-character-input-stream (getf env :raw-body))
+    (destructuring-bind (name body params headers)
+        (car (http-body:parse
               (getf env :content-type)
-              :utf-8))
-      (declare (ignore name tmpfile mime-type))
+              (getf env :raw-body)))
+      (declare (ignore name body headers))
       `(200
         (:content-type "text/plain; charset=utf-8")
-        (,filename))))
+        (,(gethash "filename" params)))))
   (lambda ()
     (multiple-value-bind (body status)
         (http-request (localhost)

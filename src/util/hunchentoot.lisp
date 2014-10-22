@@ -35,10 +35,7 @@
 (in-package :cl-user)
 (defpackage clack.util.hunchentoot
   (:use :cl
-        :flexi-streams
-        :rfc2388)
-  (:shadowing-import-from :clack.util.rfc2388
-                          :parse-mime))
+        :flexi-streams))
 (in-package :clack.util.hunchentoot)
 
 (cl-syntax:use-syntax :annot)
@@ -376,39 +373,6 @@ of file suffixes for the corresponding type.")
 \(as a string) corresponding to the suffix of the file denoted by
 PATHSPEC \(or NIL)."
   (gethash (pathname-type pathspec) *mime-type-hash*))
-
-(defun convert-hack (string external-format)
-  "The rfc2388 package is buggy in that it operates on a character
-stream and thus only accepts encodings which are 8 bit transparent.
-In order to support different encodings for parameter values
-submitted, we post process whatever string values the rfc2388 package
-has returned."
-  (flex:octets-to-string (map '(vector (unsigned-byte 8) *) 'char-code string)
-                         :external-format external-format))
-
-@export
-(defun parse-rfc2388-form-data (stream content-type-header external-format)
-  "Creates an alist of POST parameters from the stream STREAM which is
-supposed to be of content type 'multipart/form-data'."
-  (let* ((parsed-content-type-header (rfc2388:parse-header content-type-header :value))
-         (boundary (or (cdr (rfc2388:find-parameter
-                             "BOUNDARY"
-                             (rfc2388:header-parameters parsed-content-type-header)))
-                       (return-from parse-rfc2388-form-data))))
-    (loop for part in (parse-mime stream boundary)
-          for headers = (rfc2388:mime-part-headers part)
-          for content-disposition-header = (rfc2388:find-content-disposition-header headers)
-          for name = (cdr (rfc2388:find-parameter
-                           "NAME"
-                           (rfc2388:header-parameters content-disposition-header)))
-          when name
-          collect (cons name
-                        (let ((contents (rfc2388:mime-part-contents part)))
-                          (if (pathnamep contents)
-                            (list contents
-                                  (rfc2388:get-file-name headers)
-                                  (rfc2388:content-type part :as-string t))
-                            (convert-hack contents external-format)))))))
 
 (defvar *default-external-format*
     (make-external-format :utf-8 :eol-style :lf)
