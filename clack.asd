@@ -98,8 +98,7 @@
                   ((:file "doc")
                    (:file "util")
                    (:file "stream")
-                   (:file "hunchentoot")
-                   (:file "route"))))))
+                   (:file "hunchentoot"))))))
   :description "Web application environment for Common Lisp"
   :long-description
   #.(with-open-file (stream (merge-pathnames
