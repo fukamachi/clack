@@ -97,7 +97,6 @@
                   :components
                   ((:file "doc")
                    (:file "util")
-                   (:file "stream")
                    (:file "hunchentoot"))))))
   :description "Web application environment for Common Lisp"
   :long-description
