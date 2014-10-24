@@ -11,8 +11,7 @@
   (:use :cl
         :cl-annot.doc)
   (:import-from :local-time
-                :format-timestring)
-  (:import-from :clack.util.localtime
+                :format-timestring
                 :now))
 (in-package :clack.logger)
 

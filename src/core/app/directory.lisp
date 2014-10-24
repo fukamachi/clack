@@ -21,6 +21,9 @@
                 :directory-exists-p
                 :directory-pathname-p
                 :list-directory)
+  (:import-from :local-time
+                :format-rfc1123-timestring
+                :universal-to-timestamp)
   (:import-from :trivial-mimes
                 :mime-lookup)
   (:import-from :do-urlencode
@@ -72,8 +75,8 @@
             (if dir-p
                 "directory"
                 (or (mime-lookup file) "text/plain"))
-            (clack.util.localtime:format-rfc1123-timestring nil
-             (local-time:universal-to-timestamp (file-write-date file))))))
+            (format-rfc1123-timestring nil
+             (universal-to-timestamp (file-write-date file))))))
 
 (defun dir-page (path-info body)
   "Stolen from rack/directory.rb."

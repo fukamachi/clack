@@ -98,7 +98,6 @@
                   ((:file "doc")
                    (:file "util")
                    (:file "stream")
-                   (:file "localtime")
                    (:file "hunchentoot")
                    (:file "route"))))))
   :description "Web application environment for Common Lisp"

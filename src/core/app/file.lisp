@@ -10,13 +10,12 @@
 (defpackage clack.app.file
   (:use :cl
         :clack)
-  (:import-from :clack.util.localtime
-                :format-rfc1123-timestring)
   (:import-from :trivial-mimes
                 :mime-lookup)
   (:import-from :cl-ppcre
                 :scan)
   (:import-from :local-time
+                :format-rfc1123-timestring
                 :universal-to-timestamp)
   (:import-from :cl-fad
                 :file-exists-p

@@ -17,11 +17,10 @@
                 :when-let)
   (:import-from :clack.util
                 :getf*)
-  (:import-from :clack.util.localtime
-                :format-rfc1123-timestring)
   (:import-from :do-urlencode
                 :urlencode)
   (:import-from :local-time
+                :format-rfc1123-timestring
                 :universal-to-timestamp)
   (:export :status))
 (in-package :clack.response)
