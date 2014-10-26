@@ -10,7 +10,7 @@
 
 (defvar res nil)
 
-(plan 16)
+(plan 17)
 
 (setq res (make-response 200))
 
@@ -22,6 +22,9 @@
 (is (body res) nil "body")
 (setf (body res) (lambda ()))
 (is-type (body res) 'function)
+(setf (body res) (make-array 5 :element-type '(unsigned-byte 8)
+                             :initial-contents #(97 105 117 101 111)))
+(is (body res) #(97 105 117 101 111) :test #'equalp)
 (setf (body res) "aiueo")
 (is (body res) '("aiueo") "body 2")
 

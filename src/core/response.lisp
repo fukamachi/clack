@@ -37,7 +37,7 @@
       (headers :type property-list
                :initarg :headers
                :initform nil)
-      (body :type (or list pathname function)
+      (body :type (or list pathname function (vector (unsigned-byte 8)))
             :initarg :body
             :initform nil
             :reader body)
@@ -104,7 +104,7 @@ Example: (push-header res :content-type \"text/html\")")
     (setf (slot-value res 'body)
           (etypecase value
             (string (ensure-list value))
-            ((or list pathname function) value)))))
+            ((or list pathname function (vector (unsigned-byte 8))) value)))))
 
 @export
 (defgeneric set-cookies (res &optional name)
