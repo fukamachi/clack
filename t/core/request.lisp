@@ -86,7 +86,7 @@
 
 (is-type (make-request '(:hoge "a")) '<request> "<request> allow other keys")
 
-(is (cookies req) '(("hoge" . "1") ("fuga" . "semi") ("colon" . "")) "cookies")
+(is (cookies req) '(("hoge" . "1") ("fuga" . "semi") ("colon")) "cookies")
 (is (cookies req "hoge") "1" "cookie value")
 
 (diag "file upload")
