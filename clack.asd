@@ -32,6 +32,7 @@
                :cl-fad
                :ironclad
                :http-body
+               :quri
                :flexi-streams
                :do-urlencode
                :local-time
@@ -96,8 +97,7 @@
                   :serial t
                   :components
                   ((:file "doc")
-                   (:file "util")
-                   (:file "hunchentoot"))))))
+                   (:file "util"))))))
   :description "Web application environment for Common Lisp"
   :long-description
   #.(with-open-file (stream (merge-pathnames

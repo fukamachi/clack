@@ -13,6 +13,8 @@
                 :association-list)
   (:import-from :http-body
                 :parse)
+  (:import-from :quri
+                :url-decode-params)
   (:import-from :alexandria
                 :when-let)
   (:import-from :flexi-streams
@@ -150,12 +152,14 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
   ;; cookies
   (when-let (cookie (gethash "cookie" (headers this)))
     (setf (slot-value this 'http-cookie)
-          (parse-parameters cookie :delimiter "\\s*[,;]\\s*")))
+          (loop for kv in (ppcre:split "\\s*[,;]\\s*" cookie)
+                append (quri:url-decode-params kv))))
 
   ;; GET parameters
-  (unless (slot-boundp this 'query-parameters)
+  (when (and (not (slot-boundp this 'query-parameters))
+             (query-string this))
     (setf (slot-value this 'query-parameters)
-          (parse-parameters (query-string this))))
+          (quri:url-decode-params (query-string this))))
 
   ;; POST parameters
   (when (and (not (slot-boundp this 'body-parameters))
@@ -242,14 +246,6 @@ on an original raw-body."
     (if name
         (assoc-value-multi name params)
         params)))
-
-(defun parse-parameters (params &key (delimiter "&"))
-  "Convert parameters into plist. The `params' must be a string."
-  (loop for kv in (ppcre:split delimiter params)
-        for (k v) = (ppcre:split "=" kv)
-        ;; KLUDGE: calls `ignore-errors'.
-        collect (cons (or (ignore-errors (clack.util.hunchentoot:url-decode k)) k)
-                      (or (ignore-errors (clack.util.hunchentoot:url-decode v)) v))))
 
 (doc:start)
 
