@@ -20,8 +20,9 @@
   (:import-from :quri
                 :url-encode)
   (:import-from :local-time
-                :format-rfc1123-timestring
-                :universal-to-timestamp)
+                :format-timestring
+                :universal-to-timestamp
+                :+gmt-zone+)
   (:export :status))
 (in-package :clack.response)
 
@@ -176,8 +177,11 @@ Example:
       (push `("path" ,path) cookie))
     (when-let (expires (getf v :expires))
       (push `("expires"
-              ,(format-rfc1123-timestring
-                nil (universal-to-timestamp expires))) cookie))
+              ,(format-timestring
+                nil (universal-to-timestamp expires)
+                :format '(:short-weekday ", " (:day 2) #\  :short-month #\  (:year 4) #\  (:hour 2) #\:
+                          (:min 2) #\: (:sec 2) " GMT")
+                :timezone +gmt-zone+)) cookie))
     (when (getf v :secure)
       (push '("secure") cookie))
     (when (getf v :httponly)
