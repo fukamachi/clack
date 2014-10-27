@@ -46,6 +46,7 @@
                 :uri-path
                 :uri-query)
   (:import-from :quri
+                :parse-uri
                 :url-decode)
   (:import-from :flexi-streams
                 :make-in-memory-input-stream)
@@ -138,7 +139,7 @@
     (destructuring-bind (server-name &optional server-port)
         (split-sequence #\: (gethash "host" headers "") :from-end t :count 2)
       (setf (puri:uri-path puri)
-            (nth-value 3 (puri::parse-uri-string (request-resource req))))
+            (nth-value 4 (quri:parse-uri (request-resource req))))
       (list :request-method (request-method req)
             :script-name ""
             :server-name server-name

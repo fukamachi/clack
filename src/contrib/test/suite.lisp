@@ -288,13 +288,9 @@ you would call like this: `(run-server-tests :foo)'."
       (:content-type "text/plain; charset=utf-8")
       (,(getf env :path-info))))
   (lambda ()
-    ;; XXX: Though URI must not include non-ASCII chars,
-    ;;      PURI decodes PATH automatically.
-    (let ((uri (puri:parse-uri (localhost "foo%E3%81%82"))))
-      (setf (slot-value uri 'puri::path) "/foo%E3%81%82")
-      (is (http-request uri)
-          (format nil "/foo~A"
-                  (flex:octets-to-string #(#xE3 #x81 #x82) :external-format :utf-8))))))
+    (is (http-request (localhost "foo%E3%81%82") :preserve-uri t)
+        (format nil "/foo~A"
+                (flex:octets-to-string #(#xE3 #x81 #x82) :external-format :utf-8)))))
 
 (define-app-test |SERVER-PROTOCOL is required|
   (lambda (env)
@@ -394,9 +390,7 @@ you would call like this: `(run-server-tests :foo)'."
   (lambda ()
     (if (eq *clack-test-handler* :toot)
         (skip 1 "because of ~:(~A~)'s bug" *clack-test-handler*)
-        (let ((uri (puri:parse-uri (localhost "foo/bar%20baz%73?x=a"))))
-          (setf (puri:uri-path uri) "/foo/bar%20baz%73")
-          (is (http-request uri) "/foo/bar%20baz%73?x=a")))))
+        (is (http-request (localhost "foo/bar%20baz%73?x=a") :preserve-uri t) "/foo/bar%20baz%73?x=a"))))
 
 (define-app-test |a big header value > 128 bytes|
   (lambda (env)
