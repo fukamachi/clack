@@ -45,8 +45,8 @@
   (:import-from :puri
                 :uri-path
                 :uri-query)
-  (:import-from :do-urlencode
-                :urldecode)
+  (:import-from :quri
+                :url-decode)
   (:import-from :flexi-streams
                 :make-in-memory-input-stream)
   (:import-from :babel
@@ -147,7 +147,9 @@
                              80)
             :server-protocol (intern (format nil "HTTP/~A" http-version)
                                      :keyword)
-            :path-info (do-urlencode:urldecode (uri-path puri) :lenientp t)
+            :path-info (handler-case (quri:url-decode (uri-path puri))
+                         (quri:uri-malformed-string ()
+                           (uri-path puri)))
             :query-string (uri-query puri)
             :url-scheme (if ssl :https :http)
             :request-uri (request-resource req)

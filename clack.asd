@@ -34,7 +34,6 @@
                :http-body
                :quri
                :flexi-streams
-               :do-urlencode
                :local-time
                :circular-streams
                :cl-base64

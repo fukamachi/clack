@@ -14,8 +14,8 @@
                 :call)
   (:import-from :clack.http-status
                 :http-status-reason)
-  (:import-from :do-urlencode
-                :urldecode)
+  (:import-from :quri
+                :url-decode)
   (:import-from :alexandria
                 :make-keyword
                 :when-let
@@ -211,9 +211,8 @@ before passing to Clack application."
                                                                   0
                                                                   (position #\? request-uri
                                                                             :test #'char=))))
-                                           (handler-case (do-urlencode:urldecode path-info
-                                                                                 :lenientp t)
-                                             (do-urlencode:urlencode-malformed-string ()
+                                           (handler-case (quri:url-decode path-info)
+                                             (quri:uri-malformed-string ()
                                                path-info)))
                               :url-scheme :http
                               :raw-body (loop with buf = (make-array 0 :fill-pointer 0 :adjustable t)

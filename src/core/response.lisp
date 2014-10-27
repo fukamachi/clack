@@ -17,8 +17,8 @@
                 :when-let)
   (:import-from :clack.util
                 :getf*)
-  (:import-from :do-urlencode
-                :urlencode)
+  (:import-from :quri
+                :url-encode)
   (:import-from :local-time
                 :format-rfc1123-timestring
                 :universal-to-timestamp)
@@ -168,8 +168,8 @@ Example:
 
   (unless v (return-from bake-cookie ""))
 
-  (let ((cookie `((,(urlencode (symbol-name k))
-                   ,(urlencode (getf v :value))))))
+  (let ((cookie `((,(quri:url-encode (symbol-name k))
+                   ,(quri:url-encode (getf v :value))))))
     (when-let (domain (getf v :domain))
       (push `("domain" ,domain) cookie))
     (when-let (path (getf v :path))

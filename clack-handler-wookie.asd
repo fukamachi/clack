@@ -29,7 +29,7 @@
                :bordeaux-threads
                :http-parse
                :puri
-               :do-urlencode
+               :quri
                :flexi-streams
                :babel
                :fast-io
