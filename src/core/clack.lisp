@@ -91,14 +91,7 @@ Example:
                            ((and debug use-cl-debugger) nil)
                            (debug '((:<clack-error-middleware> :clack-errors)))
                            (T '((:<clack-middleware-backtrace> :clack.middleware.backtrace
-                                 :result-on-error (500 () ("Internal Server Error"))))))
-                       (:<clack-middleware-let> :clack.middleware.let
-                        :bindings ((*standard-output* ,(if (symbolp *clack-output*)
-                                                           (symbol-value *clack-output*)
-                                                           *clack-output*))
-                                   (*error-output* ,(if (symbolp *clack-error-output*)
-                                                        (symbol-value *clack-error-output*)
-                                                        *clack-error-output*)))))))
+                                 :result-on-error (500 () ("Internal Server Error")))))))))
            (run-server (handler-package app)
              (apply (intern (string '#:run) handler-package)
                     (if use-default-middlewares
