@@ -18,10 +18,7 @@
                 :url-decode)
   (:import-from :alexandria
                 :make-keyword
-                :when-let
-                :if-let)
-  (:import-from :bordeaux-threads
-                :make-thread)
+                :when-let)
   (:import-from :flexi-streams
                 :make-flexi-stream
                 :make-in-memory-input-stream
@@ -68,13 +65,12 @@
   "Start FastCGI server."
   (flet ((main-loop (req)
            (let* ((env (handle-request req))
-                  (res (if debug (call app env)
-                           (if-let (res (handler-case (call app env)
-                                          (error (error)
-                                            (princ error *error-output*)
-                                            nil)))
-                             res
-                             '(500 nil nil)))))
+                  (res (if debug
+                           (call app env)
+                           (handler-case (call app env)
+                             (error (error)
+                               (princ error *error-output*)
+                               '(500 () ("Internal Server Error")))))))
              (etypecase res
                (list (handle-response req res))
                (function (funcall res (lambda (res) (handle-response req res))))))))
@@ -82,12 +78,9 @@
             (make-instance '<fcgi-acceptor>
                            :port port
                            :file-descriptor fd)))
-      (#+thread-support bt:make-thread
-       #-thread-support funcall
-       #'(lambda ()
-           (cl-fastcgi::server-on-fd
-            #'main-loop
-            (acceptor-file-descriptor acceptor))))
+      (cl-fastcgi::server-on-fd
+       #'main-loop
+       (acceptor-file-descriptor acceptor))
       acceptor)))
 
 @export

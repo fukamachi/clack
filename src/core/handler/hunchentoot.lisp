@@ -13,14 +13,16 @@
         :split-sequence)
   (:shadow :stop
            :handle-request)
+  (:import-from :hunchentoot
+                :acceptor-taskmaster
+                :acceptor-shutdown-p)
   (:import-from :clack.component
                 :call)
   (:import-from :flexi-streams
                 :make-external-format
                 :string-to-octets)
   (:import-from :alexandria
-                :when-let
-                :if-let))
+                :when-let))
 (in-package :clack.handler.hunchentoot)
 
 (cl-syntax:use-syntax :annot)
@@ -44,12 +46,10 @@
                    (handle-response
                     (if debug
                         (call app env)
-                        (if-let (res (handler-case (call app env)
-                                       (error (error)
-                                         (princ error *error-output*)
-                                         nil)))
-                          res
-                          '(500 nil nil)))))))))
+                        (handler-case (call app env)
+                          (error (error)
+                            (princ error *error-output*)
+                            '(500 () ("Internal Server Error")))))))))))
   (let ((acceptor
           (if ssl
               (make-instance 'easy-ssl-acceptor
@@ -63,7 +63,11 @@
                              :port port
                              :access-log-destination nil
                              :error-template-directory nil))))
-    (start acceptor)))
+    (setf (acceptor-shutdown-p acceptor) nil)
+    (start-listening acceptor)
+    (let ((taskmaster (acceptor-taskmaster acceptor)))
+      (setf (taskmaster-acceptor taskmaster) acceptor)
+      (accept-connections acceptor))))
 
 @export
 (defun stop (acceptor)

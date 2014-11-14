@@ -26,7 +26,6 @@
                :cl-syntax-annot
                :wookie
                :cl-async
-               :bordeaux-threads
                :http-parse
                :puri
                :quri

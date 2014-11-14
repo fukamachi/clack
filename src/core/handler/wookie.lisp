@@ -32,12 +32,6 @@
                 :with-event-loop
                 :close-tcp-server
                 :async-io-stream)
-  (:import-from :bordeaux-threads
-                :make-thread
-                :destroy-thread
-                :make-lock
-                :acquire-lock
-                :release-lock)
   (:import-from :http-parse
                 :http-body
                 :http-store-body
@@ -59,7 +53,6 @@
   (:import-from :split-sequence
                 :split-sequence)
   (:import-from :alexandria
-                :if-let
                 :hash-table-plist
                 :copy-stream))
 (in-package :clack.handler.wookie)
@@ -73,48 +66,36 @@
 @export
 (defun run (app &key debug (port 5000)
                   ssl ssl-key-file ssl-cert-file ssl-key-password)
-  (let ((server-started-lock (bt:make-lock "server-started")))
+  (let ((*state* (make-instance 'wookie:wookie-state)))
+    (add-hook :parsed-headers 'parsed-headers-hook :clack-handler-wookie-parsed-headers-hook)
+    (defroute (:* ".*" :chunk nil) (req res)
+      (let ((env (handle-request req :ssl ssl)))
+        (handle-response
+         res
+         (if debug
+             (call app env)
+             (handler-case (call app env)
+               (error (error)
+                 (princ error *error-output*)
+                 '(500 nil ("Internal Server Error"))))))))
+    (log:config :error)
     (prog1
-        (#+thread-support bt:make-thread
-         #-thread-support funcall
-         #'(lambda ()
-             (bt:acquire-lock server-started-lock)
-             (let ((*state* (make-instance 'wookie:wookie-state)))
-               (add-hook :parsed-headers 'parsed-headers-hook :clack-handler-wookie-parsed-headers-hook)
-               (defroute (:* ".*" :chunk nil) (req res)
-                 (let ((env (handle-request req :ssl ssl)))
-                   (handle-response
-                    res
-                    (if debug
-                        (call app env)
-                        (if-let (res (handler-case (call app env)
-                                       (error (error)
-                                         (princ error *error-output*)
-                                         nil)))
-                          res
-                          '(500 nil nil))))))
-               (log:config :error)
-               (prog1
-                   (as:with-event-loop ()
-                     (let ((listener
-                             (if ssl
-                                 (make-instance 'wookie:ssl-listener
-                                                :port port
-                                                :key ssl-key-file
-                                                :certificate ssl-cert-file
-                                                :password ssl-key-password)
-                                 (make-instance 'wookie:listener
-                                                :port port))))
-                       (start-server listener))
-                     (bt:release-lock server-started-lock))
-                 (log:config :info)))))
-      (bt:acquire-lock server-started-lock t))))
+        (as:with-event-loop ()
+          (let ((listener
+                  (if ssl
+                      (make-instance 'wookie:ssl-listener
+                                     :port port
+                                     :key ssl-key-file
+                                     :certificate ssl-cert-file
+                                     :password ssl-key-password)
+                      (make-instance 'wookie:listener
+                                     :port port))))
+            (start-server listener)))
+      (log:config :info))))
 
 @export
 (defun stop (server)
-  (#+thread-support bt:destroy-thread
-   #-thread-support as:close-tcp-server
-   server))
+  (as:close-tcp-server server))
 
 (defun handle-request (req &key ssl)
   (let ((puri (request-uri req))

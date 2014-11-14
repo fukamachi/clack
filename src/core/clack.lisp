@@ -74,6 +74,7 @@ Example:
                   (port 5000)
                   (debug t)
                   watch
+                  (use-thread t)
                   (use-cl-debugger t)
                   (use-default-middlewares t)
                 &allow-other-keys)
@@ -90,37 +91,53 @@ Example:
                            ((and debug use-cl-debugger) nil)
                            (debug '((:<clack-error-middleware> :clack-errors)))
                            (T '((:<clack-middleware-backtrace> :clack.middleware.backtrace
-                                :result-on-error (500 () ("Internal Server Error"))))))
+                                 :result-on-error (500 () ("Internal Server Error"))))))
                        (:<clack-middleware-let> :clack.middleware.let
                         :bindings ((*standard-output* ,(if (symbolp *clack-output*)
                                                            (symbol-value *clack-output*)
                                                            *clack-output*))
                                    (*error-output* ,(if (symbolp *clack-error-output*)
                                                         (symbol-value *clack-error-output*)
-                                                        *clack-error-output*))))))))
+                                                        *clack-error-output*)))))))
+           (run-server (handler-package app)
+             (apply (intern (string '#:run) handler-package)
+                    (if use-default-middlewares
+                        (buildapp app)
+                        app)
+                    :port port
+                    :debug debug
+                    (delete-from-plist args :server :port :debug :watch
+                                            :use-thread
+                                            :use-cl-debugger
+                                            :use-default-middlewares))))
     (etypecase app
       (pathname-designator
        (apply #'clackup (eval-file app) args))
       (component-designator
-       (let* ((handler-package (find-handler server))
-              (handler (make-instance '<handler>
-                                      :server-name server
-                                      :acceptor
-                                      (apply (intern (string '#:run) handler-package)
-                                             (if use-default-middlewares
-                                                 (buildapp app)
-                                                 app)
-                                             :port port
-                                             :debug debug
-                                             (delete-from-plist args :server :port :debug :watch :use-cl-debugger
-                                                                :use-default-middlewares)))))
-         (format t "~&~:(~A~) server is started.~
+       (let ((handler-package (find-handler server)))
+         (unless use-thread
+           (run-server handler-package app))
+
+         (let ((handler (make-instance '<handler>
+                                       :server-name server
+                                       :acceptor
+                                       (bt:make-thread
+                                        (lambda ()
+                                          (run-server handler-package app))
+                                        :name (format nil "clack-handler-~(~A~)" server)
+                                        :initial-bindings `((*standard-output* . ,(if (symbolp *clack-output*)
+                                                                                      (symbol-value *clack-output*)
+                                                                                      *clack-output*))
+                                                            (*error-output* . ,(if (symbolp *clack-error-output*)
+                                                                                   (symbol-value *clack-error-output*)
+                                                                                   *clack-error-output*)))))))
+           (format t "~&~:(~A~) server is started.~
              ~%Listening on localhost:~A.~%" server port)
-         (when watch
-           (when (stringp watch)
-             (setf watch (split-sequence #\, watch)))
-           (watch-systems handler watch))
-         handler)))))
+           (when watch
+             (when (stringp watch)
+               (setf watch (split-sequence #\, watch)))
+             (watch-systems handler watch))
+           handler))))))
 
 (defun eval-file (file)
   "Safer way to read and eval a file content. This function returns the last value."
