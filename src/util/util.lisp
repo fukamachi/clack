@@ -126,29 +126,6 @@ Example:
    :simple-calls t))
 
 @export
-(defvar *tmp-directory*
-  #+(or :win32 :mswindows) "c:\\hunchentoot-temp\\"
-  #-(or :win32 :mswindows) "/tmp/hunchentoot/"
-  "Directory for temporary files created by MAKE-TMP-FILE-NAME.")
-
-(let ((counter 0))
-  (declare (ignorable counter))
-  @export
-  (defun make-tmp-file-name (&optional (prefix "clack"))
-    "Generates a unique name for a temporary file."
-    (let ((tmp-file-name
-           #+:allegro
-           (pathname (system:make-temp-file-name prefix *tmp-directory*))
-           #-:allegro
-           (loop for pathname = (make-pathname :name (format nil "~A-~A"
-                                                             prefix (incf counter))
-                                               :type nil
-                                               :defaults *tmp-directory*)
-                 unless (probe-file pathname)
-                 return pathname)))
-      tmp-file-name)))
-
-@export
 (defun apply-middleware (app mw-class-name mw-package &rest args)
   "Applys a middleware to the `app'. This function is for resolving symbol packages in run-time."
   (funcall (intern (symbol-name :wrap)

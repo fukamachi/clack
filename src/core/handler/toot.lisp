@@ -13,13 +13,16 @@
         :split-sequence
         :ppcre)
   (:shadow :handle-request)
+  (:import-from :toot
+                :shutdown-p
+                :listen-socket
+                :listen-backlog
+                :accept-connections)
   (:import-from :clack.component
                 :<component>
                 :call)
   (:import-from :flexi-streams
-                :octets-to-string)
-  (:import-from :alexandria
-                :if-let))
+                :octets-to-string))
 (in-package :clack.handler.toot)
 
 (cl-syntax:use-syntax :annot)
@@ -28,23 +31,32 @@
 (defun run (app &key debug (port 5000)
                   ssl ssl-key-file ssl-cert-file ssl-key-password)
   "Start Toot server."
-  (apply #'toot:start-server
-         :handler (lambda (req)
-                    (let ((env (handle-request req :ssl ssl)))
-                      (handle-response
-                       req
-                       (if debug
-                           (call app env)
-                           (if-let (res (handler-case (call app env)
-                                          (condition () nil)))
-                             res
-                             '(500 nil nil))))))
-         :port port
-         (if ssl
-             (list :ssl-certificate-file ssl-cert-file
-                   :ssl-private-key-file ssl-key-file
-                   :ssl-private-key-password ssl-key-password)
-             '())))
+  (let ((acceptor (apply #'make-instance 'toot:acceptor
+                         :handler (lambda (req)
+                                    (let ((env (handle-request req :ssl ssl)))
+                                      (handle-response
+                                       req
+                                       (if debug
+                                           (call app env)
+                                           (handler-case (call app env)
+                                             (error (error)
+                                               (princ error *error-output*)
+                                               '(500 () ("Internal Server Error"))))))))
+                         :port port
+                         :access-logger nil
+                         (if ssl
+                             (list :ssl-certificate-file ssl-cert-file
+                                   :ssl-private-key-file ssl-key-file
+                                   :ssl-private-key-password ssl-key-password)
+                             '()))))
+    (setf (shutdown-p acceptor) nil)
+    (setf (listen-socket acceptor)
+          (usocket:socket-listen
+           (or (address acceptor) usocket:*wildcard-host*) port
+           :reuseaddress t
+           :backlog (listen-backlog acceptor)
+           :element-type '(unsigned-byte 8)))
+    (accept-connections acceptor)))
 
 
 @export
@@ -60,31 +72,31 @@ before pass to Clack application."
                           (setf (slot-value req 'request-headers) (acons :content-length "" (slot-value req 'request-headers))))))
     (destructuring-bind (server-name &optional server-port)
         (split-sequence #\: (cdr (assoc :host (request-headers req))))
-      (append
-       (list
-        :request-method (request-method req)
-        :script-name ""
-        :path-info (url-decode (request-path req))
-        :server-name server-name
-        :server-port (if server-port
-                         (parse-integer server-port)
-                         80)
-        :server-protocol (server-protocol req)
-        :request-uri (request-uri req)
-        :url-scheme (if ssl :https :http)
-        :remote-addr (remote-addr req)
-        :remote-port (remote-port req)
-        :query-string (request-query req)
-        :content-length content-length
-        :content-type (request-header :content-type req)
-        :raw-body (toot::request-body-stream req)
-        :clack.streaming t
-        :clack.handler :toot)
-
-       (loop for (k . v) in (toot::request-headers req)
-             unless (find k '(:request-method :script-name :path-info :server-name :server-port :server-protocol :request-uri :remote-addr :remote-port :query-string :content-length :content-type :accept :connection))
-               append (list (intern (format nil "HTTP-~:@(~A~)" k) :keyword)
-                            v))))))
+      (list
+       :request-method (request-method req)
+       :script-name ""
+       :path-info (url-decode (request-path req))
+       :server-name server-name
+       :server-port (if server-port
+                        (parse-integer server-port)
+                        80)
+       :server-protocol (server-protocol req)
+       :request-uri (request-uri req)
+       :url-scheme (if ssl :https :http)
+       :remote-addr (remote-addr req)
+       :remote-port (remote-port req)
+       :query-string (request-query req)
+       :content-length content-length
+       :content-type (request-header :content-type req)
+       :raw-body (toot::request-body-stream req)
+       :clack.streaming t
+       :clack.handler :toot
+       :headers (loop with headers = (make-hash-table :test 'equal)
+                      for (k . v) in (toot::request-headers req)
+                      unless (or (eq k :content-length)
+                                 (eq k :content-type))
+                        do (setf (gethash (string-downcase k) headers) v)
+                      finally (return headers))))))
 
 (defun handle-response (req res)
   (let ((no-body '#:no-body))

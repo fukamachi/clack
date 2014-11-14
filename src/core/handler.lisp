@@ -12,7 +12,10 @@
   (:import-from :clack.file-watcher
                 :stop-watching)
   (:import-from :clack.util
-                :find-handler))
+                :find-handler)
+  (:import-from :bordeaux-threads
+                :threadp
+                :destroy-thread))
 (in-package :clack.handler)
 
 (cl-syntax:use-syntax :annot)
@@ -32,7 +35,10 @@
   (:method ((this <handler>))
     (let ((handler-package (find-handler (server-name this))))
       (stop-watching this)
-      (funcall (intern (string '#:stop) handler-package) (acceptor this)))))
+      (let ((acceptor (acceptor this)))
+        (if (bt:threadp acceptor)
+            (bt:destroy-thread acceptor)
+            (funcall (intern (string '#:stop) handler-package) acceptor))))))
 
 (doc:start)
 

@@ -17,12 +17,12 @@
                 :when-let)
   (:import-from :clack.util
                 :getf*)
-  (:import-from :clack.util.localtime
-                :format-rfc1123-timestring)
-  (:import-from :do-urlencode
-                :urlencode)
+  (:import-from :quri
+                :url-encode)
   (:import-from :local-time
-                :universal-to-timestamp)
+                :format-timestring
+                :universal-to-timestamp
+                :+gmt-zone+)
   (:export :status))
 (in-package :clack.response)
 
@@ -169,16 +169,19 @@ Example:
 
   (unless v (return-from bake-cookie ""))
 
-  (let ((cookie `((,(urlencode (symbol-name k))
-                   ,(urlencode (getf v :value))))))
+  (let ((cookie `((,(quri:url-encode (symbol-name k))
+                   ,(quri:url-encode (getf v :value))))))
     (when-let (domain (getf v :domain))
       (push `("domain" ,domain) cookie))
     (when-let (path (getf v :path))
       (push `("path" ,path) cookie))
     (when-let (expires (getf v :expires))
       (push `("expires"
-              ,(format-rfc1123-timestring
-                nil (universal-to-timestamp expires))) cookie))
+              ,(format-timestring
+                nil (universal-to-timestamp expires)
+                :format '(:short-weekday ", " (:day 2) #\  :short-month #\  (:year 4) #\  (:hour 2) #\:
+                          (:min 2) #\: (:sec 2) " GMT")
+                :timezone +gmt-zone+)) cookie))
     (when (getf v :secure)
       (push '("secure") cookie))
     (when (getf v :httponly)

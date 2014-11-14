@@ -26,10 +26,9 @@
                :cl-syntax-annot
                :wookie
                :cl-async
-               :bordeaux-threads
                :http-parse
                :puri
-               :do-urlencode
+               :quri
                :flexi-streams
                :babel
                :fast-io

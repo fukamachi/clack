@@ -13,14 +13,16 @@
         :split-sequence)
   (:shadow :stop
            :handle-request)
+  (:import-from :hunchentoot
+                :acceptor-taskmaster
+                :acceptor-shutdown-p)
   (:import-from :clack.component
                 :call)
   (:import-from :flexi-streams
                 :make-external-format
                 :string-to-octets)
   (:import-from :alexandria
-                :when-let
-                :if-let))
+                :when-let))
 (in-package :clack.handler.hunchentoot)
 
 (cl-syntax:use-syntax :annot)
@@ -44,12 +46,10 @@
                    (handle-response
                     (if debug
                         (call app env)
-                        (if-let (res (handler-case (call app env)
-                                       (error (error)
-                                         (princ error *error-output*)
-                                         nil)))
-                          res
-                          '(500 nil nil)))))))))
+                        (handler-case (call app env)
+                          (error (error)
+                            (princ error *error-output*)
+                            '(500 () ("Internal Server Error")))))))))))
   (let ((acceptor
           (if ssl
               (make-instance 'easy-ssl-acceptor
@@ -63,7 +63,11 @@
                              :port port
                              :access-log-destination nil
                              :error-template-directory nil))))
-    (start acceptor)))
+    (setf (acceptor-shutdown-p acceptor) nil)
+    (start-listening acceptor)
+    (let ((taskmaster (acceptor-taskmaster acceptor)))
+      (setf (taskmaster-acceptor taskmaster) acceptor)
+      (accept-connections acceptor))))
 
 @export
 (defun stop (acceptor)
@@ -124,30 +128,31 @@ before passing to Hunchentoot."
 before passing to Clack application."
   (destructuring-bind (server-name &optional (server-port "80"))
       (split-sequence #\: (host req) :from-end t)
-    (append
-     (list
-      :request-method (request-method* req)
-      :script-name ""
-      :path-info (url-decode (script-name* req))
-      :server-name server-name
-      :server-port (parse-integer server-port :junk-allowed t)
-      :server-protocol (server-protocol* req)
-      :request-uri (request-uri* req)
-      :url-scheme (if ssl :https :http)
-      :remote-addr (remote-addr* req)
-      :remote-port (remote-port* req)
-      ;; Request params
-      :query-string (or (query-string* req) "")
-      :raw-body (raw-post-data :request req :want-stream t)
-      :content-length (when-let (content-length (header-in* :content-length req))
-                        (parse-integer content-length :junk-allowed t))
-      :content-type (header-in* :content-type req)
-      :clack.streaming t)
+    (list
+     :request-method (request-method* req)
+     :script-name ""
+     :path-info (url-decode (script-name* req))
+     :server-name server-name
+     :server-port (parse-integer server-port :junk-allowed t)
+     :server-protocol (server-protocol* req)
+     :request-uri (request-uri* req)
+     :url-scheme (if ssl :https :http)
+     :remote-addr (remote-addr* req)
+     :remote-port (remote-port* req)
+     ;; Request params
+     :query-string (or (query-string* req) "")
+     :raw-body (raw-post-data :request req :want-stream t)
+     :content-length (when-let (content-length (header-in* :content-length req))
+                       (parse-integer content-length :junk-allowed t))
+     :content-type (header-in* :content-type req)
+     :clack.streaming t
 
-     (loop for (k . v) in (hunchentoot:headers-in* req)
-           unless (find k '(:request-method :script-name :path-info :server-name :server-port :server-protocol :request-uri :remote-addr :remote-port :query-string :content-length :content-type :connection))
-             append (list (intern (format nil "HTTP-~:@(~A~)" k) :keyword)
-                          v)))))
+     :headers (loop with headers = (make-hash-table :test 'equal)
+                    for (k . v) in (hunchentoot:headers-in* req)
+                    unless (or (eq k :content-length)
+                               (eq k :content-type))
+                      do (setf (gethash (string-downcase k) headers) v)
+                    finally (return headers)))))
 
 (doc:start)
 

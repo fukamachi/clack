@@ -21,8 +21,13 @@
                 :directory-exists-p
                 :directory-pathname-p
                 :list-directory)
-  (:import-from :do-urlencode
-                :urlencode))
+  (:import-from :local-time
+                :format-rfc1123-timestring
+                :universal-to-timestamp)
+  (:import-from :trivial-mimes
+                :mime-lookup)
+  (:import-from :quri
+                :url-encode))
 (in-package :clack.app.directory)
 
 (cl-syntax:use-syntax :annot)
@@ -60,7 +65,7 @@
                       (car (last (pathname-directory file)))
                       (file-namestring file)))))
     (format nil "<tr><td class='name'><a href='~A~A'>~A~A</a></td><td class='size'>~:[--~;~:*~:D bytes~]</td><td class='type'>~A</td><td class='mtime'>~A</td></tr>"
-            (do-urlencode:urlencode uri)
+            (quri:url-encode uri)
             (if dir-p "/" "")
             (clack.util:html-encode (or name uri))
             (if dir-p "/" "")
@@ -69,9 +74,9 @@
                 (file-length in)))
             (if dir-p
                 "directory"
-                (or (clack.util.hunchentoot:mime-type file) "text/plain"))
-            (clack.util.localtime:format-rfc1123-timestring nil
-             (local-time:universal-to-timestamp (file-write-date file))))))
+                (or (mime-lookup file) "text/plain"))
+            (format-rfc1123-timestring nil
+             (universal-to-timestamp (file-write-date file))))))
 
 (defun dir-page (path-info body)
   "Stolen from rack/directory.rb."

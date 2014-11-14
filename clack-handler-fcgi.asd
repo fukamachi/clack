@@ -26,11 +26,10 @@
                :cl-syntax-annot
                :cl-fastcgi
                :alexandria
-               :bordeaux-threads
                :flexi-streams
                :cl-ppcre
                :split-sequence
                :usocket
-               :do-urlencode)
+               :quri)
   :components ((:file "src/core/handler/fcgi"))
   :description "Clack handler for FastCGI.")

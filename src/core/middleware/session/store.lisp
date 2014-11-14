@@ -8,36 +8,32 @@
 
 (in-package :cl-user)
 (defpackage clack.session.store
-  (:use :cl)
-  (:import-from :alexandria
-                :make-keyword
-                :remove-from-plistf)
-  (:import-from :clack.util :getf*))
+  (:use :cl))
 (in-package :clack.session.store)
 
 (cl-syntax:use-syntax :annot)
 
 @export
 (defclass <clack-session-store> ()
-     ((stash :type list
-             :initform nil
+     ((stash :type hash-table
+             :initform (make-hash-table :test 'equal)
              :accessor stash)))
 
 @export
 (defgeneric fetch (store sid)
   (:method ((this <clack-session-store>) sid)
-    (getf* (stash this) sid)))
+    (gethash sid (stash this))))
 
 @export
 (defgeneric store-session (store sid session)
   (:method ((this <clack-session-store>) sid session)
-    (setf (getf* (stash this) (make-keyword sid))
+    (setf (gethash sid (stash this))
           session)))
 
 @export
 (defgeneric remove-session (store sid)
   (:method ((this <clack-session-store>) sid)
-    (remove-from-plistf (stash this) sid)))
+    (remhash sid (stash this))))
 
 (doc:start)
 

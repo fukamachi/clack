@@ -200,7 +200,7 @@ you would call like this: `(run-server-tests :foo)'."
   (lambda (env)
     `(200
       (:content-type "text/plain; charset=utf-8")
-      (,(getf env :http-foo))))
+      (,(gethash "foo" (getf env :headers)))))
   (lambda ()
     (multiple-value-bind (body status headers)
         (http-request (localhost "foo/?ediweitz=weitzedi")
@@ -213,7 +213,7 @@ you would call like this: `(run-server-tests :foo)'."
   (lambda (env)
     `(200
       (:content-type "text/plain; charset=utf-8")
-      (,(getf env :http-cookie))))
+      (,(gethash "cookie" (getf env :headers)))))
   (lambda ()
     (multiple-value-bind (body status headers)
         (http-request (localhost "foo/?ediweitz=weitzedi")
@@ -288,13 +288,9 @@ you would call like this: `(run-server-tests :foo)'."
       (:content-type "text/plain; charset=utf-8")
       (,(getf env :path-info))))
   (lambda ()
-    ;; XXX: Though URI must not include non-ASCII chars,
-    ;;      PURI decodes PATH automatically.
-    (let ((uri (puri:parse-uri (localhost "foo%E3%81%82"))))
-      (setf (slot-value uri 'puri::path) "/foo%E3%81%82")
-      (is (http-request uri)
-          (format nil "/foo~A"
-                  (flex:octets-to-string #(#xE3 #x81 #x82) :external-format :utf-8))))))
+    (is (http-request (localhost "foo%E3%81%82") :preserve-uri t)
+        (format nil "/foo~A"
+                (flex:octets-to-string #(#xE3 #x81 #x82) :external-format :utf-8)))))
 
 (define-app-test |SERVER-PROTOCOL is required|
   (lambda (env)
@@ -331,7 +327,7 @@ you would call like this: `(run-server-tests :foo)'."
   (lambda (env)
     `(200
       (:content-type "text/plain; charset=utf-8")
-      (,(getf env :http-foo))))
+      (,(gethash "foo" (getf env :headers)))))
   (lambda ()
     (like
      (http-request (localhost)
@@ -356,7 +352,7 @@ you would call like this: `(run-server-tests :foo)'."
     `(200
       (:content-type "text/plain; charset=utf-8"
        :x-cookie ,(not (null (getf env :cookie))))
-      (,(getf env :http-cookie))))
+      (,(gethash "cookie" (getf env :headers)))))
   (lambda ()
     (multiple-value-bind (body status headers)
         (http-request (localhost)
@@ -394,15 +390,13 @@ you would call like this: `(run-server-tests :foo)'."
   (lambda ()
     (if (eq *clack-test-handler* :toot)
         (skip 1 "because of ~:(~A~)'s bug" *clack-test-handler*)
-        (let ((uri (puri:parse-uri (localhost "foo/bar%20baz%73?x=a"))))
-          (setf (puri:uri-path uri) "/foo/bar%20baz%73")
-          (is (http-request uri) "/foo/bar%20baz%73?x=a")))))
+        (is (http-request (localhost "foo/bar%20baz%73?x=a") :preserve-uri t) "/foo/bar%20baz%73?x=a"))))
 
 (define-app-test |a big header value > 128 bytes|
   (lambda (env)
     `(200
       (:content-type "text/plain; charset=utf-8")
-      (,(getf env :http-x-foo))))
+      (,(gethash "x-foo" (getf env :headers)))))
   (lambda ()
     (let ((chunk
            (with-output-to-string (chunk)
@@ -470,16 +464,14 @@ you would call like this: `(run-server-tests :foo)'."
         (http-request (localhost))
       (is status 200)
       (is (get-header headers :client-transfer-encoding) nil)
-      (if (eq *clack-test-handler* :wookie)
-          (is body #() :test #'equalp)
-          (is body nil)))))
+      (is body nil))))
 
 (define-app-test |handle Authorization header|
   (lambda (env)
     `(200
       (:content-type "text/plain; charset=utf-8"
-       :x-authorization ,(not (null (getf env :http-authorization))))
-      (,(or (getf env :http-authorization) ""))))
+       :x-authorization ,(not (null (gethash "authorization" (getf env :headers)))))
+      (,(gethash "authorization" (getf env :headers) ""))))
   (lambda ()
     (multiple-value-bind (body status headers)
         (http-request (localhost)
@@ -508,15 +500,14 @@ you would call like this: `(run-server-tests :foo)'."
 
 (define-app-test |file upload|
   (lambda (env)
-    (destructuring-bind (name tmpfile filename mime-type)
-        (car (clack.util.hunchentoot:parse-rfc2388-form-data
-              (clack.util.stream:ensure-character-input-stream (getf env :raw-body))
+    (destructuring-bind (name body params headers)
+        (car (http-body:parse
               (getf env :content-type)
-              :utf-8))
-      (declare (ignore name tmpfile mime-type))
+              (getf env :raw-body)))
+      (declare (ignore name body headers))
       `(200
         (:content-type "text/plain; charset=utf-8")
-        (,filename))))
+        (,(gethash "filename" params)))))
   (lambda ()
     (multiple-value-bind (body status)
         (http-request (localhost)

@@ -32,12 +32,6 @@
                 :with-event-loop
                 :close-tcp-server
                 :async-io-stream)
-  (:import-from :bordeaux-threads
-                :make-thread
-                :destroy-thread
-                :make-lock
-                :acquire-lock
-                :release-lock)
   (:import-from :http-parse
                 :http-body
                 :http-store-body
@@ -45,8 +39,9 @@
   (:import-from :puri
                 :uri-path
                 :uri-query)
-  (:import-from :do-urlencode
-                :urldecode)
+  (:import-from :quri
+                :parse-uri
+                :url-decode)
   (:import-from :flexi-streams
                 :make-in-memory-input-stream)
   (:import-from :babel
@@ -58,7 +53,6 @@
   (:import-from :split-sequence
                 :split-sequence)
   (:import-from :alexandria
-                :if-let
                 :hash-table-plist
                 :copy-stream))
 (in-package :clack.handler.wookie)
@@ -72,100 +66,84 @@
 @export
 (defun run (app &key debug (port 5000)
                   ssl ssl-key-file ssl-cert-file ssl-key-password)
-  (let ((server-started-lock (bt:make-lock "server-started")))
+  (let ((*state* (make-instance 'wookie:wookie-state)))
+    (add-hook :parsed-headers 'parsed-headers-hook :clack-handler-wookie-parsed-headers-hook)
+    (defroute (:* ".*" :chunk nil) (req res)
+      (let ((env (handle-request req :ssl ssl)))
+        (handle-response
+         res
+         (if debug
+             (call app env)
+             (handler-case (call app env)
+               (error (error)
+                 (princ error *error-output*)
+                 '(500 nil ("Internal Server Error"))))))))
+    (log:config :error)
     (prog1
-        (#+thread-support bt:make-thread
-         #-thread-support funcall
-         #'(lambda ()
-             (bt:acquire-lock server-started-lock)
-             (let ((*state* (make-instance 'wookie:wookie-state)))
-               (add-hook :parsed-headers 'parsed-headers-hook :clack-handler-wookie-parsed-headers-hook)
-               (defroute (:* ".*" :chunk nil) (req res)
-                 (let ((env (handle-request req :ssl ssl)))
-                   (handle-response
-                    res
-                    (if debug
-                        (call app env)
-                        (if-let (res (handler-case (call app env)
-                                       (error (error)
-                                         (princ error *error-output*)
-                                         nil)))
-                          res
-                          '(500 nil nil))))))
-               (log:config :error)
-               (prog1
-                   (as:with-event-loop ()
-                     (let ((listener
-                             (if ssl
-                                 (make-instance 'wookie:ssl-listener
-                                                :port port
-                                                :key ssl-key-file
-                                                :certificate ssl-cert-file
-                                                :password ssl-key-password)
-                                 (make-instance 'wookie:listener
-                                                :port port))))
-                       (start-server listener))
-                     (bt:release-lock server-started-lock))
-                 (log:config :info)))))
-      (bt:acquire-lock server-started-lock t))))
+        (as:with-event-loop ()
+          (let ((listener
+                  (if ssl
+                      (make-instance 'wookie:ssl-listener
+                                     :port port
+                                     :key ssl-key-file
+                                     :certificate ssl-cert-file
+                                     :password ssl-key-password)
+                      (make-instance 'wookie:listener
+                                     :port port))))
+            (start-server listener)))
+      (log:config :info))))
 
 @export
 (defun stop (server)
-  (#+thread-support bt:destroy-thread
-   #-thread-support as:close-tcp-server
-   server))
+  (as:close-tcp-server server))
 
 (defun handle-request (req &key ssl)
   (let ((puri (request-uri req))
         (http-version (http-version (request-http req)))
-        (headers (request-headers req)))
-    (destructuring-bind (server-name &optional server-port)
-        (split-sequence #\: (string (getf headers :host)) :from-end t :count 2)
-      (setf (puri:uri-path puri)
-            (nth-value 3 (puri::parse-uri-string (request-resource req))))
-      (nconc
-       (list :request-method (request-method req)
-             :script-name ""
-             :server-name server-name
-             :server-port (if server-port
-                              (parse-integer server-port :junk-allowed t)
-                              80)
-             :server-protocol (intern (format nil "HTTP/~A" http-version)
-                                      :keyword)
-             :path-info (do-urlencode:urldecode (uri-path puri) :lenientp t)
-             :query-string (uri-query puri)
-             :url-scheme (if ssl :https :http)
-             :request-uri (request-resource req)
-             :raw-body (flex:make-in-memory-input-stream (http-parse:http-body (request-http req)))
-             :content-length (getf headers :content-length)
-             :content-type (getf headers :content-type)
-             :clack.streaming t
-             :clack.nonblocking t
-             :clack.io (request-socket req))
+        (headers (make-hash-table :test 'equal))
+        content-length
+        content-type)
+    (loop for (key val) on (request-headers req) by #'cddr
+          if (eq key :content-length)
+            do (setf content-length val)
+          else if (eq key :content-type)
+            do (setf content-type val)
+          else
+            do (let ((key (string-downcase key)))
+                 (multiple-value-bind (current existsp)
+                     (gethash key headers)
+                   (setf (gethash key headers)
+                         (if existsp
+                             (format nil "~A, ~A" current val)
+                             val)))))
 
-       (loop with env-hash = (make-hash-table :test 'eq)
-             for (key val) on headers by #'cddr
-             unless (find key '(:request-method
-                                :script-name
-                                :path-info
-                                :server-name
-                                :server-port
-                                :server-protocol
-                                :request-uri
-                                :remote-addr
-                                :remote-port
-                                :query-string
-                                :content-length
-                                :content-type
-                                :connection))
-               do
-                  (let ((key (intern (format nil "HTTP-~:@(~A~)" key) :keyword)))
-                    (if (gethash key env-hash)
-                        (setf (gethash key env-hash)
-                              (concatenate 'string (gethash key env-hash) ", " val))
-                        (setf (gethash key env-hash) val)))
-             finally
-                (return (hash-table-plist env-hash)))))))
+    (destructuring-bind (server-name &optional server-port)
+        (split-sequence #\: (gethash "host" headers "") :from-end t :count 2)
+      (setf (puri:uri-path puri)
+            (nth-value 4 (quri:parse-uri (request-resource req))))
+      (list :request-method (request-method req)
+            :script-name ""
+            :server-name server-name
+            :server-port (if server-port
+                             (parse-integer server-port :junk-allowed t)
+                             80)
+            :server-protocol (intern (format nil "HTTP/~A" http-version)
+                                     :keyword)
+            :path-info (handler-case (quri:url-decode (uri-path puri))
+                         (quri:uri-malformed-string ()
+                           (uri-path puri)))
+            :query-string (uri-query puri)
+            :url-scheme (if ssl :https :http)
+            :request-uri (request-resource req)
+            :raw-body (flex:make-flexi-stream
+                       (flex:make-in-memory-input-stream (http-parse:http-body (request-http req)))
+                       :external-format :utf-8)
+            :content-length content-length
+            :content-type content-type
+            :clack.streaming t
+            :clack.nonblocking t
+            :clack.io (request-socket req)
+            :headers headers))))
 
 (defun handle-response (res clack-res)
   (etypecase clack-res

@@ -31,16 +31,16 @@
                :cl-ppcre
                :cl-fad
                :ironclad
-               :rfc2388
+               :http-body
+               :quri
                :flexi-streams
-               :do-urlencode
                :local-time
                :circular-streams
-               :multival-plist
-               :yason
                :cl-base64
                :marshal
+               :trivial-mimes
                :trivial-backtrace
+               :bordeaux-threads
                :log4cl)
   :components ((:module "src"
                 :components
@@ -81,7 +81,6 @@
                     :depends-on ("clack" "component" "response" "request" "app")
                     :components
                     ((:file "static")
-                     (:file "json")
                      (:file "conditional")
                      (:module "session"
                       :serial t
@@ -98,12 +97,7 @@
                   :serial t
                   :components
                   ((:file "doc")
-                   (:file "util")
-                   (:file "stream")
-                   (:file "localtime")
-                   (:file "rfc2388")
-                   (:file "hunchentoot")
-                   (:file "route"))))))
+                   (:file "util"))))))
   :description "Web application environment for Common Lisp"
   :long-description
   #.(with-open-file (stream (merge-pathnames

@@ -41,10 +41,7 @@
        (:test-file "middleware/static")
        (:test-file "middleware/conditional")
        (:test-file "middleware/session")
-       (:test-file "middleware/logger")))
-     (:module "util"
-      :components
-      ((:test-file "route"))))))
+       (:test-file "middleware/logger"))))))
 
   :defsystem-depends-on (:cl-test-more)
   :perform (test-op :after (op c)
