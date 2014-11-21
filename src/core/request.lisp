@@ -9,6 +9,8 @@
 (in-package :cl-user)
 (defpackage clack.request
   (:use :cl)
+  (:import-from :clack.request-response
+                :headers)
   (:import-from :trivial-types
                 :association-list)
   (:import-from :http-body
@@ -124,8 +126,7 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
 
       (headers :type hash-table
                :initarg :headers
-               :initform (make-hash-table :test 'equal)
-               :reader headers)
+               :initform (make-hash-table :test 'equal))
 
       (http-cookie :type (or string list)
                    :initarg :http-cookie
@@ -144,6 +145,11 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
 (defgeneric user-agent (request)
   (:method ((request <request>))
     (gethash "user-agent" (headers request))))
+
+(defmethod headers ((request <request>) &optional name)
+  (if name
+      (gethash name (slot-value request 'headers))
+      (slot-value request 'headers)))
 
 (defmethod initialize-instance :after ((this <request>) &rest env)
   (remf env :allow-other-keys)

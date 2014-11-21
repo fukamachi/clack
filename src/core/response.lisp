@@ -9,6 +9,8 @@
 (in-package :cl-user)
 (defpackage clack.response
   (:use :cl)
+  (:import-from :clack.request-response
+                :headers)
   (:import-from :trivial-types
                 :property-list)
   (:import-from :alexandria

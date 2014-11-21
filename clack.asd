@@ -54,8 +54,9 @@
                                  "file-watcher"))
                    (:file "builder"
                     :depends-on ("component" "middleware" "mw"))
-                   (:file "request")
-                   (:file "response")
+                   (:file "request-response")
+                   (:file "request" :depends-on ("request-response"))
+                   (:file "response" :depends-on ("request-response"))
                    (:file "component")
                    (:file "middleware" :depends-on ("component"))
                    (:file "handler" :depends-on ("file-watcher"))
