@@ -22,7 +22,9 @@
                 :<component>
                 :call)
   (:import-from :flexi-streams
-                :octets-to-string))
+                :octets-to-string)
+  (:import-from :alexandria
+                :if-let))
 (in-package :clack.handler.toot)
 
 (cl-syntax:use-syntax :annot)
