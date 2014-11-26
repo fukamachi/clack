@@ -37,22 +37,23 @@
   (:documentation "Clack Middleware to authenticate."))
 
 (defmethod call ((this <clack-middleware-auth-basic>) env)
-  (unless (getf env :http-authorization)
-    (return-from call (unauthorized this)))
+  (let ((authorization (gethash "authorization" (getf env :headers))))
+    (unless authorization
+      (return-from call (unauthorized this)))
 
-  (destructuring-bind (user &optional (pass ""))
-      (parse-user-and-pass (getf env :http-authorization))
-    (if user
-        (multiple-value-bind (result returned-user)
-            (funcall (authenticator this) user pass)
-          (if result
-              (progn
-                (setf (getf env :remote-user)
-                      (or returned-user
-                          user))
-                (call-next this env))
-              (unauthorized this)))
-        (unauthorized this))))
+    (destructuring-bind (user &optional (pass ""))
+        (parse-user-and-pass authorization)
+      (if user
+          (multiple-value-bind (result returned-user)
+              (funcall (authenticator this) user pass)
+            (if result
+                (progn
+                  (setf (getf env :remote-user)
+                        (or returned-user
+                            user))
+                  (call-next this env))
+                (unauthorized this)))
+          (unauthorized this)))))
 
 (defmethod unauthorized ((this <clack-middleware-auth-basic>))
   `(401
