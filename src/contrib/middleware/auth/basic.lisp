@@ -9,8 +9,7 @@
 (in-package :cl-user)
 (defpackage clack.middleware.auth.basic
   (:use :cl
-        :clack
-        :split-sequence)
+        :clack)
   (:import-from :cl-ppcre
                 :scan-to-strings)
   (:import-from :cl-base64
@@ -67,7 +66,9 @@
         (nth-value 1 (scan-to-strings "^Basic (.*)$" it))
         (aref it 0)
         (base64:base64-string-to-string it)
-        (split-sequence #\: it)))
+        (cons (scan-to-strings "[^:]+" it)
+              (coerce (nth-value 1 (scan-to-strings ":(.+)" it))
+                      'list))))
 
 (doc:start)
 
