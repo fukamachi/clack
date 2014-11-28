@@ -9,8 +9,7 @@
 (in-package :cl-user)
 (defpackage clack.middleware.auth.basic
   (:use :cl
-        :clack
-        :split-sequence)
+        :clack)
   (:import-from :cl-ppcre
                 :scan-to-strings)
   (:import-from :cl-base64
@@ -37,22 +36,23 @@
   (:documentation "Clack Middleware to authenticate."))
 
 (defmethod call ((this <clack-middleware-auth-basic>) env)
-  (unless (getf env :http-authorization)
-    (return-from call (unauthorized this)))
+  (let ((authorization (gethash "authorization" (getf env :headers))))
+    (unless authorization
+      (return-from call (unauthorized this)))
 
-  (destructuring-bind (user &optional (pass ""))
-      (parse-user-and-pass (getf env :http-authorization))
-    (if user
-        (multiple-value-bind (result returned-user)
-            (funcall (authenticator this) user pass)
-          (if result
-              (progn
-                (setf (getf env :remote-user)
-                      (or returned-user
-                          user))
-                (call-next this env))
-              (unauthorized this)))
-        (unauthorized this))))
+    (destructuring-bind (user &optional (pass ""))
+        (parse-user-and-pass authorization)
+      (if user
+          (multiple-value-bind (result returned-user)
+              (funcall (authenticator this) user pass)
+            (if result
+                (progn
+                  (setf (getf env :remote-user)
+                        (or returned-user
+                            user))
+                  (call-next this env))
+                (unauthorized this)))
+          (unauthorized this)))))
 
 (defmethod unauthorized ((this <clack-middleware-auth-basic>))
   `(401
@@ -66,7 +66,9 @@
         (nth-value 1 (scan-to-strings "^Basic (.*)$" it))
         (aref it 0)
         (base64:base64-string-to-string it)
-        (split-sequence #\: it)))
+        (cons (scan-to-strings "[^:]+" it)
+              (coerce (nth-value 1 (scan-to-strings ":(.+)" it))
+                      'list))))
 
 (doc:start)
 
