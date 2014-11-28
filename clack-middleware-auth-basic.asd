@@ -25,7 +25,6 @@
                :cl-syntax
                :cl-syntax-annot
                :cl-base64
-               :split-sequence
                :cl-ppcre
                :arnesi)
   :components ((:file "src/contrib/middleware/auth/basic"))
