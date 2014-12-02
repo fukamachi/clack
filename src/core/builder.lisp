@@ -16,7 +16,9 @@
   (:import-from :clack.middleware
                 :wrap)
   (:import-from :clack.middleware.conditional
-                :<clack-middleware-conditional>))
+                :<clack-middleware-conditional>)
+  (:import-from :alexandria
+                :with-gensyms))
 (in-package :clack.builder)
 
 (cl-syntax:use-syntax :annot)
@@ -36,6 +38,25 @@ This is useful in development phase.")
                                  if (eq class :condition)
                                    collect `(make-instance '<clack-middleware-conditional>
                                                            :condition ,@args)
+                                 else if (eq class :mount)
+                                   collect (destructuring-bind (mount-path mount-app) args
+                                             (with-gensyms (path len app env path-info)
+                                               `(let* ((,path ,mount-path)
+                                                       (,len (length ,path)))
+                                                  (lambda (,app)
+                                                    (lambda (,env)
+                                                      (let ((,path-info (getf ,env :path-info)))
+                                                        (cond
+                                                          ((string= ,path-info ,path)
+                                                           (setf (getf ,env :path-info) "/")
+                                                           (call ,mount-app ,env))
+                                                          ((and (< ,len (length ,path-info))
+                                                                (string= ,path-info ,path :end1 ,len)
+                                                                (char= (aref ,path-info ,len) #\/))
+                                                           (setf (getf ,env :path-info)
+                                                                 (subseq ,path-info ,len))
+                                                           (call ,mount-app ,env))
+                                                          (T (call ,app ,env)))))))))
                                  else if (and (symbolp class) (find-class class nil))
                                         collect `(make-instance ',class ,@args)
                                  else

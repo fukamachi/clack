@@ -48,4 +48,19 @@
          'function
          "CL code can be embed")
 
+(let ((mount-app (builder
+                  (:mount "/admin" (lambda (env) `(200 () ("admin" ,(getf env :path-info)))))
+                  (lambda (env)
+                    `(200 () ("default" ,(getf env :path-info)))))))
+  (is (call mount-app '(:path-info "/login"))
+      '(200 () ("default" "/login")))
+  (is (call mount-app '(:path-info "/admin/login"))
+      '(200 () ("admin" "/login")))
+  (is (call mount-app '(:path-info "/admin"))
+      '(200 () ("admin" "/")))
+  (is (call mount-app '(:path-info "/admin/"))
+      '(200 () ("admin" "/")))
+  (is (call mount-app '(:path-info "/administrators"))
+      '(200 () ("default" "/administrators"))))
+
 (finalize)
