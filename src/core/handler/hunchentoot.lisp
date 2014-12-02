@@ -40,16 +40,20 @@
   (initialize)
   (setf *dispatch-table*
         (list
-         #'(lambda (req)
-             (let ((env (handle-request req :ssl ssl)))
-               #'(lambda ()
-                   (handle-response
-                    (if debug
-                        (call app env)
-                        (handler-case (call app env)
-                          (error (error)
-                            (princ error *error-output*)
-                            '(500 () ("Internal Server Error")))))))))))
+         (let ((stdout *standard-output*)
+               (errout *error-output*))
+           #'(lambda (req)
+               (let ((env (handle-request req :ssl ssl)))
+                 #'(lambda ()
+                     (let ((*standard-output* stdout)
+                           (*error-output* errout))
+                       (handle-response
+                        (if debug
+                            (call app env)
+                            (handler-case (call app env)
+                              (error (error)
+                                (princ error *error-output*)
+                                '(500 () ("Internal Server Error")))))))))))))
   (let ((acceptor
           (if ssl
               (make-instance 'easy-ssl-acceptor
