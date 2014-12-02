@@ -124,6 +124,7 @@ Example:
                                                             (*error-output* . ,(if (symbolp *clack-error-output*)
                                                                                    (symbol-value *clack-error-output*)
                                                                                    *clack-error-output*)))))))
+           (sleep 1)
            (format t "~&~:(~A~) server is started.~
              ~%Listening on localhost:~A.~%" server port)
            (when watch

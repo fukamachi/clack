@@ -37,7 +37,9 @@
       (stop-watching this)
       (let ((acceptor (acceptor this)))
         (if (bt:threadp acceptor)
-            (bt:destroy-thread acceptor)
+            (progn
+              (bt:destroy-thread acceptor)
+              (sleep 0.5))
             (funcall (intern (string '#:stop) handler-package) acceptor))))))
 
 (doc:start)
