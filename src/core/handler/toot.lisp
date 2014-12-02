@@ -33,24 +33,28 @@
 (defun run (app &key debug (port 5000)
                   ssl ssl-key-file ssl-cert-file ssl-key-password)
   "Start Toot server."
-  (let ((acceptor (apply #'make-instance 'toot:acceptor
-                         :handler (lambda (req)
-                                    (let ((env (handle-request req :ssl ssl)))
-                                      (handle-response
-                                       req
-                                       (if debug
-                                           (call app env)
-                                           (handler-case (call app env)
-                                             (error (error)
-                                               (princ error *error-output*)
-                                               '(500 () ("Internal Server Error"))))))))
-                         :port port
-                         :access-logger nil
-                         (if ssl
-                             (list :ssl-certificate-file ssl-cert-file
-                                   :ssl-private-key-file ssl-key-file
-                                   :ssl-private-key-password ssl-key-password)
-                             '()))))
+  (let* ((stdout *standard-output*)
+         (errout *error-output*)
+         (acceptor (apply #'make-instance 'toot:acceptor
+                          :handler (lambda (req)
+                                     (let ((env (handle-request req :ssl ssl))
+                                           (*standard-output* stdout)
+                                           (*error-output* errout))
+                                       (handle-response
+                                        req
+                                        (if debug
+                                            (call app env)
+                                            (handler-case (call app env)
+                                              (error (error)
+                                                (princ error *error-output*)
+                                                '(500 () ("Internal Server Error"))))))))
+                          :port port
+                          :access-logger nil
+                          (if ssl
+                              (list :ssl-certificate-file ssl-cert-file
+                                    :ssl-private-key-file ssl-key-file
+                                    :ssl-private-key-password ssl-key-password)
+                              '()))))
     (setf (shutdown-p acceptor) nil)
     (setf (listen-socket acceptor)
           (usocket:socket-listen
