@@ -18,7 +18,7 @@
 (in-package :clack-asd)
 
 (defsystem clack
-  :version "1.0.0"
+  :version "1.0.1"
   :author "Eitaro Fukamachi"
   :license "LLGPL"
   :depends-on (;; Utility
