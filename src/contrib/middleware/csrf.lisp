@@ -66,9 +66,7 @@
   (let ((req (make-request env)))
     (when-let (csrf-token (gethash :csrf-token
                                    (getf env :clack.session)))
-      (or (string= csrf-token (body-parameter req :|_csrf_token|))
-          (and (hash-table-p (body-parameter req :json))
-               (string= csrf-token (gethash "_csrf_token" (body-parameter req :json))))))))
+      (string= csrf-token (body-parameter req "_csrf_token")))))
 
 @export
 (defun csrf-token (session)
