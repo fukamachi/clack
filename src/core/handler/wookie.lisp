@@ -36,7 +36,7 @@
                 :http-body
                 :http-store-body
                 :http-version)
-  (:import-from :puri
+  (:import-from :quri
                 :uri-path
                 :uri-query)
   (:import-from :quri
@@ -98,7 +98,7 @@
   (as:close-tcp-server server))
 
 (defun handle-request (req &key ssl)
-  (let ((puri (request-uri req))
+  (let ((quri (request-uri req))
         (http-version (http-version (request-http req)))
         (headers (make-hash-table :test 'equal))
         content-length
@@ -119,7 +119,7 @@
 
     (destructuring-bind (server-name &optional server-port)
         (split-sequence #\: (gethash "host" headers "") :from-end t :count 2)
-      (setf (puri:uri-path puri)
+      (setf (quri:uri-path quri)
             (nth-value 4 (quri:parse-uri (request-resource req))))
       (list :request-method (request-method req)
             :script-name ""
@@ -129,10 +129,10 @@
                              80)
             :server-protocol (intern (format nil "HTTP/~A" http-version)
                                      :keyword)
-            :path-info (handler-case (quri:url-decode (uri-path puri))
+            :path-info (handler-case (quri:url-decode (uri-path quri))
                          (quri:uri-malformed-string ()
-                           (uri-path puri)))
-            :query-string (uri-query puri)
+                           (uri-path quri)))
+            :query-string (uri-query quri)
             :url-scheme (if ssl :https :http)
             :request-uri (request-resource req)
             :raw-body (flex:make-flexi-stream

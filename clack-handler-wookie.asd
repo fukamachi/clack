@@ -27,7 +27,6 @@
                :wookie
                :cl-async
                :http-parse
-               :puri
                :quri
                :flexi-streams
                :babel
