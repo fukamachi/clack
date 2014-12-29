@@ -162,16 +162,16 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
                 append (quri:url-decode-params kv))))
 
   ;; GET parameters
-  (when (and (not (slot-boundp this 'query-parameters))
-             (query-string this))
+  (unless (slot-boundp this 'query-parameters)
     (setf (slot-value this 'query-parameters)
-          (quri:url-decode-params (query-string this))))
+          (and (query-string this)
+               (quri:url-decode-params (query-string this)))))
 
   ;; POST parameters
-  (when (and (not (slot-boundp this 'body-parameters))
-             (raw-body this))
+  (unless (slot-boundp this 'body-parameters)
     (setf (slot-value this 'body-parameters)
-          (parse (content-type this) (raw-body this)))))
+          (and (raw-body this)
+               (parse (content-type this) (raw-body this))))))
 
 @export
 (defun shared-raw-body (env)

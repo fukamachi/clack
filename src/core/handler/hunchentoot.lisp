@@ -144,7 +144,7 @@ before passing to Clack application."
      :remote-addr (remote-addr* req)
      :remote-port (remote-port* req)
      ;; Request params
-     :query-string (or (query-string* req) "")
+     :query-string (query-string* req)
      :raw-body (raw-post-data :request req :want-stream t)
      :content-length (when-let (content-length (header-in* :content-length req))
                        (parse-integer content-length :junk-allowed t))
