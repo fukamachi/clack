@@ -99,6 +99,7 @@ Example:
                         app)
                     :port port
                     :debug debug
+                    :allow-other-keys t
                     (delete-from-plist args :server :port :debug :watch
                                             :use-thread
                                             :use-cl-debugger
