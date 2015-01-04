@@ -36,7 +36,7 @@
 @export
 (defun run (app &key debug (port 5000)
                   ssl ssl-key-file ssl-cert-file ssl-key-password
-                  max-thread-count max-accept-count)
+                  max-thread-count max-accept-count (persistent-connections-p t))
   "Start Hunchentoot server."
   (initialize)
   (setf *dispatch-table*
@@ -69,6 +69,7 @@
                                  :ssl-privatekey-password ssl-key-password
                                  :access-log-destination nil
                                  :error-template-directory nil
+                                 :persistent-connections-p persistent-connections-p
                                  :taskmaster taskmaster)
                   (make-instance 'easy-ssl-acceptor
                                  :port port
@@ -76,17 +77,20 @@
                                  :ssl-privatekey-file ssl-key-file
                                  :ssl-privatekey-password ssl-key-password
                                  :access-log-destination nil
-                                 :error-template-directory nil))
+                                 :error-template-directory nil
+                                 :persistent-connections-p persistent-connections-p))
               (if (and max-thread-count max-accept-count)
                   (make-instance 'easy-acceptor
                                  :port port
                                  :access-log-destination nil
                                  :error-template-directory nil
+                                 :persistent-connections-p persistent-connections-p
                                  :taskmaster taskmaster)
                   (make-instance 'easy-acceptor
                                  :port port
                                  :access-log-destination nil
-                                 :error-template-directory nil)))))
+                                 :error-template-directory nil
+                                 :persistent-connections-p persistent-connections-p)))))
     (setf (acceptor-shutdown-p acceptor) nil)
     (start-listening acceptor)
     (let ((taskmaster (acceptor-taskmaster acceptor)))
@@ -189,7 +193,7 @@ Clack.Handler.Hunchentoot - Clack handler for Hunchentoot.
       (:use :cl
             :clack.handler.hunchentoot))
     (in-package :clack-sample)
-    
+
     ;; Start Server
     (run (lambda (env)
            '(200 nil (\"ok\")))
