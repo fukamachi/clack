@@ -35,7 +35,8 @@
 
 @export
 (defun run (app &key debug (port 5000)
-                  ssl ssl-key-file ssl-cert-file ssl-key-password)
+                  ssl ssl-key-file ssl-cert-file ssl-key-password
+                  max-thread-count max-accept-count (persistent-connections-p t))
   "Start Hunchentoot server."
   (initialize)
   (setf *dispatch-table*
@@ -54,19 +55,42 @@
                               (error (error)
                                 (princ error *error-output*)
                                 '(500 () ("Internal Server Error")))))))))))))
-  (let ((acceptor
+  (let* ((taskmaster (when (and max-thread-count max-accept-count)
+                       (make-instance 'one-thread-per-connection-taskmaster
+                                      :max-thread-count max-thread-count
+                                      :max-accept-count max-accept-count)))
+         (acceptor
           (if ssl
-              (make-instance 'easy-ssl-acceptor
-                             :port port
-                             :ssl-certificate-file ssl-cert-file
-                             :ssl-privatekey-file ssl-key-file
-                             :ssl-privatekey-password ssl-key-password
-                             :access-log-destination nil
-                             :error-template-directory nil)
-              (make-instance 'easy-acceptor
-                             :port port
-                             :access-log-destination nil
-                             :error-template-directory nil))))
+              (if (and max-thread-count max-accept-count)
+                  (make-instance 'easy-ssl-acceptor
+                                 :port port
+                                 :ssl-certificate-file ssl-cert-file
+                                 :ssl-privatekey-file ssl-key-file
+                                 :ssl-privatekey-password ssl-key-password
+                                 :access-log-destination nil
+                                 :error-template-directory nil
+                                 :persistent-connections-p persistent-connections-p
+                                 :taskmaster taskmaster)
+                  (make-instance 'easy-ssl-acceptor
+                                 :port port
+                                 :ssl-certificate-file ssl-cert-file
+                                 :ssl-privatekey-file ssl-key-file
+                                 :ssl-privatekey-password ssl-key-password
+                                 :access-log-destination nil
+                                 :error-template-directory nil
+                                 :persistent-connections-p persistent-connections-p))
+              (if (and max-thread-count max-accept-count)
+                  (make-instance 'easy-acceptor
+                                 :port port
+                                 :access-log-destination nil
+                                 :error-template-directory nil
+                                 :persistent-connections-p persistent-connections-p
+                                 :taskmaster taskmaster)
+                  (make-instance 'easy-acceptor
+                                 :port port
+                                 :access-log-destination nil
+                                 :error-template-directory nil
+                                 :persistent-connections-p persistent-connections-p)))))
     (setf (acceptor-shutdown-p acceptor) nil)
     (start-listening acceptor)
     (let ((taskmaster (acceptor-taskmaster acceptor)))
@@ -169,7 +193,7 @@ Clack.Handler.Hunchentoot - Clack handler for Hunchentoot.
       (:use :cl
             :clack.handler.hunchentoot))
     (in-package :clack-sample)
-    
+
     ;; Start Server
     (run (lambda (env)
            '(200 nil (\"ok\")))
