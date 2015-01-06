@@ -42,11 +42,12 @@ Handler name is a keyword and doesn't include the clack.handler prefix.
 For example, if you have a handler `clack.handler.foo',
 you would call like this: `(run-server-tests :foo)'."
   (let ((*drakma-default-external-format* :utf-8)
-        (*clack-test-handler* handler-name))
+        (*clack-test-handler* handler-name)
+        (*package* (find-package :clack.test.suite)))
     (if name
         (run-test name)
         (progn
-          (plan 31)
+          (plan 32)
           (run-test-package :clack.test.suite)))))
 
 (defun get-header (headers key)
