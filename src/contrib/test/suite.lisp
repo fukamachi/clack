@@ -533,7 +533,8 @@ you would call like this: `(run-server-tests :foo)'."
     (if (find *clack-test-handler* '(:hunchentoot
                                      :toot
                                      :fcgi
-                                     :wookie))
+                                     :wookie
+                                     :woo))
         (multiple-value-bind (body status)
             (http-request (localhost))
           (is status 200)
