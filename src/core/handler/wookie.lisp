@@ -80,17 +80,19 @@
                  '(500 nil ("Internal Server Error"))))))))
     (log:config :error)
     (prog1
-        (as:with-event-loop ()
-          (let ((listener
-                  (if ssl
-                      (make-instance 'wookie:ssl-listener
-                                     :port port
-                                     :key ssl-key-file
-                                     :certificate ssl-cert-file
-                                     :password ssl-key-password)
-                      (make-instance 'wookie:listener
-                                     :port port))))
-            (start-server listener)))
+        (handler-case
+            (as:with-event-loop ()
+              (let ((listener
+                      (if ssl
+                          (make-instance 'wookie:ssl-listener
+                                         :port port
+                                         :key ssl-key-file
+                                         :certificate ssl-cert-file
+                                         :password ssl-key-password)
+                          (make-instance 'wookie:listener
+                                         :port port))))
+                (start-server listener)))
+          (as:socket-closed () nil))
       (log:config :info))))
 
 @export
