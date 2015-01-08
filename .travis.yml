@@ -18,6 +18,7 @@ install:
 
 before_script:
   - git clone https://github.com/fukamachi/quri ~/lisp/quri
+  - git clone https://github.com/fukamachi/xsubseq ~/lisp/xsubseq
 
 script:
   - cl -l prove
