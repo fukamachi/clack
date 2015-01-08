@@ -6,7 +6,6 @@ env:
     - LISP=ccl
     - LISP=allegro
     - LISP=clisp
-    - LISP=ecl
 
 before_install:
   # libuv for Wookie
