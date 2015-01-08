@@ -113,4 +113,5 @@
           (setf (fill-pointer seq) (read-sequence seq stream))
           seq)))
   :in-order-to ((test-op (test-op t-clack)
-                         (test-op t-clack-middleware-csrf))))
+                         (test-op t-clack-middleware-csrf)
+                         (test-op t-clack-middleware-auth-basic))))

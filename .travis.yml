@@ -17,5 +17,6 @@ script:
   - cl -l prove
        -e '(or (every (function identity)
                       (list (prove:run :t-clack)
-                            (prove:run :t-clack-middleware-csrf)))
+                            (prove:run :t-clack-middleware-csrf)
+                            (prove:run :t-clack-middleware-auth-basic)))
                (uiop:quit -1))'
