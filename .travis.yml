@@ -30,7 +30,7 @@ script:
                        (list (prove:run :t-clack)
                              (prove:run :t-clack-handler-hunchentoot)
                              #-ccl (prove:run :t-clack-handler-wookie)
-                             #-clisp (prove:run :t-clack-handler-fcgi)
+                             #+sbcl (prove:run :t-clack-handler-fcgi)
                              (prove:run :t-clack-handler-toot)
                              (prove:run :t-clack-middleware-csrf)
                              (prove:run :t-clack-middleware-auth-basic)))
