@@ -24,7 +24,7 @@ script:
        -e '(or (every (function identity)
                       (list (prove:run :t-clack)
                             (prove:run :t-clack-handler-hunchentoot)
-                            (prove:run :t-clack-handler-wookie)
+                            #-ccl (prove:run :t-clack-handler-wookie)
                             (prove:run :t-clack-handler-toot)
                             (prove:run :t-clack-middleware-csrf)
                             (prove:run :t-clack-middleware-auth-basic)))
