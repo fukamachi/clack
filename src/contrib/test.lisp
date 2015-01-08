@@ -41,12 +41,11 @@
                                :port *clack-test-port*
                                :debug debug)))))
     (when desc (diag desc))
-    (sleep 0.5)
     (unwind-protect
         (funcall client)
       (when (bt:thread-alive-p acceptor)
         (bt:destroy-thread acceptor))
-      (sleep 0.5))))
+      (sleep 1))))
 
 @export
 (defmacro define-app-test (desc app client &optional (enable-debug-p *enable-debug-p*))
