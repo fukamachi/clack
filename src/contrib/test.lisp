@@ -54,7 +54,8 @@
                       (funcall (intern (string '#:run) handler)
                                app
                                :port *clack-test-port*
-                               :debug debug)))))
+                               :debug debug))
+                    :initial-bindings `((*clack-test-port* . ,*clack-test-port*)))))
     (when desc (diag desc))
     (sleep 0.5)
     (unwind-protect
