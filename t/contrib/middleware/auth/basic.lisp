@@ -1,7 +1,7 @@
 (in-package :cl-user)
 (defpackage t.clack.middleware.auth.basic
   (:use :cl
-        :cl-test-more
+        :prove
         :clack.test
         :clack.builder
         :clack.middleware.auth.basic
@@ -34,6 +34,6 @@
        "Hello, hoge")))
 
 #-thread-support
-(skip 2 "because your lisp doesn't support threads")
+(skip 4 "because your lisp doesn't support threads")
 
 (finalize)

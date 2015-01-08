@@ -1,0 +1,31 @@
+language: common-lisp
+
+env:
+  matrix:
+    - LISP=sbcl
+    - LISP=ccl
+    - LISP=clisp
+
+before_install:
+  # libuv for Wookie
+  - curl -L https://github.com/libuv/libuv/archive/v1.2.0.tar.gz | tar xzf -
+  - (cd libuv-1.2.0 && ./autogen.sh && ./configure --prefix=/usr && make && sudo make install)
+
+install:
+  # Install cl-travis
+  - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh | bash
+
+before_script:
+  - git clone https://github.com/fukamachi/quri ~/lisp/quri
+  - git clone https://github.com/fukamachi/xsubseq ~/lisp/xsubseq
+
+script:
+  - "cl -l prove
+        -e '(or (every (function identity)
+                       (list (prove:run :t-clack)
+                             (prove:run :t-clack-handler-hunchentoot)
+                             #-ccl (prove:run :t-clack-handler-wookie)
+                             (prove:run :t-clack-handler-toot)
+                             (prove:run :t-clack-middleware-csrf)
+                             (prove:run :t-clack-middleware-auth-basic)))
+                (uiop:quit -1))'"
