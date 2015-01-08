@@ -33,11 +33,8 @@
        (:test-file "builder")
        (:test-file "response")
        (:test-file "request")
-       #+thread-support
        (:test-file "handler/hunchentoot")
-       #+thread-support
        (:test-file "handler/toot")
-       #+thread-support
        (:test-file "handler/wookie")
        (:test-file "app/file")
        (:test-file "app/urlmap")
