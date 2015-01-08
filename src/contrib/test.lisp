@@ -41,6 +41,12 @@
 @export
 (defun test-app (app client &optional desc)
   "Test Clack Application."
+  (loop repeat 5
+        until (port-available-p *clack-test-port*)
+        do (sleep 0.1)
+        finally
+        (unless (port-available-p *clack-test-port*)
+          (error "Port ~D is already in use." *clack-test-port*)))
   (let* ((handler (find-handler *clack-test-handler*))
          (debug *enable-debug-p*)
          (acceptor (bt:make-thread
