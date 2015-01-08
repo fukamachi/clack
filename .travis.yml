@@ -20,12 +20,12 @@ before_script:
   - git clone https://github.com/fukamachi/xsubseq ~/lisp/xsubseq
 
 script:
-  - cl -l prove
-       -e '(or (every (function identity)
-                      (list (prove:run :t-clack)
-                            (prove:run :t-clack-handler-hunchentoot)
-                            #-ccl (prove:run :t-clack-handler-wookie)
-                            (prove:run :t-clack-handler-toot)
-                            (prove:run :t-clack-middleware-csrf)
-                            (prove:run :t-clack-middleware-auth-basic)))
-               (uiop:quit -1))'
+  - "cl -l prove
+        -e '(or (every (function identity)
+                       (list (prove:run :t-clack)
+                             (prove:run :t-clack-handler-hunchentoot)
+                             #-ccl (prove:run :t-clack-handler-wookie)
+                             (prove:run :t-clack-handler-toot)
+                             (prove:run :t-clack-middleware-csrf)
+                             (prove:run :t-clack-middleware-auth-basic)))
+                (uiop:quit -1))'"
