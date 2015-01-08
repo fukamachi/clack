@@ -3,6 +3,16 @@ language: common-lisp
 env:
   matrix:
     - LISP=sbcl
+    - LISP=ccl
+    - LISP=alisp
+    - LISP=clisp
+    - LISP=ecl
+    - LISP=abcl
+
+matrix:
+  allow_failures:
+    # Due to a bug of Log4CL
+    - env: LISP=abcl
 
 before_install:
   # libuv for Wookie
