@@ -57,8 +57,6 @@
                                :debug debug)))))
     (when desc (diag desc))
     (sleep 0.5)
-    (loop while (port-available-p *clack-test-port*) do
-      (sleep 0.1))
     (unwind-protect
         (funcall client)
       (when (bt:thread-alive-p acceptor)
