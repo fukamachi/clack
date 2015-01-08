@@ -6,9 +6,8 @@ env:
 
 before_install:
   # libuv for Wookie
-  - sudo apt-add-repository -y ppa:linuxjedi/ppa
-  - sudo apt-get update -qq
-  - sudo apt-get -y install libuv-dev
+  - curl -L https://github.com/libuv/libuv/archive/v1.2.0.tar.gz | tar xzf -
+  - (cd libuv-1.2.0 && ./autogen.sh && ./configure --prefix=/usr && make && sudo make install)
 
 install:
   # Install cl-travis
