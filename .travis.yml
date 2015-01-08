@@ -6,7 +6,8 @@ env:
 
 before_install:
   # libuv for Wookie
-  - sudo apt-get install libuv-dev
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq libuv-dev
 
 install:
   # Install cl-travis
