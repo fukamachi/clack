@@ -44,7 +44,8 @@
     (sleep 0.5)
     (unwind-protect
         (funcall client)
-      (bt:destroy-thread acceptor)
+      (when (bt:thread-alive-p acceptor)
+        (bt:destroy-thread acceptor))
       (sleep 0.5))))
 
 @export
