@@ -44,11 +44,17 @@ you would call like this: `(run-server-tests :foo)'."
   (let ((*drakma-default-external-format* :utf-8)
         (*clack-test-handler* handler-name)
         (*package* (find-package :clack.test.suite)))
+    #+thread-support
     (if name
         (run-test name)
         (progn
           (plan 32)
-          (run-test-package :clack.test.suite)))))
+          (run-test-package :clack.test.suite)))
+    #-thread-support
+    (progn
+      (plan (if name 1 32))
+      (skip (if name 1 32) "because your Lisp doesn't support threads")
+      (finalize))))
 
 (defun get-header (headers key)
   (let ((val (assoc key headers)))
