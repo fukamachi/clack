@@ -61,9 +61,9 @@
     (unwind-protect
         (funcall client)
       (when (bt:thread-alive-p acceptor)
-        (bt:destroy-thread acceptor)))
-    (loop until (port-available-p *clack-test-port*) do
-      (sleep 0.1))))
+        (bt:destroy-thread acceptor)
+        (loop until (port-available-p *clack-test-port*) do
+          (sleep 0.1))))))
 
 @export
 (defmacro define-app-test (desc app client &optional (enable-debug-p *enable-debug-p*))
