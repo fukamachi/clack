@@ -127,8 +127,7 @@
                        :method :post
                        :redirect nil)
        (is status 302 "Status is 302")
-       (is (cdr (assoc :location headers)) "http://en.wikipedia.org/wiki/CSRF")
-       (is body ""))))
+       (is (cdr (assoc :location headers)) "http://en.wikipedia.org/wiki/CSRF"))))
 
 (setf app
       (builder <clack-middleware-session>
