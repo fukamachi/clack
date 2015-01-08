@@ -34,6 +34,6 @@
        "Hello, hoge")))
 
 #-thread-support
-(skip 2 "because your lisp doesn't support threads")
+(skip 4 "because your lisp doesn't support threads")
 
 (finalize)

@@ -17,7 +17,7 @@
                 :csrf-html-tag))
 (in-package :t.clack.middleware.csrf)
 
-(plan 18)
+(plan 17)
 
 (defun html-form (env)
   (concatenate
@@ -56,6 +56,7 @@
                  "name=\"_csrf_token\" value=\"(.+?)\"" body))))
     (and match (elt match 0))))
 
+#+thread-support
 (test-app
  app
  #'(lambda ()
@@ -103,6 +104,8 @@
          (is status 200 "Status is 200")
          (is (cdr (assoc :content-type headers)) "text/html; charset=utf-8" "Content-Type is text/html")
          (is body "Eitaro Fukamachi" "can read body-parameter")))))
+#-thread-support
+(skip 13 "because your lisp doesn't support threads")
 
 (setf app
       (builder <clack-middleware-session>
@@ -119,6 +122,7 @@
                      ("You look a safety user.")))))
 
 (diag "change blocking behavior")
+#+thread-support
 (test-app
  app
  #'(lambda ()
@@ -128,6 +132,8 @@
                        :redirect nil)
        (is status 302 "Status is 302")
        (is (cdr (assoc :location headers)) "http://en.wikipedia.org/wiki/CSRF"))))
+#-thread-support
+(skip 2 "because your lisp doesn't support threads")
 
 (setf app
       (builder <clack-middleware-session>
@@ -142,6 +148,7 @@
                              (html-form env))))))))
 
 (diag "Enable one-time token")
+#+thread-support
 (test-app
  app
  #'(lambda ()
@@ -166,5 +173,7 @@
            (declare (ignore body))
            (is status 400 "Status is 400")
            (is (cdr (assoc :content-type headers)) "text/plain; charset=utf-8" "Content-Type is text/plain")))))
+#-thread-support
+(skip 2 "because your lisp doesn't support threads")
 
 (finalize)
