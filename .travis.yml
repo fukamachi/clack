@@ -1,0 +1,16 @@
+language: common-lisp
+
+env:
+  matrix:
+    - LISP=sbcl
+
+install:
+  # Install cl-travis
+  - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh | bash
+
+script:
+  - cl -l prove
+       -e '(or (every (function identity)
+                      (list (prove:run :t-clack)
+                            (prove:run :t-clack-middleware-csrf)))
+               (uiop:quit -1))'
