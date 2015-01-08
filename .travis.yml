@@ -10,6 +10,8 @@ before_install:
   # libuv for Wookie
   - curl -L https://github.com/libuv/libuv/archive/v1.2.0.tar.gz | tar xzf -
   - (cd libuv-1.2.0 && ./autogen.sh && ./configure --prefix=/usr && make && sudo make install)
+  # nginx for FastCGI handler
+  - sudo apt-get -qq install nginx
 
 install:
   # Install cl-travis
@@ -18,6 +20,7 @@ install:
 before_script:
   - git clone https://github.com/fukamachi/quri ~/lisp/quri
   - git clone https://github.com/fukamachi/xsubseq ~/lisp/xsubseq
+  - sudo nginx -c t/nginx.conf -p "$PWD/"
 
 script:
   - "cl -l prove
@@ -25,6 +28,7 @@ script:
                        (list (prove:run :t-clack)
                              (prove:run :t-clack-handler-hunchentoot)
                              #-ccl (prove:run :t-clack-handler-wookie)
+                             #-clisp (prove:run :t-clack-handler-fcgi)
                              (prove:run :t-clack-handler-toot)
                              (prove:run :t-clack-middleware-csrf)
                              (prove:run :t-clack-middleware-auth-basic)))

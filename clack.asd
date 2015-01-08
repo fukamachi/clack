@@ -115,6 +115,7 @@
   :in-order-to ((test-op (test-op t-clack)
                          (test-op t-clack-handler-hunchentoot)
                          (test-op t-clack-handler-wookie)
+                         (test-op t-clack-handler-fcgi)
                          (test-op t-clack-handler-toot)
                          (test-op t-clack-middleware-csrf)
                          (test-op t-clack-middleware-auth-basic))))

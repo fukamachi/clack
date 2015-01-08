@@ -78,9 +78,11 @@
             (make-instance '<fcgi-acceptor>
                            :port port
                            :file-descriptor fd)))
-      (cl-fastcgi::server-on-fd
-       #'main-loop
-       (acceptor-file-descriptor acceptor))
+      (unwind-protect
+           (cl-fastcgi::server-on-fd
+            #'main-loop
+            (acceptor-file-descriptor acceptor))
+        (stop acceptor))
       acceptor)))
 
 @export

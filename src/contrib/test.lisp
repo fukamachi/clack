@@ -54,15 +54,16 @@
                       (funcall (intern (string '#:run) handler)
                                app
                                :port *clack-test-port*
-                               :debug debug)))))
+                               :debug debug))
+                    :initial-bindings `((*clack-test-port* . ,*clack-test-port*)))))
     (when desc (diag desc))
     (sleep 0.5)
     (unwind-protect
         (funcall client)
       (when (bt:thread-alive-p acceptor)
-        (bt:destroy-thread acceptor)
-        (loop until (port-available-p *clack-test-port*) do
-          (sleep 0.1))))))
+        (bt:destroy-thread acceptor)))
+    (loop until (port-available-p *clack-test-port*) do
+      (sleep 0.1))))
 
 @export
 (defmacro define-app-test (desc app client &optional (enable-debug-p *enable-debug-p*))
