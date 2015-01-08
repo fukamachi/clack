@@ -29,6 +29,15 @@
 @export
 (defvar *enable-debug-p* t)
 
+(defun port-available-p (port)
+  (let (socket)
+    (unwind-protect
+         (handler-case (setq socket (usocket:socket-listen "127.0.0.1" port :reuse-address t))
+           (usocket:address-in-use-error () nil))
+      (when socket
+        (usocket:socket-close socket)
+        T))))
+
 @export
 (defun test-app (app client &optional desc)
   "Test Clack Application."
@@ -41,11 +50,14 @@
                                :port *clack-test-port*
                                :debug debug)))))
     (when desc (diag desc))
+    (loop while (port-available-p *clack-test-port*) do
+      (sleep 0.1))
     (unwind-protect
         (funcall client)
       (when (bt:thread-alive-p acceptor)
-        (bt:destroy-thread acceptor))
-      (sleep 1))))
+        (bt:destroy-thread acceptor)
+        (loop until (port-available-p *clack-test-port*) do
+          (sleep 0.1))))))
 
 @export
 (defmacro define-app-test (desc app client &optional (enable-debug-p *enable-debug-p*))
