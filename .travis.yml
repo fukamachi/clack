@@ -25,6 +25,7 @@ before_script:
   - git clone https://github.com/fukamachi/quri ~/lisp/quri
   - git clone https://github.com/fukamachi/xsubseq ~/lisp/xsubseq
   - sudo nginx -c t/nginx.conf -p "$PWD/"
+  - export JAVA_OPTS="-XX:MaxPermSize=128m"
 
 script:
   - "cl -l prove
