@@ -5,6 +5,7 @@ env:
     - LISP=sbcl
     - LISP=ccl
     - LISP=clisp
+    - LISP=abcl
 
 before_install:
   # libuv for Wookie
@@ -18,11 +19,14 @@ before_install:
 install:
   # Install cl-travis
   - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh | bash
+  - if [ "$LISP" = "abcl" ]; then cim install abcl-1.3.1 && cim use abcl-1.3.1 --default; fi
 
 before_script:
+  - git clone https://github.com/fukamachi/prove ~/lisp/prove
   - git clone https://github.com/fukamachi/quri ~/lisp/quri
   - git clone https://github.com/fukamachi/xsubseq ~/lisp/xsubseq
   - sudo nginx -c t/nginx.conf -p "$PWD/"
+  - export _JAVA_OPTIONS="-XX:MaxPermSize=512m -XX:+CMSClassUnloadingEnabled -Xmx1024m"
 
 script:
   - "cl -l prove
