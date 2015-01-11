@@ -25,7 +25,7 @@ before_script:
   - git clone https://github.com/fukamachi/quri ~/lisp/quri
   - git clone https://github.com/fukamachi/xsubseq ~/lisp/xsubseq
   - sudo nginx -c t/nginx.conf -p "$PWD/"
-  - export JAVA_OPTS="-XX:MaxPermSize=512m -XX:+CMSClassUnloadingEnabled -Xmx1024m"
+  - export _JAVA_OPTIONS="-XX:MaxPermSize=512m -XX:+CMSClassUnloadingEnabled -Xmx1024m"
 
 script:
   - "cl -l prove
