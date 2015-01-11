@@ -5,7 +5,7 @@ env:
     - LISP=sbcl
     - LISP=ccl
     - LISP=clisp
-    - LISP=abcl
+    - LISP=abcl-1.3.1
 
 before_install:
   # libuv for Wookie
@@ -19,6 +19,9 @@ before_install:
 install:
   # Install cl-travis
   - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh | bash
+  - if [ "$LISP" = "abcl-1.3.1" ]; then
+      cim install abcl-1.3.1 && cim use abcl-1.3.1 --default
+    fi
 
 before_script:
   - git clone https://github.com/fukamachi/prove ~/lisp/prove
