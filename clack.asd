@@ -40,8 +40,7 @@
                :marshal
                :trivial-mimes
                :trivial-backtrace
-               :bordeaux-threads
-               :log4cl)
+               :bordeaux-threads)
   :components ((:module "src"
                 :components
                 ((:module "core"

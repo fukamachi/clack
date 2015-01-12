@@ -10,14 +10,6 @@
 (defpackage clack.middleware.accesslog
   (:use :cl
         :clack)
-  (:import-from :log
-                :category
-                :config)
-  (:import-from :log4cl
-                :logger
-                :add-appender
-                :this-console-appender
-                :pattern-layout)
   (:import-from :local-time
                 :now
                 :format-timestring))
@@ -31,16 +23,6 @@
 
 @export
 (defparameter *now* nil)
-
-@export
-(defvar *access-logger*
-  (let ((logger (log:category '(clack middleware accesslog))))
-    (log:config logger :own :trace)
-    (log4cl:add-appender logger
-                         (make-instance 'log4cl:this-console-appender
-                                        :layout (make-instance 'log4cl:pattern-layout
-                                                               :conversion-pattern "%m%n")))
-    logger))
 
 (defun content-length (res)
   (destructuring-bind (status headers body)
@@ -56,12 +38,10 @@
 
 @export
 (defclass <clack-middleware-accesslog> (<middleware>)
-  ((logger :type log4cl::logger
+  ((logger :type function
            :initarg :logger
-           :initform *access-logger*)
-   (log-level :type keyword
-              :initarg :log-level
-              :initform :trace)
+           :initform (lambda (output)
+                       (format t "~&~A~%" output)))
    (formatter :type function
               :initarg :formatter
               :initform (lambda (env res)
@@ -79,9 +59,7 @@
 (defmethod call ((mw <clack-middleware-accesslog>) env)
   (let ((*now* (local-time:now))
         (res (call-next mw env)))
-    (eval `(,(intern (string (slot-value mw 'log-level)) :log)
-            :logger ,(slot-value mw 'logger)
-            ,(funcall (slot-value mw 'formatter) env res)))
+    (funcall (slot-value mw 'logger) (funcall (slot-value mw 'formatter) env res))
     res))
 
 (doc:start)
