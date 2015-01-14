@@ -40,7 +40,8 @@
             (progn
               (bt:destroy-thread acceptor)
               (sleep 0.5))
-            (funcall (intern (string '#:stop) handler-package) acceptor))))))
+            (funcall (intern (string '#:stop) handler-package) acceptor))
+        T))))
 
 (doc:start)
 
