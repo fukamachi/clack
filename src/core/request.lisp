@@ -159,13 +159,13 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
   (when-let (cookie (gethash "cookie" (headers this)))
     (setf (slot-value this 'http-cookie)
           (loop for kv in (ppcre:split "\\s*[,;]\\s*" cookie)
-                append (quri:url-decode-params kv))))
+                append (quri:url-decode-params kv :lenient t))))
 
   ;; GET parameters
   (unless (slot-boundp this 'query-parameters)
     (setf (slot-value this 'query-parameters)
           (and (query-string this)
-               (quri:url-decode-params (query-string this)))))
+               (quri:url-decode-params (query-string this) :lenient t))))
 
   ;; POST parameters
   (unless (slot-boundp this 'body-parameters)
