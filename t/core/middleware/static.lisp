@@ -2,7 +2,7 @@
 (defpackage t.clack.middleware.static
   (:use :cl
         :asdf
-        :cl-test-more
+        :prove
         :clack.test
         :clack.builder
         :clack.middleware.static

@@ -1,14 +1,14 @@
 (in-package :cl-user)
 (defpackage t.clack.middleware.session
   (:use :cl
-        :cl-test-more
+        :prove
         :clack.test
         :clack.builder
         :clack.middleware.session
         :clack.middleware.session.cookie
         :clack.session.state.cookie
         :drakma)
-  (:shadowing-import-from :cl-test-more :finalize))
+  (:shadowing-import-from :prove :finalize))
 (in-package :t.clack.middleware.session)
 
 (plan 8)

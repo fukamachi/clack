@@ -3,7 +3,7 @@
   (:use :cl
         :clack
         :clack.app.urlmap
-        :cl-test-more))
+        :prove))
 (in-package :t.clack.app.urlmap)
 
 (plan 4)

@@ -1,7 +1,7 @@
 (in-package :cl-user)
 (defpackage t.clack.logger
   (:use :cl
-        :cl-test-more
+        :prove
         :clack.logger))
 (in-package :t.clack.logger)
 

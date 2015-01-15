@@ -9,7 +9,7 @@
 (in-package :cl-user)
 (defpackage clack.test.suite
   (:use :cl
-        :cl-test-more)
+        :prove)
   (:import-from :flexi-streams
                 :octet
                 :octets-to-string)

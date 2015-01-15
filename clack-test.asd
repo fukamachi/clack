@@ -24,7 +24,7 @@
   :depends-on (:clack
                :cl-syntax
                :cl-syntax-annot
-               :cl-test-more
+               :prove
                :flexi-streams
                :drakma)
   :components ((:file "src/contrib/test")

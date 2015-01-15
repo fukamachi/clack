@@ -3,7 +3,7 @@
   (:use :cl
         :clack
         :clack.builder
-        :cl-test-more
+        :prove
         :clack.middleware.conditional
         :clack.middleware.static
         :cl-ppcre))

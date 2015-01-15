@@ -1,7 +1,7 @@
 (in-package :cl-user)
 (defpackage t.clack.middleware.logger
   (:use :cl
-        :cl-test-more
+        :prove
         :clack.test
         :clack.builder
         :clack.logger

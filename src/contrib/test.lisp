@@ -9,7 +9,7 @@
 (in-package :cl-user)
 (defpackage clack.test
   (:use :cl)
-  (:import-from :cl-test-more
+  (:import-from :prove
                 :diag
                 :deftest)
   (:import-from :clack.util
@@ -67,7 +67,7 @@
 
 @export
 (defmacro define-app-test (desc app client &optional (enable-debug-p *enable-debug-p*))
-  "Define tests for Clack Application. This just wrap `cl-test-more:deftest', so you can run this test by calling `(cl-test-more:run-test :foo)'."
+  "Define tests for Clack Application. This just wrap `prove:deftest', so you can run this test by calling `(prove:run-test :foo)'."
   `(deftest ,desc
        (let ((*enable-debug-p* ,enable-debug-p))
          (test-app ,app ,client))))
@@ -82,7 +82,7 @@ Clack.Test - Testing Clack Applications.
     (defpackage clack-test.sample
       (:use :cl
             :clack.test
-            :cl-test-more
+            :prove
             :drakma))
     (in-package :clack-test.sample)
     
@@ -110,6 +110,6 @@ Eitaro Fukamachi (e.arrows@gmail.com)
 "
 
 @doc:SEE "
-* [CL-TEST-MORE](https://github.com/fukamachi/cl-test-more)
+* [prove](https://github.com/fukamachi/prove)
 * Drakma
 "

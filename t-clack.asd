@@ -20,7 +20,7 @@
 (defsystem t-clack
   :depends-on (:clack
                :clack-test
-               :cl-test-more
+               :prove
                :bordeaux-threads
                :drakma)
   :components
@@ -40,7 +40,6 @@
        (:test-file "middleware/session")
        (:test-file "middleware/logger"))))))
 
-  :defsystem-depends-on (:cl-test-more)
+  :defsystem-depends-on (:prove-asdf)
   :perform (test-op :after (op c)
-                    (funcall (intern #. (string :run-test-system) :cl-test-more)
-                             c)))
+                    (funcall (intern #.(string :run-test-system) :prove) c)))

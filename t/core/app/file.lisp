@@ -2,7 +2,7 @@
 (defpackage t.clack.app.file
   (:use :cl
         :asdf
-        :cl-test-more
+        :prove
         :clack.test
         :clack.app.file
         :drakma))

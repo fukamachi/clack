@@ -1,7 +1,7 @@
 (in-package :cl-user)
 (defpackage t.clack.middleware.csrf
   (:use :cl
-        :cl-test-more
+        :prove
         :clack
         :clack.builder
         :clack.request)

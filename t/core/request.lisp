@@ -2,7 +2,7 @@
 (defpackage t.clack.request
   (:use :cl
         :asdf
-        :cl-test-more
+        :prove
         :flexi-streams
         :clack.request
         :clack.test

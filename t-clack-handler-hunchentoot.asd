@@ -10,4 +10,4 @@
   ((:test-file "t/core/handler/hunchentoot"))
   :defsystem-depends-on (:prove-asdf)
   :perform (test-op :after (op c)
-                    (funcall #.(intern (string :run-test-system) :prove) c)))
+                    (funcall (intern #.(string :run-test-system) :prove) c)))

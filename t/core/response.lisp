@@ -1,7 +1,7 @@
 (in-package :cl-user)
 (defpackage t.clack.response
   (:use :cl
-        :cl-test-more
+        :prove
         :clack.response)
   (:shadowing-import-from
    :clack.response
@@ -50,4 +50,4 @@
           do (fail "finalized :set-cookie")
       else do (pass "finalized :set-cookie"))
 
-(cl-test-more:finalize)
+(prove:finalize)

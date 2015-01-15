@@ -21,12 +21,11 @@
   :depends-on (:clack
                :clack-test
                :clack-middleware-csrf
-               :cl-test-more
+               :prove
                :drakma)
   :components
   ((:test-file "t/contrib/middleware/csrf"))
 
-  :defsystem-depends-on (:cl-test-more)
+  :defsystem-depends-on (:prove-asdf)
   :perform (test-op :after (op c)
-                    (funcall (intern #. (string :run-test-system) :cl-test-more)
-                             c)))
+                    (funcall (intern #.(string :run-test-system) :prove) c)))

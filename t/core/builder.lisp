@@ -1,7 +1,7 @@
 (in-package :cl-user)
 (defpackage t.clack.builder
   (:use :cl
-        :cl-test-more
+        :prove
         :clack.builder
         :clack.component
         :clack.middleware))
