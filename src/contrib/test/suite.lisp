@@ -48,7 +48,7 @@ you would call like this: `(run-server-tests :foo)'."
     (if name
         (run-test name)
         (progn
-          (plan 32)
+          (plan 33)
           (run-test-package :clack.test.suite)))
     #-thread-support
     (progn
@@ -71,6 +71,15 @@ you would call like this: `(run-server-tests :foo)'."
           path))
 
 ;; Tests
+
+(define-app-test |list body|
+  (lambda (env)
+    '(200 () ("Hello" "World")))
+  (lambda ()
+    (multiple-value-bind (body status)
+        (http-request (localhost))
+      (is status 200)
+      (is body "HelloWorld"))))
 
 (define-app-test |SCRIPT-NAME|
   (lambda (env)

@@ -27,8 +27,7 @@
     (declare (ignore status))
     (or (getf headers :content-length)
         (typecase body
-          (list (+ (reduce #'+ body :key #'length)
-                   (length body)))
+          (list (reduce #'+ body :key #'length))
           (pathname (with-open-file (in body)
                       (file-length in)))
           ((vector (unsigned-byte 8)) (1+ (length body)))))))

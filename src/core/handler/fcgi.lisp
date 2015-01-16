@@ -130,7 +130,7 @@
             (list
              (fcgx-puts req
                         (flex:string-to-octets
-                         (format nil "~{~A~^~%~}" body)
+                         (format nil "~{~A~}" body)
                          :external-format :utf-8)))
             ((vector (unsigned-byte 8))
              (fcgx-puts req body)))

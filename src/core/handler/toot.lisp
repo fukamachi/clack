@@ -147,7 +147,7 @@ before pass to Clack application."
                  (etypecase body
                    (null) ;; nothing to response
                    (list
-                    (write-sequence (flex:string-to-octets (format nil "~{~A~^~%~}" body)
+                    (write-sequence (flex:string-to-octets (format nil "~{~A~}" body)
                                                            :external-format toot::*default-charset*)
                                     out)))))))
       (etypecase res

@@ -139,7 +139,7 @@ before passing to Hunchentoot."
                   (hunchentoot:handle-static-file body (getf headers :content-type)))
                  (list
                   (with-output-to-string (s)
-                    (format s "~{~A~^~%~}" body)))
+                    (format s "~{~A~}" body)))
                  ((vector (unsigned-byte 8))
                   ;; I'm not convinced with this header should be send automatically or not
                   ;; and not sure how to handle same way in other method so comment out
