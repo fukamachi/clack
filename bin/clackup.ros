@@ -1,0 +1,73 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#|
+exec ros -Q -- $0 "$@"
+|#
+
+#|
+A command-line interface for clack:clackup.
+|#
+
+(defun help ()
+  (format t "~&Usage:
+    # read your app from app.lisp file
+    ~A
+
+    # run the .lisp file
+    ~:*~A hello.lisp
+
+    # switch server handler with --server
+    ~:*~A --server wookie --port 8080 hello.lisp
+"
+          (read-from-string
+           (second (assoc "script"
+                          (let ((*read-eval*))
+                            (read-from-string (asdf::getenv "ROS_OPTS")))
+                          :test 'equal)))))
+
+(defun terminate (code &optional message args)
+  (when message
+    (format *error-output* "~&Error: ~A~%"
+            (apply #'format nil (princ-to-string message) args)))
+  (asdf::quit code))
+
+(defun starts-with (x starts)
+  (and (<= (length starts) (length x))
+       (string= x starts :end1 (length starts))))
+
+(defun parse-args (args)
+  (flet ((parse-value (value)
+           (or (ignore-errors
+                (let ((read-value (read-from-string value)))
+                  (if (and (symbolp read-value)
+                           (not (keywordp read-value)))
+                      value
+                      read-value)))
+               value)))
+    (loop for (option value) on args by #'cddr
+          if (not (starts-with option "--"))
+            do (error "Invalid option: ~S" option)
+          else if (string-equal option "--server")
+                 append (list :server
+                              (let ((parsed (parse-value value)))
+                                (if (keywordp parsed)
+                                    parsed
+                                    (intern (string-upcase value) :keyword))))
+          else
+            append (list (intern (string-upcase (subseq option 2)) :keyword)
+                         (parse-value value)))))
+
+(defun main (&optional app-file &rest key-args)
+  (unless app-file
+    (help)
+    (asdf::quit -1))
+
+  (unless (probe-file app-file)
+    (terminate -1 "File doesn't exist: ~A" app-file))
+
+  (ql:quickload :clack :silent t)
+
+  (handler-case
+      (apply (intern (string :clackup) :clack) app-file :use-thread nil (parse-args key-args))
+    (error (e)
+      (terminate -1 e))))
