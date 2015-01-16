@@ -10,9 +10,6 @@ A command-line interface for clack:clackup.
 
 (defun help ()
   (format t "~&Usage:
-    # read your app from app.lisp file
-    ~A
-
     # run the .lisp file
     ~:*~A hello.lisp
 
