@@ -1,7 +1,7 @@
 #!/bin/sh
 #|-*- mode:lisp -*-|#
 #|
-exec ros -Q -- $0 "$@"
+exec ros +Q -- $0 "$@"
 |#
 
 #|
@@ -62,9 +62,12 @@ A command-line interface for clack:clackup.
   (unless (probe-file app-file)
     (terminate -1 "File doesn't exist: ~A" app-file))
 
-  (ql:quickload :clack :silent t)
+  (if (asdf::getenv "QUICKLISP_HOME")
+      (let ((qldir (merge-pathnames (asdf::getenv "QUICKLISP_HOME")
+                                    (merge-pathnames app-file))))
+        (format t "~&Using Quicklisp installed at '~A'~%" qldir)
+        (load (merge-pathnames "setup.lisp" qldir)))
+      (ros:quicklisp))
+  (funcall (intern (string :quickload) :ql) :clack :silent t)
 
-  (handler-case
-      (apply (intern (string :clackup) :clack) app-file :use-thread nil (parse-args key-args))
-    (error (e)
-      (terminate -1 e))))
+  (apply (intern (string :clackup) :clack) app-file :use-thread nil (parse-args key-args)))
