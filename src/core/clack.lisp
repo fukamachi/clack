@@ -110,6 +110,8 @@ Example:
       (component-designator
        (let ((handler-package (find-handler server)))
          (unless use-thread
+           (format t "~&~:(~A~) server is starting.~
+             ~%Listening on localhost:~A.~%" server port)
            (run-server handler-package app))
 
          (let ((handler (make-instance '<handler>
