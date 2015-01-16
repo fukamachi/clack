@@ -74,7 +74,8 @@ you would call like this: `(run-server-tests :foo)'."
 
 (define-app-test |list body|
   (lambda (env)
-    '(200 () ("Hello" "World")))
+    (declare (ignore env))
+    '(200 (:content-type "text/plain") ("Hello" "World")))
   (lambda ()
     (multiple-value-bind (body status)
         (http-request (localhost))
