@@ -86,7 +86,7 @@ Clack.Builder - Clack utility to build up from some Middleware and Application i
 
 @doc:SYNOPSIS "
     (builder
-     <clack-middleware-logger>
+     <clack-middleware-accesslog>
      (<clack-middleware-static>
       :path \"/public/\"
       :root #p\"/static-files/\")
@@ -99,7 +99,7 @@ Clack.Builder allows you to write middlewares inline. It builds up with calling 
 The following example is:
 
     (builder
-     <clack-middleware-logger>
+     <clack-middleware-accesslog>
      (<clack-middleware-static>
       :path \"/public/\"
       :root #p\"/static-files/\")
@@ -107,7 +107,7 @@ The following example is:
 
 same as below one.
 
-    (wrap (make-instance '<clack-middleware-logger>)
+    (wrap (make-instance '<clack-middleware-accesslog>)
           (wrap (make-instance '<clack-middleware-static>
                    :path \"/public/\"
                    :root #p\"/static-files/\")

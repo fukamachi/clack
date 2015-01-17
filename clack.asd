@@ -67,15 +67,6 @@
                      (:file "directory" :depends-on ("file"))
                      (:file "urlmap")))
                    (:file "file-watcher")
-                   (:file "logger")
-                   (:module "middleware/logger"
-                    :depends-on ("logger" "middleware")
-                    :serial t
-                    :components
-                    ((:file "base")
-                     (:file "stream")
-                     (:file "file")
-                     (:file "logger")))
                    (:module "mw"
                     :pathname "middleware"
                     :depends-on ("clack" "component" "response" "request" "app")

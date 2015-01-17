@@ -37,8 +37,7 @@
        (:test-file "app/urlmap")
        (:test-file "middleware/static")
        (:test-file "middleware/conditional")
-       (:test-file "middleware/session")
-       (:test-file "middleware/logger"))))))
+       (:test-file "middleware/session"))))))
 
   :defsystem-depends-on (:prove-asdf)
   :perform (test-op :after (op c)
