@@ -43,12 +43,13 @@
                        (etypecase (output mw)
                          (symbol (print-error condition env (symbol-value (output mw))))
                          (stream (print-error condition env (output mw)))
-                         (pathname (with-open-file (out (output mw)
-                                                        :direction :output
-                                                        :external-format :utf-8
-                                                        :if-exists :append
-                                                        :if-does-not-exist :create)
-                                     (print-error condition env out)))))))
+                         ((or pathname string)
+                          (with-open-file (out (output mw)
+                                               :direction :output
+                                               :external-format :utf-8
+                                               :if-exists :append
+                                               :if-does-not-exist :create)
+                            (print-error condition env out)))))))
     (call-next mw env)))
 
 (defun print-error (error env &optional (stream *error-output*))
