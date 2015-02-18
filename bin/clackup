@@ -8,7 +8,9 @@ exec ros -Q -- $0 "$@"
 A command-line interface for clack:clackup.
 |#
 
-(ql:quickload :uiop :silent t)
+(ql:quickload '(:uiop :split-sequence) :silent t)
+
+(import 'split-sequence:split-sequence)
 
 (defun help ()
   (format t "~&Usage:
@@ -56,6 +58,22 @@ A command-line interface for clack:clackup.
             append (list (intern (string-upcase (subseq option 2)) :keyword)
                          (parse-value value)))))
 
+(defun parse-server-starter-port ()
+  (flet ((parse-host-port (host-port)
+           (parse-integer
+            (let ((colon-pos (position #\: host-port)))
+              (if colon-pos
+                  (subseq host-port (1+ colon-pos))
+                  host-port)))))
+    (let ((ss-ports (uiop:getenv "SERVER_STARTER_PORT")))
+      (when (stringp ss-ports)
+        (destructuring-bind (host-port fd)
+            (split-sequence #\=
+                            ;; Assuming the first binding is for the Clack web server.
+                            (car (split-sequence #\; ss-ports :count 1)))
+          (values (parse-host-port host-port)
+                  (parse-integer fd)))))))
+
 (defun main (&optional app-file &rest key-args)
   (unless app-file
     (help)
@@ -66,4 +84,14 @@ A command-line interface for clack:clackup.
 
   (ql:quickload :clack :silent t)
 
-  (apply (intern (string :clackup) :clack) app-file :use-thread nil (parse-args key-args)))
+  (let ((args (parse-args key-args)))
+    ;; Add :port and :fd from Server::Starter's environment var.
+    (multiple-value-bind (port fd)
+        (parse-server-starter-port)
+      (when port
+        (setf args (append args (list :port port :fd fd)))))
+
+    ;; Disable threads
+    (setf (getf args :use-thread) nil)
+
+    (apply (intern (string :clackup) :clack) app-file args)))
