@@ -18,7 +18,7 @@ A command-line interface for clack:clackup.
     ~A hello.lisp
 
     # switch server handler with --server
-    ~:*~A hello.lisp --server wookie --port 8080
+    ~:*~A --server wookie --port 8080 hello.lisp
 "
           (read-from-string
            (second (assoc "script"
@@ -45,18 +45,25 @@ A command-line interface for clack:clackup.
                       value
                       read-value)))
                value)))
-    (loop for (option value) on args by #'cddr
+    (loop with app-file = nil
+          for (option value) on args by #'cddr
           if (not (starts-with option "--"))
-            do (error "Invalid option: ~S" option)
+            do (if app-file
+                   (error "Invalid option: ~S" option)
+                   (setf app-file option))
           else if (string-equal option "--server")
                  append (list :server
                               (let ((parsed (parse-value value)))
                                 (if (keywordp parsed)
                                     parsed
                                     (intern (string-upcase value) :keyword))))
+                   into key-args
           else
             append (list (intern (string-upcase (subseq option 2)) :keyword)
-                         (parse-value value)))))
+                         (parse-value value))
+              into key-args
+          finally
+             (return (values app-file key-args)))))
 
 (defun parse-server-starter-port ()
   (flet ((parse-host-port (host-port)
@@ -74,24 +81,25 @@ A command-line interface for clack:clackup.
           (values (parse-host-port host-port)
                   (parse-integer fd)))))))
 
-(defun main (&optional app-file &rest key-args)
-  (unless app-file
+(defun main (&rest args)
+  (unless args
     (help)
     (uiop:quit -1))
 
-  (unless (probe-file app-file)
-    (terminate -1 "File doesn't exist: ~A" app-file))
-
   (ql:quickload :clack :silent t)
 
-  (let ((args (parse-args key-args)))
+  (multiple-value-bind (app-file key-args)
+      (parse-args args)
+    (unless (probe-file app-file)
+      (terminate -1 "File doesn't exist: ~A" app-file))
+
     ;; Add :port and :fd from Server::Starter's environment var.
     (multiple-value-bind (port fd)
         (parse-server-starter-port)
       (when port
-        (setf args (append args (list :port port :fd fd)))))
+        (setf key-args (append args (list :port port :fd fd)))))
 
     ;; Disable threads
-    (setf (getf args :use-thread) nil)
+    (setf (getf key-args :use-thread) nil)
 
-    (apply (intern (string :clackup) :clack) app-file args)))
+    (apply (intern (string :clackup) :clack) app-file key-args)))
