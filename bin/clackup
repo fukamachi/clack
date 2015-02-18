@@ -13,10 +13,10 @@ A command-line interface for clack:clackup.
 (defun help ()
   (format t "~&Usage:
     # run the .lisp file
-    ~:*~A hello.lisp
+    ~A hello.lisp
 
     # switch server handler with --server
-    ~:*~A --server wookie --port 8080 hello.lisp
+    ~:*~A hello.lisp --server wookie --port 8080
 "
           (read-from-string
            (second (assoc "script"
