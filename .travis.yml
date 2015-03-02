@@ -22,6 +22,7 @@ install:
 before_script:
   - git clone https://github.com/fukamachi/quri ~/lisp/quri
   - git clone https://github.com/orthecreedence/wookie ~/lisp/wookie
+  - git clone https://github.com/orthecreedence/cl-async ~/lisp/cl-async
   - sudo nginx -c t/nginx.conf -p "$PWD/"
 
 script:
