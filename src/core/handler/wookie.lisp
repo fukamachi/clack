@@ -25,6 +25,8 @@
                 :request-headers
                 :request-resource
                 :request-http
+                :request-body
+                :request-store-body
                 :request-method
                 :request-uri
                 :request-socket)
@@ -32,9 +34,7 @@
                 :with-event-loop
                 :close-tcp-server
                 :async-io-stream)
-  (:import-from :http-parse
-                :http-body
-                :http-store-body
+  (:import-from :fast-http
                 :http-version)
   (:import-from :quri
                 :uri-path
@@ -61,7 +61,7 @@
 
 ;; XXX: :store-body keeps the whole POST data in-memory.
 (defun parsed-headers-hook (request)
-  (setf (http-parse:http-store-body (request-http request)) t))
+  (setf (wookie:request-store-body request) t))
 
 @export
 (defun run (app &key debug (port 5000)
@@ -99,22 +99,7 @@
 (defun handle-request (req &key ssl)
   (let ((quri (request-uri req))
         (http-version (http-version (request-http req)))
-        (headers (make-hash-table :test 'equal))
-        content-length
-        content-type)
-    (loop for (key val) on (request-headers req) by #'cddr
-          if (eq key :content-length)
-            do (setf content-length val)
-          else if (eq key :content-type)
-            do (setf content-type val)
-          else
-            do (let ((key (string-downcase key)))
-                 (multiple-value-bind (current existsp)
-                     (gethash key headers)
-                   (setf (gethash key headers)
-                         (if existsp
-                             (format nil "~A, ~A" current val)
-                             val)))))
+        (headers (request-headers req)))
 
     (destructuring-bind (server-name &optional server-port)
         (split-sequence #\: (gethash "host" headers "") :from-end t :count 2)
@@ -135,10 +120,10 @@
             :url-scheme (if ssl :https :http)
             :request-uri (request-resource req)
             :raw-body (flex:make-flexi-stream
-                       (flex:make-in-memory-input-stream (http-parse:http-body (request-http req)))
+                       (flex:make-in-memory-input-stream (wookie:request-body req))
                        :external-format :utf-8)
-            :content-length content-length
-            :content-type content-type
+            :content-length (gethash "content-length" headers)
+            :content-type (gethash "content-type" headers)
             :clack.streaming t
             :clack.nonblocking t
             :clack.io (request-socket req)

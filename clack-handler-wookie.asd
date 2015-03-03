@@ -26,7 +26,7 @@
                :cl-syntax-annot
                :wookie
                :cl-async
-               :http-parse
+               :fast-http
                :quri
                :flexi-streams
                :babel
