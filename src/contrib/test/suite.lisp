@@ -378,8 +378,8 @@ you would call like this: `(run-server-tests :foo)'."
       (is (get-header headers :x-cookie) nil)
       (is body "foo=bar"))))
 
-;; NOTE: This may fail on Hunchentoot because it's bug.
-;;   Hunchentoot returns Content-Type and Content-Length headers
+;; NOTE: This may fail on Hunchentoot because of its bug.
+;;   Hunchentoot returns Content-Type header
 ;;   though 304 Not Modified.
 ;; And Wookie also always returns Transfer-Encoding header.
 (define-app-test |no entity headers on 304|
