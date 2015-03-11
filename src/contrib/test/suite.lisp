@@ -486,7 +486,7 @@ you would call like this: `(run-server-tests :foo)'."
         (dex:get (localhost))
       (is status 200)
       (is (gethash "client-transfer-encoding" headers) nil)
-      (is body ""))))
+      (is body #() :test #'equalp))))
 
 (define-app-test |handle Authorization header|
   (lambda (env)
