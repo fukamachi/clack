@@ -75,7 +75,9 @@
 before pass to Clack application."
   (let ((content-length (if-let (content-length (request-header :content-length req))
                           (parse-integer content-length :junk-allowed t)
-                          (setf (slot-value req 'request-headers) (acons :content-length "" (slot-value req 'request-headers))))))
+                          (progn
+                            (setf (slot-value req 'request-headers) (acons :content-length "" (slot-value req 'request-headers)))
+                            nil))))
     (destructuring-bind (server-name &optional server-port)
         (split-sequence #\: (cdr (assoc :host (request-headers req))))
       (list
