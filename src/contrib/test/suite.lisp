@@ -17,6 +17,9 @@
                 :*clack-test-handler*
                 :*clack-test-port*
                 :define-app-test)
+  (:import-from :drakma
+                :*drakma-default-external-format*
+                :http-request)
   (:import-from :asdf
                 :find-system
                 :component-pathname))
@@ -38,14 +41,14 @@ Use if you want to set another port. The default is `*clack-test-port*`.")
 Handler name is a keyword and doesn't include the clack.handler prefix.
 For example, if you have a handler `clack.handler.foo',
 you would call like this: `(run-server-tests :foo)'."
-  (let ((*clack-test-handler* handler-name)
-        (dex:*use-connection-pool* nil)
+  (let ((*drakma-default-external-format* :utf-8)
+        (*clack-test-handler* handler-name)
         (*package* (find-package :clack.test.suite)))
     #+thread-support
     (if name
         (run-test name)
         (progn
-          (plan 34)
+          (plan 33)
           (run-test-package :clack.test.suite)))
     #-thread-support
     (progn
@@ -75,7 +78,7 @@ you would call like this: `(run-server-tests :foo)'."
     '(200 (:content-type "text/plain") ("Hello" "World")))
   (lambda ()
     (multiple-value-bind (body status)
-        (dex:get (localhost))
+        (http-request (localhost))
       (is status 200)
       (is body "HelloWorld"))))
 
@@ -85,7 +88,7 @@ you would call like this: `(run-server-tests :foo)'."
       (:content-type "text/plain; charset=utf-8")
       (,(getf env :script-name))))
   (lambda ()
-    (ok (member (dex:get (localhost)) '(nil "") :test #'equal))))
+    (ok (member (http-request (localhost)) '(nil "") :test #'equal))))
 
 (define-app-test |GET|
   (lambda (env)
@@ -94,9 +97,9 @@ you would call like this: `(run-server-tests :foo)'."
       (,(format nil "Hello, ~A" (getf env :query-string)))))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (dex:get (localhost "?name=fukamachi"))
+        (http-request (localhost "?name=fukamachi"))
       (is status 200)
-      (is (gethash "content-type" headers)
+      (is (get-header headers :content-type)
           "text/plain; charset=utf-8")
       (is body "Hello, name=fukamachi"))))
 
@@ -111,11 +114,12 @@ you would call like this: `(run-server-tests :foo)'."
         (,(format nil "Hello, ~A" (babel:octets-to-string body))))))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (dex:post (localhost)
-                  :content '(("name" . "eitaro")))
+        (http-request (localhost)
+                      :method :post
+                      :parameters '(("name" . "eitaro")))
       (is status 200)
-      (is (gethash "client-content-length" headers) 11)
-      (is (gethash "client-content-type" headers) "application/x-www-form-urlencoded")
+      (is (get-header headers :client-content-length) "11")
+      (is (get-header headers :client-content-type) "application/x-www-form-urlencoded")
       (is body "Hello, name=eitaro"))))
 
 (define-app-test |big POST|
@@ -136,13 +140,14 @@ you would call like this: `(run-server-tests :foo)'."
               chunk))
            (len (length chunk)))
       (multiple-value-bind (body status headers)
-          (dex:post (localhost)
-                    :headers `((:content-type . "application/octet-stream")
-                               (:content-length . ,len))
-                    :content `((,chunk)))
+          (http-request (localhost)
+                        :method :post
+                        :content-type "application/octet-stream"
+                        :content-length len
+                        :parameters `((,chunk)))
         (is status 200)
-        (is (gethash "client-content-length" headers)
-            len)
+        (is (get-header headers :client-content-length)
+            (princ-to-string len))
         (is (length body) len)))))
 
 (define-app-test |url-scheme|
@@ -152,9 +157,9 @@ you would call like this: `(run-server-tests :foo)'."
       (,(string (getf env :url-scheme)))))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (dex:post (localhost))
+        (http-request (localhost) :method :post)
       (is status 200)
-      (is (gethash "content-type" headers) "text/plain; charset=utf-8")
+      (is (get-header headers :content-type) "text/plain; charset=utf-8")
       (is body "HTTP"))))
 
 (define-app-test |return pathname|
@@ -165,9 +170,9 @@ you would call like this: `(run-server-tests :foo)'."
       ,(merge-pathnames #p"tmp/file.txt" *clack-pathname*)))
   (lambda ()
       (multiple-value-bind (body status headers)
-          (dex:get (localhost))
+          (http-request (localhost))
         (is status 200)
-        (is (gethash "content-type" headers) "text/plain; charset=utf-8")
+        (is (get-header headers :content-type) "text/plain; charset=utf-8")
         (like body "This is a text for test."))))
 
 (define-app-test |binary file|
@@ -180,13 +185,13 @@ you would call like this: `(run-server-tests :foo)'."
         ,file)))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (dex:get (localhost "redhat.png"))
+        (http-request (localhost "redhat.png"))
       (is status 200)
-      (is (gethash "content-type" headers) "image/png")
+      (is (get-header headers :content-type) "image/png")
       (if (eq *clack-test-handler* :wookie)
-          (is (gethash "transfer-encoding" headers) "chunked"
+          (is (get-header headers :transfer-encoding) "chunked"
             "Wookie always returns with Transfer-Encoding: chunked and no Content-Length.")
-          (ok (gethash "content-length" headers)))
+          (ok (get-header headers :content-length)))
       (is (length body) 12155))))
 
 (define-app-test |bigger file|
@@ -199,13 +204,13 @@ you would call like this: `(run-server-tests :foo)'."
         ,file)))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (dex:get (localhost "jellyfish.jpg"))
+        (http-request (localhost "jellyfish.jpg"))
       (is status 200)
-      (is (gethash "content-type" headers) "image/jpeg")
+      (is (get-header headers :content-type) "image/jpeg")
       (if (eq *clack-test-handler* :wookie)
-          (is (gethash "transfer-encoding" headers) "chunked"
+          (is (get-header headers :transfer-encoding) "chunked"
             "Wookie always returns with Transfer-Encoding: chunked and no Content-Length.")
-          (ok (gethash "content-length" headers)))
+          (ok (get-header headers :content-length)))
       (is (length body) 139616))))
 
 (define-app-test |handle HTTP-Header|
@@ -215,10 +220,10 @@ you would call like this: `(run-server-tests :foo)'."
       (,(gethash "foo" (getf env :headers)))))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (dex:get (localhost "foo/?ediweitz=weitzedi")
-                 :headers '(("Foo" . "Bar")))
+        (http-request (localhost "foo/?ediweitz=weitzedi")
+                      :additional-headers '(("Foo" . "Bar")))
       (is status 200)
-      (is (gethash "content-type" headers) "text/plain; charset=utf-8")
+      (is (get-header headers :content-type) "text/plain; charset=utf-8")
       (is body "Bar"))))
 
 (define-app-test |handler HTTP-Cookie|
@@ -228,10 +233,10 @@ you would call like this: `(run-server-tests :foo)'."
       (,(gethash "cookie" (getf env :headers)))))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (dex:get (localhost "foo/?ediweitz=weitzedi")
-                 :headers '(("Cookie" . "foo")))
+        (http-request (localhost "foo/?ediweitz=weitzedi")
+                      :additional-headers '(("Cookie" . "foo")))
       (is status 200)
-      (is (gethash "content-type" headers) "text/plain; charset=utf-8")
+      (is (get-header headers :content-type) "text/plain; charset=utf-8")
       (is body "foo"))))
 
 (define-app-test |validate env|
@@ -247,9 +252,9 @@ you would call like this: `(run-server-tests :foo)'."
                 do (format str "~A:~S~%" h (getf env h)))))))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (dex:get (localhost "foo/?ediweitz=weitzedi"))
+        (http-request (localhost "foo/?ediweitz=weitzedi"))
       (is status 200)
-      (is (gethash "content-type" headers) "text/plain; charset=utf-8")
+      (is (get-header headers :content-type) "text/plain; charset=utf-8")
       (is body (format nil "~{~A~%~}"
                        `("REQUEST-METHOD::GET"
                          "PATH-INFO:\"/foo/\""
@@ -268,10 +273,11 @@ you would call like this: `(run-server-tests :foo)'."
                 do (format str "~A:~A~%" h (typep (getf env h) '(or integer null))))))))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (dex:post (localhost)
-                  :content '(("name" . "eitaro")))
+        (http-request (localhost)
+                      :method :post
+                      :parameters '(("name" . "eitaro")))
       (is status 200)
-      (is (gethash "content-type" headers) "text/plain; charset=utf-8")
+      (is (get-header headers :content-type) "text/plain; charset=utf-8")
       (is body (format nil "~{~A~%~}"
                        `("SERVER-PORT:T"
                          "REMOTE-PORT:T"
@@ -283,7 +289,7 @@ you would call like this: `(run-server-tests :foo)'."
       (:content-type "text/plain; charset=utf-8")
       (,(getf env :path-info))))
   (lambda ()
-    (is (dex:get (localhost "foo/bar%2cbaz")) "/foo/bar,baz")))
+    (is (http-request (localhost "foo/bar%2cbaz")) "/foo/bar,baz")))
 
 (define-app-test |% double encoding in PATH-INFO|
   (lambda (env)
@@ -291,7 +297,7 @@ you would call like this: `(run-server-tests :foo)'."
       (:content-type "text/plain; charset=utf-8")
       (,(getf env :path-info))))
   (lambda ()
-    (is (dex:get (localhost "foo/bar%252cbaz")) "/foo/bar%2cbaz")))
+    (is (http-request (localhost "foo/bar%252cbaz")) "/foo/bar%2cbaz")))
 
 (define-app-test |% encoding in PATH-INFO (outside of URI characters)|
   (lambda (env)
@@ -299,7 +305,7 @@ you would call like this: `(run-server-tests :foo)'."
       (:content-type "text/plain; charset=utf-8")
       (,(getf env :path-info))))
   (lambda ()
-    (is (dex:get (localhost "foo%E3%81%82"))
+    (is (http-request (localhost "foo%E3%81%82") :preserve-uri t)
         (format nil "/foo~A"
                 (flex:octets-to-string #(#xE3 #x81 #x82) :external-format :utf-8)))))
 
@@ -310,9 +316,9 @@ you would call like this: `(run-server-tests :foo)'."
       (,(prin1-to-string (getf env :server-protocol)))))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (dex:get (localhost "foo/?ediweitz=weitzedi"))
+        (http-request (localhost "foo/?ediweitz=weitzedi"))
       (is status 200)
-      (is (gethash "content-type" headers) "text/plain; charset=utf-8")
+      (is (get-header headers :content-type) "text/plain; charset=utf-8")
       (like body "^:HTTP/1\\.[01]$"))))
 
 (define-app-test |SCRIPT-NAME should not be nil|
@@ -321,7 +327,7 @@ you would call like this: `(run-server-tests :foo)'."
       (:content-type "text/plain; charset=utf-8")
       (,(princ-to-string (not (null (getf env :script-name)))))))
   (lambda ()
-    (is (dex:get (localhost "foo/?ediweitz=weitzedi"))
+    (is (http-request (localhost "foo/?ediweitz=weitzedi"))
         "T"
         :test #'equalp)))
 
@@ -330,7 +336,7 @@ you would call like this: `(run-server-tests :foo)'."
     @ignore env
     (error "Throwing an exception from app handler. Server shouldn't crash."))
   (lambda ()
-    (is (nth-value 1 (dex:get (localhost)))
+    (is (nth-value 1 (http-request (localhost)))
         500))
   nil)
 
@@ -341,9 +347,9 @@ you would call like this: `(run-server-tests :foo)'."
       (,(gethash "foo" (getf env :headers)))))
   (lambda ()
     (like
-     (dex:get (localhost)
-              :headers '(("Foo" . "bar")
-                         ("Foo" . "baz")))
+     (http-request (localhost)
+                   :additional-headers '(("Foo" . "bar")
+                                         ("Foo" . "baz")))
      "^bar,\\s*baz$")))
 
 (define-app-test |multi headers (response)|
@@ -355,20 +361,8 @@ you would call like this: `(run-server-tests :foo)'."
        :x-foo "bar, baz")
       ("hi")))
   (lambda ()
-    (let ((headers (nth-value 2 (dex:get (localhost)))))
-      (like (gethash "x-foo" headers) "foo,\\s*bar,\\s*baz"))))
-
-(define-app-test |multi Set-Cookie headers (response)|
-  (lambda (env)
-    @ignore env
-    `(200
-      (:content-type "text/plain; charset=utf-8"
-       :set-cookie "SID=8ac23780325277ed40b2a382a4b02094ad0f0e12"
-       :set-cookie "name=guest")
-      ("hi")))
-  (lambda ()
-    (let ((headers (nth-value 2 (dex:get (localhost)))))
-      (is (gethash "set-cookie" headers) '("SID=8ac23780325277ed40b2a382a4b02094ad0f0e12" "name=guest")))))
+    (let ((headers (nth-value 2 (http-request (localhost)))))
+      (like (get-header headers :x-foo) "foo,\\s*bar,\\s*baz"))))
 
 (define-app-test |Do not set COOKIE|
   (lambda (env)
@@ -378,10 +372,10 @@ you would call like this: `(run-server-tests :foo)'."
       (,(gethash "cookie" (getf env :headers)))))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (dex:get (localhost)
-                 :headers '(("Cookie" . "foo=bar")))
+        (http-request (localhost)
+                      :additional-headers '(("Cookie" . "foo=bar")))
       (is status 200)
-      (is (gethash "x-cookie" headers) nil)
+      (is (get-header headers :x-cookie) nil)
       (is body "foo=bar"))))
 
 ;; NOTE: This may fail on Hunchentoot because of its bug.
@@ -398,12 +392,12 @@ you would call like this: `(run-server-tests :foo)'."
             (eq *clack-test-handler* :wookie))
         (skip 5 (format nil "because of ~:(~A~)'s bug" *clack-test-handler*))
         (multiple-value-bind (body status headers)
-            (dex:get (localhost))
+            (http-request (localhost))
           (is status 304)
           (is body #() :test #'equalp)
-          (is (nth-value 1 (gethash "content-type" headers)) nil "No Content-Type")
-          (is (nth-value 1 (gethash "content-length" headers)) nil "No Content-Length")
-          (is (nth-value 1 (gethash "transfer-encoding" headers)) nil "No Transfer-Encoding")))))
+          (is (nth-value 1 (get-header headers :content-type)) nil "No Content-Type")
+          (is (nth-value 1 (get-header headers :content-length)) nil "No Content-Length")
+          (is (nth-value 1 (get-header headers :transfer-encoding)) nil "No Transfer-Encoding")))))
 
 (define-app-test |REQUEST-URI is set|
   (lambda (env)
@@ -413,7 +407,7 @@ you would call like this: `(run-server-tests :foo)'."
   (lambda ()
     (if (eq *clack-test-handler* :toot)
         (skip 1 "because of ~:(~A~)'s bug" *clack-test-handler*)
-        (is (dex:get (localhost "foo/bar%20baz%73?x=a")) "/foo/bar%20baz%73?x=a"))))
+        (is (http-request (localhost "foo/bar%20baz%73?x=a") :preserve-uri t) "/foo/bar%20baz%73?x=a"))))
 
 (define-app-test |a big header value > 128 bytes|
   (lambda (env)
@@ -426,8 +420,8 @@ you would call like this: `(run-server-tests :foo)'."
              (dotimes (i 12000) (write-string "abcdefgh" chunk))
              chunk)))
       (multiple-value-bind (body status)
-          (dex:get (localhost)
-                   :headers `(("X-Foo" . ,chunk)))
+          (http-request (localhost)
+                        :additional-headers `(("X-Foo" . ,chunk)))
         (if (eq :fcgi *clack-test-handler*)
             (progn
               (is status 400)
@@ -445,9 +439,9 @@ you would call like this: `(run-server-tests :foo)'."
                 #\Return #\NewLine #\Return #\NewLine))))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (dex:get (localhost))
+        (http-request (localhost))
       (is status 200)
-      (is (gethash "foo" headers) nil)
+      (is (get-header headers :foo) nil)
       (is body (format nil "Foo: Bar~A~A~A~AHello World"
                        #\Return #\NewLine #\Return #\NewLine)))))
 
@@ -459,7 +453,7 @@ you would call like this: `(run-server-tests :foo)'."
       ("Not Found")))
   (lambda ()
     (multiple-value-bind (body status)
-        (dex:get (localhost))
+        (http-request (localhost))
       (is status 404)
       (is body "Not Found"))))
 
@@ -471,8 +465,9 @@ you would call like this: `(run-server-tests :foo)'."
         (:content-type "text/plain; charset=utf-8")
         (,(babel:octets-to-string body)))))
   (lambda ()
-    (is (dex:post (localhost)
-                  :content "body")
+    (is (http-request (localhost)
+                      :method :post
+                      :content "body")
         "body")))
 
 (define-app-test |Content-Length 0 is not set Transfer-Encoding|
@@ -483,10 +478,10 @@ you would call like this: `(run-server-tests :foo)'."
       ("")))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (dex:get (localhost))
+        (http-request (localhost))
       (is status 200)
-      (is (gethash "client-transfer-encoding" headers) nil)
-      (is body #() :test #'equalp))))
+      (is (get-header headers :client-transfer-encoding) nil)
+      (is body nil))))
 
 (define-app-test |handle Authorization header|
   (lambda (env)
@@ -496,18 +491,18 @@ you would call like this: `(run-server-tests :foo)'."
       (,(gethash "authorization" (getf env :headers) ""))))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (dex:get (localhost)
-                 :headers '(("Authorization" . "Basic XXXX")))
+        (http-request (localhost)
+                      :additional-headers '(("Authorization" . "Basic XXXX")))
       (is status 200)
-      (is (gethash "x-authorization" headers) "T"
+      (is (get-header headers :x-authorization) "T"
           :test #'equalp)
       (is body "Basic XXXX"))
     ;; XXX: On Wookie handler, this raises USOCKET:CONNECTION-REFUSED-ERROR.
     (unless (eq *clack-test-handler* :wookie)
       (multiple-value-bind (body status headers)
-          (dex:get (localhost))
+          (http-request (localhost))
         (is status 200)
-        (is (gethash "x-authorization" headers) nil)
+        (is (get-header headers :x-authorization) nil)
         (ok (member body '(nil "") :test #'equal))))))
 
 (define-app-test |repeated slashes|
@@ -517,9 +512,9 @@ you would call like this: `(run-server-tests :foo)'."
       (,(getf env :path-info))))
   (lambda ()
     (multiple-value-bind (body status headers)
-        (dex:get (localhost "foo///bar/baz"))
+        (http-request (localhost "foo///bar/baz"))
       (is status 200)
-      (is (gethash "content-type" headers) "text/plain; charset=utf-8")
+      (is (get-header headers :content-type) "text/plain; charset=utf-8")
       (is body "/foo///bar/baz"))))
 
 (define-app-test |file upload|
@@ -535,9 +530,12 @@ you would call like this: `(run-server-tests :foo)'."
         (,(gethash "filename" params)))))
   (lambda ()
     (multiple-value-bind (body status)
-        (dex:post (localhost)
-                  :content
-                  `(("file" . ,(merge-pathnames #p"tmp/file.txt" *clack-pathname*))))
+        (http-request (localhost)
+                      :method :post
+                      :parameters
+                      `(("file" ,(merge-pathnames #p"tmp/file.txt" *clack-pathname*)
+                                :content-type "plain/text"
+                                :filename "file.txt")))
       (is status 200)
       (is body "file.txt"))))
 
@@ -557,7 +555,7 @@ you would call like this: `(run-server-tests :foo)'."
                                      :wookie
                                      :woo))
         (multiple-value-bind (body status)
-            (dex:get (localhost))
+            (http-request (localhost))
           (is status 200)
           (is body (format nil "0~%1~%2~%")))
         (skip 2 (format nil "because ~:(~A~) doesn't support streaming" *clack-test-handler*)))))
@@ -577,7 +575,7 @@ Clack.Test.Suite - Test suite for Clack handlers.
 "
 
 @doc:DESCRIPTION "
-Clack.Test.Suite is a test suite to test a new Clack server implementation. It automatically loads a new handler environment and uses Dexador to send HTTP requests to the local server to make sure your handler implements the Clack specification correctly.
+Clack.Test.Suite is a test suite to test a new Clack server implementation. It automatically loads a new handler environment and uses Drakma to send HTTP requests to the local server to make sure your handler implements the Clack specification correctly.
 
 Your Lisp have to support multi-thread to run these tests.
 "

@@ -20,11 +20,6 @@ install:
 
 before_script:
   - sudo nginx -c t/nginx.conf -p "$PWD/"
-  - git clone https://github.com/fukamachi/fast-http ~/lisp/fast-http
-  - git clone https://github.com/fukamachi/quri ~/lisp/quri
-  - git clone https://github.com/fukamachi/cl-cookie ~/lisp/cl-cookie
-  - git clone https://github.com/fukamachi/dexador ~/lisp/dexador
-  - git clone https://github.com/fukamachi/http-body ~/lisp/http-body
 
 script:
   - "cl -l prove
