@@ -96,7 +96,9 @@
       (fcgx-puts req (format nil "Status: ~D ~A~%" status (http-status-reason status)))
       (loop for (k v) on headers by #'cddr
             with hash = (make-hash-table :test #'eq)
-            if (gethash k hash)
+            if (eq k :set-cookie)
+              do (fcgx-puts req (format nil "~:(~A~): ~A~%" k v))
+            else if (gethash k hash)
               do (setf (gethash k hash)
                        (concatenate 'string (gethash k hash) ", " v))
             else

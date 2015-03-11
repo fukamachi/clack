@@ -171,7 +171,7 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
   (unless (slot-boundp this 'body-parameters)
     (setf (slot-value this 'body-parameters)
           (and (raw-body this)
-               (parse (content-type this) (raw-body this))))))
+               (parse (content-type this) (content-length this) (raw-body this))))))
 
 @export
 (defun shared-raw-body (env)

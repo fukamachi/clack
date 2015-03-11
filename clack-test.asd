@@ -26,7 +26,7 @@
                :cl-syntax-annot
                :prove
                :flexi-streams
-               :drakma)
+               :dexador)
   :components ((:file "src/contrib/test")
                (:file "src/contrib/test/suite" :depends-on ("src/contrib/test")))
   :description "Testing Clack Applications.")

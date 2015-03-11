@@ -111,15 +111,18 @@ before passing to Hunchentoot."
              (destructuring-bind (status headers &optional (body no-body)) res
                (setf (return-code*) status)
                (loop for (k v) on headers by #'cddr
-                     with hash = (make-hash-table :test #'eq)
-                     if (gethash k hash)
-                       do (setf (gethash k hash)
-                                (format nil "~:[~;~:*~A, ~]~A" (gethash k hash) v))
-                     else do (setf (gethash k hash) v)
-                     finally
-                        (loop for k being the hash-keys in hash
-                                using (hash-value v)
-                              do (setf (header-out k) v)))
+                     if (eq k :set-cookie)
+                       do (rplacd (last (headers-out*))
+                                  (list (cons k v)))
+                     else if (eq k :content-type) do
+                       (setf (content-type*) v)
+                     else if (eq k :content-length) do
+                       (setf (content-length*) v)
+                     else if (header-out k) do
+                       (setf (header-out k)
+                             (format nil "~A, ~A" (header-out k) v))
+                     else
+                       do (setf (header-out k) v))
 
                (when (eq body no-body)
                  (return-from handle-normal-response

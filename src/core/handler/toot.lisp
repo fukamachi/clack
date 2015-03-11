@@ -115,20 +115,19 @@ before pass to Clack application."
 
                (setf (status-code req) status)
                (loop for (k v) on headers by #'cddr
-                     with hash = (make-hash-table :test #'eq)
-                     if (gethash k hash)
-                       do (setf (gethash k hash)
-                                (format nil "~:[~;~:*~A, ~]~A" (gethash k hash) v))
-                     else if (eq k :content-type)
-                            do (multiple-value-bind (v charset)
-                                   (parse-charset v)
-                                 (setf (gethash k hash) v)
-                                 (setf (toot::response-charset req) charset))
-                     else do (setf (gethash k hash) v)
-                     finally
-                        (loop for k being the hash-keys in hash
-                                using (hash-value v)
-                              do (setf (response-header k req) v)))
+                     if (eq k :set-cookie)
+                       do (rplacd (last (toot::response-headers req))
+                                  (list (cons k v)))
+                     else if (eq k :content-type) do
+                       (multiple-value-bind (v charset)
+                           (parse-charset v)
+                         (setf (response-header k req) v)
+                         (setf (toot::response-charset req) charset))
+                     else if (response-header k req) do
+                       (setf (response-header k req)
+                             (format nil "~A, ~A" (response-header k req) v))
+                     else do
+                       (setf (response-header k req) v))
                (toot::send-response-headers
                 req
                 (getf headers :content-length)
