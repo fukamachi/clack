@@ -39,6 +39,7 @@ Handler name is a keyword and doesn't include the clack.handler prefix.
 For example, if you have a handler `clack.handler.foo',
 you would call like this: `(run-server-tests :foo)'."
   (let ((*clack-test-handler* handler-name)
+        (dex:*use-connection-pool* nil)
         (*package* (find-package :clack.test.suite)))
     #+thread-support
     (if name
