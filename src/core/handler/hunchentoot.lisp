@@ -60,37 +60,23 @@
                                       :max-thread-count max-thread-count
                                       :max-accept-count max-accept-count)))
          (acceptor
-          (if ssl
-              (if (and max-thread-count max-accept-count)
-                  (make-instance 'easy-ssl-acceptor
-                                 :port port
-                                 :ssl-certificate-file ssl-cert-file
-                                 :ssl-privatekey-file ssl-key-file
-                                 :ssl-privatekey-password ssl-key-password
-                                 :access-log-destination nil
-                                 :error-template-directory nil
-                                 :persistent-connections-p persistent-connections-p
-                                 :taskmaster taskmaster)
-                  (make-instance 'easy-ssl-acceptor
-                                 :port port
-                                 :ssl-certificate-file ssl-cert-file
-                                 :ssl-privatekey-file ssl-key-file
-                                 :ssl-privatekey-password ssl-key-password
-                                 :access-log-destination nil
-                                 :error-template-directory nil
-                                 :persistent-connections-p persistent-connections-p))
-              (if (and max-thread-count max-accept-count)
-                  (make-instance 'easy-acceptor
-                                 :port port
-                                 :access-log-destination nil
-                                 :error-template-directory nil
-                                 :persistent-connections-p persistent-connections-p
-                                 :taskmaster taskmaster)
-                  (make-instance 'easy-acceptor
-                                 :port port
-                                 :access-log-destination nil
-                                 :error-template-directory nil
-                                 :persistent-connections-p persistent-connections-p)))))
+           (if ssl
+               (apply #'make-instance 'easy-ssl-acceptor
+                      :port port
+                      :ssl-certificate-file ssl-cert-file
+                      :ssl-privatekey-file ssl-key-file
+                      :ssl-privatekey-password ssl-key-password
+                      :access-log-destination nil
+                      :persistent-connections-p persistent-connections-p
+                      (and taskmaster
+                           (list :taskmaster taskmaster)))
+               (apply #'make-instance 'easy-acceptor
+                      :port port
+                      :access-log-destination nil
+                      :error-template-directory nil
+                      :persistent-connections-p persistent-connections-p
+                      (and taskmaster
+                           (list :taskmaster taskmaster))))))
     (setf (acceptor-shutdown-p acceptor) nil)
     (start-listening acceptor)
     (let ((taskmaster (acceptor-taskmaster acceptor)))
@@ -130,7 +116,8 @@ before passing to Hunchentoot."
                      (lambda (body &key (close nil))
                        (write-sequence
                         (if (stringp body)
-                            (flex:string-to-octets body)
+                            (flex:string-to-octets body
+                                                   :external-format *hunchentoot-default-external-format*)
                             body)
                         out)
                        (when close
@@ -141,8 +128,11 @@ before passing to Hunchentoot."
                  (pathname
                   (hunchentoot:handle-static-file body (getf headers :content-type)))
                  (list
-                  (with-output-to-string (s)
-                    (format s "~{~A~}" body)))
+                  (let ((out (send-headers)))
+                    (dolist (chunk body)
+                      (write-sequence (flex:string-to-octets chunk
+                                                             :external-format *hunchentoot-default-external-format*)
+                                      out))))
                  ((vector (unsigned-byte 8))
                   ;; I'm not convinced with this header should be send automatically or not
                   ;; and not sure how to handle same way in other method so comment out
