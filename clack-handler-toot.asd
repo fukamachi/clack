@@ -28,5 +28,5 @@
                :toot
                :split-sequence
                :cl-ppcre)
-  :components ((:file "src/core/handler/toot"))
+  :components ((:file "src/handler/toot"))
   :description "Clack handler for Toot.")

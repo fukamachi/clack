@@ -27,5 +27,5 @@
                :hunchentoot
                :split-sequence
                :alexandria)
-  :components ((:file "src/core/handler/hunchentoot"))
+  :components ((:file "src/handler/hunchentoot"))
   :description "Clack handler for Hunchentoot.")

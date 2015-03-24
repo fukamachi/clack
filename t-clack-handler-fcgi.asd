@@ -8,7 +8,7 @@
                ;; :clack-handler-fcgi
                :clack-test)
   :components
-  ((:test-file "t/core/handler/fcgi"))
+  ((:test-file "t/handler/fcgi"))
   :defsystem-depends-on (:prove-asdf)
   :perform (test-op :after (op c)
                     (funcall (intern #.(string :run-test-system) :prove) c)))

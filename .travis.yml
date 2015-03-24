@@ -27,8 +27,7 @@ before_script:
 script:
   - "cl -l prove
         -e '(or (every (function identity)
-                       (list (prove:run :t-clack)
-                             (prove:run :t-clack-handler-hunchentoot)
+                       (list (prove:run :t-clack-handler-hunchentoot)
                              #-ccl (prove:run :t-clack-handler-wookie)
                              #+sbcl (prove:run :t-clack-handler-fcgi)
                              (prove:run :t-clack-handler-toot)
