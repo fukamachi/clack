@@ -18,9 +18,6 @@
                 :listen-socket
                 :listen-backlog
                 :accept-connections)
-  (:import-from :clack.component
-                :<component>
-                :call)
   (:import-from :flexi-streams
                 :octets-to-string)
   (:import-from :alexandria
@@ -43,8 +40,8 @@
                                        (handle-response
                                         req
                                         (if debug
-                                            (call app env)
-                                            (handler-case (call app env)
+                                            (funcall app env)
+                                            (handler-case (funcall app env)
                                               (error (error)
                                                 (princ error *error-output*)
                                                 '(500 () ("Internal Server Error"))))))))

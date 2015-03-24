@@ -9,8 +9,6 @@
 (in-package :cl-user)
 (defpackage clack.handler.wookie
   (:use :cl)
-  (:import-from :clack.component
-                :call)
   (:import-from :wookie
                 :*state*
                 :wookie-state
@@ -73,8 +71,8 @@
         (handle-response
          res
          (if debug
-             (call app env)
-             (handler-case (call app env)
+             (funcall app env)
+             (handler-case (funcall app env)
                (error (error)
                  (princ error *error-output*)
                  '(500 nil ("Internal Server Error"))))))))
