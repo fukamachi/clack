@@ -39,11 +39,7 @@
                   :depends-on ("util")
                   :components
                   ((:file "clack"
-                    :depends-on ("component"
-                                 "middleware"
-                                 "handler"))
-                   (:file "component")
-                   (:file "middleware" :depends-on ("component"))
+                    :depends-on ("handler"))
                    (:file "handler")
                    (:file "http-status")))
                  (:file "util"))))
