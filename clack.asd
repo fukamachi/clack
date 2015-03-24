@@ -29,16 +29,12 @@
                :cl-syntax-annot
                ;; for Other purpose
                :cl-ppcre
-               :cl-fad
                :ironclad
                :http-body
                :quri
                :flexi-streams
                :local-time
                :circular-streams
-               :cl-base64
-               :marshal
-               :trivial-mimes
                :trivial-backtrace
                :bordeaux-threads)
   :components ((:module "src"
@@ -51,8 +47,6 @@
                                  "middleware"
                                  "handler"
                                  "file-watcher"))
-                   (:file "builder"
-                    :depends-on ("component" "middleware" "mw"))
                    (:file "request-response")
                    (:file "request" :depends-on ("request-response"))
                    (:file "response" :depends-on ("request-response"))
@@ -60,30 +54,7 @@
                    (:file "middleware" :depends-on ("component"))
                    (:file "handler" :depends-on ("file-watcher"))
                    (:file "http-status")
-                   (:module "app"
-                    :depends-on ("clack")
-                    :components
-                    ((:file "file")
-                     (:file "directory" :depends-on ("file"))
-                     (:file "urlmap")))
-                   (:file "file-watcher")
-                   (:module "mw"
-                    :pathname "middleware"
-                    :depends-on ("clack" "component" "response" "request" "app")
-                    :components
-                    ((:file "static")
-                     (:file "conditional")
-                     (:module "session"
-                      :serial t
-                      :components
-                      ((:file "state")
-                       (:file "state/cookie")
-                       (:file "store")
-                       (:file "session")
-                       (:file "cookie")))
-                     (:file "accesslog")
-                     (:file "let")
-                     (:file "backtrace")))))
+                   (:file "file-watcher")))
                  (:module "util"
                   :serial t
                   :components
