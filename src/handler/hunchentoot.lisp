@@ -16,8 +16,6 @@
   (:import-from :hunchentoot
                 :acceptor-taskmaster
                 :acceptor-shutdown-p)
-  (:import-from :clack.component
-                :call)
   (:import-from :flexi-streams
                 :make-external-format
                 :string-to-octets)
@@ -50,8 +48,8 @@
                            (*error-output* errout))
                        (handle-response
                         (if debug
-                            (call app env)
-                            (handler-case (call app env)
+                            (funcall app env)
+                            (handler-case (funcall app env)
                               (error (error)
                                 (princ error *error-output*)
                                 '(500 () ("Internal Server Error")))))))))))))

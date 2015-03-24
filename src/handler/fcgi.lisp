@@ -10,8 +10,6 @@
 (defpackage clack.handler.fcgi
   (:use :cl
         :cl-fastcgi)
-  (:import-from :clack.component
-                :call)
   (:import-from :clack.http-status
                 :http-status-reason)
   (:import-from :quri
@@ -66,8 +64,8 @@
   (flet ((main-loop (req)
            (let* ((env (handle-request req))
                   (res (if debug
-                           (call app env)
-                           (handler-case (call app env)
+                           (funcall app env)
+                           (handler-case (funcall app env)
                              (error (error)
                                (princ error *error-output*)
                                '(500 () ("Internal Server Error")))))))
