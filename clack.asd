@@ -46,10 +46,7 @@
                    (:file "middleware" :depends-on ("component"))
                    (:file "handler")
                    (:file "http-status")))
-                 (:module "util"
-                  :serial t
-                  :components
-                  ((:file "util"))))))
+                 (:file "util"))))
   :description "Web application environment for Common Lisp"
   :long-description
   #.(with-open-file (stream (merge-pathnames
