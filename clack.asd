@@ -49,8 +49,7 @@
                  (:module "util"
                   :serial t
                   :components
-                  ((:file "doc")
-                   (:file "util"))))))
+                  ((:file "util"))))))
   :description "Web application environment for Common Lisp"
   :long-description
   #.(with-open-file (stream (merge-pathnames

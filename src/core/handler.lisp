@@ -9,8 +9,8 @@
 (in-package :cl-user)
 (defpackage clack.handler
   (:use :cl)
-  (:import-from :lack.util
-                :find-package-or-load)
+  (:import-from :clack.util
+                :find-handler)
   (:import-from :bordeaux-threads
                 :threadp
                 :make-thread
@@ -23,15 +23,6 @@
 (defstruct handler
   server
   acceptor)
-
-(defun find-handler (server)
-  (flet ((find-with-prefix (prefix)
-           (find-package-or-load (concatenate 'string
-                                              prefix
-                                              (symbol-name server)))))
-    (or (find-with-prefix #.(string '#:clack.handler.))
-        (error "~S is unknown handler."
-               server))))
 
 (defun run (app server &rest args &key use-thread &allow-other-keys)
   (let ((handler-package (find-handler server)))
