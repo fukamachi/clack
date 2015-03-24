@@ -83,7 +83,7 @@ you would call like this: `(run-server-tests :foo)'."
           (:content-type "text/plain; charset=utf-8")
           (,(format nil "Hello, ~A" (getf env :query-string)))))
     (multiple-value-bind (body status headers)
-        (http-request (localhost "?name=fukamachi"))
+        (http-request (localhost "/?name=fukamachi"))
       (is status 200)
       (is (get-header headers :content-type)
           "text/plain; charset=utf-8")
@@ -166,7 +166,7 @@ you would call like this: `(run-server-tests :foo)'."
              :content-length ,(file-size file))
             ,file)))
     (multiple-value-bind (body status headers)
-        (http-request (localhost "redhat.png"))
+        (http-request (localhost "/redhat.png"))
       (is status 200)
       (is (get-header headers :content-type) "image/png")
       (if (eq *clack-test-handler* :wookie)
@@ -184,7 +184,7 @@ you would call like this: `(run-server-tests :foo)'."
              :content-length ,(file-size file))
             ,file)))
     (multiple-value-bind (body status headers)
-        (http-request (localhost "jellyfish.jpg"))
+        (http-request (localhost "/jellyfish.jpg"))
       (is status 200)
       (is (get-header headers :content-type) "image/jpeg")
       (if (eq *clack-test-handler* :wookie)
@@ -199,7 +199,7 @@ you would call like this: `(run-server-tests :foo)'."
           (:content-type "text/plain; charset=utf-8")
           (,(gethash "foo" (getf env :headers)))))
     (multiple-value-bind (body status headers)
-        (http-request (localhost "foo/?ediweitz=weitzedi")
+        (http-request (localhost "/foo/?ediweitz=weitzedi")
                       :additional-headers '(("Foo" . "Bar")))
       (is status 200)
       (is (get-header headers :content-type) "text/plain; charset=utf-8")
@@ -211,7 +211,7 @@ you would call like this: `(run-server-tests :foo)'."
           (:content-type "text/plain; charset=utf-8")
           (,(gethash "cookie" (getf env :headers)))))
     (multiple-value-bind (body status headers)
-        (http-request (localhost "foo/?ediweitz=weitzedi")
+        (http-request (localhost "/foo/?ediweitz=weitzedi")
                       :additional-headers '(("Cookie" . "foo")))
       (is status 200)
       (is (get-header headers :content-type) "text/plain; charset=utf-8")
@@ -229,7 +229,7 @@ you would call like this: `(run-server-tests :foo)'."
                                :server-port)
                     do (format str "~A:~S~%" h (getf env h)))))))
     (multiple-value-bind (body status headers)
-        (http-request (localhost "foo/?ediweitz=weitzedi"))
+        (http-request (localhost "/foo/?ediweitz=weitzedi"))
       (is status 200)
       (is (get-header headers :content-type) "text/plain; charset=utf-8")
       (is body (format nil "~{~A~%~}"
@@ -264,21 +264,21 @@ you would call like this: `(run-server-tests :foo)'."
         `(200
           (:content-type "text/plain; charset=utf-8")
           (,(getf env :path-info))))
-    (is (http-request (localhost "foo/bar%2cbaz")) "/foo/bar,baz"))
+    (is (http-request (localhost "/foo/bar%2cbaz")) "/foo/bar,baz"))
 
   (subtest-app "% double encoding in PATH-INFO"
       (lambda (env)
         `(200
           (:content-type "text/plain; charset=utf-8")
           (,(getf env :path-info))))
-    (is (http-request (localhost "foo/bar%252cbaz")) "/foo/bar%2cbaz"))
+    (is (http-request (localhost "/foo/bar%252cbaz")) "/foo/bar%2cbaz"))
 
   (subtest-app "% encoding in PATH-INFO (outside of URI characters)"
       (lambda (env)
         `(200
           (:content-type "text/plain; charset=utf-8")
           (,(getf env :path-info))))
-    (is (http-request (localhost "foo%E3%81%82") :preserve-uri t)
+    (is (http-request (localhost "/foo%E3%81%82") :preserve-uri t)
         (format nil "/foo~A"
                 (flex:octets-to-string #(#xE3 #x81 #x82) :external-format :utf-8))))
 
@@ -288,7 +288,7 @@ you would call like this: `(run-server-tests :foo)'."
           (:content-type "text/plain; charset=utf-8")
           (,(prin1-to-string (getf env :server-protocol)))))
     (multiple-value-bind (body status headers)
-        (http-request (localhost "foo/?ediweitz=weitzedi"))
+        (http-request (localhost "/foo/?ediweitz=weitzedi"))
       (is status 200)
       (is (get-header headers :content-type) "text/plain; charset=utf-8")
       (like body "^:HTTP/1\\.[01]$")))
@@ -298,7 +298,7 @@ you would call like this: `(run-server-tests :foo)'."
         `(200
           (:content-type "text/plain; charset=utf-8")
           (,(princ-to-string (not (null (getf env :script-name)))))))
-    (is (http-request (localhost "foo/?ediweitz=weitzedi"))
+    (is (http-request (localhost "/foo/?ediweitz=weitzedi"))
         "T"
         :test #'equalp))
 
@@ -371,7 +371,7 @@ you would call like this: `(run-server-tests :foo)'."
           (,(getf env :request-uri))))
     (if (eq *clack-test-handler* :toot)
         (skip 1 "because of ~:(~A~)'s bug" *clack-test-handler*)
-        (is (http-request (localhost "foo/bar%20baz%73?x=a") :preserve-uri t) "/foo/bar%20baz%73?x=a")))
+        (is (http-request (localhost "/foo/bar%20baz%73?x=a") :preserve-uri t) "/foo/bar%20baz%73?x=a")))
 
   (subtest-app "a big header value > 128 bytes"
       (lambda (env)
@@ -469,7 +469,7 @@ you would call like this: `(run-server-tests :foo)'."
           (:content-type "text/plain; charset=utf-8")
           (,(getf env :path-info))))
     (multiple-value-bind (body status headers)
-        (http-request (localhost "foo///bar/baz"))
+        (http-request (localhost "/foo///bar/baz"))
       (is status 200)
       (is (get-header headers :content-type) "text/plain; charset=utf-8")
       (is body "/foo///bar/baz")))

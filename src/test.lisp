@@ -45,6 +45,13 @@
         T))))
 
 (defun localhost (&optional (path "/"))
+  (check-type path string)
+  (setf path
+        (cond
+          ((= 0 (length path)) "/")
+          ((not (char= (aref path 0) #\/))
+           (concatenate 'string "/" path))
+          (t path)))
   (format nil "http://localhost:~D~A"
           *clack-test-port* path))
 
