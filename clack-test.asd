@@ -22,11 +22,12 @@
   :author "Eitaro Fukamachi"
   :license "LLGPL"
   :depends-on (:clack
-               :cl-syntax
-               :cl-syntax-annot
                :prove
+               :bordeaux-threads
+               :usocket
+               :drakma
                :flexi-streams
-               :drakma)
+               :http-body)
   :components ((:file "src/contrib/test")
                (:file "src/contrib/test/suite" :depends-on ("src/contrib/test")))
   :description "Testing Clack Applications.")
