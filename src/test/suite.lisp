@@ -13,6 +13,7 @@
   (:import-from :clack.test
                 :*clack-test-handler*
                 :*clack-test-port*
+                :*enable-debug-p*
                 :localhost
                 :subtest-app)
   (:import-from :flexi-streams
@@ -302,12 +303,13 @@ you would call like this: `(run-server-tests :foo)'."
         "T"
         :test #'equalp))
 
-  (subtest-app "Do not crash when the app dies"
-      (lambda (env)
-        (declare (ignore env))
-        (error "Throwing an exception from app handler. Server shouldn't crash."))
-    (is (nth-value 1 (http-request (localhost)))
-        500))
+  (let ((*enable-debug-p* nil))
+    (subtest-app "Do not crash when the app dies"
+        (lambda (env)
+          (declare (ignore env))
+          (error "Throwing an exception from app handler. Server shouldn't crash."))
+      (is (nth-value 1 (http-request (localhost)))
+          500)))
 
   (subtest-app "multi headers (request)"
       (lambda (env)

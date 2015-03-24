@@ -23,6 +23,7 @@
                 :address-in-use-error)
   (:export :*clack-test-handler*
            :*clack-test-port*
+           :*enable-debug-p*
            :localhost
            :subtest-app))
 (in-package :clack.test)
