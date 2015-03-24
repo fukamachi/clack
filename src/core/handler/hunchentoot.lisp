@@ -174,29 +174,3 @@ before passing to Clack application."
                                (eq k :content-type))
                       do (setf (gethash (string-downcase k) headers) v)
                     finally (return headers)))))
-
-(doc:start)
-
-@doc:NAME "
-Clack.Handler.Hunchentoot - Clack handler for Hunchentoot.
-"
-
-@doc:SYNOPSIS "
-    (defpackage clack-sample
-      (:use :cl
-            :clack.handler.hunchentoot))
-    (in-package :clack-sample)
-
-    ;; Start Server
-    (run (lambda (env)
-           '(200 nil (\"ok\")))
-         :port 5000)
-"
-
-@doc:DESCRIPTION "
-Clack.Handler.Hunchentoot is a Clack handler for the Lisp web server Hunchentoot. This package exports `run' and `stop'.
-"
-
-@doc:AUTHOR "
-Eitaro Fukamachi (e.arrows@gmail.com)
-"
