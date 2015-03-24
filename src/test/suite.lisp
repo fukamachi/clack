@@ -14,7 +14,6 @@
                 :*clack-test-handler*
                 :*clack-test-port*
                 :*enable-debug-p*
-                :localhost
                 :subtest-app)
   (:import-from :flexi-streams
                 :octet
@@ -34,6 +33,9 @@ Use if you want to set another port. The default is `*clack-test-port*`.")
 
 (defvar *clack-pathname*
   (asdf:system-source-directory :clack))
+
+(defun localhost (&optional (path "/"))
+  (clack.test:localhost path *clack-test-access-port*))
 
 (defun run-server-tests (handler-name)
   "Run tests for clack.handler.
