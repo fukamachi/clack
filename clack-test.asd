@@ -28,6 +28,6 @@
                :drakma
                :flexi-streams
                :http-body)
-  :components ((:file "src/contrib/test")
-               (:file "src/contrib/test/suite" :depends-on ("src/contrib/test")))
+  :components ((:file "src/test")
+               (:file "src/test/suite" :depends-on ("src/test")))
   :description "Testing Clack Applications.")
