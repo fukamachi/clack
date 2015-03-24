@@ -37,13 +37,13 @@
                (return (apply #'values results))))))
 
 (defun clackup (app &rest args
-               &key (server :hunchentoot)
-                 (port 5000)
-                 (debug t)
-                 silent
-                 (use-thread #+thread-support t #-thread-support nil)
-                 (use-default-middlewares t)
-               &allow-other-keys)
+                &key (server :hunchentoot)
+                  (port 5000)
+                  (debug t)
+                  silent
+                  (use-thread #+thread-support t #-thread-support nil)
+                  (use-default-middlewares t)
+                &allow-other-keys)
   (flet ((print-start-message ()
            (unless silent
              (format t "~&~:(~A~) server is started.~%Listening on localhost:~A.~%" server port)))
@@ -56,10 +56,8 @@
                  (builder :backtrace app)
                  app))))
     (unless use-thread
-      (start-message))
       (print-start-message))
     (prog1
-        (apply #'clack.handler:run app server
         (apply #'clack.handler:run (buildapp app) server
                :port port
                :debug debug
