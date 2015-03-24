@@ -31,5 +31,5 @@
                :split-sequence
                :usocket
                :quri)
-  :components ((:file "src/core/handler/fcgi"))
+  :components ((:file "src/handler/fcgi"))
   :description "Clack handler for FastCGI.")

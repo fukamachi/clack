@@ -33,5 +33,5 @@
                :fast-io
                :split-sequence
                :alexandria)
-  :components ((:file "src/core/handler/wookie"))
+  :components ((:file "src/handler/wookie"))
   :description "Clack handler for Wookie.")

@@ -35,13 +35,9 @@
                :bordeaux-threads)
   :components ((:module "src"
                 :components
-                ((:module "core"
-                  :depends-on ("util")
-                  :components
-                  ((:file "clack"
-                    :depends-on ("handler"))
-                   (:file "handler")
-                   (:file "http-status")))
+                ((:file "clack" :depends-on ("handler"))
+                 (:file "handler" :depends-on ("util"))
+                 (:file "http-status")
                  (:file "util"))))
   :description "Web application environment for Common Lisp"
   :long-description
@@ -56,8 +52,7 @@
                                :fill-pointer t)))
           (setf (fill-pointer seq) (read-sequence seq stream))
           seq)))
-  :in-order-to ((test-op (test-op t-clack)
-                         (test-op t-clack-handler-hunchentoot)
+  :in-order-to ((test-op (test-op t-clack-handler-hunchentoot)
                          (test-op t-clack-handler-wookie)
                          (test-op t-clack-handler-fcgi)
                          (test-op t-clack-handler-toot)

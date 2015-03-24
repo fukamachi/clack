@@ -7,7 +7,7 @@
   :depends-on (:clack-handler-toot
                :clack-test)
   :components
-  ((:test-file "t/core/handler/toot"))
+  ((:test-file "t/handler/toot"))
   :defsystem-depends-on (:prove-asdf)
   :perform (test-op :after (op c)
                     (funcall (intern #.(string :run-test-system) :prove) c)))
