@@ -12,7 +12,8 @@
   (:import-from :clack.request-response
                 :headers)
   (:import-from :trivial-types
-                :association-list)
+                :association-list
+                :property-list)
   (:import-from :http-body
                 :parse)
   (:import-from :quri
