@@ -45,7 +45,7 @@
         (usocket:socket-close socket)
         T))))
 
-(defun localhost (&optional (path "/"))
+(defun localhost (&optional (path "/") (port *clack-test-port*))
   (check-type path string)
   (setf path
         (cond
@@ -54,7 +54,7 @@
            (concatenate 'string "/" path))
           (t path)))
   (format nil "http://localhost:~D~A"
-          *clack-test-port* path))
+          port path))
 
 (defun %subtest-app (desc app client)
   (loop repeat 5
