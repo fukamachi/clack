@@ -12,15 +12,7 @@
   (:import-from :cl-ppcre
                 :regex-replace-all)
   (:import-from :alexandria
-                :make-keyword)
-  (:import-from :ironclad
-                :ascii-string-to-byte-array
-                :byte-array-to-hex-string
-                :digest-sequence
-                :make-digest
-                :make-hmac
-                :update-hmac
-                :hmac-digest))
+                :make-keyword))
 (in-package :clack.util)
 
 (cl-syntax:use-syntax :annot)
@@ -67,23 +59,6 @@ Example:
   p2)
 
 @export
-(defun find-handler (server &key (force t))
-  "Returns a handler package. SERVER must be a symbol or a keyword without \"Clack.Handler.\" prefix.
-
-Example:
-  (find-handler :hunchentoot)"
-  (let* ((handler-name (concatenate 'string
-                                    "CLACK.HANDLER."
-                                    (symbol-name server)))
-         (pkg (find-package handler-name)))
-    (when (and (not pkg) force)
-      (load-handler server)
-      (setf pkg (find-handler server :force nil)))
-    (or pkg
-        (error "Handler package is not found. Forgot to load it?: ~A"
-               server))))
-
-@export
 (defun load-handler (server)
   "Loads a handler system in run-time. SERVER must be a symbol or a keyword.
 
@@ -93,22 +68,6 @@ Example:
          (make-keyword (format nil "clack-handler-~(~A~)" server))))
     #+quicklisp (ql:quickload system :verbose nil)
     #-quicklisp (asdf:load-system system :verbose nil)))
-
-@export
-(defun hmac-sha1-hex-string (string secret)
-  (let ((hmac (make-hmac (ascii-string-to-byte-array secret) :sha1)))
-    (update-hmac hmac (ascii-string-to-byte-array string))
-    (byte-array-to-hex-string (hmac-digest hmac))))
-
-@export
-(defun generate-random-id ()
-  "Generates a random token."
-  (byte-array-to-hex-string
-   (digest-sequence
-    (make-digest :SHA1)
-    (ascii-string-to-byte-array
-     (format nil "~A~A"
-      (random 1.0) (get-universal-time))))))
 
 @export
 (defun html-encode (str)
