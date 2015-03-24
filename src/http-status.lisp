@@ -8,12 +8,11 @@
 
 (in-package :cl-user)
 (defpackage clack.http-status
-  (:use :cl))
+  (:use :cl)
+  (:export :*http-status*
+           :http-status-reason))
 (in-package :clack.http-status)
 
-(cl-syntax:use-syntax :annot)
-
-@export
 (defvar *http-status* (make-hash-table :test #'eql))
 
 (macrolet ((def-http-status (code phrase)
@@ -61,6 +60,5 @@
   (def-http-status 504 "Gateway Time-out")
   (def-http-status 505 "Version not supported"))
 
-@export
 (defun http-status-reason (code)
   (gethash code *http-status*))

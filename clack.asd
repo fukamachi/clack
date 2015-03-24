@@ -23,15 +23,7 @@
   :license "LLGPL"
   :depends-on (:lack
                :lack-util
-
-               ;; Utility
                :alexandria
-               :split-sequence
-               :cl-syntax
-               :cl-syntax-annot
-
-               ;; for Other purpose
-               :cl-ppcre
                :bordeaux-threads)
   :components ((:module "src"
                 :components
