@@ -305,7 +305,8 @@ you would call like this: `(run-server-tests :foo)'."
         "T"
         :test #'equalp))
 
-  (let ((*enable-debug-p* nil))
+  (let ((*enable-debug-p* nil)
+        (*error-output* (make-broadcast-stream)))
     (subtest-app "Do not crash when the app dies"
         (lambda (env)
           (declare (ignore env))
