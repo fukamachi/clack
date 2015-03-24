@@ -9,46 +9,54 @@
 (in-package :cl-user)
 (defpackage clack.handler
   (:use :cl)
-  (:import-from :clack.file-watcher
-                :stop-watching)
-  (:import-from :clack.util
-                :find-handler)
+  (:import-from :lack.util
+                :find-package-or-load)
   (:import-from :bordeaux-threads
                 :threadp
-                :destroy-thread))
+                :make-thread
+                :thread-alive-p
+                :destroy-thread)
+  (:export :run
+           :stop))
 (in-package :clack.handler)
 
-(cl-syntax:use-syntax :annot)
+(defstruct handler
+  server
+  acceptor)
 
-@export
-(defclass <handler> ()
-     ((server-name :type keyword
-                   :initarg :server-name
-                   :accessor server-name)
-      (acceptor :initarg :acceptor
-                :accessor acceptor)))
+(defun find-handler (server)
+  (flet ((find-with-prefix (prefix)
+           (find-package-or-load (concatenate 'string
+                                              prefix
+                                              (symbol-name server)))))
+    (or (find-with-prefix #.(string '#:clack.handler.))
+        (error "~S is unknown handler."
+               server))))
 
-@export
-(defgeneric stop (handler)
-  (:documentation
-   "Stop the Clack server. Currently only works with Hunchentoot.")
-  (:method ((this <handler>))
-    (let ((handler-package (find-handler (server-name this))))
-      (stop-watching this)
-      (let ((acceptor (acceptor this)))
-        (if (bt:threadp acceptor)
-            (progn
-              (bt:destroy-thread acceptor)
-              (sleep 0.5))
-            (funcall (intern (string '#:stop) handler-package) acceptor))
-        T))))
+(defun run (app server &rest args &key use-thread &allow-other-keys)
+  (let ((handler-package (find-handler server)))
+    (flet ((run-server ()
+             (apply (intern #.(string '#:run) handler-package)
+                    app
+                    :allow-other-keys t
+                    args)))
+      (make-handler
+       :server server
+       :acceptor (if use-thread
+                     (bt:make-thread #'run-server
+                                     :name (format nil "clack-handler-~(~A~)" server)
+                                     :initial-bindings
+                                     `((*standard-output* . ,*standard-output*)
+                                       (*error-output* . ,*error-output*)))
+                     (run-server))))))
 
-(doc:start)
-
-@doc:NAME "
-Clack.Handler - Class for Handler
-"
-
-@doc:AUTHOR "
-* Eitaro Fukamachi (e.arrows@gmail.com)
-"
+(defun stop (handler)
+  (let ((acceptor (handler-acceptor handler)))
+    (if (bt:threadp acceptor)
+        (progn
+          (when (bt:thread-alive-p acceptor)
+            (bt:destroy-thread acceptor))
+          (sleep 0.5))
+        (let ((package (find-handler (handler-server handler))))
+          (funcall (intern #.(string '#:stop) package) acceptor)))
+    t))

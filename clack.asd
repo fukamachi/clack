@@ -21,15 +21,17 @@
   :version "2.0.0"
   :author "Eitaro Fukamachi"
   :license "LLGPL"
-  :depends-on (;; Utility
+  :depends-on (:lack
+               :lack-util
+
+               ;; Utility
                :alexandria
                :split-sequence
                :cl-syntax
                :cl-syntax-annot
+
                ;; for Other purpose
                :cl-ppcre
-               :ironclad
-               :trivial-backtrace
                :bordeaux-threads)
   :components ((:module "src"
                 :components
@@ -39,13 +41,11 @@
                   ((:file "clack"
                     :depends-on ("component"
                                  "middleware"
-                                 "handler"
-                                 "file-watcher"))
+                                 "handler"))
                    (:file "component")
                    (:file "middleware" :depends-on ("component"))
-                   (:file "handler" :depends-on ("file-watcher"))
-                   (:file "http-status")
-                   (:file "file-watcher")))
+                   (:file "handler")
+                   (:file "http-status")))
                  (:module "util"
                   :serial t
                   :components
