@@ -22,7 +22,6 @@
   :author "Eitaro Fukamachi"
   :license "LLGPL"
   :depends-on (;; Utility
-               :trivial-types
                :alexandria
                :split-sequence
                :cl-syntax
@@ -30,11 +29,6 @@
                ;; for Other purpose
                :cl-ppcre
                :ironclad
-               :http-body
-               :quri
-               :flexi-streams
-               :local-time
-               :circular-streams
                :trivial-backtrace
                :bordeaux-threads)
   :components ((:module "src"
@@ -47,9 +41,6 @@
                                  "middleware"
                                  "handler"
                                  "file-watcher"))
-                   (:file "request-response")
-                   (:file "request" :depends-on ("request-response"))
-                   (:file "response" :depends-on ("request-response"))
                    (:file "component")
                    (:file "middleware" :depends-on ("component"))
                    (:file "handler" :depends-on ("file-watcher"))
