@@ -23,6 +23,7 @@ before_script:
   - sudo nginx -c t/nginx.conf -p "$PWD/"
   - git clone https://github.com/fukamachi/fast-http ~/lisp/fast-http
   - git clone https://github.com/fukamachi/http-body ~/lisp/http-body
+  - git clone https://github.com/fukamachi/lack ~/lisp/lack
 
 script:
   - "cl -l prove
