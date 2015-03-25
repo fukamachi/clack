@@ -1,6 +1,7 @@
 # Clack - Web Application Environment for Common Lisp
 
 [![Build Status](https://travis-ci.org/fukamachi/clack.svg?branch=master)](https://travis-ci.org/fukamachi/clack)
+[![Coverage Status](https://coveralls.io/repos/fukamachi/clack/badge.svg?branch=master)](https://coveralls.io/r/fukamachi/clack)
 
 Clack is a web application environment for Common Lisp inspired by Python's WSGI and Ruby's Rack. Your awesome framework should base on this.
 
