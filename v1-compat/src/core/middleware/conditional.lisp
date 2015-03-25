@@ -1,17 +1,8 @@
-#|
-  This file is a part of Clack package.
-  URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
-
-  Clack is freely distributable under the LLGPL License.
-|#
-
 (in-package :cl-user)
 (defpackage clack.middleware.conditional
   (:use :cl
-        :clack)
-  (:import-from :clack.component
-                :component-designator))
+        :clack.component
+        :clack.middleware))
 (in-package :clack.middleware.conditional)
 
 (cl-syntax:use-syntax :annot)
@@ -43,39 +34,3 @@
      (if (call condition env)
          (call middleware env)
          (call-next this env))))
-
-(doc:start)
-
-@doc:NAME "
-Clack.Middleware.Conditional - Conditional wrapper for Clack middleware.
-"
-
-@doc:SYNOPSIS "
-    (builder
-     (:condition (lambda (env)
-                   (scan \"WebKit\" (getf env :http-user-agent)))
-      :builder '<clack-middleware-something>)
-     app)
-
-    (builder
-      (<clack-middleware-conditional>
-       :condition (lambda (env)
-                    (scan \"WebKit\" (getf env :http-user-agent)))
-       :builder '(<clack-middleware-static>
-                  :path \"/public/\"
-                  :root #p\"/static-files/\"))
-      app)
-
-    (wrap
-     (make-instance '<clack-middleware-conditional>
-        :condition (lambda (env)
-                     (scan \"WebKit\" (getf env :http-user-agent)))
-        :builder '(<clack-middleware-something>
-                   :path \"/public/\"
-                   :root #p\"/static-files/\"))
-     app)
-"
-
-@doc:AUTHOR "
-* Eitaro Fukamachi (e.arrows@gmail.com)
-"

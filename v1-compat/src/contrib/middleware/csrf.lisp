@@ -1,11 +1,3 @@
-#|
-  This file is a part of Clack package.
-  URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
-
-  Clack is freely distributable under the LLGPL License.
-|#
-
 (in-package :cl-user)
 (defpackage clack.middleware.csrf
   (:use :cl
@@ -85,43 +77,3 @@ Note this has a side-effect, natually. This function stores the generated id int
    "<input type=\"hidden\" name=\"_csrf_token\" value=\""
    (csrf-token session)
    "\" />"))
-
-(doc:start)
-
-@doc:NAME "
-Clack.Middleware.Csrf - Middleware for easy CSRF protection.
-"
-
-@doc:SYNOPSIS "
-    ;; building application.
-    (builder <clack-middleware-csrf> app)
-    
-    ;; in CL-EMB template.
-    <form name=\"test-form\" method=\"post\" action=\"/\">
-    <input type=\"text\" name=\"name\" />
-    <%= (csrf-html-tag session) %>
-    <input type=\"submit\" value=\"Send\" />
-    </form>
-"
-
-@doc:DESCRIPTION "
-## Block behavior
-
-    (builder
-     <clack-middleware-session>
-     (<clack-middleware-csrf>
-      :block-app #'(lambda (env)
-                     @ignore env
-                     '(302
-                       (:location \"http://en.wikipedia.org/wiki/CSRF\")
-                       nil)))
-     app)
-"
-
-@doc:AUTHOR "
-* Eitaro Fukamachi (e.arrows@gmail.com)
-"
-
-@doc:SEE "
-* Clack.Middleware.Session
-"

@@ -1,11 +1,3 @@
-#|
-  This file is a part of Clack package.
-  URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
-
-  Clack is freely distributable under the LLGPL License.
-|#
-
 (in-package :cl-user)
 (defpackage clack.session.state.cookie
   (:use :cl
@@ -13,8 +5,6 @@
   (:import-from :clack.request
                 :make-request
                 :cookies)
-  (:import-from :clack.util
-                :merge-plist)
   (:import-from :alexandria
                 :remove-from-plist)
   (:import-from :clack.response
@@ -33,6 +23,22 @@
 (in-package :clack.session.state.cookie)
 
 (cl-syntax:use-syntax :annot)
+
+(defun merge-plist (p1 p2)
+  "Merges two plists into one plist.
+If there are same keys in the two plists, the one in P2 is adopted.
+
+Example:
+  (merge-plist '(:apple 1 :grape 2) '(:banana 3 :apple 4))
+  ;;=> (:GRAPE 2 :BANANA 3 :APPLE 4)
+"
+  (loop with notfound = '#:notfound
+        for (indicator value) on p1 by #'cddr
+        when (eq (getf p2 indicator notfound) notfound)
+          do (progn
+               (push value p2)
+               (push indicator p2)))
+  p2)
 
 @export
 (defclass <clack-session-state-cookie> (<clack-session-state>)
@@ -91,22 +97,3 @@
       (setf (set-cookies r (symbol-name (session-key this)))
             (append `(:value ,id) options))
       (clack.response:finalize r))))
-
-(doc:start)
-
-@doc:NAME "
-Clack.Session.State.Cookie - Basic cookie-based session state.
-"
-
-@doc:DESCRIPTION "
-Clack.Session.State.Cookie will maintain session state using browser cookies.
-"
-
-@doc:AUTHOR "
-Eitaro Fukamachi (e.arrows@gmail.com)
-"
-
-@doc:SEE "
-* Clack.Session.State
-* Clack.Middleware.Session
-"
