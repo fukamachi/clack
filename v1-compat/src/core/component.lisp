@@ -18,3 +18,8 @@
 (defgeneric make-app (comp)
   (:method ((comp <component>))
     (to-app comp)))
+
+(import '(<component>
+          call
+          make-app)
+        (find-package :clack))
