@@ -75,11 +75,8 @@
                                      :certificate ssl-cert-file
                                      :password ssl-key-password)
                       (make-instance 'wookie:listener
-                                     :port port)))
-                server)
-            (unwind-protect
-                 (setq server) (start-server listener)
-              (as:close-tcp-server server))))
+                                     :port port))))
+            (start-server listener)))
       (as:socket-closed () nil))))
 
 (defun handle-request (req &key ssl)
