@@ -1,11 +1,3 @@
-#|
-  This file is a part of Clack package.
-  URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
-
-  Clack is freely distributable under the LLGPL License.
-|#
-
 (in-package :cl-user)
 (defpackage clack.middleware.auth.basic
   (:use :cl
@@ -69,33 +61,3 @@
         (cons (scan-to-strings "[^:]+" it)
               (coerce (nth-value 1 (scan-to-strings ":(.+)" it))
                       'list))))
-
-(doc:start)
-
-@doc:NAME "
-Clack.Middleware.Auth.Basic - Basic Authentication Middleware.
-"
-
-@doc:SYNOPSIS "
-    (clackup
-     (builder
-      (<clack-middleware-auth-basic>
-       :authenticator #'(lambda (user pass)
-                          (and (string= user \"hoge\")
-                               (string= pass \"fuga\"))))
-      app))
-"
-
-@doc:DESCRIPTION "
-Clack.Middleware.Auth.Basic allows to basic authenticate simply. All you have to do is pass a function to authenticate to `<clack-middleware-auth-basic>`, `:authenticator`.
-
-    (make-instance '<clack-middleware-auth-basic>
-       :authenticator
-       #'(lambda (user pass)
-           ;; Authenticate here and return t or nil.
-           ))
-"
-
-@doc:AUTHOR "
-* Eitaro Fukamachi (e.arrows@gmail.com)
-"

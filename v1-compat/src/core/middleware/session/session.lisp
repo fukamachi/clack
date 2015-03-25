@@ -1,15 +1,8 @@
-#|
-  This file is a part of Clack package.
-  URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
-
-  Clack is freely distributable under the LLGPL License.
-|#
-
 (in-package :cl-user)
 (defpackage clack.middleware.session
   (:use :cl
-        :clack
+        :clack.component
+        :clack.middleware
         :clack.session.state
         :clack.session.state.cookie
         :clack.session.store)
@@ -89,39 +82,3 @@
      (state this)
      id res
      (hash-table-plist (getf env :clack.session.options)))))
-
-(doc:start)
-
-@doc:NAME "
-Clack.Middleware.Session - Middleware for session management.
-"
-
-@doc:SYNOPSIS "
-    (clackup (builder
-              (<clack-middleware-session>
-               :state (make-instance '<clack-session-state-cookie>))
-              (lambda (env)
-                (sunless (gethash :counter (getf env :clack.session))
-                  (setf it 0))
-                `(200
-                  (:content-type \"text/plain\")
-                  (,(format nil \"Hello, you've been here for ~Ath times!\"
-                            (incf (gethash :counter (getf env :clack.session)))))))))
-"
-
-@doc:DESCRIPTION "
-Clack.Middleware.Session provides a session interface. By default this will use cookies to keep session state and store data in memory.
-
-You can change this behavior by inheriting `<clack-session-state>' and `<clack-session-store>'.
-
-Note the `:clack.session' is a hash table, not a plist, because plists cannot keep state between functions.
-"
-
-@doc:AUTHOR "
-Eitaro Fukamachi (e.arrows@gmail.com)
-"
-
-@doc:SEE "
-* Clack.Session.State
-* Clack.Session.Store
-"

@@ -1,11 +1,3 @@
-#|
-  This file is a part of Clack package.
-  URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
-
-  Clack is freely distributable under the LLGPL License.
-|#
-
 (in-package :cl-user)
 (defpackage clack.middleware.oauth
   (:use :cl
@@ -110,58 +102,3 @@
       (unless (remhash oauth-token (oauth-state this))
         (error "BUG"))
       (funcall (oauth-authorized this) req acc-token))))
-
-(doc:start)
-
-@doc:NAME "
-Clack.Middleware.OAuth - Supports authorization mechanism by OAuth.
-"
-
-@doc:SYNOPSIS "
-    (run
-      (builder
-       (<clack-middleware-oauth>
-         :consumer-key \"XXXXXXXXXXXXXXXXXXXXX\"
-         :consumer-secret \"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"
-         :authorize-uri \"http://localhost/authorize\"
-         :request-token-uri \"http://localhost/request\"
-         :access-token-uri \"http://localhost/access\"
-         :path \"/auth\"
-         :callback-base \"http://localhost/\"
-         :authorized #'callback)
-       app))
-"
-
-@doc:DESCRIPTION "
-This is a Clack Middleware for OAuth.
-Please read rfc5849 for more information.
-
-## Slots
-
-* consumer-key, consumer-secret (Required, String)
-
-OAuth parameter.
-
-* authorize-uri, request-token-uri, access-token-uri (Required, String)
-
-URIs to process OAuth.
-
-* path
-
-A path to be handled by <clack.middleware.oauth>.
-
-* callback-base
-
-A host address will be passed to OAuth Provider.
-(format nil \"~a~a\" `callback-base' `path') should be valid URI.
-
-* authorized (Required, function)
-
-A callback function when authorization is suceeded.
-It will be called with two parameters: clack request and cl-oauth:access-token.
-
-"
-
-@doc:AUTHOR "
-* Norihisa Fujita (n.fujita@ariel-networks.com)
-"

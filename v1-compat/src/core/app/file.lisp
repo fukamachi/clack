@@ -1,15 +1,7 @@
-#|
-  This file is a part of Clack package.
-  URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
-
-  Clack is freely distributable under the LLGPL License.
-|#
-
 (in-package :cl-user)
 (defpackage clack.app.file
   (:use :cl
-        :clack)
+        :clack.component)
   (:import-from :trivial-mimes
                 :mime-lookup)
   (:import-from :cl-ppcre
@@ -111,30 +103,3 @@
            ,(format-rfc1123-timestring nil
                                        (universal-to-timestamp univ-time)))
           ,file)))))
-
-(doc:start)
-
-@doc:NAME "
-Clack.App.File - Serve static files.
-"
-
-@doc:SYNOPSIS "
-    ;; THIS IS JUST FOR EXAMPLE
-    (clackup (<clack-app-file>
-              :root #p\"./static-files/\"))
-    
-    ;; Then access 'http://localhost/jellyfish.jpg' through into local './static-files/jellyfish.jpg'.
-    ;; If the file isn't found, 404 will be returned.
-"
-
-@doc:DESCRIPTION "
-Clack.App.File serves static files in local directory. This Application should be used in other Middleware or Application (ex. Clack.Middleware.Static).
-"
-
-@doc:AUTHOR "
-Eitaro Fukamachi (e.arrows@gmail.com)
-"
-
-@doc:SEE "
-* Clack.Middleware.Static
-"

@@ -1,17 +1,7 @@
-#|
-  This file is a part of Clack package.
-  URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
-
-  Clack is freely distributable under the LLGPL License.
-|#
-
 (in-package :cl-user)
 (defpackage clack.app.directory
   (:use :cl
-        :clack)
-  (:import-from :clack.util
-                :html-encode)
+        :clack.component)
   (:import-from :clack.app.file
                 :<clack-app-file>
                 :should-handle
@@ -57,6 +47,20 @@
                          (mapcar #'dir-file (list-directory file))))))
       (call-next-method)))
 
+(defun html-encode (str)
+  (ppcre:regex-replace-all
+   "([&><\"'])"
+   str
+   #'(lambda (match &rest regs)
+       (declare (ignore regs))
+       (cond
+         ((string= "&" match) "&amp;")
+         ((string= ">" match) "&gt;")
+         ((string= "<" match) "&lt;")
+         ((string= "\"" match) "&quot;")
+         ((string= "'" match) "&#39;")))
+   :simple-calls t))
+
 (defun dir-file (file &key uri name)
   "Stolen from rack/directory.rb."
   (let* ((dir-p (directory-pathname-p file))
@@ -67,7 +71,7 @@
     (format nil "<tr><td class='name'><a href='~A~A'>~A~A</a></td><td class='size'>~:[--~;~:*~:D bytes~]</td><td class='type'>~A</td><td class='mtime'>~A</td></tr>"
             (quri:url-encode uri)
             (if dir-p "/" "")
-            (clack.util:html-encode (or name uri))
+            (html-encode (or name uri))
             (if dir-p "/" "")
             (unless dir-p
               (with-open-file (in file)
@@ -105,32 +109,5 @@ tr, td { white-space: nowrap; }
 </table>
 <hr />
 </body></html>"
-          (clack.util:html-encode path-info)
+          (html-encode path-info)
           body))
-
-(doc:start)
-
-@doc:NAME "
-Clack.App.Directory - Server static files from document root with directory index.
-"
-
-@doc:SYNOPSIS "
-    ;; mount /var/www/ to http://localhost:5000/
-    (clackup
-     (make-instance '<clack-app-directory>
-        :root #p\"/var/www/\")
-     :port 5000)
-    
-    ;; same as above
-    (clack.app.directory:start-server
-       :root #p\"/var/www/\"
-       :port 5000)
-"
-
-@doc:AUTHOR "
-* Eitaro Fukamachi (e.arrows@gmail.com)
-"
-
-@doc:SEE "
-* Clack.App.File
-"

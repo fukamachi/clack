@@ -1,11 +1,3 @@
-#|
-  This file is a part of Clack package.
-  URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
-
-  Clack is freely distributable under the LLGPL License.
-|#
-
 (in-package :cl-user)
 (defpackage clack.middleware.session.cookie
   (:use :cl
@@ -17,8 +9,6 @@
                 :extract
                 :save-state
                 :commit)
-  (:import-from :clack.util
-                :hmac-sha1-hex-string)
   (:import-from :marshal
                 :marshal
                 :unmarshal)
@@ -26,10 +16,20 @@
                 :base64-string-to-string
                 :string-to-base64-string)
   (:import-from :alexandria
-                :hash-table-plist))
+                :hash-table-plist)
+  (:import-from :ironclad
+                :ascii-string-to-byte-array
+                :update-hmac
+                :byte-array-to-hex-string
+                :hmac-digest))
 (in-package :clack.middleware.session.cookie)
 
 (cl-syntax:use-syntax :annot)
+
+(defun hmac-sha1-hex-string (string secret)
+  (let ((hmac (make-hmac (ascii-string-to-byte-array secret) :sha1)))
+    (update-hmac hmac (ascii-string-to-byte-array string))
+    (byte-array-to-hex-string (hmac-digest hmac))))
 
 @export
 (defclass <clack-middleware-session-cookie> (<clack-middleware-session>)
@@ -78,25 +78,3 @@
             id
             base64
             (signature this base64))))
-
-(doc:start)
-
-@doc:NAME "
-Clack.Middleware.Session.Cookie - Session middleware that saves session data in the cookie.
-"
-
-@doc:SYNOPSIS "
-    (clackup (builder
-              (<clack-middleware-session-cookie>
-               :secret \"secret key here\")
-              app)
-"
-
-@doc:AUTHOR "
-Eitaro Fukamachi (e.arrows@gmail.com)
-"
-
-@doc:SEE "
-* Clack.Middleware.Session
-* Clack.Session.State
-"

@@ -1,15 +1,8 @@
-#|
-  This file is a part of Clack package.
-  URL: http://github.com/fukamachi/clack
-  Copyright (c) 2014 Eitaro Fukamachi <e.arrows@gmail.com>
-
-  Clack is freely distributable under the LLGPL License.
-|#
-
 (in-package :cl-user)
 (defpackage clack.middleware.accesslog
   (:use :cl
-        :clack)
+        :clack.component
+        :clack.middleware)
   (:import-from :local-time
                 :now
                 :format-timestring))
@@ -58,24 +51,3 @@
   (let ((res (call-next mw env)))
     (funcall (slot-value mw 'logger) (funcall (slot-value mw 'formatter) env res (local-time:now)))
     res))
-
-(doc:start)
-
-@doc:NAME "
-Clack.Middleware.Accesslog
-"
-
-@doc:SYNOPSIS "
-    (clackup (builder
-              <clack-middleware-accesslog>
-              (lambda (env)
-                '(200 () (\"Hi.\")))))
-"
-
-@doc:DESCRIPTION "
-Clack.Middleware.Accesslog provides access logging facility.
-"
-
-@doc:AUTHOR  "
-Eitaro Fukamachi (e.arrows@gmail.com)
-"

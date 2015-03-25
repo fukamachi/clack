@@ -1,11 +1,3 @@
-#|
-  This file is a part of Clack package.
-  URL: http://github.com/fukamachi/clack
-  Copyright (c) 2013 Eitaro Fukamachi <e.arrows@gmail.com>
-
-  Clack is freely distributable under the LLGPL License.
-|#
-
 (in-package :cl-user)
 (defpackage clack.middleware.backtrace
   (:use :cl
@@ -64,27 +56,3 @@
                    "~&    ~A: ~S~%"
                    k v))
   (values))
-
-(doc:start)
-
-@doc:NAME "
-Clack.Middleware.Backtrace
-"
-
-@doc:SYNOPSIS "
-    (clackup (builder
-              (<clack-middleware-backtrace>
-               :output #P\"/var/log/app/myapp_error.log\"
-               :result-on-error '(500 () (\"Internal Server Error\")))
-              (lambda (env)
-                (error \"Fatal error! Help!!\")
-                '(200 () (\"ok? (probably not)\")))))
-"
-
-@doc:DESCRIPTION "
-Clack.Middleware.Backtrace catches all errors and outputs their backtraces to `*error-output*`. You can specify what to return in `:result-on-error` slot. The default behaviour is rethrowing the signal.
-"
-
-@doc:AUTHOR "
-Eitaro Fukamachi (e.arrows@gmail.com)
-"

@@ -1,15 +1,7 @@
-#|
-  This file is a part of Clack package.
-  URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
-
-  Clack is freely distributable under the LLGPL License.
-|#
-
 (in-package :cl-user)
 (defpackage clack.app.urlmap
   (:use :cl
-        :clack)
+        :clack.component)
   (:import-from :cl-ppcre
                 :scan
                 :scan-to-strings
@@ -68,29 +60,3 @@
           (lambda (app) `(mount ,urlmap ,@app))
           apps)
        ,urlmap)))
-
-(doc:start)
-
-@doc:NAME "
-Clack.App.URLMap - Map multiple apps in different paths.
-"
-
-@doc:SYNOPSIS "
-    (defparameter *urlmap* (make-instance '<clack-app-urlmap>))
-    (mount *urlmap* \"/pc/\" #'app-for-pc)
-    (mount *urlmap* \"/api/\" #'app-for-api)
-    (call *urlmap* env)
-    
-    ;; Useful synonym.
-    (builder-urlmap
-      (\"/pc/\" #'app-for-pc)
-      (\"/api/\" #'app-for-api))
-"
-
-@doc:AUTHOR "
-* Eitaro Fukamachi (e.arrows@gmail.com)
-"
-
-@doc:SEE "
-* Clack.Builder
-"
