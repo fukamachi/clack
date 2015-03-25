@@ -29,7 +29,6 @@
                 :components
                 ((:file "clack" :depends-on ("handler"))
                  (:file "handler" :depends-on ("util"))
-                 (:file "http-status")
                  (:file "util"))))
   :description "Web application environment for Common Lisp"
   :long-description

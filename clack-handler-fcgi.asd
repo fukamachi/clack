@@ -21,14 +21,9 @@
   :version "0.3.1"
   :author "Eitaro Fukamachi"
   :license "LLGPL"
-  :depends-on (:clack
-               :cl-syntax
-               :cl-syntax-annot
-               :cl-fastcgi
+  :depends-on (:cl-fastcgi
                :alexandria
                :flexi-streams
-               :cl-ppcre
-               :split-sequence
                :usocket
                :quri)
   :components ((:file "src/handler/fcgi"))
