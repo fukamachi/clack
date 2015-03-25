@@ -22,10 +22,11 @@
   :version "0.2.0"
   :author "Eitaro Fukamachi"
   :license "LLGPL"
-  :depends-on (:cl-syntax
-               :cl-syntax-annot
-               :toot
+  :depends-on (:toot
+               :flexi-streams
+               :bordeaux-threads
+               :cl-ppcre
                :split-sequence
-               :cl-ppcre)
+               :alexandria)
   :components ((:file "src/handler/toot"))
   :description "Clack handler for Toot.")
