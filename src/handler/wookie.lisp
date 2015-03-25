@@ -1,11 +1,3 @@
-#|
-  This file is a part of Clack package.
-  URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
-
-  Clack is freely distributable under the LLGPL License.
-|#
-
 (in-package :cl-user)
 (defpackage clack.handler.wookie
   (:use :cl)
@@ -51,17 +43,14 @@
   (:import-from :split-sequence
                 :split-sequence)
   (:import-from :alexandria
-                :hash-table-plist
-                :copy-stream))
+                :copy-stream)
+  (:export :run))
 (in-package :clack.handler.wookie)
-
-(cl-syntax:use-syntax :annot)
 
 ;; XXX: :store-body keeps the whole POST data in-memory.
 (defun parsed-headers-hook (request)
   (setf (wookie:request-store-body request) t))
 
-@export
 (defun run (app &key debug (port 5000)
                   ssl ssl-key-file ssl-cert-file ssl-key-password)
   (let ((*state* (make-instance 'wookie:wookie-state)))
@@ -86,13 +75,12 @@
                                      :certificate ssl-cert-file
                                      :password ssl-key-password)
                       (make-instance 'wookie:listener
-                                     :port port))))
-            (start-server listener)))
+                                     :port port)))
+                server)
+            (unwind-protect
+                 (setq server) (start-server listener)
+              (as:close-tcp-server server))))
       (as:socket-closed () nil))))
-
-@export
-(defun stop (server)
-  (as:close-tcp-server server))
 
 (defun handle-request (req &key ssl)
   (let ((quri (request-uri req))
@@ -117,9 +105,7 @@
             :query-string (uri-query quri)
             :url-scheme (if ssl :https :http)
             :request-uri (request-resource req)
-            :raw-body (flex:make-flexi-stream
-                       (flex:make-in-memory-input-stream (wookie:request-body req))
-                       :external-format :utf-8)
+            :raw-body (flex:make-in-memory-input-stream (wookie:request-body req))
             :content-length (gethash "content-length" headers)
             :content-type (gethash "content-type" headers)
             :clack.streaming t
