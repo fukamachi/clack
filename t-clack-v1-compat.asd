@@ -12,6 +12,8 @@
   ((:module "v1-compat/t/core"
     :components
     ((:test-file "builder")
+     (:test-file "request")
+     (:test-file "response")
      (:test-file "app/file")
      (:test-file "app/urlmap")
      (:test-file "middleware/conditional")

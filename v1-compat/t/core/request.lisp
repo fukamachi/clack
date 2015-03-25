@@ -26,7 +26,7 @@
                                        "cookie" "hoge=1;fuga=semi;colon")
                                  :test 'equal))))
 
-(plan 19)
+(plan 16)
 
 (ok (env req) "env")
 
@@ -95,31 +95,30 @@
     (asdf:component-pathname (asdf:find-system :clack)))
 
 #+thread-support
-(test-app
- (lambda (env)
-   (make-request env)
-   `(200 nil (,(gethash "filename" (cadr (body-parameter (make-request env) :|file|))))))
- (lambda ()
-   (multiple-value-bind (body status)
-       (http-request "http://localhost:4242/"
-                     :method :post
-                     :parameters
-                     `(("file" ,(merge-pathnames #p"tmp/jellyfish.jpg" *clack-pathname*)
-                               :content-type "image/jpeg"
-                               :filename "jellyfish.jpg")))
-     (is status 200)
-     (is body "jellyfish.jpg"))
+(subtest-app "make-request"
+    (lambda (env)
+      (make-request env)
+      `(200 nil (,(gethash "filename" (cadr (body-parameter (make-request env) :|file|))))))
+  (multiple-value-bind (body status)
+      (http-request "http://localhost:4242/"
+                    :method :post
+                    :parameters
+                    `(("file" ,(merge-pathnames #p"tmp/jellyfish.jpg" *clack-pathname*)
+                              :content-type "image/jpeg"
+                              :filename "jellyfish.jpg")))
+    (is status 200)
+    (is body "jellyfish.jpg"))
 
-   (multiple-value-bind (body status)
-       (http-request "http://localhost:4242/"
-                     :method :post
-                     :parameters
-                     `(("file" ,(merge-pathnames #p"tmp/jellyfish.jpg" *clack-pathname*)
-                               :content-type "image/jpeg"
-                               :filename "jellyfish.jpg"))
-                     :content-length t)
-     (is status 200)
-     (is body "jellyfish.jpg"))))
+  (multiple-value-bind (body status)
+      (http-request "http://localhost:4242/"
+                    :method :post
+                    :parameters
+                    `(("file" ,(merge-pathnames #p"tmp/jellyfish.jpg" *clack-pathname*)
+                              :content-type "image/jpeg"
+                              :filename "jellyfish.jpg"))
+                    :content-length t)
+    (is status 200)
+    (is body "jellyfish.jpg")))
 #-thread-support
 (skip 4 "because your lisp doesn't support threads")
 

@@ -9,7 +9,7 @@
         :drakma))
 (in-package :t.clack.middleware.static)
 
-(plan 8)
+(plan 1)
 
 (defvar *clack-pathname*
     (asdf:component-pathname (asdf:find-system :clack)))
@@ -39,6 +39,6 @@
     (is body "Happy Valentine!")))
 
 #-thread-support
-(skip 8 "because your lisp doesn't support threads")
+(skip 1 "because your lisp doesn't support threads")
 
 (finalize)
