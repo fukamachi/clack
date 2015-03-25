@@ -21,9 +21,9 @@
   :version "0.4.0"
   :author "Eitaro Fukamachi"
   :license "LLGPL"
-  :depends-on (:cl-syntax
-               :cl-syntax-annot
-               :hunchentoot
+  :depends-on (:hunchentoot
+               :flexi-streams
+               :bordeaux-threads
                :split-sequence
                :alexandria)
   :components ((:file "src/handler/hunchentoot"))

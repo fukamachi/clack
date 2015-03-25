@@ -1,29 +1,20 @@
-#|
-  This file is a part of Clack package.
-  URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
-
-  Clack is freely distributable under the LLGPL License.
-|#
-
 (in-package :cl-user)
 (defpackage clack.handler.hunchentoot
   (:use :cl
         :hunchentoot
         :split-sequence)
-  (:shadow :stop
-           :handle-request)
+  (:shadow :handle-request)
   (:import-from :hunchentoot
                 :acceptor-taskmaster
+                :acceptor-process
                 :acceptor-shutdown-p)
   (:import-from :flexi-streams
                 :make-external-format
                 :string-to-octets)
   (:import-from :alexandria
-                :when-let))
+                :when-let)
+  (:export :run))
 (in-package :clack.handler.hunchentoot)
-
-(cl-syntax:use-syntax :annot)
 
 (defun initialize ()
   (setf *hunchentoot-default-external-format*
@@ -31,7 +22,6 @@
         *default-content-type* "text/html; charset=utf-8"
         *catch-errors-p* nil))
 
-@export
 (defun run (app &key debug (port 5000)
                   ssl ssl-key-file ssl-cert-file ssl-key-password
                   max-thread-count max-accept-count (persistent-connections-p t))
@@ -41,18 +31,18 @@
         (list
          (let ((stdout *standard-output*)
                (errout *error-output*))
-           #'(lambda (req)
-               (let ((env (handle-request req :ssl ssl)))
-                 #'(lambda ()
-                     (let ((*standard-output* stdout)
-                           (*error-output* errout))
-                       (handle-response
-                        (if debug
-                            (funcall app env)
-                            (handler-case (funcall app env)
-                              (error (error)
-                                (princ error *error-output*)
-                                '(500 () ("Internal Server Error")))))))))))))
+           (lambda (req)
+             (let ((env (handle-request req :ssl ssl)))
+               (lambda ()
+                 (let ((*standard-output* stdout)
+                       (*error-output* errout))
+                   (handle-response
+                    (if debug
+                        (funcall app env)
+                        (handler-case (funcall app env)
+                          (error (error)
+                            (princ error *error-output*)
+                            '(500 () ("Internal Server Error")))))))))))))
   (let* ((taskmaster (when (and max-thread-count max-accept-count)
                        (make-instance 'one-thread-per-connection-taskmaster
                                       :max-thread-count max-thread-count
@@ -75,17 +65,14 @@
                       :persistent-connections-p persistent-connections-p
                       (and taskmaster
                            (list :taskmaster taskmaster))))))
-    (setf (acceptor-shutdown-p acceptor) nil)
+    (setf (hunchentoot::acceptor-shutdown-p acceptor) nil)
     (start-listening acceptor)
     (let ((taskmaster (acceptor-taskmaster acceptor)))
       (setf (taskmaster-acceptor taskmaster) acceptor)
-      (accept-connections acceptor))))
-
-@export
-(defun stop (acceptor)
-  "Stop Hunchentoot server.
-If no acceptor is given, try to stop `*acceptor*' by default."
-  (hunchentoot:stop acceptor))
+      (setf (acceptor-process taskmaster) (bt:current-thread))
+      (unwind-protect
+           (accept-connections acceptor)
+        (hunchentoot:stop acceptor)))))
 
 (defun handle-response (res)
   "Convert Response from Clack application into a string
