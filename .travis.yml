@@ -28,7 +28,7 @@ before_script:
 
 script:
   - "cl -l prove -l cl-coveralls
-        -e '(or (coveralls:with-coveralls (:exclude '(\"t\" \"v1-compat\"))
+        -e '(or (coveralls:with-coveralls (:exclude (list \"t\" \"v1-compat\"))
                   (every (function identity)
                          (list (prove:run :t-clack-handler-hunchentoot)
                                #-ccl (prove:run :t-clack-handler-wookie)
