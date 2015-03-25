@@ -26,7 +26,6 @@
                 ((:file "builder")
                  (:file "component")
                  (:file "middleware" :depends-on ("component"))
-                 #+nil
                  (:module "middleware-components"
                   :pathname "middleware"
                   :depends-on ("component" "middleware" "app")
@@ -39,7 +38,7 @@
                    (:module "session-middleware"
                     :pathname "session"
                     :components
-                    ((:file "session" :depends-on ("state" "cookie" "store"))
+                    ((:file "session" :depends-on ("state" "state/cookie" "store"))
                      (:file "session/cookie" :depends-on ("session"))
                      (:file "state")
                      (:file "state/cookie" :depends-on ("state"))

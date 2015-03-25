@@ -57,53 +57,52 @@
     (and match (elt match 0))))
 
 #+thread-support
-(test-app
- app
- #'(lambda ()
-     (let (csrf-token
-           (cookie-jar (make-instance 'cookie-jar)))
-       (diag "first POST request")
-       (is (nth-value 1 (http-request "http://localhost:4242/"
-                                      :method :post
-                                      :cookie-jar cookie-jar))
-           400)
-       (diag "first GET request")
-       (multiple-value-bind (body status headers)
-           (http-request "http://localhost:4242/"
-                         :cookie-jar cookie-jar)
-         (is status 200 "Status is 200")
-         (is (cdr (assoc :content-type headers)) "text/html" "Content-Type is text/html")
-         (setf csrf-token (parse-csrf-token body))
-         (ok csrf-token "can get CSRF token")
-         (is-type csrf-token 'string "CSRF token is string")
-         (is (length csrf-token) 40 "CSRF token is 40 chars"))
-       (diag "bad POST request (no token)")
-       (multiple-value-bind (body status headers)
-           (http-request "http://localhost:4242/"
-                         :method :post
-                         :cookie-jar cookie-jar)
-         (is status 400 "Status is 400")
-         (is (cdr (assoc :content-type headers)) "text/plain" "Content-Type is text/plain")
-         (is body "Bad Request: invalid CSRF token" "Body is 'forbidden'"))
-       (diag "bad POST request (wrong token)")
-       (is (nth-value
-            1
-            (http-request "http://localhost:4242/"
-                          :method :post
-                          :parameters '(("name" . "Eitaro Fukamachi")
-                                        ("_csrf_token" . "wrongtokeniknow"))
-                          :cookie-jar cookie-jar))
-           400)
-       (diag "valid POST request")
-       (multiple-value-bind (body status headers)
-           (http-request "http://localhost:4242/"
-                         :method :post
-                         :parameters `(("name" . "Eitaro Fukamachi")
-                                       ("_csrf_token" . ,csrf-token))
-                         :cookie-jar cookie-jar)
-         (is status 200 "Status is 200")
-         (is (cdr (assoc :content-type headers)) "text/html" "Content-Type is text/html")
-         (is body "Eitaro Fukamachi" "can read body-parameter")))))
+(subtest-app "csrf"
+    app
+  (let (csrf-token
+        (cookie-jar (make-instance 'cookie-jar)))
+    (diag "first POST request")
+    (is (nth-value 1 (http-request "http://localhost:4242/"
+                                   :method :post
+                                   :cookie-jar cookie-jar))
+        400)
+    (diag "first GET request")
+    (multiple-value-bind (body status headers)
+        (http-request "http://localhost:4242/"
+                      :cookie-jar cookie-jar)
+      (is status 200 "Status is 200")
+      (is (cdr (assoc :content-type headers)) "text/html" "Content-Type is text/html")
+      (setf csrf-token (parse-csrf-token body))
+      (ok csrf-token "can get CSRF token")
+      (is-type csrf-token 'string "CSRF token is string")
+      (is (length csrf-token) 40 "CSRF token is 40 chars"))
+    (diag "bad POST request (no token)")
+    (multiple-value-bind (body status headers)
+        (http-request "http://localhost:4242/"
+                      :method :post
+                      :cookie-jar cookie-jar)
+      (is status 400 "Status is 400")
+      (is (cdr (assoc :content-type headers)) "text/plain" "Content-Type is text/plain")
+      (is body "Bad Request: invalid CSRF token" "Body is 'forbidden'"))
+    (diag "bad POST request (wrong token)")
+    (is (nth-value
+         1
+         (http-request "http://localhost:4242/"
+                       :method :post
+                       :parameters '(("name" . "Eitaro Fukamachi")
+                                     ("_csrf_token" . "wrongtokeniknow"))
+                       :cookie-jar cookie-jar))
+        400)
+    (diag "valid POST request")
+    (multiple-value-bind (body status headers)
+        (http-request "http://localhost:4242/"
+                      :method :post
+                      :parameters `(("name" . "Eitaro Fukamachi")
+                                    ("_csrf_token" . ,csrf-token))
+                      :cookie-jar cookie-jar)
+      (is status 200 "Status is 200")
+      (is (cdr (assoc :content-type headers)) "text/html" "Content-Type is text/html")
+      (is body "Eitaro Fukamachi" "can read body-parameter"))))
 #-thread-support
 (skip 13 "because your lisp doesn't support threads")
 
@@ -121,18 +120,16 @@
                      (:content-type "text/html")
                      ("You look a safety user.")))))
 
-(diag "change blocking behavior")
 #+thread-support
-(test-app
- app
- #'(lambda ()
-     (multiple-value-bind (body status headers)
-         (http-request "http://localhost:4242/"
-                       :method :post
-                       :redirect nil)
-       (declare (ignore body))
-       (is status 302 "Status is 302")
-       (is (cdr (assoc :location headers)) "http://en.wikipedia.org/wiki/CSRF"))))
+(subtest-app "change blocking behavior"
+    app
+  (multiple-value-bind (body status headers)
+      (http-request "http://localhost:4242/"
+                    :method :post
+                    :redirect nil)
+    (declare (ignore body))
+    (is status 302 "Status is 302")
+    (is (cdr (assoc :location headers)) "http://en.wikipedia.org/wiki/CSRF")))
 #-thread-support
 (skip 2 "because your lisp doesn't support threads")
 
@@ -148,32 +145,30 @@
                              (body-parameter req :|name|)
                              (html-form env))))))))
 
-(diag "Enable one-time token")
 #+thread-support
-(test-app
- app
- #'(lambda ()
-     (let (csrf-token
-           (cookie-jar (make-instance 'cookie-jar)))
-         (setf csrf-token
-               (parse-csrf-token
-                (http-request "http://localhost:4242/"
-                              :cookie-jar cookie-jar)))
-         (http-request "http://localhost:4242/"
-                       :method :post
-                       :parameters `(("name" . "Eitaro Fukamachi")
-                                     ("_csrf_token" . ,csrf-token))
-                       :cookie-jar cookie-jar)
-         (diag "bad POST request with before token")
-         (multiple-value-bind (body status headers)
-             (http-request "http://localhost:4242/"
-                           :method :post
-                           :parameters `(("name" . "Eitaro Fukamachi")
-                                         ("_csrf_token" . ,csrf-token))
-                           :cookie-jar cookie-jar)
-           (declare (ignore body))
-           (is status 400 "Status is 400")
-           (is (cdr (assoc :content-type headers)) "text/plain" "Content-Type is text/plain")))))
+(subtest-app "Enable one-time token"
+    app
+  (let (csrf-token
+        (cookie-jar (make-instance 'cookie-jar)))
+    (setf csrf-token
+          (parse-csrf-token
+           (http-request "http://localhost:4242/"
+                         :cookie-jar cookie-jar)))
+    (http-request "http://localhost:4242/"
+                  :method :post
+                  :parameters `(("name" . "Eitaro Fukamachi")
+                                ("_csrf_token" . ,csrf-token))
+                  :cookie-jar cookie-jar)
+    (diag "bad POST request with before token")
+    (multiple-value-bind (body status headers)
+        (http-request "http://localhost:4242/"
+                      :method :post
+                      :parameters `(("name" . "Eitaro Fukamachi")
+                                    ("_csrf_token" . ,csrf-token))
+                      :cookie-jar cookie-jar)
+      (declare (ignore body))
+      (is status 400 "Status is 400")
+      (is (cdr (assoc :content-type headers)) "text/plain" "Content-Type is text/plain"))))
 #-thread-support
 (skip 2 "because your lisp doesn't support threads")
 

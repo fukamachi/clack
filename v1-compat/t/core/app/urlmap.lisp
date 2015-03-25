@@ -1,7 +1,7 @@
 (in-package :cl-user)
 (defpackage t.clack.app.urlmap
   (:use :cl
-        :clack
+        :clack.component
         :clack.app.urlmap
         :prove))
 (in-package :t.clack.app.urlmap)

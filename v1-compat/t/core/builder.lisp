@@ -29,10 +29,9 @@
 
 ;; Tests
 
-(plan 9)
+(plan 8)
 
 (is-type (builder <simple-middleware> app) 'function "builder")
-(is-type (builder-lazy <simple-middleware> app) 'function "builder-lazy")
 (is-type (builder
           (<simple-middleware2>
            :one "1" :two "2")
