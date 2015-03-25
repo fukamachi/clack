@@ -21,9 +21,7 @@
   :version "0.2.0"
   :author "Eitaro Fukamachi"
   :license "LLGPL"
-  :depends-on (:cl-syntax
-               :cl-syntax-annot
-               :wookie
+  :depends-on (:wookie
                :cl-async
                :fast-http
                :quri
