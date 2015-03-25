@@ -21,10 +21,11 @@
   :version "0.2.1"
   :author "Eitaro Fukamachi"
   :license "LLGPL"
-  :depends-on (:clack
+  :depends-on (:clack-v1-compat
+               :lack-util
                :cl-syntax
                :cl-syntax-annot
                :alexandria)
   :components ((:file "src/contrib/middleware/csrf"))
   :description "Middleware for easy CSRF protection"
-  :in-order-to ((test-op (load-op clack-middleware-csrf-test))))
+  :in-order-to ((test-op (test-op t-clack-middleware-csrf))))

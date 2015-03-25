@@ -8,7 +8,7 @@
   :version "0.1"
   :author "Karl Heinrichmeyer"
   :license "BSD2"
-  :depends-on (:clack
+  :depends-on (:clack-v1-compat
                :cl-syntax
                :cl-syntax-annot
                :postmodern)

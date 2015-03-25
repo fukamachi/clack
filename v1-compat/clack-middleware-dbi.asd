@@ -21,7 +21,7 @@
   :version "0.2.0"
   :author "Eitaro Fukamachi"
   :license "LLGPL"
-  :depends-on (:clack
+  :depends-on (:clack-v1-compat
                :cl-syntax
                :cl-syntax-annot
                :dbi)

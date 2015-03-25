@@ -21,11 +21,12 @@
   :version "0.2.0"
   :author "Eitaro Fukamachi"
   :license "LLGPL"
-  :depends-on (:clack
+  :depends-on (:clack-v1-compat
                :cl-syntax
                :cl-syntax-annot
                :cl-base64
                :cl-ppcre
                :arnesi)
   :components ((:file "src/contrib/middleware/auth/basic"))
-  :description "Basic Authentication Middleware.")
+  :description "Basic Authentication Middleware."
+  :in-order-to ((test-op (test-op t-clack-middleware-auth-basic))))

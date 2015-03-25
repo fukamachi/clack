@@ -1,7 +1,8 @@
 (in-package :cl-user)
 (defpackage clack.middleware.dbi
   (:use :cl
-        :clack)
+        :clack.component
+        :clack.middleware)
   (:import-from :dbi
                 :connect
                 :disconnect))

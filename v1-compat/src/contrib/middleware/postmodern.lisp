@@ -3,7 +3,8 @@
 (in-package :cl-user)
 (defpackage clack.middleware.postmodern
   (:use #:cl
-	#:clack)
+	#:clack.component
+  #:clack.middleware)
   (:import-from #:postmodern
 		#:with-connection
 		#:*database*))

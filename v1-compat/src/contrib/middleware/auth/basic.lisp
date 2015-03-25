@@ -1,7 +1,8 @@
 (in-package :cl-user)
 (defpackage clack.middleware.auth.basic
   (:use :cl
-        :clack)
+        :clack.component
+        :clack.middleware)
   (:import-from :cl-ppcre
                 :scan-to-strings)
   (:import-from :cl-base64

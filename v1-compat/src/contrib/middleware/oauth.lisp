@@ -1,7 +1,8 @@
 (in-package :cl-user)
 (defpackage clack.middleware.oauth
   (:use :cl
-        :clack
+        :clack.component
+        :clack.middleware
         :clack.request
         :clack.response))
 (in-package :clack.middleware.oauth)
