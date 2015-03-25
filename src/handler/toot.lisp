@@ -1,11 +1,3 @@
-#|
-  This file is a part of Clack package.
-  URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
-
-  Clack is freely distributable under the LLGPL License.
-|#
-
 (in-package :cl-user)
 (defpackage clack.handler.toot
   (:use :cl
@@ -17,16 +9,15 @@
                 :shutdown-p
                 :listen-socket
                 :listen-backlog
+                :acceptor-process
                 :accept-connections)
   (:import-from :flexi-streams
                 :octets-to-string)
   (:import-from :alexandria
-                :if-let))
+                :if-let)
+  (:export :run))
 (in-package :clack.handler.toot)
 
-(cl-syntax:use-syntax :annot)
-
-@export
 (defun run (app &key debug (port 5000)
                   ssl ssl-key-file ssl-cert-file ssl-key-password)
   "Start Toot server."
@@ -59,13 +50,10 @@
            :reuseaddress t
            :backlog (listen-backlog acceptor)
            :element-type '(unsigned-byte 8)))
-    (accept-connections acceptor)))
-
-
-@export
-(defun stop (acceptor)
-  "Stop Toot server."
-  (toot:stop-acceptor acceptor))
+    (setf (acceptor-process (toot:taskmaster acceptor)) (bt:current-thread))
+    (unwind-protect
+         (accept-connections acceptor)
+      (toot:stop-acceptor acceptor))))
 
 (defun handle-request (req &key ssl)
   "Convert Request from server into a plist
