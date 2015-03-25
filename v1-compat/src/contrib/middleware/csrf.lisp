@@ -1,13 +1,12 @@
 (in-package :cl-user)
 (defpackage clack.middleware.csrf
   (:use :cl
-        :clack)
-  (:import-from :clack.component
-                :component-designator)
+        :clack.component
+        :clack.middleware)
   (:import-from :clack.request
                 :make-request
                 :body-parameter)
-  (:import-from :clack.util
+  (:import-from :lack.util
                 :generate-random-id)
   (:import-from :alexandria
                 :when-let))

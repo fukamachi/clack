@@ -1,7 +1,8 @@
 (in-package :cl-user)
 (defpackage clack.middleware.clsql
   (:use :cl
-        :clack)
+        :clack.component
+        :clack.middleware)
   (:import-from :clsql
                 :connect
                 :disconnect))

@@ -1,7 +1,8 @@
 (in-package :cl-user)
 (defpackage clack.middleware.rucksack
   (:use :cl
-        :clack)
+        :clack.component
+        :clack.middleware)
   (:import-from :rucksack
                 :with-transaction
                 :current-rucksack))
