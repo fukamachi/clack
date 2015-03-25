@@ -24,12 +24,14 @@ before_script:
   - git clone https://github.com/fukamachi/fast-http ~/lisp/fast-http
   - git clone https://github.com/fukamachi/http-body ~/lisp/http-body
   - git clone https://github.com/fukamachi/lack ~/lisp/lack
+  - git clone https://github.com/fukamachi/cl-coveralls ~/lisp/cl-coveralls
 
 script:
-  - "cl -l prove
-        -e '(or (every (function identity)
-                       (list (prove:run :t-clack-handler-hunchentoot)
-                             #-ccl (prove:run :t-clack-handler-wookie)
-                             #+sbcl (prove:run :t-clack-handler-fcgi)
-                             (prove:run :t-clack-handler-toot)))
+  - "cl -l prove -l cl-coveralls
+        -e '(or (coveralls:with-coveralls
+                  (every (function identity)
+                         (list (prove:run :t-clack-handler-hunchentoot)
+                               #-ccl (prove:run :t-clack-handler-wookie)
+                               #+sbcl (prove:run :t-clack-handler-fcgi)
+                               (prove:run :t-clack-handler-toot))))
                 (uiop:quit -1))'"
