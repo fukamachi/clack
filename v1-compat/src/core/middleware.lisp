@@ -25,3 +25,8 @@
     (lambda (env) (call mw env)))
   (:method ((mw function) app-or-middleware)
     (funcall mw app-or-middleware)))
+
+(import '(<middleware>
+          call-next
+          wrap)
+        (find-package :clack))
