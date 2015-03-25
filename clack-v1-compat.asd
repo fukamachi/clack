@@ -17,6 +17,10 @@
                :cl-fad
                :quri
                :trivial-mimes
+               :trivial-types
+               :http-body
+               :flexi-streams
+               :circular-streams
                :ironclad
                :cl-syntax-annot
                :alexandria
@@ -24,6 +28,9 @@
   :components ((:module "v1-compat/src/core"
                 :components
                 ((:file "builder")
+                 (:file "request-response")
+                 (:file "request" :depends-on ("request-response"))
+                 (:file "response" :depends-on ("request-response"))
                  (:file "component")
                  (:file "middleware" :depends-on ("component"))
                  (:module "middleware-components"
@@ -39,7 +46,7 @@
                     :pathname "session"
                     :components
                     ((:file "session" :depends-on ("state" "state/cookie" "store"))
-                     (:file "session/cookie" :depends-on ("session"))
+                     (:file "cookie" :depends-on ("session"))
                      (:file "state")
                      (:file "state/cookie" :depends-on ("state"))
                      (:file "store")))))

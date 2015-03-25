@@ -1,11 +1,3 @@
-#|
-  This file is a part of Clack package.
-  URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
-
-  Clack is freely distributable under the LLGPL License.
-|#
-
 (in-package :cl-user)
 (defpackage clack.response
   (:use :cl)
@@ -16,9 +8,8 @@
   (:import-from :alexandria
                 :ensure-list
                 :doplist
-                :when-let)
-  (:import-from :clack.util
-                :getf*)
+                :when-let
+                :make-keyword)
   (:import-from :quri
                 :url-encode)
   (:import-from :local-time
@@ -61,6 +52,12 @@ Create a <response> instance."
      :headers headers
      :body body))
 
+(defun normalize-key (name)
+  "Returns a keyword of NAME."
+  (etypecase name
+    (keyword name)
+    ((or string symbol) (make-keyword name))))
+
 @export
 (defgeneric headers (res &optional name)
   (:documentation
@@ -73,7 +70,7 @@ Example:
   ;;=> \"text/plain\"")
   (:method ((res <response>) &optional name)
     (if name
-        (getf* (headers res) name)
+        (getf (headers res) (normalize-key name))
         (slot-value res 'headers))))
 
 @export
@@ -86,7 +83,7 @@ Example:
   (setf (headers res :content-type) \"text/html\")")
   (:method (value (res <response>) &optional name)
     (if name
-        (setf (getf* (slot-value res 'headers) name) value)
+        (setf (getf (slot-value res 'headers) (normalize-key name)) value)
         (setf (slot-value res 'headers) value))))
 
 @export
@@ -121,7 +118,7 @@ Example:
   (:method ((res <response>) &optional name)
     (let ((cookies (slot-value res 'set-cookies)))
       (if name
-          (getf* cookies name)
+          (getf cookies (normalize-key name))
           cookies))))
 
 @export
@@ -134,7 +131,7 @@ Example:
   (setf (set-cookies res :hoge) \"1\")")
   (:method (value (res <response>) &optional name)
     (if name
-        (setf (getf* (slot-value res 'set-cookies) name)
+        (setf (getf (slot-value res 'set-cookies) (normalize-key name))
               (if (consp value)
                   value
                   `(:value ,value)))
@@ -192,41 +189,3 @@ Example:
     (format nil
             "~{~{~A~^=~}~^; ~}"
             (nreverse cookie))))
-
-(doc:start)
-
-@doc:NAME "
-Clack.Response - Portable HTTP Response object for Clack response.
-"
-
-@doc:SYNOPSIS "
-    (defvar res nil)
-    
-    (setf res (make-response 200))
-    (setf res (make-response 200 '(:content-type \"text/html\")))
-    (setf res (make-response 200 '(:content-type \"text/html\") '(\"aiueo\")))
-    
-    ;; Access each fields
-    (status res)
-    ;;=> 200
-    (headers res)
-    ;;=> (:content-type \"text/html\")
-    (headers res :content-type)
-    ;;=> \"text/html\"
-    (body res)
-    ;;=> (\"aiueo\")
-    
-    ;; Set to each fields
-    (setf (status res) 304)
-    (setf (headers res :content-type) \"text/plain\")
-    (setf (body res) '(\"moved\"))
-    (setf (body res) \"moved\") ;; string also allowed
-"
-
-@doc:DESCRIPTION "
-Clack.Response allows you a way to create Clack response.
-"
-
-@doc:AUTHOR "
-* Eitaro Fukamachi (e.arrows@gmail.com)
-"

@@ -1,7 +1,8 @@
 (in-package :cl-user)
 (defpackage t.clack.middleware.conditional
   (:use :cl
-        :clack
+        :clack.component
+        :clack.middleware
         :clack.builder
         :prove
         :clack.middleware.conditional

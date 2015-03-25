@@ -20,6 +20,7 @@
   (:import-from :ironclad
                 :ascii-string-to-byte-array
                 :update-hmac
+                :make-hmac
                 :byte-array-to-hex-string
                 :hmac-digest))
 (in-package :clack.middleware.session.cookie)

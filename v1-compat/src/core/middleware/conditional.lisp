@@ -1,11 +1,21 @@
 (in-package :cl-user)
 (defpackage clack.middleware.conditional
+  (:nicknames :lack.middleware.condition)
   (:use :cl
         :clack.component
         :clack.middleware))
 (in-package :clack.middleware.conditional)
 
 (cl-syntax:use-syntax :annot)
+
+@export
+(defparameter *lack-middleware-condition*
+  (lambda (app cond &key builder)
+    (wrap
+     (make-instance '<clack-middleware-conditional>
+                    :condition cond
+                    :builder builder)
+     app)))
 
 @export
 (defclass <clack-middleware-conditional> (<middleware>)

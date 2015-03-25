@@ -1,18 +1,11 @@
-#|
-  This file is a part of Clack package.
-  URL: http://github.com/fukamachi/clack
-  Copyright (c) 2011 Eitaro Fukamachi <e.arrows@gmail.com>
-
-  Clack is freely distributable under the LLGPL License.
-|#
-
 (in-package :cl-user)
 (defpackage clack.request
   (:use :cl)
   (:import-from :clack.request-response
                 :headers)
   (:import-from :trivial-types
-                :association-list)
+                :association-list
+                :property-list)
   (:import-from :http-body
                 :parse)
   (:import-from :quri
@@ -29,8 +22,6 @@
   (:import-from :circular-streams
                 :make-circular-input-stream
                 :circular-stream-buffer)
-  (:import-from :clack.util
-                :nappend)
   (:export :env
            :request-method
            :script-name
@@ -185,7 +176,7 @@ instances of <request>."
           ;; FIXME: Return a circular stream
           (flex:make-in-memory-input-stream buffer)
           (let ((stream (make-circular-input-stream body)))
-            (nappend env `(:raw-body-buffer ,(circular-stream-buffer stream)))
+            (rplacd (last env) (list :raw-body-buffer (circular-stream-buffer stream)))
             stream)))))
 
 @export
@@ -252,25 +243,3 @@ on an original raw-body."
     (if name
         (assoc-value-multi name params)
         params)))
-
-(doc:start)
-
-@doc:NAME "
-Clack.Request - Portable HTTP Request object for Clack Request.
-"
-
-@doc:SYNOPSIS "
-    (defun app (env)
-      (let ((req (make-request env)))
-      `(200
-        (:content-type \"text/plain\")
-        (\"Hello, \" (query-parameter req \"name\")))))
-"
-
-@doc:DESCRIPTION "
-Clack.Request provides a consistent API for request objects.
-"
-
-@doc:AUTHOR "
-* Eitaro Fukamachi (e.arrows@gmail.com)
-"

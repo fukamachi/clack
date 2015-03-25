@@ -11,7 +11,7 @@
   (:shadowing-import-from :prove :finalize))
 (in-package :t.clack.middleware.session)
 
-(plan 8)
+(plan 2)
 
 #+thread-support
 (subtest-app "middleware session"
@@ -67,6 +67,6 @@
       (is body "Hello, you've been here for 2th times!"))))
 
 #-thread-support
-(skip 4 "because your lisp doesn't support threads")
+(skip 2 "because your lisp doesn't support threads")
 
 (finalize)
