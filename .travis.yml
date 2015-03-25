@@ -33,5 +33,6 @@ script:
                          (list (prove:run :t-clack-handler-hunchentoot)
                                #-ccl (prove:run :t-clack-handler-wookie)
                                #+sbcl (prove:run :t-clack-handler-fcgi)
-                               (prove:run :t-clack-handler-toot))))
+                               (prove:run :t-clack-handler-toot)
+                               (prove:run :t-clack-v1-compat))))
                 (uiop:quit -1))'"
