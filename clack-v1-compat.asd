@@ -9,6 +9,7 @@
   :depends-on (:lack
                :lack-util
                :clack
+               :clack-test
                :local-time
                :trivial-backtrace
                :marshal
@@ -56,4 +57,5 @@
                   ((:file "directory" :depends-on ("file"))
                    (:file "file")
                    (:file "urlmap")))
-                 (:file "http-status")))))
+                 (:file "http-status")))
+               (:file "v1-compat/src/contrib/test")))
