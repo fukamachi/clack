@@ -26,7 +26,8 @@
   (:method ((mw function) app-or-middleware)
     (funcall mw app-or-middleware)))
 
-(import '(<middleware>
-          call-next
-          wrap)
-        (find-package :clack))
+(let ((symbols '(<middleware>
+                 call-next
+                 wrap)))
+  (import symbols (find-package :clack))
+  (export symbols (find-package :clack)))
