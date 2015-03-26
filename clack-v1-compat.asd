@@ -55,4 +55,5 @@
                   :components
                   ((:file "directory" :depends-on ("file"))
                    (:file "file")
-                   (:file "urlmap")))))))
+                   (:file "urlmap")))
+                 (:file "http-status")))))
