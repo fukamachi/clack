@@ -19,7 +19,8 @@
   (:method ((comp <component>))
     (to-app comp)))
 
-(import '(<component>
-          call
-          make-app)
-        (find-package :clack))
+(let ((symbols '(<component>
+                 call
+                 make-app)))
+  (import symbols (find-package :clack))
+  (export symbols (find-package :clack)))
