@@ -1,15 +1,17 @@
 (in-package :cl-user)
-(defpackage clack
-  (:use :cl)
-  (:import-from :clack.handler
-                :run
-                :stop)
-  (:import-from :lack
-                :builder)
-  (:import-from :alexandria
-                :delete-from-plist)
-  (:export :clackup
-           :stop))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (unless (find-package :clack)
+    (defpackage clack
+      (:use :cl)
+      (:import-from :clack.handler
+                    :run
+                    :stop)
+      (:import-from :lack
+                    :builder)
+      (:import-from :alexandria
+                    :delete-from-plist)
+      (:export :clackup
+               :stop))))
 (in-package :clack)
 
 (defun eval-file (file)
