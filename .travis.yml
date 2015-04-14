@@ -4,7 +4,6 @@ env:
   matrix:
     - LISP=sbcl COVERALLS=true
     - LISP=ccl
-    - LISP=clisp
 
 before_install:
   # libuv for Wookie
