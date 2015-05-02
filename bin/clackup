@@ -46,11 +46,15 @@ A command-line interface for clack:clackup.
                       read-value)))
                value)))
     (loop with app-file = nil
-          for (option value) on args by #'cddr
+          for option = (pop args)
+          for value = (pop args)
+          while option
           if (not (starts-with option "--"))
             do (if app-file
                    (error "Invalid option: ~S" option)
-                   (setf app-file option))
+                   (progn
+                     (setf app-file option)
+                     (push value args)))
           else if (string-equal option "--server")
                  append (list :server
                               (let ((parsed (parse-value value)))
