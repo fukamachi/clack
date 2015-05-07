@@ -42,13 +42,15 @@
            (unless silent
              (format t "~&~:(~A~) server is started.~%Listening on localhost:~A.~%" server port)))
          (buildapp (app)
-           (let ((app (etypecase app
+           (let ((app (typecase app
                         ((or pathname string)
                          (eval-file app))
-                        (function app))))
-             (if use-default-middlewares
-                 (builder :backtrace app)
-                 app))))
+                        (otherwise app))))
+             (builder
+              (if use-default-middlewares
+                  :backtrace
+                  nil)
+              app))))
     (unless use-thread
       (print-start-message))
     (prog1
