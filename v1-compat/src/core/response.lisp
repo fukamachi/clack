@@ -112,9 +112,9 @@ Example: (push-header res :content-type \"text/html\")")
 
 Example:
   (set-cookies res)
-  ;;=> (:hoge \"1\")
+  ;;=> (:hoge (:value \"1\"))
   (set-cookies res :hoge)
-  ;;=> \"1\"")
+  ;;=> (:value \"1\")")
   (:method ((res <response>) &optional name)
     (let ((cookies (slot-value res 'set-cookies)))
       (if name
@@ -127,8 +127,8 @@ Example:
    "Set set-cookies.
 
 Example:
-  (setf (set-cookies res) '(:hoge \"1\"))
-  (setf (set-cookies res :hoge) \"1\")")
+  (setf (set-cookies res) '(:hoge (:value \"1\")))
+  (setf (set-cookies res :hoge) '(:value \"1\" :secure t :httponly t))")
   (:method (value (res <response>) &optional name)
     (if name
         (setf (getf (slot-value res 'set-cookies) (normalize-key name))
