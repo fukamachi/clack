@@ -154,11 +154,9 @@
                                   (car body)
                                   (with-fast-output (buffer :vector)
                                     (dolist (str body)
-                                      (fast-write-sequence (babel:string-to-octets str) buffer))))
-                        :close t))
+                                      (fast-write-sequence (babel:string-to-octets str) buffer))))))
         ((vector (unsigned-byte 8))
          (send-response res
                         :status status
                         :headers headers
-                        :body body
-                        :close t))))))
+                        :body body))))))
