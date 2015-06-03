@@ -7,7 +7,7 @@
   :version "0.1.0"
   :author "Eitaro Fukamachi"
   :license "LLGPL"
-  :depends-on (:clack
+  :depends-on (:clack-v1-compat
                :dbi
                :cl-base64
                :marshal)
