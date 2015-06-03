@@ -6,7 +6,8 @@
                 :make-request
                 :cookies)
   (:import-from :alexandria
-                :remove-from-plist)
+                :remove-from-plist
+                :ensure-car)
   (:import-from :clack.response
                 :make-response
                 :set-cookies)
@@ -84,7 +85,8 @@ Example:
 @export
 (defmethod session-id ((this <clack-session-state-cookie>) env)
   (let ((req (make-request env)))
-    (cookies req (symbol-name (session-key this)))))
+    ;; `cookies` may returns a list.
+    (ensure-car (cookies req (symbol-name (session-key this))))))
 
 @export
 (defmethod finalize ((this <clack-session-state-cookie>) id res options)
