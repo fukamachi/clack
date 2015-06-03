@@ -62,7 +62,11 @@
 @export
 (defgeneric should-handle (app file)
   (:method ((this <clack-app-file>) file)
-    (and (file-exists-p file)
+    (and (ignore-errors
+          ;; Ignore simple-file-error in a case that
+          ;; the file path contains some special characters like "?".
+          ;; See https://github.com/fukamachi/clack/issues/111
+          (file-exists-p file))
          (not (directory-exists-p file)))))
 
 @export
