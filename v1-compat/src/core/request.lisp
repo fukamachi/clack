@@ -1,4 +1,11 @@
 (in-package :cl-user)
+
+#-abcl
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (when (find-package '#:clack.request)
+    (do-external-symbols (symbol (find-package '#:clack.request))
+      (unexport symbol '#:clack.request))))
+
 (defpackage clack.request
   (:use :cl)
   (:import-from :clack.request-response

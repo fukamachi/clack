@@ -36,7 +36,7 @@
                  (:file "middleware" :depends-on ("component"))
                  (:module "middleware-components"
                   :pathname "middleware"
-                  :depends-on ("component" "middleware" "app")
+                  :depends-on ("component" "middleware" "app" "request" "response")
                   :components
                   ((:file "accesslog")
                    (:file "backtrace")
