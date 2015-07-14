@@ -69,6 +69,7 @@
     (start-listening acceptor)
     (let ((taskmaster (acceptor-taskmaster acceptor)))
       (setf (taskmaster-acceptor taskmaster) acceptor)
+      #+thread-support
       (setf (acceptor-process taskmaster) (bt:current-thread))
       (unwind-protect
            (accept-connections acceptor)
