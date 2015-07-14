@@ -32,7 +32,7 @@ install:
   - ros install prove
 
 before_script:
-  - sudo nginx -c t/nginx.conf -p "$PWD/"
+  - nginx -c t/nginx.conf -p "$PWD/"
   - ros run -- --version
 
 script:
