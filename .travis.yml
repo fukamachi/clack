@@ -6,6 +6,7 @@ env:
   global:
     - PATH=~/.roswell/bin:~/nginx/sbin:$PATH
     - LD_LIBRARY_PATH=$HOME/libuv/lib:$LD_LIBRARY_PATH
+    - INCLUDE=$HOME/libuv/include:$INCLUDE
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
     - ROSWELL_REQUIRE_SUDO=0
     - COVERAGE_EXCLUDE=t:v1-compat
