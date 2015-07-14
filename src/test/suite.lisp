@@ -259,14 +259,14 @@ you would call like this: `(run-server-tests :foo)'."
         `(200
           (:content-type "text/plain; charset=utf-8")
           (,(getf env :path-info))))
-    (is (http-request (localhost "/foo/bar%2cbaz")) "/foo/bar,baz"))
+    (is (http-request (localhost "/foo/bar%2cbaz") :preserve-uri t) "/foo/bar,baz"))
 
   (subtest-app "% double encoding in PATH-INFO"
       (lambda (env)
         `(200
           (:content-type "text/plain; charset=utf-8")
           (,(getf env :path-info))))
-    (is (http-request (localhost "/foo/bar%252cbaz")) "/foo/bar%2cbaz"))
+    (is (http-request (localhost "/foo/bar%252cbaz") :preserve-uri t) "/foo/bar%2cbaz"))
 
   (subtest-app "% encoding in PATH-INFO (outside of URI characters)"
       (lambda (env)
