@@ -1,22 +1,31 @@
 language: common-lisp
 
+sudo: false
+
 env:
   global:
     - PATH=~/.roswell/bin:$PATH
+    - LD_LIBRARY_PATH=$HOME/libuv
+    - ROSWELL_INSTALL_DIR=$HOME/.roswell
+    - COVERAGE_EXCLUDE=t:v1-compat
   matrix:
     - LISP=sbcl COVERALLS=true
     - LISP=ccl
+
+addons:
+  apt:
+    sources:
+      - ppa:nginx/stable
+    packages:
+      - nginx
+      - libfcgi-dev
 
 before_install:
   # Install Roswell
   - curl -L https://raw.githubusercontent.com/snmsts/roswell/release/scripts/install-for-ci.sh | sh
   # libuv for Wookie
   - curl -L https://github.com/libuv/libuv/archive/v1.2.0.tar.gz | tar xzf -
-  - (cd libuv-1.2.0 && ./autogen.sh && ./configure --prefix=/usr && make && sudo make install)
-  # nginx for FastCGI handler
-  - sudo add-apt-repository -y ppa:nginx/stable
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq nginx libfcgi-dev
+  - (cd libuv-1.2.0 && ./autogen.sh && ./configure --prefix=$HOME/libuv && make && make install)
 
 install:
   - ros install prove
@@ -26,4 +35,4 @@ before_script:
   - ros run -- --version
 
 script:
-  - COVERAGE_EXCLUDE=t:v1-compat run-prove t-*.asd
+  - run-prove t-*.asd
