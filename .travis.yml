@@ -4,7 +4,7 @@ sudo: false
 
 env:
   global:
-    - PATH=~/.roswell/bin:$PATH
+    - PATH=$HOME/.roswell/bin:$PATH
     - LD_LIBRARY_PATH=$HOME/libuv
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
     - COVERAGE_EXCLUDE=t:v1-compat
