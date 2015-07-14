@@ -35,4 +35,8 @@ before_script:
   - ros run -- --version
 
 script:
-  - run-prove t-*.asd
+  - test_files=$(ls t-*.asd)
+  - if [ "$LISP" != "sbcl" ]; then
+      test_files=$(echo $tests | grep -v t-clack-handler-fcgi.asd);
+    fi
+  - run-prove $test_files
