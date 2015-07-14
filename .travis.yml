@@ -32,7 +32,7 @@ install:
   - ros install prove
 
 before_script:
-  - nginx -c t/nginx.conf -p "$PWD/"
+  - nginx -c "$TRAVIS_BUILD_DIR/t/nginx.conf" -p "$HOME/nginx"
   - ros run -- --version
 
 script:
