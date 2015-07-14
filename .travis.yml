@@ -41,6 +41,6 @@ script:
   - if [ "$LISP" = "sbcl" ]; then
       test_files=$(ls t-*.asd);
     else
-      test_files=$(ls t-*.asd | grep -v t-clack-handler-fcgi.asd);
+      test_files=$(ls t-*.asd | grep -v t-clack-handler-wookie.asd | grep -v t-clack-handler-fcgi.asd);
     fi
   - run-prove $test_files
