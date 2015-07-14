@@ -1,11 +1,15 @@
 language: common-lisp
 
 env:
+  global:
+    - PATH=~/.roswell/bin:$PATH
   matrix:
     - LISP=sbcl COVERALLS=true
     - LISP=ccl
 
 before_install:
+  # Install Roswell
+  - curl -L https://raw.githubusercontent.com/snmsts/roswell/release/scripts/install-for-ci.sh | sh
   # libuv for Wookie
   - curl -L https://github.com/libuv/libuv/archive/v1.2.0.tar.gz | tar xzf -
   - (cd libuv-1.2.0 && ./autogen.sh && ./configure --prefix=/usr && make && sudo make install)
@@ -15,23 +19,11 @@ before_install:
   - sudo apt-get install -qq nginx libfcgi-dev
 
 install:
-  # Install cl-travis
-  - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh | bash
+  - ros install prove
 
 before_script:
   - sudo nginx -c t/nginx.conf -p "$PWD/"
-  - git clone https://github.com/fukamachi/fast-http ~/lisp/fast-http
-  - git clone https://github.com/fukamachi/http-body ~/lisp/http-body
-  - git clone https://github.com/fukamachi/lack ~/lisp/lack
-  - git clone https://github.com/fukamachi/cl-coveralls ~/lisp/cl-coveralls
+  - ros run -- --version
 
 script:
-  - "cl -l prove -l cl-coveralls
-        -e '(or (coveralls:with-coveralls (:exclude (list \"t\" \"v1-compat\"))
-                  (every (function identity)
-                         (list (prove:run :t-clack-handler-hunchentoot)
-                               #-ccl (prove:run :t-clack-handler-wookie)
-                               #+sbcl (prove:run :t-clack-handler-fcgi)
-                               (prove:run :t-clack-handler-toot)
-                               (prove:run :t-clack-v1-compat))))
-                (uiop:quit -1))'"
+  - COVERAGE_EXCLUDE=t:v1-compat run-prove t-*.asd
