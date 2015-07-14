@@ -4,7 +4,7 @@ sudo: false
 
 env:
   global:
-    - PATH=$HOME/.roswell/bin:$PATH
+    - PATH=~/.roswell/bin:~/nginx/sbin:$PATH
     - LD_LIBRARY_PATH=$HOME/libuv
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
     - ROSWELL_REQUIRE_SUDO=0
@@ -15,10 +15,7 @@ env:
 
 addons:
   apt:
-    sources:
-      - ppa:nginx/stable
     packages:
-      - nginx
       - libfcgi-dev
 
 before_install:
@@ -27,6 +24,9 @@ before_install:
   # libuv for Wookie
   - curl -L https://github.com/libuv/libuv/archive/v1.2.0.tar.gz | tar xzf -
   - (cd libuv-1.2.0 && ./autogen.sh && ./configure --prefix=$HOME/libuv && make && make install)
+  # nginx
+  - curl -L http://nginx.org/download/nginx-1.8.0.tar.gz | tar xzf -
+  - (cd nginx-1.8.0 && ./configure --prefix=$HOME/nginx && make && make install)
 
 install:
   - ros install prove
