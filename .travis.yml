@@ -1,6 +1,7 @@
 language: common-lisp
 
-sudo: false
+# Wookie handler fails with memory corruption when using Travis CI's new container-based architecture.
+sudo: required
 
 env:
   global:
@@ -23,8 +24,8 @@ before_install:
   # Install Roswell
   - curl -L https://raw.githubusercontent.com/fukamachi/roswell/require-sudo/scripts/install-for-ci.sh | sh
   # libuv for Wookie
-  - curl -L https://github.com/libuv/libuv/archive/v1.2.0.tar.gz | tar xzf -
-  - (cd libuv-1.2.0 && ./autogen.sh && ./configure --prefix=$HOME/libuv && make && make install)
+  - curl -L https://github.com/libuv/libuv/archive/v1.6.1.tar.gz | tar xzf -
+  - (cd libuv-1.6.1 && ./autogen.sh && ./configure --prefix=$HOME/libuv && make && make install)
   # nginx
   - curl -L http://nginx.org/download/nginx-1.8.0.tar.gz | tar xzf -
   - (cd nginx-1.8.0 && ./configure --prefix=$HOME/nginx && make && make install)
@@ -37,10 +38,9 @@ before_script:
   - ros run -- --version
 
 script:
-  # Wookie handler fails with memory corruption. Just skip all tests of it.
   - if [ "$LISP" = "sbcl" ]; then
-      test_files=$(ls t-*.asd | grep -v t-clack-handler-wookie.asd);
+      test_files=$(ls t-*.asd);
     else
-      test_files=$(ls t-*.asd | grep -v t-clack-handler-wookie.asd | grep -v t-clack-handler-fcgi.asd);
+      test_files=$(ls t-*.asd | grep -v t-clack-handler-fcgi.asd);
     fi
   - run-prove $test_files
