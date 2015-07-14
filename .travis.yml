@@ -22,6 +22,7 @@ addons:
 before_install:
   # Install Roswell
   - curl -L https://raw.githubusercontent.com/fukamachi/roswell/require-sudo/scripts/install-for-ci.sh | sh
+  - ros install sbcl-bin/1.2.6
   # libuv for Wookie
   - curl -L https://github.com/libuv/libuv/archive/v1.2.0.tar.gz | tar xzf -
   - (cd libuv-1.2.0 && ./autogen.sh && ./configure --prefix=$HOME/libuv && make && make install)
