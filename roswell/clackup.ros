@@ -101,7 +101,7 @@ A command-line interface for clack:clackup.
     (multiple-value-bind (port fd)
         (parse-server-starter-port)
       (when port
-        (setf key-args (append args (list :port port :fd fd)))))
+        (setf key-args (append key-args (list :port port :fd fd)))))
 
     ;; Disable threads
     (setf (getf key-args :use-thread) nil)
