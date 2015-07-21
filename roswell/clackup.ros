@@ -40,10 +40,10 @@ A command-line interface for clack:clackup.
   (flet ((parse-value (value)
            (or (ignore-errors
                 (let ((read-value (read-from-string value)))
-                  (if (and (symbolp read-value)
-                           (not (keywordp read-value)))
-                      value
-                      read-value)))
+                  (typecase read-value
+                    (boolean read-value)
+                    ((and symbol (not keyword)) value)
+                    (otherwise read-value))))
                value)))
     (loop with app-file = nil
           for option = (pop args)
