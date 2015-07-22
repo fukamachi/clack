@@ -38,10 +38,7 @@
                   (use-thread #+thread-support t #-thread-support nil)
                   (use-default-middlewares t)
                 &allow-other-keys)
-  (flet ((print-start-message ()
-           (unless silent
-             (format t "~&~:(~A~) server is started.~%Listening on localhost:~A.~%" server port)))
-         (buildapp (app)
+  (flet ((buildapp (app)
            (let ((app (typecase app
                         ((or pathname string)
                          (eval-file app))
@@ -51,12 +48,14 @@
                   :backtrace
                   nil)
               app))))
-    (unless use-thread
-      (print-start-message))
+    (when (and (not use-thread)
+               (not silent))
+      (format t "~&~:(~A~) server is going to start.~%Listening on localhost:~A.~%" server port))
     (prog1
         (apply #'clack.handler:run (buildapp app) server
                :port port
                :debug debug
                :use-thread use-thread
                (delete-from-plist args :server :port :debug :silent :use-thread))
-      (print-start-message))))
+      (unless silent
+        (format t "~&~:(~A~) server is started.~%Listening on localhost:~A.~%" server port)))))
