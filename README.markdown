@@ -3,25 +3,42 @@
 [![Build Status](https://travis-ci.org/fukamachi/clack.svg?branch=master)](https://travis-ci.org/fukamachi/clack)
 [![Coverage Status](https://coveralls.io/repos/fukamachi/clack/badge.svg?branch=master)](https://coveralls.io/r/fukamachi/clack)
 
-Clack is a web application environment for Common Lisp inspired by Python's WSGI and Ruby's Rack. Your awesome framework should base on this.
+Clack is a web application environment for Common Lisp inspired by Python's WSGI and Ruby's Rack.
 
 ## Usage
 
 ```common-lisp
-(defpackage simple-app
-  (:use :cl
-        :clack))
-(in-package :simple-app)
-
 (defvar *handler*
-    (clackup
-      #'(lambda (env)
-          '(200 (:content-type "text/plain") ("Hello, Clack!")))))
+    (clack:clackup
+      (lambda (env)
+        (declare (ignore env))
+        '(200 (:content-type "text/plain") ("Hello, Clack!")))))
 ```
 
 Open your web browser and go to [http://localhost:5000/](http://localhost:5000/). You should get "Hello, Clack!".
 
 To stop the server, use `(clack:stop *handler*)`.
+
+## Command-line interface
+
+Clack provides a script to start a web server. It's useful when you deploy to production environment.
+
+NOTE: Install [Roswell](https://github.com/snmsts/roswell) before as it depends on it.
+
+When you execute `ros install clack`, it copies `clackup` script to `$HOME/.roswell/bin`. Make sure the path is in your shell `$PATH`.
+
+    $ ros install clack
+    $ which
+    /Users/nitro_idiot/.roswell/bin
+
+    $ cat <<EOF >> app.lisp
+    (lambda (env)
+      (declare (ignore env))
+      '(200 (:content-type "text/plain") ("Hello, Clack!")))
+    EOF
+    $ clackup app.lisp
+    Hunchentoot server is started.
+    Listening on localhost:5000.
 
 ## Installation
 
