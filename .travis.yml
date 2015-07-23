@@ -9,7 +9,6 @@ env:
     - LD_LIBRARY_PATH=$HOME/libuv/lib:$LD_LIBRARY_PATH
     - C_INCLUDE_PATH=$HOME/libuv/include:$C_INCLUDE_PATH
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
-    - ROSWELL_REQUIRE_SUDO=0
     - COVERAGE_EXCLUDE=t:v1-compat
   matrix:
     - LISP=sbcl COVERALLS=true
@@ -22,7 +21,7 @@ addons:
 
 before_install:
   # Install Roswell
-  - curl -L https://raw.githubusercontent.com/fukamachi/roswell/require-sudo/scripts/install-for-ci.sh | sh
+  - curl -L https://raw.githubusercontent.com/fukamachi/roswell/no-sudo/scripts/install-for-ci.sh | sh
   # libuv for Wookie
   - curl -L https://github.com/libuv/libuv/archive/v1.6.1.tar.gz | tar xzf -
   - (cd libuv-1.6.1 && ./autogen.sh && ./configure --prefix=$HOME/libuv && make && make install)
