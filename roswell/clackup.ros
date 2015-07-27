@@ -47,7 +47,8 @@ Options:
                             (read-from-string (uiop:getenv "ROS_OPTS")))
                           :test 'equal)))))
 
-(defun terminate (code &optional message args)
+;; Prevent a symbol conflict with CCL:TERMINATE.
+(defun %terminate (code &optional message args)
   (when message
     (format *error-output* "~&Error: ~A~%"
             (apply #'format nil (princ-to-string message) args)))
@@ -117,7 +118,7 @@ Options:
   (multiple-value-bind (app-file key-args)
       (parse-args args)
     (unless (probe-file app-file)
-      (terminate -1 "File doesn't exist: ~A" app-file))
+      (%terminate -1 "File doesn't exist: ~A" app-file))
 
     ;; Add :port and :fd from Server::Starter's environment var.
     (multiple-value-bind (port fd)
