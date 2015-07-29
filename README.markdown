@@ -48,7 +48,6 @@ When you execute `ros install clack`, it copies `clackup` script to `$HOME/.rosw
 
 ## Documentation
 
-- [Tutorial](http://clacklisp.org/tutorial/)
 - [Quickdocs Page](http://quickdocs.org/clack/)
 
 ## Server
@@ -58,6 +57,10 @@ When you execute `ros install clack`, it copies `clackup` script to `$HOME/.rosw
 * [Wookie](http://wookie.beeets.com/)
 * [Toot](https://github.com/gigamonkey/toot)
 * [Woo](https://github.com/fukamachi/woo)
+
+## See Also
+
+* [Lack](https://github.com/fukamachi/lack): Clack application builder
 
 ## Author
 
