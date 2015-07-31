@@ -14,7 +14,8 @@
                 :socket-close)
   (:import-from :alexandria
                 :make-keyword
-                :when-let)
+                :when-let
+                :starts-with-subseq)
   (:export :run))
 (in-package :clack.handler.fcgi)
 
@@ -150,7 +151,7 @@ before passing to Clack application."
                          v)))))
       (loop with request-uri = nil
             for (k . v) in (fcgx-getenv req)
-            if (string= k "HTTP_" :end1 5)
+            if (starts-with-subseq "HTTP_" k)
               do (set-header (canonicalize k :start 5 :case :downcase) v)
             if (or (string= k "SERVER_NAME")
                    (string= k "REMOTE_ADDR")
