@@ -28,10 +28,10 @@
                 :http-version)
   (:import-from :quri
                 :uri-path
-                :uri-query)
-  (:import-from :quri
+                :uri-query
                 :parse-uri
-                :url-decode)
+                :url-decode
+                :uri-error)
   (:import-from :flexi-streams
                 :make-in-memory-input-stream)
   (:import-from :babel
@@ -97,7 +97,7 @@
             :server-protocol (intern (format nil "HTTP/~A" http-version)
                                      :keyword)
             :path-info (handler-case (quri:url-decode (uri-path quri))
-                         (quri:uri-malformed-string ()
+                         (quri:uri-error ()
                            (uri-path quri)))
             :query-string (uri-query quri)
             :url-scheme (if ssl :https :http)
