@@ -4,7 +4,7 @@
         :cl-fastcgi)
   (:import-from :quri
                 :url-decode
-                :uri-malformed-string)
+                :uri-error)
   (:import-from :flexi-streams
                 :make-in-memory-input-stream
                 :string-to-octets)
@@ -191,7 +191,7 @@ before passing to Clack application."
                                                                   (position #\? request-uri
                                                                             :test #'char=))))
                                            (handler-case (quri:url-decode path-info)
-                                             (quri:uri-malformed-string ()
+                                             (quri:uri-error ()
                                                path-info)))
                               :url-scheme :http
                               :raw-body (loop with buf = (make-array 0 :fill-pointer 0 :adjustable t)
