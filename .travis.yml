@@ -12,8 +12,8 @@ env:
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
     - COVERAGE_EXCLUDE=t:v1-compat
   matrix:
-    - LISP=sbcl COVERALLS=true
-    - LISP=ccl
+    - LISP=sbcl-bin COVERALLS=true
+    - LISP=ccl-bin
 
 addons:
   apt:
@@ -38,7 +38,7 @@ before_script:
   - ros run -- --version
 
 script:
-  - if [ "$LISP" = "sbcl" ]; then
+  - if [ "$LISP" = "sbcl-bin" ]; then
       test_files=$(ls t-*.asd);
     else
       test_files=$(ls t-*.asd | grep -v t-clack-handler-wookie.asd | grep -v t-clack-handler-fcgi.asd);
