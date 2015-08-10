@@ -22,6 +22,7 @@
   :author "Eitaro Fukamachi"
   :license "LLGPL"
   :depends-on (:wookie
+               :clack-socket
                :cl-async
                :fast-http
                :quri

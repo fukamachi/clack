@@ -23,7 +23,9 @@
   (:import-from :cl-async
                 :with-event-loop
                 :close-tcp-server
-                :async-io-stream)
+                :async-io-stream
+                :socket-data
+                :write-socket-data)
   (:import-from :fast-http
                 :http-version)
   (:import-from :quri
@@ -160,3 +162,14 @@
                         :status status
                         :headers headers
                         :body body))))))
+
+(defmethod clack.socket:set-read-callback (socket callback)
+  (setf (getf (as:socket-data socket) :parser) callback))
+
+(defmethod clack.socket:write-to-socket (socket message &key callback)
+  (as:write-socket-data socket message
+                        :write-cb
+                        (and callback
+                             (lambda (socket)
+                               (declare (ignore socket))
+                               (funcall callback)))))
