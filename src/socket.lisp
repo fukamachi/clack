@@ -2,6 +2,7 @@
 (defpackage clack.socket
   (:use :cl)
   (:export :set-read-callback
+           :close-socket
            :write-sequence-to-socket
            :write-byte-to-socket
            :write-sequence-to-socket-buffer
@@ -11,6 +12,9 @@
 
 ;; required
 (defgeneric set-read-callback (socket callback))
+
+;; required
+(defgeneric close-socket (socket))
 
 ;; required.
 (defgeneric write-sequence-to-socket (socket data &key callback)

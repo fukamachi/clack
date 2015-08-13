@@ -173,3 +173,6 @@
                              (lambda (socket)
                                (declare (ignore socket))
                                (funcall callback)))))
+
+(defmethod clack.socket:close-socket ((socket as:socket))
+  (as:close-socket socket))
