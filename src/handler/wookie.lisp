@@ -163,16 +163,10 @@
                         :headers headers
                         :body body))))))
 
-(defmethod clack.socket:set-read-callback (socket callback)
+(defmethod clack.socket:set-read-callback ((socket as:socket) callback)
   (setf (getf (as:socket-data socket) :parser) callback))
 
-(defmethod clack.socket:write-byte-to-socket (socket byte &key callback)
-  (clack.socket:write-sequence-to-socket socket
-                                         (make-array 1 :element-type '(unsigned-byte 8)
-                                                     :initial-contents (list byte))
-                                         :callback callback))
-
-(defmethod clack.socket:write-sequence-to-socket (socket data &key callback)
+(defmethod clack.socket:write-sequence-to-socket ((socket as:socket) data &key callback)
   (as:write-socket-data socket data
                         :write-cb
                         (and callback

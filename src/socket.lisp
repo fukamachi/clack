@@ -12,18 +12,17 @@
 ;; required
 (defgeneric set-read-callback (socket callback))
 
-;; required
-(defgeneric write-byte-to-socket (socket byte &key callback))
-
-;; optional. fallback to write-byte-to-socket
+;; required.
 (defgeneric write-sequence-to-socket (socket data &key callback)
+  (:method (socket data &key callback)))
+
+;; optional. fallback to write-sequence-to-socket
+(defgeneric write-byte-to-socket (socket byte &key callback)
   (:method (socket data &key callback)
-    (loop for byte of-type (unsigned-byte 8) across data
-          do (write-byte-to-socket socket byte))
-    (when callback
-      (write-byte-to-socket socket
-                            #.(make-array 0 :element-type '(unsigned-byte 8))
-                            :callback callback))))
+    (write-sequence-to-socket socket
+                              (make-array 1 :element-type '(unsigned-byte 8)
+                                          :initial-contents (list byte))
+                              :callback callback)))
 
 ;; optional. fallback to synchronous version
 (defgeneric write-sequence-to-socket-buffer (socket data)
@@ -38,7 +37,6 @@
 ;; optional.
 (defgeneric flush-socket-buffer (socket &key callback)
   (:method (socket &key callback)
-    (when callback
-      (warn "Calling the callback immediately because the socket (~A) doesn't have asynchronous APIs."
-            (type-of socket))
-      (funcall callback))))
+    (write-sequence-to-socket socket
+                              #.(make-array 0 :element-type '(unsigned-byte 8))
+                              :callback callback)))
