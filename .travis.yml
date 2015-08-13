@@ -19,18 +19,31 @@ addons:
     packages:
       - libfcgi-dev
 
-before_install:
-  # Install Roswell
-  - curl -L https://raw.githubusercontent.com/snmsts/roswell/master/scripts/install-for-ci.sh | sh
-  # libuv for Wookie
-  - curl -L https://github.com/libuv/libuv/archive/v1.6.1.tar.gz | tar xzf -
-  - (cd libuv-1.6.1 && ./autogen.sh && ./configure --prefix=$HOME/libuv && make && make install)
-  # nginx
-  - curl -L http://nginx.org/download/nginx-1.8.0.tar.gz | tar xzf -
-  - (cd nginx-1.8.0 && ./configure --prefix=$HOME/nginx && make && make install)
-
 install:
+  # Install Roswell
+  - if ! $(which ros >/dev/null); then
+      curl -L https://raw.githubusercontent.com/snmsts/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh;
+    else
+      ros -e '(ql:update-all-dists :prompt nil)';
+    fi
+  # libuv for Wookie
+  - if ! [ -f "$HOME/libuv/include/uv.h" ]; then
+      curl -L https://github.com/libuv/libuv/archive/v1.6.1.tar.gz | tar xzf -;
+      (cd libuv-1.6.1 && ./autogen.sh && ./configure --prefix=$HOME/libuv && make && make install);
+    fi
+  # nginx
+  - if ! [ -f "$HOME/nginx/sbin/nginx" ]; then
+      curl -L http://nginx.org/download/nginx-1.8.0.tar.gz | tar xzf -;
+      (cd nginx-1.8.0 && ./configure --prefix=$HOME/nginx && make && make install);
+    fi
   - ros install prove
+
+cache:
+  directories:
+    - $HOME/.roswell
+    - $HOME/libuv
+    - $HOME/nginx
+    - $HOME/.config/common-lisp
 
 before_script:
   - nginx -c "$TRAVIS_BUILD_DIR/t/nginx.conf" -p "$HOME/nginx"
