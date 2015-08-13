@@ -175,4 +175,14 @@
                                (funcall callback)))))
 
 (defmethod clack.socket:close-socket ((socket as:socket))
-  (as:close-socket socket))
+  (unless (as:socket-closed-p socket)
+    (as:close-socket socket)))
+
+
+
+
+
+
+
+
+
