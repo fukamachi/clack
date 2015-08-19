@@ -8,12 +8,15 @@ env:
     - PATH=~/.roswell/bin:~/nginx/sbin:$PATH
     - LD_LIBRARY_PATH=$HOME/libuv/lib:$LD_LIBRARY_PATH
     - C_INCLUDE_PATH=$HOME/libuv/include:$C_INCLUDE_PATH
-    - ROSWELL_BRANCH=release
+    - ROSWELL_BRANCH=master
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
     - COVERAGE_EXCLUDE=t:v1-compat
   matrix:
     - LISP=sbcl-bin COVERALLS=true
     - LISP=ccl-bin
+    - LISP=abcl
+    - LISP=ecl
+    - LISP=clisp
 
 addons:
   apt:
@@ -22,11 +25,8 @@ addons:
 
 install:
   # Install Roswell
-  - if ! $(which ros >/dev/null); then
-      curl -L https://raw.githubusercontent.com/snmsts/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh;
-    else
-      ros -e '(ql:update-all-dists :prompt nil)';
-    fi
+  - curl -L https://raw.githubusercontent.com/snmsts/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
+  - ros -e '(ql:update-all-dists :prompt nil)'
   # libuv for Wookie
   - if ! [ -f "$HOME/libuv/include/uv.h" ]; then
       curl -L https://github.com/libuv/libuv/archive/v1.6.1.tar.gz | tar xzf -;
@@ -48,7 +48,8 @@ cache:
 
 before_script:
   - nginx -c "$TRAVIS_BUILD_DIR/t/nginx.conf" -p "$HOME/nginx"
-  - ros run -- --version
+  - ros --version
+  - ros config
 
 script:
   - if [ "$LISP" = "sbcl-bin" ]; then
