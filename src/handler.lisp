@@ -7,6 +7,7 @@
                 :threadp
                 :make-thread
                 :thread-alive-p
+                :interrupt-thread
                 :destroy-thread)
   (:export :run
            :stop))
@@ -38,6 +39,7 @@
     (if (bt:threadp acceptor)
         (progn
           (when (bt:thread-alive-p acceptor)
+            (bt:interrupt-thread acceptor (lambda ()))
             (bt:destroy-thread acceptor))
           (sleep 0.5))
         (let ((package (find-handler (handler-server handler))))
