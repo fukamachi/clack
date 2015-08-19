@@ -5,7 +5,8 @@
   (:import-from :clack.test
                 :*clack-test-handler*
                 :*clack-test-port*
-                :*enable-debug-p*
+                :*clack-test-access-port*
+                :*enable-debug*
                 :subtest-app)
   (:import-from :flexi-streams
                 :octet
@@ -15,13 +16,8 @@
                 :http-request)
   (:import-from :http-body
                 :parse)
-  (:export :*clack-test-access-port*
-           :run-server-tests))
+  (:export :run-server-tests))
 (in-package :clack.test.suite)
-
-(defvar *clack-test-access-port* *clack-test-port*
-  "Port of localhost to request.
-Use if you want to set another port. The default is `*clack-test-port*`.")
 
 (defvar *clack-pathname*
   (asdf:system-source-directory :clack))
@@ -297,7 +293,7 @@ you would call like this: `(run-server-tests :foo)'."
         "T"
         :test #'equalp))
 
-  (let ((*enable-debug-p* nil)
+  (let ((*enable-debug* nil)
         (*error-output* (make-broadcast-stream)))
     (subtest-app "Do not crash when the app dies"
         (lambda (env)
