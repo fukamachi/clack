@@ -31,11 +31,16 @@
 (defun port-available-p (port)
   (let (socket)
     (unwind-protect
-         (handler-case (setq socket (usocket:socket-listen "127.0.0.1" port :reuse-address t))
-           (usocket:address-in-use-error () nil))
+         (handler-case (progn
+                         (setq socket (usocket:socket-listen "127.0.0.1" port :reuse-address t))
+                         t)
+           (usocket:address-in-use-error () nil)
+           (usocket:socket-error (e)
+             (warn "USOCKET:SOCKET-ERROR: ~A" e)
+             nil))
       (when socket
         (usocket:socket-close socket)
-        T))))
+        t))))
 
 (defun localhost (&optional (path "/") (port *clack-test-port*))
   (check-type path string)
