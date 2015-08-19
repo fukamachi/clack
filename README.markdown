@@ -29,8 +29,8 @@ NOTE: Install [Roswell](https://github.com/snmsts/roswell) before as it depends 
 When you execute `ros install clack`, it copies `clackup` script to `$HOME/.roswell/bin`. Make sure the path is in your shell `$PATH`.
 
     $ ros install clack
-    $ which
-    /Users/nitro_idiot/.roswell/bin
+    $ which clackup
+    /Users/nitro_idiot/.roswell/bin/clackup
 
     $ cat <<EOF >> app.lisp
     (lambda (env)
@@ -69,7 +69,7 @@ When you execute `ros install clack`, it copies `clackup` script to `$HOME/.rosw
 
 ## Copyright
 
-Copyright (c) 2011-2014 Eitaro Fukamachi & [contributors](https://github.com/fukamachi/clack/graphs/contributors)
+Copyright (c) 2011-2015 Eitaro Fukamachi & [contributors](https://github.com/fukamachi/clack/graphs/contributors)
 
 ## License
 
