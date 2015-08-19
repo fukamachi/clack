@@ -39,6 +39,7 @@ install:
     fi
   - git clone https://github.com/rpav/fast-io ~/lisp/fast-io
   - git clone https://github.com/Rudolph-Miller/jonathan ~/lisp/jonathan
+  - git clone https://github.com/fukamachi/fast-http ~/lisp/fast-http
   - ros install prove
 
 cache:
