@@ -6,13 +6,11 @@
                 :stop)
   (:import-from :prove
                 :subtest)
-  (:import-from :bordeaux-threads
-                :thread-alive-p
-                :destroy-thread)
   (:import-from :usocket
                 :socket-listen
                 :socket-close
-                :address-in-use-error)
+                :address-in-use-error
+                :socket-error)
   (:export :*clack-test-handler*
            :*clack-test-port*
            :*enable-debug-p*
