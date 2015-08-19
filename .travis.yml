@@ -55,8 +55,7 @@ before_script:
 
 script:
   - if [ "$LISP" = "sbcl-bin" ]; then
-      test_files=$(ls t-*.asd);
+      run-prove t-*.asd;
     else
-      test_files=$(ls t-*.asd | grep -v t-clack-handler-wookie.asd | grep -v t-clack-handler-fcgi.asd);
+      run-prove t-clack-handler-hunchentoot.asd
     fi
-  - run-prove $test_files
