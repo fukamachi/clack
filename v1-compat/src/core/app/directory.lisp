@@ -6,11 +6,11 @@
                 :<clack-app-file>
                 :should-handle
                 :serve-path)
-  (:import-from :cl-fad
+  (:import-from :uiop
                 :file-exists-p
-                :directory-exists-p
                 :directory-pathname-p
-                :list-directory)
+                :subdirectories
+                :directory-files)
   (:import-from :local-time
                 :format-rfc1123-timestring
                 :universal-to-timestamp)
@@ -33,11 +33,19 @@
    :port port))
 
 (defmethod should-handle ((this <clack-app-directory>) file)
-  (file-exists-p file))
+  (uiop:file-exists-p file))
+
+(defun list-directory (dir)
+  (sort (nconc (uiop:subdirectories dir) (uiop:directory-files dir))
+        #'string<
+        :key (lambda (path)
+               (if (uiop:directory-pathname-p path)
+                   (car (last (pathname-directory path)))
+                   (file-namestring path)))))
 
 (defmethod serve-path ((this <clack-app-directory>) env file encoding)
   (declare (ignore encoding))
-  (if (directory-pathname-p file)
+  (if (uiop:directory-pathname-p file)
       `(200 nil (,(dir-page
                  (getf env :path-info)
                  (format nil "~A~{~A~}"
@@ -63,7 +71,7 @@
 
 (defun dir-file (file &key uri name)
   "Stolen from rack/directory.rb."
-  (let* ((dir-p (directory-pathname-p file))
+  (let* ((dir-p (uiop:directory-pathname-p file))
          (uri (or uri
                   (if dir-p
                       (car (last (pathname-directory file)))

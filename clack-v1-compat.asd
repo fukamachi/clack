@@ -15,7 +15,7 @@
                :marshal
                :cl-base64
                :cl-ppcre
-               :cl-fad
+               :uiop
                :quri
                :trivial-mimes
                :trivial-types

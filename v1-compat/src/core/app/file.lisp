@@ -9,7 +9,7 @@
   (:import-from :local-time
                 :format-rfc1123-timestring
                 :universal-to-timestamp)
-  (:import-from :cl-fad
+  (:import-from :uiop
                 :file-exists-p
                 :directory-exists-p)
   (:import-from :alexandria
@@ -66,8 +66,8 @@
           ;; Ignore simple-file-error in a case that
           ;; the file path contains some special characters like "?".
           ;; See https://github.com/fukamachi/clack/issues/111
-          (file-exists-p file))
-         (not (directory-exists-p file)))))
+          (uiop:file-exists-p file))
+         (not (uiop:directory-exists-p file)))))
 
 @export
 (defgeneric locate-file (app path root)
