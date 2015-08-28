@@ -22,34 +22,54 @@
         *default-content-type* "text/html; charset=utf-8"
         *catch-errors-p* nil))
 
+(defclass clack-acceptor (acceptor)
+  ((app :initarg :app
+        :initform (error ":app is required")
+        :accessor acceptor-app)
+   (debug :initarg :debug
+          :initform nil
+          :accessor acceptor-debug)))
+
+#-hunchentoot-no-ssl
+(defclass clack-ssl-acceptor (clack-acceptor ssl-acceptor) ())
+
+(defgeneric acceptor-handle-request (acceptor req)
+  (:method ((acceptor clack-acceptor) req)
+    (handle-request req :ssl nil))
+  (:method  ((acceptor clack-ssl-acceptor) req)
+    (handle-request req :ssl t)))
+
+(defmethod acceptor-dispatch-request ((acceptor clack-acceptor) req)
+  (let ((app (acceptor-app acceptor))
+        (env (acceptor-handle-request acceptor req)))
+    (handle-response
+     (if (acceptor-debug acceptor)
+         (funcall app env)
+         (handler-case (funcall app env)
+           (error (error)
+             (princ error *error-output*)
+             '(500 () ("Internal Server Error"))))))))
+
 (defun run (app &key debug (port 5000)
                   ssl ssl-key-file ssl-cert-file ssl-key-password
                   max-thread-count max-accept-count (persistent-connections-p t))
   "Start Hunchentoot server."
   (initialize)
-  (setf *dispatch-table*
-        (list
-         (let ((stdout *standard-output*)
-               (errout *error-output*))
-           (lambda (req)
-             (let ((env (handle-request req :ssl ssl)))
-               (lambda ()
-                 (let ((*standard-output* stdout)
-                       (*error-output* errout))
-                   (handle-response
-                    (if debug
-                        (funcall app env)
-                        (handler-case (funcall app env)
-                          (error (error)
-                            (princ error *error-output*)
-                            '(500 () ("Internal Server Error")))))))))))))
-  (let* ((taskmaster (when (and max-thread-count max-accept-count)
+  (let* ((app (let ((stdout *standard-output*)
+                    (stderr *error-output*))
+                (lambda (env)
+                  (let ((*standard-output* stdout)
+                        (*error-output* stderr))
+                    (funcall app env)))))
+         (taskmaster (when (and max-thread-count max-accept-count)
                        (make-instance 'one-thread-per-connection-taskmaster
                                       :max-thread-count max-thread-count
                                       :max-accept-count max-accept-count)))
          (acceptor
            (if ssl
-               (apply #'make-instance 'easy-ssl-acceptor
+               (apply #'make-instance 'clack-ssl-acceptor
+                      :app app
+                      :debug debug
                       :port port
                       :ssl-certificate-file ssl-cert-file
                       :ssl-privatekey-file ssl-key-file
@@ -58,7 +78,9 @@
                       :persistent-connections-p persistent-connections-p
                       (and taskmaster
                            (list :taskmaster taskmaster)))
-               (apply #'make-instance 'easy-acceptor
+               (apply #'make-instance 'clack-acceptor
+                      :app app
+                      :debug debug
                       :port port
                       :access-log-destination nil
                       :error-template-directory nil
