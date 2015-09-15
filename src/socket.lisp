@@ -22,10 +22,10 @@
 
 ;; optional. fallback to write-sequence-to-socket
 (defgeneric write-byte-to-socket (socket byte &key callback)
-  (:method (socket data &key callback)
+  (:method (socket byte &key callback)
     (write-sequence-to-socket socket
                               (make-array 1 :element-type '(unsigned-byte 8)
-                                          :initial-contents (list byte))
+                                            :initial-contents (list byte))
                               :callback callback)))
 
 ;; optional. fallback to synchronous version
