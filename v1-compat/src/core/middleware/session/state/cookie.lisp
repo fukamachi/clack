@@ -78,8 +78,8 @@ Example:
 
 @export
 (defmethod expire ((this <clack-session-state-cookie>)
-                              id res &optional options)
-  (setf (gethash :expires options) 0)
+                   id res &optional options)
+  (setf (getf options :expires) 1)
   (finalize this id res options))
 
 @export
