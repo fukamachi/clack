@@ -60,13 +60,14 @@ Options:
 
 (defun parse-args (args)
   (flet ((parse-value (value)
-           (or (ignore-errors
-                (let ((read-value (read-from-string value)))
-                  (typecase read-value
-                    (boolean read-value)
-                    ((and symbol (not keyword)) value)
-                    (otherwise read-value))))
-               value)))
+           (handler-case
+               (let ((read-value (read-from-string value)))
+                 (typecase read-value
+                   (boolean read-value)
+                   ((and symbol (not keyword)) value)
+                   (otherwise read-value)))
+             (error ()
+               value))))
     (loop with app-file = nil
           for option = (pop args)
           for value = (pop args)
