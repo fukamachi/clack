@@ -150,7 +150,8 @@ before passing to Hunchentoot."
                     (finish-output out)))))))
       (etypecase res
         (list (handle-normal-response res))
-        (function (funcall res #'handle-normal-response))))))
+        (function (funcall res #'handle-normal-response)))
+      (values))))
 
 (defun handle-request (req &key ssl)
   "Convert Request from server into a plist
