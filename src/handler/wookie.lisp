@@ -138,7 +138,8 @@
                 (finish-response res))))))
 
       (etypecase body
-        (null) ;; nothing to response
+        ;; Just send the headers and status.
+        (null (send-response res :status status :headers headers))
         (pathname
          (let ((stream (start-response res
                                        :status status
