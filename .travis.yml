@@ -8,7 +8,7 @@ env:
     - PATH=~/.roswell/bin:~/nginx/sbin:$PATH
     - LD_LIBRARY_PATH=$HOME/libuv/lib:$LD_LIBRARY_PATH
     - C_INCLUDE_PATH=$HOME/libuv/include:$C_INCLUDE_PATH
-    - ROSWELL_BRANCH=master
+    - ROSWELL_BRANCH=release
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
     - COVERAGE_EXCLUDE=t:v1-compat
   matrix:
