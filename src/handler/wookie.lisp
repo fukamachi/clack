@@ -53,8 +53,15 @@
 (defun parsed-headers-hook (request)
   (setf (wookie:request-store-body request) t))
 
-(defun run (app &key debug (port 5000)
-                  ssl ssl-key-file ssl-cert-file ssl-key-password)
+(defun run (app &rest args
+            &key debug (port 5000)
+              ssl ssl-key-file ssl-cert-file ssl-key-password)
+  (cond
+    ((asdf::getenv "SERVER_STARTER_PORT")
+     (error "Wookie handler doesn't work with Server::Starter."))
+    ((getf args :fd)
+     (error ":fd is specified though Wookie handler cannot listen on fd")))
+
   (let ((*state* (make-instance 'wookie:wookie-state)))
     (add-hook :parsed-headers 'parsed-headers-hook :clack-handler-wookie-parsed-headers-hook)
     (defroute (:* ".*" :chunk nil) (req res)
@@ -178,12 +185,3 @@
 (defmethod clack.socket:close-socket ((socket as:socket))
   (unless (as:socket-closed-p socket)
     (as:close-socket socket)))
-
-
-
-
-
-
-
-
-

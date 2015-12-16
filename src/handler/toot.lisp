@@ -18,9 +18,16 @@
   (:export :run))
 (in-package :clack.handler.toot)
 
-(defun run (app &key debug (port 5000)
-                  ssl ssl-key-file ssl-cert-file ssl-key-password)
+(defun run (app &rest args
+            &key debug (port 5000)
+              ssl ssl-key-file ssl-cert-file ssl-key-password)
   "Start Toot server."
+  (cond
+    ((asdf::getenv "SERVER_STARTER_PORT")
+     (error "Toot handler doesn't work with Server::Starter."))
+    ((getf args :fd)
+     (error ":fd is specified though Toot handler cannot listen on fd")))
+
   (let* ((stdout *standard-output*)
          (errout *error-output*)
          (acceptor (apply #'make-instance 'toot:acceptor

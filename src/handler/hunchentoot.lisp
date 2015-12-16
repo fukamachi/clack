@@ -50,10 +50,17 @@
              (princ error *error-output*)
              '(500 () ("Internal Server Error"))))))))
 
-(defun run (app &key debug (port 5000)
-                  ssl ssl-key-file ssl-cert-file ssl-key-password
-                  max-thread-count max-accept-count (persistent-connections-p t))
+(defun run (app &rest args
+            &key debug (port 5000)
+              ssl ssl-key-file ssl-cert-file ssl-key-password
+              max-thread-count max-accept-count (persistent-connections-p t))
   "Start Hunchentoot server."
+  (cond
+    ((asdf::getenv "SERVER_STARTER_PORT")
+     (error "Hunchentoot handler doesn't work with Server::Starter."))
+    ((getf args :fd)
+     (error ":fd is specified though Hunchentoot handler cannot listen on fd")))
+
   (initialize)
   (let* ((app (let ((stdout *standard-output*)
                     (stderr *error-output*))
