@@ -37,9 +37,6 @@ install:
       curl -L http://nginx.org/download/nginx-1.8.0.tar.gz | tar xzf -;
       (cd nginx-1.8.0 && ./configure --prefix=$HOME/nginx && make && make install);
     fi
-  - git clone https://github.com/rpav/fast-io ~/lisp/fast-io
-  - git clone https://github.com/Rudolph-Miller/jonathan ~/lisp/jonathan
-  - git clone https://github.com/fukamachi/fast-http ~/lisp/fast-http
   - ros install prove
 
 cache:
