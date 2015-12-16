@@ -59,6 +59,10 @@ When you execute `ros install clack`, it copies `clackup` script to `$HOME/.rosw
 * [Toot](https://github.com/gigamonkey/toot)
 * [Woo](https://github.com/fukamachi/woo)
 
+## How to contribute
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## See Also
 
 * [Lack](https://github.com/fukamachi/lack): Clack application builder
