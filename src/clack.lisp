@@ -16,12 +16,13 @@
 
 (defun eval-file (file)
   "Safer way to read and eval a file content. This function returns the last value."
-  (check-type file (or pathname string))
+  (setf file (probe-file file))
+  (check-type file pathname)
   (with-open-file (in file)
     (let ((*package* *package*)
           (*readtable* *readtable*)
-          (*load-pathname* nil)
-          (*load-truename* nil))
+          (*load-pathname* file)
+          (*load-truename* file))
       (loop with results
             with eof = '#:eof
             for form = (read in nil eof)
