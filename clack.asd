@@ -27,7 +27,7 @@
                :bordeaux-threads)
   :components ((:module "src"
                 :components
-                ((:file "clack" :depends-on ("handler"))
+                ((:file "clack" :depends-on ("handler" "util"))
                  (:file "handler" :depends-on ("util"))
                  (:file "util"))))
   :description "Web application environment for Common Lisp"

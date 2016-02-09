@@ -6,6 +6,8 @@
       (:import-from :clack.handler
                     :run
                     :stop)
+      (:import-from :clack.util
+                    :find-handler)
       (:import-from :lack
                     :builder)
       (:import-from :alexandria
@@ -49,14 +51,17 @@
                   :backtrace
                   nil)
               app))))
-    (when (and (not use-thread)
-               (not silent))
-      (format t "~&~:(~A~) server is going to start.~%Listening on localhost:~A.~%" server port))
-    (prog1
-        (apply #'clack.handler:run (buildapp app) server
-               :port port
-               :debug debug
-               :use-thread use-thread
-               (delete-from-plist args :server :port :debug :silent :use-thread))
-      (unless silent
-        (format t "~&~:(~A~) server is started.~%Listening on localhost:~A.~%" server port)))))
+    (let ((app (buildapp app)))
+      ;; Ensure the handler to be loaded.
+      (find-handler server)
+      (when (and (not use-thread)
+                 (not silent))
+        (format t "~&~:(~A~) server is going to start.~%Listening on localhost:~A.~%" server port))
+      (prog1
+          (apply #'clack.handler:run app server
+                 :port port
+                 :debug debug
+                 :use-thread use-thread
+                 (delete-from-plist args :server :port :debug :silent :use-thread))
+        (unless silent
+          (format t "~&~:(~A~) server is started.~%Listening on localhost:~A.~%" server port))))))
