@@ -33,6 +33,25 @@
             finally
                (return (apply #'values results))))))
 
+(defmacro with-handle-interrupt (int-handler &body body)
+  (let ((main (gensym "MAIN")))
+    `(flet ((,main () ,@body))
+       #+(or sbcl ccl clisp allegro ecl)
+       (handler-case
+           (let (#+ccl (ccl:*break-hook* (lambda (condition hook)
+                                           (declare (ignore hook))
+                                           (error condition))))
+             (,main))
+         (#+sbcl sb-sys:interactive-interrupt
+          #+ccl  ccl:interrupt-signal-condition
+          #+clisp system::simple-interrupt-condition
+          #+ecl ext:interactive-interrupt
+          #+allegro excl:interrupt-signal
+          ()
+           (funcall ,int-handler)))
+       #-(or sbcl ccl clisp allegro ecl)
+       (,main))))
+
 (defun clackup (app &rest args
                 &key (server :hunchentoot)
                   (port 5000)
@@ -57,12 +76,15 @@
       (when (and (not use-thread)
                  (not silent))
         (format t "~&~:(~A~) server is going to start.~%Listening on localhost:~A.~%" server port))
-      (prog1
-          (apply #'clack.handler:run app server
-                 :port port
-                 :debug debug
-                 :use-thread use-thread
-                 (delete-from-plist args :server :port :debug :silent :use-thread))
-        (when (and use-thread
-                   (not silent))
-          (format t "~&~:(~A~) server is started.~%Listening on localhost:~A.~%" server port))))))
+      (with-handle-interrupt (lambda ()
+                               (format *error-output* "Interrupted")
+                               (uiop:quit -1))
+        (prog1
+            (apply #'clack.handler:run app server
+                   :port port
+                   :debug debug
+                   :use-thread use-thread
+                   (delete-from-plist args :server :port :debug :silent :use-thread))
+          (when (and use-thread
+                     (not silent))
+            (format t "~&~:(~A~) server is started.~%Listening on localhost:~A.~%" server port)))))))

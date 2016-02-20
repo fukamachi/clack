@@ -23,8 +23,9 @@
   :license "LLGPL"
   :depends-on (:lack
                :lack-util
+               :bordeaux-threads
                :alexandria
-               :bordeaux-threads)
+               :uiop)
   :components ((:module "src"
                 :components
                 ((:file "clack" :depends-on ("handler" "util"))
