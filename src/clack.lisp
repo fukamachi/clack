@@ -77,8 +77,7 @@
                  (not silent))
         (format t "~&~:(~A~) server is going to start.~%Listening on localhost:~A.~%" server port))
       (with-handle-interrupt (lambda ()
-                               (format *error-output* "Interrupted")
-                               (uiop:quit -1))
+                               (format *error-output* "Interrupted"))
         (prog1
             (apply #'clack.handler:run app server
                    :port port
