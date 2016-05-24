@@ -474,10 +474,12 @@ you would call like this: `(run-server-tests :foo)'."
                   (getf env :content-type)
                   (getf env :content-length)
                   (getf env :raw-body)))
-          (declare (ignore name body headers))
+          (declare (ignore name params headers))
           `(200
             (:content-type "text/plain; charset=utf-8")
-            (,(gethash "filename" params)))))
+            (,(let* ((buffer (make-array 1024 :element-type '(unsigned-byte 8)))
+                     (read-bytes (read-sequence buffer body)))
+                (flex:octets-to-string (subseq buffer 0 read-bytes)))))))
     (multiple-value-bind (body status)
         (http-request (localhost)
                       :method :post
@@ -486,7 +488,8 @@ you would call like this: `(run-server-tests :foo)'."
                                 :content-type "plain/text"
                                 :filename "file.txt")))
       (is status 200)
-      (is body "file.txt")))
+      (is body "This is a text for test.
+")))
 
   (subtest-app "streaming"
       (lambda (env)
