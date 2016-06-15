@@ -33,7 +33,7 @@ you would call like this: `(run-server-tests :foo)'."
   (let ((*drakma-default-external-format* :utf-8)
         (*clack-test-handler* handler-name)
         (*package* (find-package :clack.test.suite)))
-    (plan 33)
+    (plan 35)
     #+thread-support
     (%run-tests)
     #-thread-support
@@ -123,6 +123,34 @@ you would call like this: `(run-server-tests :foo)'."
         (is status 200)
         (is (get-header headers :client-content-length)
             (princ-to-string len))
+        (is (length body) len))))
+
+  (subtest-app "big POST (chunked)"
+      (lambda (env)
+        `(200
+          (:content-type "text/plain; charset=utf-8"
+           :client-content-length ,(getf env :content-length)
+           :client-content-type ,(getf env :content-type))
+          (,(let* ((body (getf env :raw-body))
+                   (buffer (make-array 1024 :element-type '(unsigned-byte 8))))
+              (apply #'concatenate 'string
+                     (loop for read-bytes = (read-sequence buffer body)
+                           collect (flex:octets-to-string (subseq buffer 0 read-bytes))
+                           while (= read-bytes 1024)))))))
+    (let* ((chunk
+             (with-output-to-string (chunk)
+               (dotimes (i 12000) (write-string "abcdefgh" chunk))
+               chunk))
+           (len (length chunk)))
+      (multiple-value-bind (body status headers)
+          (http-request (localhost)
+                        :method :post
+                        :content-type "application/octet-stream"
+                        :content-length nil
+                        :parameters `((,chunk)))
+        (is status 200)
+        (is (get-header headers :client-content-length)
+            nil)
         (is (length body) len))))
 
   (subtest-app "url-scheme"
@@ -490,6 +518,37 @@ you would call like this: `(run-server-tests :foo)'."
       (is status 200)
       (is body "This is a text for test.
 ")))
+
+  (subtest-app "large file upload"
+      (lambda (env)
+        (destructuring-bind (name body params headers)
+            (car (http-body:parse
+                  (getf env :content-type)
+                  (getf env :content-length)
+                  (getf env :raw-body)))
+          (declare (ignore name params headers))
+          (let ((body-file
+                  (uiop:with-temporary-file (:stream out :pathname tmp
+                                             :direction :output
+                                             :element-type '(unsigned-byte 8)
+                                             :keep t)
+                    (alexandria:copy-stream body out)
+                    tmp)))
+            `(200
+              (:content-type "text/plain")
+              (,(if (equalp (ironclad:digest-file :sha1 body-file)
+                            (ironclad:digest-file :sha1 (merge-pathnames #p"tmp/jellyfish.jpg" *clack-pathname*)))
+                    "ok"
+                    (format nil "ng (~A)" body-file)))))))
+    (multiple-value-bind (body status)
+        (http-request (localhost)
+                      :method :post
+                      :parameters
+                      `(("file" ,(merge-pathnames #p"tmp/jellyfish.jpg" *clack-pathname*)
+                                :content-type "image/jpeg"
+                                :filename "image.jpg")))
+      (is status 200)
+      (is body "ok")))
 
   (subtest-app "streaming"
       (lambda (env)
