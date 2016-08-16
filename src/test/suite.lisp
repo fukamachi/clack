@@ -149,8 +149,10 @@ you would call like this: `(run-server-tests :foo)'."
                         :content-length nil
                         :parameters `((,chunk)))
         (is status 200)
-        (is (get-header headers :client-content-length)
-            nil)
+        (if (eq *clack-test-handler* :fcgi)
+            (skip 1 "because FCGI handler always adds :CONTENT-TYPE")
+            (is (get-header headers :client-content-length)
+                nil))
         (is (length body) len))))
 
   (subtest-app "url-scheme"
