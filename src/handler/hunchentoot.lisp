@@ -135,8 +135,9 @@ before passing to Hunchentoot."
                                                    :external-format *hunchentoot-default-external-format*)
                             body)
                         out)
-                       (when close
-                         (finish-output out))))))
+                       (if close
+                           (finish-output out)
+                           (force-output out))))))
 
                (etypecase body
                  (null) ;; nothing to response
