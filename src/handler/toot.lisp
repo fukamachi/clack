@@ -82,7 +82,7 @@ before pass to Clack application."
                         80)
        :server-protocol (server-protocol req)
        :request-uri (request-uri req)
-       :url-scheme (if ssl :https :http)
+       :url-scheme (if ssl "https" "http")
        :remote-addr (remote-addr req)
        :remote-port (remote-port req)
        :query-string (request-query req)

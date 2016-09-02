@@ -193,7 +193,7 @@ before passing to Clack application."
                                            (handler-case (quri:url-decode path-info)
                                              (quri:uri-error ()
                                                path-info)))
-                              :url-scheme :http
+                              :url-scheme "http"
                               :raw-body (loop with buf = (make-array 0 :fill-pointer 0 :adjustable t)
                                               for v in (cdr (fcgx-read-all req))
                                               do (adjust-array buf (+ (length buf) (length v)))

@@ -174,7 +174,7 @@ before passing to Clack application."
      :server-port (parse-integer server-port :junk-allowed t)
      :server-protocol (server-protocol* req)
      :request-uri (request-uri* req)
-     :url-scheme (if ssl :https :http)
+     :url-scheme (if ssl "https" "http")
      :remote-addr (remote-addr* req)
      :remote-port (remote-port* req)
      ;; Request params
