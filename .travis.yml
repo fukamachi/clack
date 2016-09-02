@@ -38,6 +38,7 @@ install:
       (cd nginx-1.8.0 && ./configure --prefix=$HOME/nginx && make && make install);
     fi
   - ros install prove
+  - ros install fukamachi/dexador
 
 cache:
   directories:

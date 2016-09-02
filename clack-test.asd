@@ -25,7 +25,7 @@
                :prove
                :bordeaux-threads
                :usocket
-               :drakma
+               :dexador
                :flexi-streams
                :http-body)
   :components ((:file "src/test")
