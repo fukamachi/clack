@@ -159,12 +159,12 @@ you would call like this: `(run-server-tests :foo)'."
       (lambda (env)
         `(200
           (:content-type "text/plain; charset=utf-8")
-          (,(string (getf env :url-scheme)))))
+          (,(getf env :url-scheme))))
     (multiple-value-bind (body status headers)
         (http-request (localhost) :method :post)
       (is status 200)
       (is (get-header headers :content-type) "text/plain; charset=utf-8")
-      (is body "HTTP")))
+      (is body "http")))
 
   (subtest-app "return pathname"
       (lambda (env)
