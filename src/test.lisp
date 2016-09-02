@@ -13,6 +13,7 @@
                 :socket-error)
   (:export :*clack-test-handler*
            :*clack-test-port*
+           :*clack-additional-args*
            :*clack-test-access-port*
            :*enable-debug*
            :*random-port*
@@ -25,6 +26,9 @@
 
 (defvar *clack-test-port* 4242
   "HTTP port number of Handler.")
+
+(defvar *clack-additional-args* '()
+  "Additional arguments for clackup.")
 
 (defvar *clack-test-access-port* *clack-test-port*
   "Port of localhost to request.
@@ -78,12 +82,13 @@ Use if you want to set another port. The default is `*clack-test-port*`.")
           finally
              (unless (port-available-p *clack-test-port*)
                (error "Port ~D is already in use." *clack-test-port*)))
-    (let ((acceptor (clackup app
-                             :server *clack-test-handler*
-                             :use-thread t
-                             :silent t
-                             :port *clack-test-port*
-                             :debug *enable-debug*)))
+    (let ((acceptor (apply #'clackup app
+                           :server *clack-test-handler*
+                           :port *clack-test-port*
+                           :debug *enable-debug*
+                           :use-thread t
+                           :silent t
+                           *clack-additional-args*)))
       (subtest desc
         (sleep 0.5)
         (unwind-protect
