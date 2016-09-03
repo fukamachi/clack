@@ -399,16 +399,17 @@ you would call like this: `(run-server-tests :foo)'."
             (with-output-to-string (chunk)
               (dotimes (i 12000) (write-string "abcdefgh" chunk))
               chunk)))
-      (multiple-value-bind (body status)
-          (dex:get (localhost)
-                   :headers `(("X-Foo" . ,chunk)))
-        (if (eq :fcgi *clack-test-handler*)
-            (progn
-              (is status 400)
-              (like body "400 Request Header Or Cookie Too Large"))
-            (progn
-              (is status 200)
-              (is body chunk))))))
+      (handler-bind ((dex:http-request-failed #'dex:ignore-and-continue))
+        (multiple-value-bind (body status)
+            (dex:get (localhost)
+                     :headers `(("X-Foo" . ,chunk)))
+          (if (eq :fcgi *clack-test-handler*)
+              (progn
+                (is status 400)
+                (like body "400 Request Header Or Cookie Too Large"))
+              (progn
+                (is status 200)
+                (is body chunk)))))))
 
   (subtest-app "CRLF output"
       (lambda (env)
