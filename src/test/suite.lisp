@@ -301,9 +301,10 @@ you would call like this: `(run-server-tests :foo)'."
         `(200
           (:content-type "text/plain; charset=utf-8")
           (,(getf env :path-info))))
-    (is (dex:get (localhost "/%E3%81%82%BF%27%22%28"))
-        (format nil "/あ~A'\"("
-                (flex:octets-to-string #(#xEF #xBF #xBD) :external-format :utf-8))))
+    (like (dex:get (localhost "/%E3%81%82%BF%27%22%28"))
+        (format nil "/あ~A"
+                #+abcl "\\?"
+                #-abcl #\Replacement_Character)))
 
   (subtest-app "SERVER-PROTOCOL is required"
       (lambda (env)
