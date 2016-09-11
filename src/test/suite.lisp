@@ -30,11 +30,11 @@ you would call like this: `(run-server-tests :foo)'."
   (let ((*clack-test-handler* handler-name)
         (*package* (find-package :clack.test.suite))
         (dex:*use-connection-pool* nil))
-    (plan 35)
+    (plan 36)
     #+thread-support
     (%run-tests)
     #-thread-support
-    (skip 33 "because your Lisp doesn't support threads")
+    (skip 36 "because your Lisp doesn't support threads")
     (finalize)))
 
 (defun get-header (headers key)
@@ -295,6 +295,18 @@ you would call like this: `(run-server-tests :foo)'."
     (is (dex:get (localhost "/foo%E3%81%82"))
         (format nil "/foo~A"
                 (flex:octets-to-string #(#xE3 #x81 #x82) :external-format :utf-8))))
+
+  (subtest-app "Invalid UTF-8 encoded PATH-INFO"
+      (lambda (env)
+        `(200
+          (:content-type "text/plain; charset=utf-8")
+          (,(getf env :path-info))))
+      (if (eq *clack-test-handler* :wookie)
+          (skip 1 "because do-urlencode Wookie uses cannot decode invalid UTF8 strings anyways")
+          (like (dex:get (localhost "/%E3%81%82%BF%27%22%28"))
+                (format nil "/あ~A"
+                        #+abcl "\\?"
+                        #-abcl #\Replacement_Character))))
 
   (subtest-app "SERVER-PROTOCOL is required"
       (lambda (env)

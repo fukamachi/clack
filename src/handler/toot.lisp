@@ -12,7 +12,8 @@
                 :acceptor-process
                 :accept-connections)
   (:import-from :flexi-streams
-                :octets-to-string)
+                :octets-to-string
+                :*substitution-char*)
   (:import-from :alexandria
                 :if-let)
   (:export :run))
@@ -75,7 +76,9 @@ before pass to Clack application."
       (list
        :request-method (request-method req)
        :script-name ""
-       :path-info (url-decode (request-path req))
+       :path-info (let ((flex:*substitution-char* #-abcl #\Replacement_Character
+                                                  #+abcl #\?))
+                    (url-decode (request-path req)))
        :server-name server-name
        :server-port (if server-port
                         (parse-integer server-port)

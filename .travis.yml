@@ -39,6 +39,7 @@ install:
     fi
   - ros install prove
   - ros install fukamachi/dexador
+  - ros install fukamachi/quri
 
 cache:
   directories:

@@ -3,8 +3,7 @@
   (:use :cl
         :cl-fastcgi)
   (:import-from :quri
-                :url-decode
-                :uri-error)
+                :url-decode)
   (:import-from :flexi-streams
                 :make-in-memory-input-stream
                 :string-to-octets)
@@ -150,7 +149,8 @@ before passing to Clack application."
                          (format nil "~A, ~A" v current)
                          v)))))
       (loop with request-uri = nil
-            for (k . v) in (fcgx-getenv req)
+            for (k . v) in (let ((cffi:*default-foreign-encoding* :latin-1))
+                             (fcgx-getenv req))
             if (starts-with-subseq "HTTP_" k)
               do (set-header (canonicalize k :start 5 :case :downcase) v)
             if (or (string= k "SERVER_NAME")
@@ -186,13 +186,11 @@ before passing to Clack application."
                (return (nconc
                         env
                         (list :headers headers
-                              :path-info (let ((path-info (subseq request-uri
-                                                                  0
-                                                                  (position #\? request-uri
-                                                                            :test #'char=))))
-                                           (handler-case (quri:url-decode path-info)
-                                             (quri:uri-error ()
-                                               path-info)))
+                              :path-info
+                              (quri:url-decode request-uri
+                                               :end (position #\? request-uri
+                                                              :test #'char=)
+                                               :lenient t)
                               :url-scheme "http"
                               :raw-body (loop with buf = (make-array 0 :fill-pointer 0 :adjustable t)
                                               for v in (cdr (fcgx-read-all req))

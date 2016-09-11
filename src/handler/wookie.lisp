@@ -32,8 +32,7 @@
                 :uri-path
                 :uri-query
                 :parse-uri
-                :url-decode
-                :uri-error)
+                :url-decode)
   (:import-from :flexi-streams
                 :make-in-memory-input-stream)
   (:import-from :babel
@@ -54,7 +53,7 @@
   (setf (wookie:request-store-body request) t))
 
 (defun run (app &rest args
-            &key debug (port 5000)
+            &key (debug t) (port 5000)
               ssl ssl-key-file ssl-cert-file ssl-key-password)
   (cond
     ((asdf::getenv "SERVER_STARTER_PORT")
@@ -105,9 +104,7 @@
                              80)
             :server-protocol (intern (format nil "HTTP/~A" http-version)
                                      :keyword)
-            :path-info (handler-case (quri:url-decode (uri-path quri))
-                         (quri:uri-error ()
-                           (uri-path quri)))
+            :path-info (quri:url-decode (uri-path quri) :lenient t)
             :query-string (uri-query quri)
             :url-scheme (if ssl "https" "http")
             :request-uri (request-resource req)

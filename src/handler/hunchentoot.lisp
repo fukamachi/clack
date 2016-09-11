@@ -10,7 +10,8 @@
                 :acceptor-shutdown-p)
   (:import-from :flexi-streams
                 :make-external-format
-                :string-to-octets)
+                :string-to-octets
+                :*substitution-char*)
   (:import-from :alexandria
                 :when-let)
   (:export :run))
@@ -50,6 +51,11 @@
            (error (error)
              (princ error *error-output*)
              '(500 () ("Internal Server Error"))))))))
+
+(defmethod hunchentoot:process-connection :around ((acceptor clack-acceptor) socket)
+  (let ((flex:*substitution-char* #-abcl #\Replacement_Character
+                                  #+abcl #\?))
+    (call-next-method)))
 
 (defun run (app &rest args
             &key debug (port 5000)
