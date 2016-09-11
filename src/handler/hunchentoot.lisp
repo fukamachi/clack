@@ -20,7 +20,7 @@
   (setf *hunchentoot-default-external-format*
         (flex:make-external-format :utf-8 :eol-style :lf)
         *default-content-type* "text/html; charset=utf-8"
-        *catch-errors-p* nil))
+        *catch-errors-p* t))
 
 (defclass clack-acceptor (acceptor)
   ((app :initarg :app
@@ -41,7 +41,8 @@
 
 (defmethod acceptor-dispatch-request ((acceptor clack-acceptor) req)
   (let ((app (acceptor-app acceptor))
-        (env (acceptor-handle-request acceptor req)))
+        (env (acceptor-handle-request acceptor req))
+        (hunchentoot:*catch-errors-p* nil))
     (handle-response
      (if (acceptor-debug acceptor)
          (funcall app env)
