@@ -149,7 +149,8 @@ before passing to Clack application."
                          (format nil "~A, ~A" v current)
                          v)))))
       (loop with request-uri = nil
-            for (k . v) in (fcgx-getenv req)
+            for (k . v) in (let ((cffi:*default-foreign-encoding* :latin-1))
+                             (fcgx-getenv req))
             if (starts-with-subseq "HTTP_" k)
               do (set-header (canonicalize k :start 5 :case :downcase) v)
             if (or (string= k "SERVER_NAME")
