@@ -53,7 +53,7 @@
   (setf (wookie:request-store-body request) t))
 
 (defun run (app &rest args
-            &key debug (port 5000)
+            &key (debug t) (port 5000)
               ssl ssl-key-file ssl-cert-file ssl-key-password)
   (cond
     ((asdf::getenv "SERVER_STARTER_PORT")
