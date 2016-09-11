@@ -185,11 +185,11 @@ before passing to Clack application."
                (return (nconc
                         env
                         (list :headers headers
-                              :path-info (let ((path-info (subseq request-uri
-                                                                  0
-                                                                  (position #\? request-uri
-                                                                            :test #'char=))))
-                                           (quri:url-decode path-info :lenient t))
+                              :path-info
+                              (quri:url-decode request-uri
+                                               :end (position #\? request-uri
+                                                              :test #'char=)
+                                               :lenient t)
                               :url-scheme "http"
                               :raw-body (loop with buf = (make-array 0 :fill-pointer 0 :adjustable t)
                                               for v in (cdr (fcgx-read-all req))
