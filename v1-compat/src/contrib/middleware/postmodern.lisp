@@ -68,7 +68,7 @@ the environment with the key :clack.postmodern.databases."))
 			   :port port
 			   :pooled-p pooled-p
 			   :use-ssl use-ssl)
-      (let* ((old-dbs (getf env :databases))
+      (let* ((old-dbs (getf env :clack.postmodern.databases))
 	     (new-dbs (acons database *database* old-dbs)))
 	;; store the databases in env
 	(setf (getf env :clack.postmodern.databases) new-dbs)
