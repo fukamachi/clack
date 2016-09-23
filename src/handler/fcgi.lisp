@@ -93,8 +93,18 @@
 
       (when (eq body no-body)
         (return-from handle-response
-          (lambda (body &key (close nil))
-            (fcgx-puts req body)
+          (lambda (body &key (start 0 has-start) (end (length body) has-end) (close nil))
+            (etypecase body
+              (string
+               (fcgx-puts req
+                          (flex:string-to-octets body
+                                                 :start start :end end
+                                                 :external-format :utf-8)))
+              ((vector (unsigned-byte 8))
+               (fcgx-puts req
+                          (if (or has-start has-end)
+                              (subseq body start end)
+                              body))))
             (if close
                 (fcgx-finish req)
                 (fcgx-flush req)))))

@@ -135,13 +135,16 @@ before passing to Hunchentoot."
                (when (eq body no-body)
                  (return-from handle-normal-response
                    (let ((out (send-headers)))
-                     (lambda (body &key (close nil))
-                       (write-sequence
-                        (if (stringp body)
-                            (flex:string-to-octets body
-                                                   :external-format *hunchentoot-default-external-format*)
-                            body)
-                        out)
+                     (lambda (body &key (start 0) (end (length body)) (close nil))
+                       (etypecase body
+                         (string
+                          (write-sequence
+                           (flex:string-to-octets body
+                                                  :start start :end end
+                                                  :external-format *hunchentoot-default-external-format*)
+                           out))
+                         ((vector (unsigned-byte 8))
+                          (write-sequence body out :start start :end end)))
                        (if close
                            (finish-output out)
                            (force-output out))))))

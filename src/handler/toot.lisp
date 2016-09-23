@@ -133,12 +133,16 @@ before pass to Clack application."
                (let ((out (toot::content-stream req)))
                  (when (eq body no-body)
                    (return-from handle-normal-response
-                     (lambda (body &key (close nil))
+                     (lambda (body &key (start 0) (end (length body)) (close nil))
                        (declare (ignore close))
-                       (write-sequence (if (stringp body)
-                                           (flex:string-to-octets body :external-format toot::*default-charset*)
-                                           body)
-                                       out))))
+                       (etypecase body
+                         (string
+                          (write-sequence (flex:string-to-octets body
+                                                                 :start start :end end
+                                                                 :external-format toot::*default-charset*)
+                                          out))
+                         ((vector (unsigned-byte 8))
+                          (write-sequence body out :start start :end end))))))
 
                  (etypecase body
                    (null) ;; nothing to response

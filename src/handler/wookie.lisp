@@ -134,10 +134,10 @@
                                       :status status
                                       :headers headers)))
           (return-from handle-normal-response
-            (lambda (body &key (close nil))
+            (lambda (body &key (start 0) (end (length body)) (close nil))
               (etypecase body
-                (string (write-sequence (babel:string-to-octets body) stream))
-                (vector (write-sequence body stream)))
+                (string (write-sequence (babel:string-to-octets body :start start :end end) stream))
+                ((vector (unsigned-byte 8)) (write-sequence body stream :start start :end end)))
               (when close
                 (finish-response res))))))
 
