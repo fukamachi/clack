@@ -95,6 +95,7 @@
         (return-from handle-response
           (lambda (body &key (start 0 has-start) (end (length body) has-end) (close nil))
             (etypecase body
+              (null)
               (string
                (fcgx-puts req
                           (flex:string-to-octets body

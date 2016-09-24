@@ -136,6 +136,7 @@ before pass to Clack application."
                      (lambda (body &key (start 0) (end (length body)) (close nil))
                        (declare (ignore close))
                        (etypecase body
+                         (null)
                          (string
                           (write-sequence (flex:string-to-octets body
                                                                  :start start :end end

@@ -136,6 +136,7 @@
           (return-from handle-normal-response
             (lambda (body &key (start 0) (end (length body)) (close nil))
               (etypecase body
+                (null)
                 (string (write-sequence (babel:string-to-octets body :start start :end end) stream))
                 ((vector (unsigned-byte 8)) (write-sequence body stream :start start :end end)))
               (when close
