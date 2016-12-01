@@ -69,13 +69,7 @@
      (error ":fd is specified though Hunchentoot handler cannot listen on fd")))
 
   (initialize)
-  (let* ((app (let ((stdout *standard-output*)
-                    (stderr *error-output*))
-                (lambda (env)
-                  (let ((*standard-output* stdout)
-                        (*error-output* stderr))
-                    (funcall app env)))))
-         (taskmaster (when (and max-thread-count max-accept-count)
+  (let* ((taskmaster (when (and max-thread-count max-accept-count)
                        (make-instance 'one-thread-per-connection-taskmaster
                                       :max-thread-count max-thread-count
                                       :max-accept-count max-accept-count)))
