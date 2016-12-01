@@ -17,7 +17,10 @@
   acceptor)
 
 (defun run (app server &rest args &key use-thread &allow-other-keys)
-  (let ((handler-package (find-handler server)))
+  (let ((handler-package (find-handler server))
+        (bt:*default-special-bindings* `((*standard-output* . ,*standard-output*)
+                                         (*error-output* . ,*error-output*)
+                                         ,@bt:*default-special-bindings*)))
     (flet ((run-server ()
              (apply (intern #.(string '#:run) handler-package)
                     app
@@ -29,8 +32,8 @@
                      (bt:make-thread #'run-server
                                      :name (format nil "clack-handler-~(~A~)" server)
                                      :initial-bindings
-                                     `((*standard-output* . ,*standard-output*)
-                                       (*error-output* . ,*error-output*)))
+                                     `((bt:*default-special-bindings* . ',bt:*default-special-bindings*)
+                                       ,@bt:*default-special-bindings*))
                      (run-server))))))
 
 (defun stop (handler)
