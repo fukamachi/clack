@@ -149,43 +149,6 @@ Typically this will be something like :HTTP/1.0 or :HTTP/1.1.")
       (gethash name (slot-value request 'headers))
       (slot-value request 'headers)))
 
-(defmethod initialize-instance :after ((this <request>) &rest env)
-  (remf env :allow-other-keys)
-  (setf (slot-value this 'env) env)
-
-  ;; cookies
-  (when-let (cookie (gethash "cookie" (headers this)))
-    (setf (slot-value this 'http-cookie)
-          (loop for kv in (ppcre:split "\\s*[,;]\\s*" cookie)
-                append (quri:url-decode-params kv :lenient t))))
-
-  ;; GET parameters
-  (unless (slot-boundp this 'query-parameters)
-    (setf (slot-value this 'query-parameters)
-          (and (query-string this)
-               (quri:url-decode-params (query-string this) :lenient t))))
-
-  ;; POST parameters
-  (unless (slot-boundp this 'body-parameters)
-    (setf (slot-value this 'body-parameters)
-          (and (raw-body this)
-               (parse (content-type this) (content-length this) (raw-body this))))))
-
-@export
-(defun shared-raw-body (env)
-  "Returns a shared raw-body, or returns nil if raw-body is
-empty. This function modifies REQ to share raw-body among the
-instances of <request>."
-  (when-let ((body (getf env :raw-body)))
-    (assert (not (typep body 'circular-streams:circular-input-stream)))
-    (let ((buffer (getf env :raw-body-buffer)))
-      (if buffer
-          ;; FIXME: Return a circular stream
-          (flex:make-in-memory-input-stream buffer)
-          (let ((stream (make-circular-input-stream body)))
-            (rplacd (last env) (list :raw-body-buffer (circular-stream-buffer stream)))
-            stream)))))
-
 @export
 ;; constructor
 (defun make-request (env)
@@ -193,10 +156,38 @@ instances of <request>."
 Make a <request> instance from environment plist. Raw-body of the instance
 will be shared, meaning making an instance of <request> doesn't effect
 on an original raw-body."
-  (apply #'make-instance '<request>
-         :allow-other-keys t
-         :raw-body (shared-raw-body env)
-         env))
+  (let ((req (apply #'make-instance '<request>
+                    :env env
+                    :allow-other-keys t
+                    env)))
+
+    ;; cookies
+    (when-let (cookie (gethash "cookie" (headers req)))
+      (setf (slot-value req 'http-cookie)
+            (loop for kv in (ppcre:split "\\s*[,;]\\s*" cookie)
+                  append (quri:url-decode-params kv :lenient t)))
+      (rplacd (last env) (list :cookies (slot-value req 'http-cookie))))
+
+    ;; GET parameters
+    (unless (slot-boundp req 'query-parameters)
+      (setf (slot-value req 'query-parameters)
+            (and (query-string req)
+                 (quri:url-decode-params (query-string req) :lenient t)))
+      (rplacd (last env) (list :query-parameters (slot-value req 'query-parameters))))
+
+    (when (raw-body req)
+      (setf (slot-value req 'raw-body)
+            (make-circular-input-stream (raw-body req)))
+
+      (setf (getf env :raw-body) (slot-value req 'raw-body))
+      ;; POST parameters
+      (unless (slot-boundp req 'body-parameters)
+        (setf (slot-value req 'body-parameters)
+              (parse (content-type req) (content-length req) (raw-body req)))
+        (file-position (raw-body req) 0)
+        (rplacd (last env) (list :body-parameters (slot-value req 'body-parameters)))))
+
+    req))
 
 @export
 (defgeneric securep (req)
