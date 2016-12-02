@@ -26,6 +26,7 @@ addons:
 install:
   # Install Roswell
   - curl -L https://raw.githubusercontent.com/snmsts/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
+  - ros asdf install
   - ros -e '(ql:update-all-dists :prompt nil)'
   # libuv for Wookie
   - if ! [ -f "$HOME/libuv/include/uv.h" ]; then
