@@ -10,7 +10,7 @@ env:
     - C_INCLUDE_PATH=$HOME/libuv/include:$C_INCLUDE_PATH
     - ROSWELL_BRANCH=release
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
-    - COVERAGE_EXCLUDE=t:v1-compat
+    - COVERAGE_EXCLUDE=t
   matrix:
     - LISP=sbcl-bin COVERALLS=true
     - LISP=ccl-bin
