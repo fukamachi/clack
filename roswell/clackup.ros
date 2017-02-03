@@ -38,6 +38,13 @@ Options:
         A flag if use default middlewares. The default is T.
         Specify NIL for preventing from loading those middlewares.
 
+    -S, --source-registry
+        Append ASDF source registry to the default.
+        (Unlike Roswell's, this doesn't override it)
+
+    -l, --load
+        Load a file before starting a server.
+
     --help
         Shows this message.
 "
@@ -72,7 +79,14 @@ Options:
           for option = (pop args)
           for value = (pop args)
           while option
-          if (not (starts-with option "--"))
+          if (or (string= option "--source-registry")
+                 (string= option "-S"))
+            append (list :source-registry value)
+              into opt-args
+          else if (or (string= option "--load")
+                      (string= option "-l"))
+                 collect value into load-files
+          else if (not (starts-with option "--"))
             do (if app-file
                    (error "Invalid option: ~S" option)
                    (progn
@@ -90,7 +104,8 @@ Options:
                          (parse-value value))
               into key-args
           finally
-             (return (values app-file key-args)))))
+             (return (values app-file key-args
+                             (list* :load load-files opt-args))))))
 
 (defun parse-server-starter-port ()
   (flet ((parse-host-port (host-port)
@@ -116,10 +131,16 @@ Options:
 
   (ql:quickload :clack :silent t)
 
-  (multiple-value-bind (app-file key-args)
+  (multiple-value-bind (app-file key-args opt-args)
       (parse-args args)
     (unless (probe-file app-file)
       (%terminate -1 "File doesn't exist: ~A" app-file))
+
+    ;; Add ASDF source-registry
+    (asdf:compute-source-registry (getf opt-args :source-registry))
+
+    ;; Load files
+    (mapc #'load (getf opt-args :load))
 
     ;; Add :port and :fd from Server::Starter's environment var.
     (multiple-value-bind (port fd)
