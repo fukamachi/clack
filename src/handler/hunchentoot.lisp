@@ -17,6 +17,17 @@
   (:export :run))
 (in-package :clack.handler.hunchentoot)
 
+(defvar *client-socket*)
+
+(defclass client ()
+  ((stream :initarg :stream
+           :reader client-stream)
+   (socket :initarg :socket
+           :reader client-socket)
+   (read-callback :initarg :read-callback
+                  :initform nil
+                  :accessor client-read-callback)))
+
 (defun initialize ()
   (setf *hunchentoot-default-external-format*
         (flex:make-external-format :utf-8 :eol-style :lf)
@@ -54,7 +65,8 @@
 
 (defmethod hunchentoot:process-connection :around ((acceptor clack-acceptor) socket)
   (let ((flex:*substitution-char* #-abcl #\Replacement_Character
-                                  #+abcl #\?))
+                                  #+abcl #\?)
+        (*client-socket* socket))
     (call-next-method)))
 
 (defun run (app &rest args
@@ -189,6 +201,9 @@ before passing to Clack application."
                        (parse-integer content-length :junk-allowed t))
      :content-type (header-in* :content-type req)
      :clack.streaming t
+     :clack.io (make-instance 'client
+                              :socket *client-socket*
+                              :stream (hunchentoot::content-stream req))
 
      :headers (loop with headers = (make-hash-table :test 'equal)
                     for (k . v) in (hunchentoot:headers-in* req)
@@ -196,3 +211,60 @@ before passing to Clack application."
                                (eq k :content-type))
                       do (setf (gethash (string-downcase k) headers) v)
                     finally (return headers)))))
+
+(defmethod clack.socket:set-read-callback ((client client) callback)
+  (setf (client-read-callback client) callback))
+
+(defmethod clack.socket:write-sequence-to-socket ((client client) data &key callback)
+  (let ((stream (client-stream client)))
+    (write-sequence data stream)
+    (force-output stream))
+  (when callback
+    (funcall callback)))
+
+(defmethod clack.socket:close-socket ((client client))
+  (finish-output (client-stream client)))
+
+(defmethod clack.socket:flush-socket-buffer ((client client) &key callback)
+  (force-output (client-stream client))
+  (when callback
+    (funcall callback)))
+
+(defmethod clack.socket:start-connection ((client client))
+  (hunchentoot::set-timeouts (client-socket client) 300 300)
+  (let ((stream (client-stream client))
+        (buf (make-array 2 :element-type '(unsigned-byte 8)))
+        (extended-buf (make-array 8 :element-type '(unsigned-byte 8))))
+    (tagbody retry
+       (loop for read-bytes = (handler-case (read-sequence buf stream)
+                                (error ()
+                                  ;; Retry when I/O timeout error
+                                  (go retry)))
+             while (/= read-bytes 0)
+             for maskp = (plusp (ldb (byte 1 7) (aref buf 1)))
+             for data-length = (ldb (byte 7 0) (aref buf 1))
+             do (cond
+                  ((<= 0 data-length 125))
+                  (t
+                   (let ((end (if (= data-length 126) 2 8)))
+                     (read-sequence extended-buf stream :end end)
+                     (incf read-bytes end)
+                     (setf data-length
+                           (loop with length = 0
+                                 for i from 0 to end
+                                 do (incf length (+ (ash length 8) (aref extended-buf i)))
+                                 finally (return length))))))
+                (when maskp
+                  (incf data-length 4))
+                (let ((data (make-array (+ read-bytes data-length) :element-type '(unsigned-byte 8))))
+                  (replace data buf :end2 2)
+                  (unless (= read-bytes 2)
+                    (replace data extended-buf :start1 2 :end2 (- read-bytes 2)))
+                  (handler-case
+                      (read-sequence data stream :start read-bytes)
+                    (error (e)
+                      ;; I/O timeout. Maybe the connection has been lost
+                      (warn "~A" e)
+                      (return)))
+                  (funcall (client-read-callback client) data))))
+    (clack.socket:close-socket client)))

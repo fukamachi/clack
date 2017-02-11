@@ -22,6 +22,7 @@
   :author "Eitaro Fukamachi"
   :license "LLGPL"
   :depends-on (:hunchentoot
+               :clack-socket
                :flexi-streams
                :bordeaux-threads
                :split-sequence
