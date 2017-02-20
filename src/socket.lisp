@@ -1,18 +1,22 @@
 (in-package :cl-user)
 (defpackage clack.socket
   (:use :cl)
-  (:export :set-read-callback
+  (:export :read-callback
            :close-socket
            :write-sequence-to-socket
            :write-byte-to-socket
            :write-sequence-to-socket-buffer
            :write-byte-to-socket-buffer
            :flush-socket-buffer
-           :start-connection))
+           :socket-async-p
+           :socket-stream))
 (in-package :clack.socket)
 
 ;; required
-(defgeneric set-read-callback (socket callback))
+(defgeneric read-callback (socket))
+
+;; required
+(defgeneric (setf read-callback) (callback socket))
 
 ;; required
 (defgeneric close-socket (socket))
@@ -46,5 +50,10 @@
                               :callback callback)))
 
 ;; optional
-(defgeneric start-connection (socket)
-  (:method (socket)))
+(defgeneric socket-async-p (socket)
+  (:method (socket)
+    t))
+
+;; optional
+;: required if socket-async-p returns nil
+(defgeneric socket-stream (socket))

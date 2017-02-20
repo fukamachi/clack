@@ -169,7 +169,10 @@
                         :headers headers
                         :body body))))))
 
-(defmethod clack.socket:set-read-callback ((socket as:socket) callback)
+(defmethod clack.socket:read-callback ((socket as:socket))
+  (getf (as:socket-data socket) :parser))
+
+(defmethod (setf clack.socket:read-callback) (callback (socket as:socket))
   (setf (getf (as:socket-data socket) :parser) callback))
 
 (defmethod clack.socket:write-sequence-to-socket ((socket as:socket) data &key callback)
@@ -183,3 +186,6 @@
 (defmethod clack.socket:close-socket ((socket as:socket))
   (unless (as:socket-closed-p socket)
     (as:close-socket socket)))
+
+(defmethod clack.socket:socket-async-p ((socket as:socket))
+  t)
