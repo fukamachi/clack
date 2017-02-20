@@ -251,7 +251,9 @@ you would call like this: `(run-server-tests :foo)'."
                        `("REQUEST-METHOD::GET"
                          "PATH-INFO:\"/foo/\""
                          "QUERY-STRING:\"ediweitz=weitzedi\""
-                         "SERVER-NAME:\"127.0.0.1\""
+                         ,(if (eq *clack-test-handler* :fcgi)
+                              "SERVER-NAME:\"localhost\"" ;; probably the name from Nginx conf
+                              "SERVER-NAME:\"127.0.0.1\"")
                          ,(format nil "SERVER-PORT:~D" *clack-test-access-port*))))))
 
   (subtest-app "validate env (must be integer)"
