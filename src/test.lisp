@@ -66,7 +66,7 @@ Use if you want to set another port. The default is `*clack-test-port*`.")
           ((not (char= (aref path 0) #\/))
            (concatenate 'string "/" path))
           (t path)))
-  (format nil "http://localhost:~D~A"
+  (format nil "http://127.0.0.1:~D~A"
           port path))
 
 (defun %subtest-app (desc app client)
