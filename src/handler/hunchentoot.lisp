@@ -12,6 +12,9 @@
                 :make-external-format
                 :string-to-octets
                 :*substitution-char*)
+  (:import-from #:bordeaux-threads
+                #:make-lock
+                #:with-lock-held)
   (:import-from :alexandria
                 :when-let)
   (:export :run))
@@ -26,7 +29,9 @@
            :reader client-socket)
    (read-callback :initarg :read-callback
                   :initform nil
-                  :accessor client-read-callback)))
+                  :accessor client-read-callback)
+   (write-lock :initform (bt:make-lock)
+               :reader client-write-lock)))
 
 (defun initialize ()
   (setf *hunchentoot-default-external-format*
@@ -219,17 +224,20 @@ before passing to Clack application."
   (setf (client-read-callback client) callback))
 
 (defmethod clack.socket:write-sequence-to-socket ((client client) data &key callback)
-  (let ((stream (client-stream client)))
-    (write-sequence data stream)
-    (force-output stream))
+  (bt:with-lock-held ((client-write-lock client))
+    (let ((stream (client-stream client)))
+      (write-sequence data stream)
+      (force-output stream)))
   (when callback
     (funcall callback)))
 
 (defmethod clack.socket:close-socket ((client client))
-  (finish-output (client-stream client)))
+  (bt:with-lock-held ((client-write-lock client))
+    (finish-output (client-stream client))))
 
 (defmethod clack.socket:flush-socket-buffer ((client client) &key callback)
-  (force-output (client-stream client))
+  (bt:with-lock-held ((client-write-lock client))
+    (force-output (client-stream client)))
   (when callback
     (funcall callback)))
 
