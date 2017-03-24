@@ -18,6 +18,11 @@ env:
     - LISP=ecl
     - LISP=clisp
 
+matrix:
+  allow_failures:
+    - env: LISP=ecl
+    - env: LISP=clisp
+
 addons:
   apt:
     packages:
