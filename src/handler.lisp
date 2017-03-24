@@ -17,7 +17,8 @@
   (handler-case (let ((socket (usocket:socket-connect "127.0.0.1" port)))
                   (usocket:socket-close socket)
                   t)
-    (usocket:connection-refused-error () nil)))
+    ((or usocket:connection-refused-error
+         usocket:connection-reset-error) () nil)))
 
 (defstruct handler
   server
