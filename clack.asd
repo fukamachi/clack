@@ -24,6 +24,7 @@
   :depends-on (:lack
                :lack-util
                :bordeaux-threads
+               :usocket
                :alexandria
                :uiop)
   :components ((:module "src"
