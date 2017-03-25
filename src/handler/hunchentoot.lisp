@@ -114,11 +114,11 @@
                            (list :taskmaster taskmaster))))))
     (let ((taskmaster (acceptor-taskmaster acceptor)))
       (setf (taskmaster-acceptor taskmaster) acceptor)
-      (hunchentoot:start acceptor)
       (unwind-protect
-           (bt:join-thread (hunchentoot::acceptor-process taskmaster))
-        (ignore-errors
-         (hunchentoot:stop acceptor))))))
+           (progn
+             (hunchentoot:start acceptor)
+             (bt:join-thread (hunchentoot::acceptor-process taskmaster)))
+        (hunchentoot:stop acceptor)))))
 
 (defun handle-response (res)
   "Convert Response from Clack application into a string

@@ -39,10 +39,24 @@ Use if you want to set another port. The default is `*clack-test-port*`.")
 (defvar *random-port* nil)
 
 (defun port-available-p (port)
-  (handler-case (let ((socket (usocket:socket-listen "127.0.0.1" port :reuse-address t)))
+  (let (socket)
+    (unwind-protect
+         (handler-case (progn
+                         (setq socket (usocket:socket-listen "127.0.0.1" port :reuse-address t))
+                         t)
+           (usocket:address-in-use-error () nil)
+           (usocket:socket-error (e)
+             (warn "USOCKET:SOCKET-ERROR: ~A" e)
+             nil))
+      (when socket
+        (usocket:socket-close socket)
+        t))))
+
+(defun server-running-p (port)
+  (handler-case (let ((socket (usocket:socket-connect "127.0.0.1" port)))
                   (usocket:socket-close socket)
                   t)
-    (error () nil)))
+    (usocket:connection-refused-error () nil)))
 
 (defun random-port ()
   "Return a port number not in use from 50000 to 60000."
@@ -68,6 +82,12 @@ Use if you want to set another port. The default is `*clack-test-port*`.")
          (*clack-test-access-port* (if *random-port*
                                        *clack-test-port*
                                        *clack-test-access-port*)))
+    (loop repeat 5
+          until (port-available-p *clack-test-port*)
+          do (sleep 0.1)
+          finally
+             (unless (port-available-p *clack-test-port*)
+               (error "Port ~D is already in use." *clack-test-port*)))
     (let ((acceptor (apply #'clackup app
                            :server *clack-test-handler*
                            :port *clack-test-port*
@@ -76,6 +96,9 @@ Use if you want to set another port. The default is `*clack-test-port*`.")
                            :silent t
                            *clackup-additional-args*)))
       (subtest desc
+        (sleep 0.5)
+        (loop until (server-running-p *clack-test-port*)
+              do (sleep 0.1))
         (unwind-protect
              (funcall client)
           (stop acceptor))))))
