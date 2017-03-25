@@ -39,8 +39,9 @@
 (defun stop (handler)
   (let ((acceptor (handler-acceptor handler)))
     (if (bt:threadp acceptor)
-        (when (bt:thread-alive-p acceptor)
-          (bt:destroy-thread acceptor)
+        (progn
+          (when (bt:thread-alive-p acceptor)
+            (bt:destroy-thread acceptor))
           (sleep 0.5))
         (let ((package (find-handler (handler-server handler))))
           (funcall (intern #.(string '#:stop) package) acceptor)))

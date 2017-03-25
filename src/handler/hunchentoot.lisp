@@ -112,12 +112,14 @@
                       :persistent-connections-p persistent-connections-p
                       (and taskmaster
                            (list :taskmaster taskmaster))))))
+    (setf (hunchentoot::acceptor-shutdown-p acceptor) nil)
+    (start-listening acceptor)
     (let ((taskmaster (acceptor-taskmaster acceptor)))
       (setf (taskmaster-acceptor taskmaster) acceptor)
+      #+thread-support
+      (setf (acceptor-process taskmaster) (bt:current-thread))
       (unwind-protect
-           (progn
-             (hunchentoot:start acceptor)
-             (bt:join-thread (hunchentoot::acceptor-process taskmaster)))
+           (accept-connections acceptor)
         (hunchentoot:stop acceptor)))))
 
 (defun handle-response (res)
