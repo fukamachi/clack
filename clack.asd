@@ -22,6 +22,7 @@
   :author "Eitaro Fukamachi"
   :license "LLGPL"
   :depends-on (:lack
+               :lack-middleware-backtrace
                :lack-util
                :bordeaux-threads
                :alexandria
