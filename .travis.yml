@@ -61,7 +61,11 @@ before_script:
 
 script:
   - if [ "$LISP" = "sbcl-bin" ]; then
-      run-prove t-*.asd;
+      run-prove t-clack-handler-fcgi.asd;
+      run-prove t-clack-handler-hunchentoot.asd;
+      run-prove t-clack-handler-toot.asd;
+      run-prove t-clack-handler-wookie.asd;
+      run-prove t-clack-v1-compat.asd;
     else
       run-prove t-clack-handler-hunchentoot.asd;
     fi
