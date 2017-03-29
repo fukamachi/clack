@@ -4,6 +4,8 @@
   (:import-from :clack
                 :clackup
                 :stop)
+  (:import-from :dexador
+                :*use-connection-pool*)
   (:import-from :prove
                 :subtest)
   (:import-from :usocket
@@ -100,7 +102,8 @@ Use if you want to set another port. The default is `*clack-test-port*`.")
         (loop until (server-running-p *clack-test-port*)
               do (sleep 0.1))
         (unwind-protect
-             (funcall client)
+             (let ((dex:*use-connection-pool* nil))
+               (funcall client))
           (stop acceptor))))))
 
 (defmacro subtest-app (desc app &body client)
