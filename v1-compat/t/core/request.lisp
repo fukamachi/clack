@@ -100,7 +100,7 @@
       (make-request env)
       `(200 nil (,(gethash "filename" (cadr (body-parameter (make-request env) :|file|))))))
   (multiple-value-bind (body status)
-      (http-request "http://localhost:4242/"
+      (http-request (localhost)
                     :method :post
                     :parameters
                     `(("file" ,(merge-pathnames #p"tmp/jellyfish.jpg" *clack-pathname*)
@@ -110,7 +110,7 @@
     (is body "jellyfish.jpg"))
 
   (multiple-value-bind (body status)
-      (http-request "http://localhost:4242/"
+      (http-request (localhost)
                     :method :post
                     :parameters
                     `(("file" ,(merge-pathnames #p"tmp/jellyfish.jpg" *clack-pathname*)
