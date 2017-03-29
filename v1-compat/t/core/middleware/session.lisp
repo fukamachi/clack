@@ -26,13 +26,13 @@
                    (incf (gethash :counter (getf env :clack.session))))))))
   (let ((cookie-jar (make-instance 'cookie-jar)))
     (multiple-value-bind (body status)
-        (http-request "http://localhost:4242/"
+        (http-request (localhost)
                       :cookie-jar cookie-jar)
       (diag "1st request")
       (is status 200)
       (is body "Hello, you've been here for 1th times!"))
     (multiple-value-bind (body status)
-        (http-request "http://localhost:4242/"
+        (http-request (localhost)
                       :cookie-jar cookie-jar)
       (diag "2nd request")
       (is status 200)
@@ -54,13 +54,13 @@
                    (incf (gethash :counter (getf env :clack.session))))))))
   (let ((cookie-jar (make-instance 'cookie-jar)))
     (multiple-value-bind (body status)
-        (http-request "http://localhost:4242/"
+        (http-request (localhost)
                       :cookie-jar cookie-jar)
       (diag "1st request")
       (is status 200)
       (is body "Hello, you've been here for 1th times!"))
     (multiple-value-bind (body status)
-        (http-request "http://localhost:4242/"
+        (http-request (localhost)
                       :cookie-jar cookie-jar)
       (diag "2nd request")
       (is status 200)
