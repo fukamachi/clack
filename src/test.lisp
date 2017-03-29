@@ -38,7 +38,7 @@ Use if you want to set another port. The default is `*clack-test-port*`.")
 
 (defvar *enable-debug* t)
 
-(defvar *random-port* nil)
+(defvar *random-port* t)
 
 (defun port-available-p (port)
   (let (socket)
