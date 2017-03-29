@@ -51,11 +51,16 @@
                                     :ssl-private-key-file ssl-key-file
                                     :ssl-private-key-password ssl-key-password)
                               '()))))
+    (setf (shutdown-p acceptor) nil)
+    (setf (listen-socket acceptor)
+          (usocket:socket-listen
+           (or (address acceptor) usocket:*wildcard-host*) port
+           :reuseaddress t
+           :backlog (listen-backlog acceptor)
+           :element-type '(unsigned-byte 8)))
+    (setf (acceptor-process (toot:taskmaster acceptor)) (bt:current-thread))
     (unwind-protect
-         (progn
-           (toot:start-acceptor acceptor)
-           (when (typep (toot:taskmaster acceptor) 'toot::thread-per-connection-taskmaster)
-             (bt:join-thread (toot::acceptor-process (toot:taskmaster acceptor)))))
+         (accept-connections acceptor)
       (toot:stop-acceptor acceptor))))
 
 (defun handle-request (req &key ssl)
