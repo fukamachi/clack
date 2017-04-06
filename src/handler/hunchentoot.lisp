@@ -37,7 +37,9 @@
   (setf *hunchentoot-default-external-format*
         (flex:make-external-format :utf-8 :eol-style :lf)
         *default-content-type* "text/html; charset=utf-8"
-        *catch-errors-p* t))
+        *catch-errors-p* t
+        ;; Not logging 'Broken pipe'
+        *log-lisp-errors-p* nil))
 
 (defclass clack-acceptor (acceptor)
   ((app :initarg :app
