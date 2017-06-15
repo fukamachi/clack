@@ -20,6 +20,7 @@
            :*enable-debug*
            :*random-port*
            :localhost
+           :testing-app
            :subtest-app))
 (in-package :clack.test)
 
@@ -77,7 +78,7 @@ Use if you want to set another port. The default is `*clack-test-port*`.")
   (format nil "http://127.0.0.1:~D~A"
           port path))
 
-(defun %subtest-app (desc app client)
+(defun %testing-app (app client)
   (let* ((*clack-test-port* (if *random-port*
                                 (random-port)
                                 *clack-test-port*))
@@ -96,15 +97,20 @@ Use if you want to set another port. The default is `*clack-test-port*`.")
                            :debug *enable-debug*
                            :use-thread t
                            :silent t
-                           *clackup-additional-args*)))
-      (subtest desc
-        (sleep 0.5)
-        (loop until (server-running-p *clack-test-port*)
-              do (sleep 0.1))
-        (unwind-protect
-             (let ((dex:*use-connection-pool* nil))
-               (funcall client))
-          (stop acceptor))))))
+                           *clackup-additional-args*))
+          (dex:*use-connection-pool* nil))
+      (loop until (server-running-p *clack-test-port*)
+            do (sleep 0.1))
 
-(defmacro subtest-app (desc app &body client)
-  `(%subtest-app ,desc ,app (lambda () ,@client)))
+      (multiple-value-prog1
+          (unwind-protect (funcall client)
+            (stop acceptor))
+
+        (loop while (server-running-p *clack-test-port*)
+              do (sleep 0.1))))))
+
+(defmacro testing-app (app &body body)
+  `(%testing-app ,app (lambda () ,@body)))
+
+(defmacro subtest-app (desc app &body body)
+  `(testing-app ,app (subtest ,desc ,@body)))
