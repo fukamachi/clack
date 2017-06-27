@@ -68,7 +68,7 @@ Use if you want to set another port. The default is `*clack-test-port*`.")
         if (port-available-p port)
           return port))
 
-(defun localhost (&optional (path "/") (port *clack-test-port*))
+(defun localhost (&optional (path "/") (port *clack-test-access-port*))
   (check-type path string)
   (setf path
         (cond
