@@ -59,7 +59,8 @@ Use if you want to set another port. The default is `*clack-test-port*`.")
   (handler-case (let ((socket (usocket:socket-connect "127.0.0.1" port)))
                   (usocket:socket-close socket)
                   t)
-    (usocket:connection-refused-error () nil)))
+    (usocket:connection-refused-error () nil)
+    (usocket:connection-reset-error () nil)))
 
 (defun random-port ()
   "Return a port number not in use from 50000 to 60000."
