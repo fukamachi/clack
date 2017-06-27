@@ -84,7 +84,9 @@ Use if you want to set another port. The default is `*clack-test-port*`.")
                                 *clack-test-port*))
          (*clack-test-access-port* (if *random-port*
                                        *clack-test-port*
-                                       *clack-test-access-port*)))
+                                       *clack-test-access-port*))
+         (threads #+thread-support (bt:all-threads)
+                  #-thread-support '()))
     (loop repeat 5
           until (port-available-p *clack-test-port*)
           do (sleep 0.1)
@@ -104,7 +106,13 @@ Use if you want to set another port. The default is `*clack-test-port*`.")
 
       (multiple-value-prog1
           (unwind-protect (funcall client)
-            (stop acceptor))
+            (stop acceptor)
+            ;; Ensure all threads are finished for preventing from leaking
+            #+thread-support
+            (dolist (thread (bt:all-threads))
+              (when (and (not (find thread threads))
+                         (bt:thread-alive-p thread))
+                (bt:destroy-thread thread))))
 
         (loop while (server-running-p *clack-test-port*)
               do (sleep 0.1))))))
