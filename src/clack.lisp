@@ -60,6 +60,9 @@
                   (use-thread #+thread-support t #-thread-support nil)
                   (use-default-middlewares t)
                 &allow-other-keys)
+  #-thread-support
+  (when use-thread
+    (error ":use-thread is T though there's no thread support."))
   (flet ((buildapp (app)
            (let ((app (typecase app
                         ((or pathname string)
