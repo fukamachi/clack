@@ -59,6 +59,8 @@
                   silent
                   (use-thread #+thread-support t #-thread-support nil)
                   (use-default-middlewares t)
+                  (interrupt-handler
+                    (lambda () (format *error-output* "Interrupted")))
                 &allow-other-keys)
   #-thread-support
   (when use-thread
@@ -79,8 +81,7 @@
       (when (and (not use-thread)
                  (not silent))
         (format t "~&~:(~A~) server is going to start.~%Listening on localhost:~A.~%" server port))
-      (with-handle-interrupt (lambda ()
-                               (format *error-output* "Interrupted"))
+      (with-handle-interrupt interrupt-handler
         (prog1
             (apply #'clack.handler:run app server
                    :port port
