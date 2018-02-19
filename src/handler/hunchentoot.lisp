@@ -126,7 +126,13 @@
                (bt:join-thread (hunchentoot::acceptor-process taskmaster))))
         (hunchentoot:stop acceptor))
       #+lispworks
-      (hunchentoot:start acceptor))))
+      (unwind-protect
+          (if threadedp
+              (progn
+                (hunchentoot:start acceptor)
+                (loop (sleep (expt 2 32))))
+              (hunchentoot:start acceptor))
+        (hunchentoot:stop acceptor)))))
 
 (defun handle-response (res)
   "Convert Response from Clack application into a string
