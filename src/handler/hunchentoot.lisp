@@ -118,20 +118,14 @@
     (let* ((taskmaster (acceptor-taskmaster acceptor))
            (threadedp (typep taskmaster 'multi-threaded-taskmaster)))
       (setf (taskmaster-acceptor taskmaster) acceptor)
-      #-lispworks
       (unwind-protect
-           (progn
-             (hunchentoot:start acceptor)
-             (when threadedp
-               (bt:join-thread (hunchentoot::acceptor-process taskmaster))))
-        (hunchentoot:stop acceptor))
-      #+lispworks
-      (unwind-protect
-          (if threadedp
-              (progn
-                (hunchentoot:start acceptor)
-                (loop (sleep (expt 2 32))))
-              (hunchentoot:start acceptor))
+          (progn
+            (hunchentoot:start acceptor)
+            #-lispworks
+            (when threadedp
+              (bt:join-thread (hunchentoot::acceptor-process taskmaster)))
+            #+lispworks
+            (loop (sleep (expt 2 32))))
         (hunchentoot:stop acceptor)))))
 
 (defun handle-response (res)
