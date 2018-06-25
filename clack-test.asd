@@ -22,6 +22,7 @@
   :author "Eitaro Fukamachi"
   :license "LLGPL"
   :depends-on (:clack
+               :clack-handler-hunchentoot
                :prove
                :bordeaux-threads
                :usocket

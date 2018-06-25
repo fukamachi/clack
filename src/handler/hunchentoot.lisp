@@ -62,13 +62,12 @@
   (let ((app (acceptor-app acceptor))
         (env (acceptor-handle-request acceptor req))
         (hunchentoot:*catch-errors-p* nil))
-    (handle-response
-     (if (acceptor-debug acceptor)
-         (funcall app env)
-         (handler-case (funcall app env)
-           (error (error)
-             (princ error *error-output*)
-             '(500 () ("Internal Server Error"))))))))
+    (if (acceptor-debug acceptor)
+        (handle-response (funcall app env))
+        (handler-case (handle-response (funcall app env))
+          (error (error)
+            (princ error *error-output*)
+            '(500 () ("Internal Server Error")))))))
 
 (defmethod hunchentoot:process-connection :around ((acceptor clack-acceptor) socket)
   (let ((flex:*substitution-char* #-(or abcl lispworks) #\Replacement_Character

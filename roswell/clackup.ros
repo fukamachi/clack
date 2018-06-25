@@ -31,9 +31,6 @@ Options:
     --port
         Binds to a TCP port. Defaults to 5000.
 
-    --debug
-        Debug flag. The default is T.
-
     --use-default-middlewares
         A flag if use default middlewares. The default is T.
         Specify NIL for preventing from loading those middlewares.
@@ -150,5 +147,8 @@ Options:
 
     ;; Disable threads
     (setf (getf key-args :use-thread) nil)
+
+    ;; Disable debugger
+    (setf (getf key-args :debug) nil)
 
     (apply (intern (string :clackup) :clack) app-file key-args)))
