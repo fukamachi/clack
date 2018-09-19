@@ -13,13 +13,14 @@
       (:import-from :alexandria
                     :delete-from-plist)
       (:export :clackup
+               :eval-file
                :stop))))
 (in-package :clack)
 
-(defun eval-file (file)
-  "Safer way to read and eval a file content. This function returns the last value."
-  (setf file (probe-file file))
-  (check-type file pathname)
+(defvar *app-file-cache*
+  (make-hash-table :test 'equal))
+
+(defun %load-file (file)
   (with-open-file (in file)
     (let ((*package* *package*)
           (*readtable* *readtable*)
@@ -32,6 +33,21 @@
             do (setf results (multiple-value-list (eval form)))
             finally
                (return (apply #'values results))))))
+
+(defun eval-file (file)
+  "Safer way to read and eval a file content. This function returns the last value."
+  (setf file (probe-file file))
+  (check-type file pathname)
+  (let ((modified-at (file-write-date file)))
+    (cond
+      ((< (car (gethash file *app-file-cache* '(0 . nil)))
+          modified-at)
+       (let ((app (%load-file file)))
+         (setf (gethash file *app-file-cache*)
+               (cons modified-at app))
+         app))
+      (t
+       (cdr (gethash file *app-file-cache*))))))
 
 (defmacro with-handle-interrupt (int-handler &body body)
   (let ((main (gensym "MAIN")))
