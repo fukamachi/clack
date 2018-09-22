@@ -134,7 +134,7 @@ Options:
       (%terminate -1 "File doesn't exist: ~A" app-file))
 
     ;; Add ASDF source-registry
-    (asdf:compute-source-registry (getf opt-args :source-registry))
+    (asdf:compute-source-registry (truename (getf opt-args :source-registry)))
 
     ;; Load files
     (mapc #'load (getf opt-args :load))
