@@ -160,6 +160,17 @@ you would call like this: `(run-server-tests :foo)'."
       (is (get-header headers :content-type) "text/plain; charset=utf-8")
       (is body "http")))
 
+  (subtest-app "url-scheme should respect X-Forwarded-Proto header"
+      (lambda (env)
+        `(200
+          (:content-type "text/plain; charset=utf-8")
+          (,(getf env :url-scheme))))
+    (multiple-value-bind (body status headers)
+        (dex:post (localhost) :headers '(("X-Forwarded-Proto" . "https")))
+      (is status 200)
+      (is (get-header headers :content-type) "text/plain; charset=utf-8")
+      (is body "https")))
+
   (subtest-app "return pathname"
       (lambda (env)
         (declare (ignore env))
