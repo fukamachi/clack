@@ -55,6 +55,7 @@
 (defgeneric acceptor-handle-request (acceptor req)
   (:method ((acceptor clack-acceptor) req)
     (handle-request req :ssl nil))
+  #-hunchentoot-no-ssl
   (:method  ((acceptor clack-ssl-acceptor) req)
     (handle-request req :ssl t)))
 
