@@ -6,8 +6,7 @@
 (pushnew :wookie-no-ssl *features*)
 
 (defsystem t-clack-handler-wookie
-  :depends-on (;; Some environment cannot load Wookie due to like non FFI support.
-               ;; :clack-handler-wookie
+  :depends-on (:clack-handler-wookie
                :clack-test)
   :components
   ((:test-file "t/handler/wookie"))
