@@ -3,6 +3,8 @@
   (:use :cl :asdf))
 (in-package :t-clack-handler-wookie-asd)
 
+(pushnew :wookie-no-ssl *features*)
+
 (defsystem t-clack-handler-wookie
   :depends-on (;; Some environment cannot load Wookie due to like non FFI support.
                ;; :clack-handler-wookie
