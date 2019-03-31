@@ -34,7 +34,7 @@
 (defmethod initialize-instance :after ((acceptor <fcgi-acceptor>) &rest args)
   (declare (ignore args))
   (unless (acceptor-file-descriptor acceptor)
-    (let ((socket (usocket:socket-listen "0.0.0.0"
+    (let ((socket (usocket:socket-listen "127.0.0.1"
                                          (acceptor-port acceptor)
                                          :reuse-address t
                                          :backlog 128)))
