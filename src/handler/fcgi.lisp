@@ -48,7 +48,10 @@
   (flet ((main-loop (req)
            (let* ((env (handle-request req))
                   (res (if debug
-                           (funcall app env)
+                           (restart-case
+                             (funcall app env)
+                             (throw-internal-server-error ()
+                               '(500 () ("Internal Server Error"))))
                            (handler-case (funcall app env)
                              (error (error)
                                (princ error *error-output*)
