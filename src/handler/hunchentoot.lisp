@@ -78,7 +78,7 @@
     (call-next-method)))
 
 (defun run (app &rest args
-            &key debug (port 5000)
+            &key debug (port 5000) (address "0.0.0.0")
               ssl ssl-key-file ssl-cert-file ssl-key-password
               max-thread-count max-accept-count (persistent-connections-p t))
   "Start Hunchentoot server."
@@ -99,6 +99,7 @@
                       :app app
                       :debug debug
                       :port port
+                      :address address
                       :ssl-certificate-file ssl-cert-file
                       :ssl-privatekey-file ssl-key-file
                       :ssl-privatekey-password ssl-key-password
@@ -110,6 +111,7 @@
                       :app app
                       :debug debug
                       :port port
+                      :address address
                       :access-log-destination nil
                       :error-template-directory nil
                       :persistent-connections-p persistent-connections-p
