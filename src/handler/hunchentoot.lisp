@@ -78,7 +78,7 @@
     (call-next-method)))
 
 (defun run (app &rest args
-            &key debug (port 5000) (address "0.0.0.0")
+            &key debug (address "127.0.0.1") (port 5000)
               ssl ssl-key-file ssl-cert-file ssl-key-password
               max-thread-count max-accept-count (persistent-connections-p t))
   "Start Hunchentoot server."
@@ -98,6 +98,7 @@
                (apply #'make-instance 'clack-ssl-acceptor
                       :app app
                       :debug debug
+                      :address address
                       :port port
                       :address address
                       :ssl-certificate-file ssl-cert-file
@@ -110,6 +111,7 @@
                (apply #'make-instance 'clack-acceptor
                       :app app
                       :debug debug
+                      :address address
                       :port port
                       :address address
                       :access-log-destination nil
