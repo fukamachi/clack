@@ -100,7 +100,6 @@
                       :debug debug
                       :address address
                       :port port
-                      :address address
                       :ssl-certificate-file ssl-cert-file
                       :ssl-privatekey-file ssl-key-file
                       :ssl-privatekey-password ssl-key-password
@@ -113,7 +112,6 @@
                       :debug debug
                       :address address
                       :port port
-                      :address address
                       :access-log-destination nil
                       :error-template-directory nil
                       :persistent-connections-p persistent-connections-p
