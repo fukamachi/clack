@@ -53,7 +53,7 @@
   (setf (wookie:request-store-body request) t))
 
 (defun run (app &rest args
-            &key (debug t) (port 5000)
+            &key (debug t) (address "127.0.0.1") (port 5000)
               ssl ssl-key-file ssl-cert-file ssl-key-password)
   (cond
     ((asdf::getenv "SERVER_STARTER_PORT")
@@ -81,11 +81,13 @@
           (let ((listener
                   (if ssl
                       (make-instance 'wookie:ssl-listener
+                                     :bind address
                                      :port port
                                      :key ssl-key-file
                                      :certificate ssl-cert-file
                                      :password ssl-key-password)
                       (make-instance 'wookie:listener
+                                     :bind address
                                      :port port))))
             (start-server listener)))
       (as:socket-closed () nil))))

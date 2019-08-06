@@ -20,7 +20,7 @@
 (in-package :clack.handler.toot)
 
 (defun run (app &rest args
-            &key debug (port 5000)
+            &key debug (address "127.0.0.1") (port 5000)
               ssl ssl-key-file ssl-cert-file ssl-key-password)
   "Start Toot server."
   (cond
@@ -47,6 +47,7 @@
                                               (error (error)
                                                 (princ error *error-output*)
                                                 '(500 () ("Internal Server Error"))))))))
+                          :address address
                           :port port
                           :access-logger nil
                           (if ssl

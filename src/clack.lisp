@@ -70,6 +70,7 @@
 
 (defun clackup (app &rest args
                 &key (server :hunchentoot)
+                  (address "127.0.0.1")
                   (port 5000)
                   (debug t)
                   silent
@@ -94,7 +95,7 @@
       (find-handler server)
       (when (and (not use-thread)
                  (not silent))
-        (format t "~&~:(~A~) server is going to start.~%Listening on localhost:~A.~%" server port))
+        (format t "~&~:(~A~) server is going to start.~%Listening on ~A:~A.~%" server address port))
       (with-handle-interrupt (lambda ()
                                (format *error-output* "Interrupted"))
         (prog1
@@ -105,4 +106,4 @@
                    (delete-from-plist args :server :port :debug :silent :use-thread))
           (when (and use-thread
                      (not silent))
-            (format t "~&~:(~A~) server is started.~%Listening on localhost:~A.~%" server port)))))))
+            (format t "~&~:(~A~) server is started.~%Listening on ~A:~A.~%" server address port)))))))
