@@ -49,7 +49,7 @@
            (let* ((env (handle-request req))
                   (res (if debug
                            (restart-case
-                             (funcall app env)
+                               (funcall app env)
                              (throw-internal-server-error ()
                                '(500 () ("Internal Server Error"))))
                            (handler-case (funcall app env)
