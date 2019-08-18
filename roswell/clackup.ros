@@ -28,6 +28,9 @@ Options:
         Selects a specific server handler to run on.
         The value has to be a keyword like \":wookie\".
 
+    --address
+        Binds to a TCP interface. Defaults to 127.0.0.1. This option is only valid for servers which support TCP sockets.
+
     --port
         Binds to a TCP port. Defaults to 5000.
 
