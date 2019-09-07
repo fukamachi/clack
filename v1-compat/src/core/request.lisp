@@ -181,7 +181,8 @@ on an original raw-body."
 
       (setf (getf env :raw-body) (slot-value req 'raw-body))
       ;; POST parameters
-      (unless (slot-boundp req 'body-parameters)
+      (unless (or (null (content-type req))
+                  (slot-boundp req 'body-parameters))
         (setf (slot-value req 'body-parameters)
               (parse (content-type req) (content-length req) (raw-body req)))
         (file-position (raw-body req) 0)
