@@ -23,7 +23,7 @@
   :license "LLGPL"
   :depends-on (:clack
                :clack-handler-hunchentoot
-               :prove
+               :rove
                :bordeaux-threads
                :usocket
                :dexador
