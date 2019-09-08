@@ -12,7 +12,7 @@ env:
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
     - COVERAGE_EXCLUDE=t:v1-compat
   matrix:
-    - LISP=sbcl-bin COVERALLS=true
+    - LISP=sbcl COVERALLS=true
     - LISP=ccl-bin
     - LISP=abcl
     - LISP=ecl
@@ -31,8 +31,6 @@ addons:
 install:
   # Install Roswell
   - curl -L https://raw.githubusercontent.com/snmsts/roswell/$ROSWELL_BRANCH/scripts/install-for-ci.sh | sh
-  - ros asdf install
-  - ros -e '(ql:update-all-dists :prompt nil)'
   # libuv for Wookie
   - if ! [ -f "$HOME/libuv/include/uv.h" ]; then
       curl -L https://github.com/libuv/libuv/archive/v1.6.1.tar.gz | tar xzf -;
@@ -46,20 +44,13 @@ install:
   - ros install rove
   - ros install fukamachi/dexador
 
-cache:
-  directories:
-    - $HOME/.roswell
-    - $HOME/libuv
-    - $HOME/nginx
-    - $HOME/.config/common-lisp
-
 before_script:
   - nginx -c "$TRAVIS_BUILD_DIR/t/nginx.conf" -p "$HOME/nginx"
   - ros --version
   - ros config
 
 script:
-  - if [ "$LISP" = "sbcl-bin" ]; then
+  - if [ "$LISP" = "sbcl" ]; then
       for file in t-*.asd; do rove $file; done
     else
       rove t-clack-handler-hunchentoot.asd;
