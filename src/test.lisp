@@ -6,8 +6,8 @@
                 :stop)
   (:import-from :dexador
                 :*use-connection-pool*)
-  (:import-from :prove
-                :subtest)
+  (:import-from :rove
+                :testing)
   (:import-from :usocket
                 :socket-listen
                 :socket-close
@@ -20,8 +20,7 @@
            :*enable-debug*
            :*random-port*
            :localhost
-           :testing-app
-           :subtest-app))
+           :testing-app))
 (in-package :clack.test)
 
 (defvar *clack-test-handler* :hunchentoot
@@ -118,8 +117,5 @@ Use if you want to set another port. The default is `*clack-test-port*`.")
         (loop while (server-running-p *clack-test-port*)
               do (sleep 0.1))))))
 
-(defmacro testing-app (app &body body)
-  `(%testing-app ,app (lambda () ,@body)))
-
-(defmacro subtest-app (desc app &body body)
-  `(testing-app ,app (subtest ,desc ,@body)))
+(defmacro testing-app (desc app &body body)
+  `(%testing-app ,app (lambda () (testing ,desc ,@body))))

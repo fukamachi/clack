@@ -2,9 +2,11 @@
 
 (defpackage clack-test.handler.toot
   (:use :cl
-        :clack.test.suite))
+        :clack.test.suite
+        :rove))
 
 (in-package :clack-test.handler.toot)
 
-(let ((*error-output* (make-broadcast-stream)))
-  (clack.test.suite:run-server-tests :toot))
+(deftest toot-tests
+  (let ((*error-output* (make-broadcast-stream)))
+    (clack.test.suite:run-server-tests :toot)))
