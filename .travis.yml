@@ -60,7 +60,7 @@ before_script:
 
 script:
   - if [ "$LISP" = "sbcl-bin" ]; then
-      rove t-*.asd;
+      for file in t-*.asd; do rove $file; done
     else
       rove t-clack-handler-hunchentoot.asd;
     fi
