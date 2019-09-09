@@ -51,7 +51,7 @@ before_script:
 
 script:
   - if [ "$LISP" = "sbcl-bin" ]; then
-      for file in t-*.asd; do rove $file; done
+      for file in `ls t-*.asd | grep -v wookie | grep -v v1-compat`; do rove $file; done
     else
       rove t-clack-handler-hunchentoot.asd;
     fi
