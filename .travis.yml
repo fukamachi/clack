@@ -43,6 +43,7 @@ install:
     fi
   - ros install rove
   - ros install fukamachi/dexador
+  - ros install fukamachi/fast-http
 
 before_script:
   - nginx -c "$TRAVIS_BUILD_DIR/t/nginx.conf" -p "$HOME/nginx"
