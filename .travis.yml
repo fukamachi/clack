@@ -12,7 +12,7 @@ env:
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
     - COVERAGE_EXCLUDE=t:v1-compat
   matrix:
-    - LISP=sbcl COVERALLS=true
+    - LISP=sbcl-bin COVERALLS=true
     - LISP=ccl-bin
     - LISP=abcl
     - LISP=ecl
@@ -50,7 +50,7 @@ before_script:
   - ros config
 
 script:
-  - if [ "$LISP" = "sbcl" ]; then
+  - if [ "$LISP" = "sbcl-bin" ]; then
       for file in `ls t-*.asd | grep -v wookie | grep -v v1-compat`; do rove $file; done
     else
       rove t-clack-handler-hunchentoot.asd;
