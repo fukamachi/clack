@@ -351,7 +351,7 @@ you would call like this: `(run-server-tests :foo)'."
         (dex:post (localhost)
                   :content '(("name" . "eitaro")))
       (ok (eql status 200))
-      (ok (eql (get-header headers :client-content-length) 11))
+      (ok (equal (get-header headers :client-content-length) "11"))
       (ok (equal (get-header headers :client-content-type) "application/x-www-form-urlencoded"))
       (ok (equal body "Hello, name=eitaro"))))
 
@@ -378,8 +378,8 @@ you would call like this: `(run-server-tests :foo)'."
                       (:content-length . ,len))
                     :content chunk)
         (ok (eql status 200))
-        (ok (eql (get-header headers :client-content-length)
-                 len))
+        (ok (equal (get-header headers :client-content-length)
+                   (princ-to-string len)))
         (ok (equal (length body) len)))))
 
   (testing-app "big POST (chunked)"
