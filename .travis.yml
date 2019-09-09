@@ -42,7 +42,8 @@ install:
       (cd nginx-1.8.0 && ./configure --prefix=$HOME/nginx && make && make install);
     fi
   - ros install rove
-  - ros install fukamachi/dexador
+  - ros install fukamachi/dexador/stop-parse-number-headers
+  - ros install fukamachi/fast-http/stop-parse-number-headers
 
 before_script:
   - nginx -c "$TRAVIS_BUILD_DIR/t/nginx.conf" -p "$HOME/nginx"
