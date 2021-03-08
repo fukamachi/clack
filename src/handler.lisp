@@ -8,6 +8,7 @@
                 :make-thread
                 :thread-alive-p
                 :destroy-thread)
+  (:import-from :usocket)
   (:export :run
            :stop))
 (in-package :clack.handler)
@@ -16,7 +17,7 @@
   server
   acceptor)
 
-(defun run (app server &rest args &key use-thread &allow-other-keys)
+(defun run (app server &rest args &key (address nil address-specified-p) use-thread &allow-other-keys)
   (let ((handler-package (find-handler server))
         (bt:*default-special-bindings* `((*standard-output* . ,*standard-output*)
                                          (*error-output* . ,*error-output*)
@@ -25,7 +26,12 @@
              (apply (intern #.(string '#:run) handler-package)
                     app
                     :allow-other-keys t
-                    args)))
+                    (append
+                      (and address-specified-p
+                           (list :address
+                                 (usocket:host-to-hostname
+                                   (usocket:get-host-by-name address))))
+                      args))))
       (make-handler
        :server server
        :acceptor (if use-thread

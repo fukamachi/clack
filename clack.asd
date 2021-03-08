@@ -25,6 +25,7 @@
                :lack-middleware-backtrace
                :lack-util
                :bordeaux-threads
+               :usocket
                :alexandria
                :uiop)
   :components ((:module "src"
