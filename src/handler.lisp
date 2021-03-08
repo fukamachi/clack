@@ -29,7 +29,7 @@
                     (append
                       (and address-specified-p
                            (list :address
-                                 (usocket:vector-quad-to-dotted-quad
+                                 (usocket:host-to-hostname
                                    (usocket:get-host-by-name address))))
                       args))))
       (make-handler
