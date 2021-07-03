@@ -10,7 +10,7 @@ env:
     - C_INCLUDE_PATH=$HOME/libuv/include:$C_INCLUDE_PATH
     - ROSWELL_BRANCH=release
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
-    - COVERAGE_EXCLUDE=t:v1-compat
+    - COVERAGE_EXCLUDE=t
   matrix:
     - LISP=sbcl-bin COVERALLS=true
     - LISP=ccl-bin
@@ -52,7 +52,7 @@ before_script:
 
 script:
   - if [ "$LISP" = "sbcl-bin" ]; then
-      for file in `ls t-*.asd | grep -v wookie | grep -v v1-compat`; do rove $file; done
+      for file in `ls t-*.asd | grep -v wookie`; do rove $file; done
     else
       rove t-clack-handler-hunchentoot.asd;
     fi
