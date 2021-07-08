@@ -61,8 +61,7 @@
 
 (defmethod acceptor-dispatch-request ((acceptor clack-acceptor) req)
   (let ((app (acceptor-app acceptor))
-        (env (acceptor-handle-request acceptor req))
-        (hunchentoot:*catch-errors-p* nil))
+        (env (acceptor-handle-request acceptor req)))
     (if (acceptor-debug acceptor)
         (handle-response (funcall app env))
         (handler-case (handle-response (funcall app env))
