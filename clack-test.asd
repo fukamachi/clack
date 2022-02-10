@@ -25,6 +25,7 @@
                :clack-handler-hunchentoot
                :rove
                :bordeaux-threads
+               :ironclad
                :usocket
                :dexador
                :flexi-streams
