@@ -72,6 +72,8 @@
                 &key (server :hunchentoot)
                   (address "127.0.0.1")
                   (port 5000)
+                  (swank-interface "127.0.0.1")
+                  swank-port
                   (debug t)
                   silent
                   (use-thread #+thread-support t #-thread-support nil)
@@ -95,7 +97,12 @@
       (find-handler server)
       (when (and (not use-thread)
                  (not silent))
-        (format t "~&~:(~A~) server is going to start.~%Listening on ~A:~A.~%" server address port))
+        (format t "~&~:(~A~) server is going to start.~%Listening on ~A:~A.~%" server address port)
+        (when swank-port
+          (format t
+                  "~&Swank server will be up at ~A:~A~%"
+                  swank-interface
+                  swank-port)))
       (with-handle-interrupt (lambda ()
                                (format *error-output* "Interrupted"))
         (prog1
@@ -106,4 +113,9 @@
                    (delete-from-plist args :server :port :debug :silent :use-thread))
           (when (and use-thread
                      (not silent))
-            (format t "~&~:(~A~) server is started.~%Listening on ~A:~A.~%" server address port)))))))
+            (format t "~&~:(~A~) server is started.~%Listening on ~A:~A.~%" server address port)
+            (when swank-port
+              (format t
+                      "~&Swank server is up at ~A:~A~%"
+                      swank-interface
+                      swank-port))))))))
