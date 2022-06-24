@@ -72,11 +72,14 @@
                 &key (server :hunchentoot)
                   (address "127.0.0.1")
                   (port 5000)
+                  swank-interface
+                  swank-port
                   (debug t)
                   silent
                   (use-thread #+thread-support t #-thread-support nil)
                   (use-default-middlewares t)
                 &allow-other-keys)
+  (declare (ignore swank-interface swank-port))
   #-thread-support
   (when use-thread
     (error ":use-thread is T though there's no thread support."))

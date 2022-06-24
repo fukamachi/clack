@@ -34,6 +34,10 @@ Options:
     --port
         Binds to a TCP port. Defaults to 5000.
 
+    --swank-interface
+    --swank-port
+        Runs Swank server.
+
     --use-default-middlewares
         A flag if use default middlewares. The default is T.
         Specify NIL for preventing from loading those middlewares.
