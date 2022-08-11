@@ -73,8 +73,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Copyright
 
-Copyright (c) 2011-2015 Eitaro Fukamachi & [contributors](https://github.com/fukamachi/clack/graphs/contributors)
+Copyright (c) 2011 Eitaro Fukamachi & [contributors](https://github.com/fukamachi/clack/graphs/contributors)
 
 ## License
 
-Licensed under the LLGPL License.
+Licensed under the MIT License.

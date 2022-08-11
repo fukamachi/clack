@@ -1,10 +1,5 @@
-(in-package :cl-user)
-(defpackage clack-socket-asd
-  (:use :cl :asdf))
-(in-package :clack-socket-asd)
-
-(defsystem clack-socket
-  :version "0.1"
+(defsystem "clack-socket"
+  :version "0.2.0"
   :author "Eitaro Fukamachi"
-  :license "LLGPL"
+  :license "MIT"
   :components ((:file "src/socket")))
