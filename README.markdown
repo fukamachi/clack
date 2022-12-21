@@ -51,6 +51,11 @@ When you execute `ros install clack`, it copies `clackup` script to `$HOME/.rosw
 
 - [Quickdocs Page](http://quickdocs.org/clack/)
 
+## Resources
+
+* [How to build a web app with Clack/Lack (1)](https://fukamachi.hashnode.dev/how-to-build-a-web-app-with-clack-and-lack-1)
+* [jasom/clack-tutorial](https://github.com/jasom/clack-tutorial/blob/src/pages/getting-started-with-clack.org)
+
 ## Server
 
 * [Hunchentoot](http://weitz.de/hunchentoot/)
