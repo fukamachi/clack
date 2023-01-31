@@ -114,7 +114,7 @@
             :url-scheme (if ssl "https" "http")
             :request-uri (request-resource req)
             :raw-body (flex:make-in-memory-input-stream (wookie:request-body req))
-            :content-length (gethash "content-length" headers)
+            :content-length (parse-integer (gethash "content-length" headers))
             :content-type (gethash "content-type" headers)
             :clack.streaming t
             :clack.nonblocking t
