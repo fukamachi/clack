@@ -93,9 +93,10 @@
       (as:socket-closed () nil))))
 
 (defun handle-request (req &key ssl)
-  (let ((quri (request-uri req))
-        (http-version (http-version (request-http req)))
-        (headers (request-headers req)))
+  (let* ((quri (request-uri req))
+         (http-version (http-version (request-http req)))
+         (headers (request-headers req))
+         (content-length (gethash "content-length" headers)))
 
     (destructuring-bind (server-name &optional server-port)
         (split-sequence #\: (gethash "host" headers "") :from-end t :count 2)
@@ -114,7 +115,8 @@
             :url-scheme (if ssl "https" "http")
             :request-uri (request-resource req)
             :raw-body (flex:make-in-memory-input-stream (wookie:request-body req))
-            :content-length (parse-integer (gethash "content-length" headers))
+            :content-length (when content-length
+                              (parse-integer content-length :junk-allowed t))
             :content-type (gethash "content-type" headers)
             :clack.streaming t
             :clack.nonblocking t
