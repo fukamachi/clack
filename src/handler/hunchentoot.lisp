@@ -132,7 +132,7 @@
   "Convert Response from Clack application into a string
 before passing to Hunchentoot."
   (flet ((handle-normal-response (res)
-           (destructuring-bind (status headers &optional (body nil no-body-p)) res
+           (destructuring-bind (status headers &optional (body nil body-p)) res
              (setf (hunchentoot:return-code*) status)
              (loop for (k v) on headers by #'cddr
                    if (eq k :set-cookie)
@@ -148,7 +148,7 @@ before passing to Hunchentoot."
                    else
                      do (setf (hunchentoot:header-out k) v))
 
-             (when no-body-p
+             (unless body-p
                (return-from handle-normal-response
                  (let ((out (hunchentoot:send-headers)))
                    (lambda (body &key (start 0) (end (length body)) (close nil))
