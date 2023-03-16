@@ -1,9 +1,7 @@
 (in-package :cl-user)
 (defpackage clack.handler.hunchentoot
   (:use :cl
-        :hunchentoot
         :split-sequence)
-  (:shadow :handle-request)
   (:import-from :hunchentoot
                 :acceptor-taskmaster
                 :acceptor-process
@@ -34,14 +32,14 @@
                :reader client-write-lock)))
 
 (defun initialize ()
-  (setf *hunchentoot-default-external-format*
+  (setf hunchentoot:*hunchentoot-default-external-format*
         (flex:make-external-format :utf-8 :eol-style :lf)
-        *default-content-type* "text/html; charset=utf-8"
-        *catch-errors-p* t
+        hunchentoot:*default-content-type* "text/html; charset=utf-8"
+        hunchentoot:*catch-errors-p* t
         ;; Not logging 'Broken pipe'
-        *log-lisp-errors-p* nil))
+        hunchentoot:*log-lisp-errors-p* nil))
 
-(defclass clack-acceptor (acceptor)
+(defclass clack-acceptor (hunchentoot:acceptor)
   ((app :initarg :app
         :initform (error ":app is required")
         :accessor acceptor-app)
@@ -90,7 +88,7 @@
 
   (initialize)
   (let* ((taskmaster (when (and max-thread-count max-accept-count)
-                       (make-instance 'one-thread-per-connection-taskmaster
+                       (make-instance 'hunchentoot:one-thread-per-connection-taskmaster
                                       :max-thread-count max-thread-count
                                       :max-accept-count max-accept-count)))
          (acceptor
@@ -118,8 +116,8 @@
                       (and taskmaster
                            (list :taskmaster taskmaster))))))
     (let* ((taskmaster (acceptor-taskmaster acceptor))
-           (threadedp (typep taskmaster 'multi-threaded-taskmaster)))
-      (setf (taskmaster-acceptor taskmaster) acceptor)
+           (threadedp (typep taskmaster 'hunchentoot:multi-threaded-taskmaster)))
+      (setf (hunchentoot:taskmaster-acceptor taskmaster) acceptor)
       (unwind-protect
           (progn
             (hunchentoot:start acceptor)
@@ -136,24 +134,24 @@ before passing to Hunchentoot."
   (let ((no-body '#:no-body))
     (flet ((handle-normal-response (res)
              (destructuring-bind (status headers &optional (body no-body)) res
-               (setf (return-code*) status)
+               (setf (hunchentoot:return-code*) status)
                (loop for (k v) on headers by #'cddr
                      if (eq k :set-cookie)
-                       do (rplacd (last (headers-out*))
+                       do (rplacd (last (hunchentoot:headers-out*))
                                   (list (cons k v)))
                      else if (eq k :content-type) do
-                       (setf (content-type*) v)
+                       (setf (hunchentoot:content-type*) v)
                      else if (eq k :content-length) do
-                       (setf (content-length*) v)
-                     else if (header-out k) do
-                       (setf (header-out k)
-                             (format nil "~A, ~A" (header-out k) v))
+                       (setf (hunchentoot:content-length*) v)
+                     else if (hunchentoot:header-out k) do
+                       (setf (hunchentoot:header-out k)
+                             (format nil "~A, ~A" (hunchentoot:header-out k) v))
                      else
-                       do (setf (header-out k) v))
+                       do (setf (hunchentoot:header-out k) v))
 
                (when (eq body no-body)
                  (return-from handle-normal-response
-                   (let ((out (send-headers)))
+                   (let ((out (hunchentoot:send-headers)))
                      (lambda (body &key (start 0) (end (length body)) (close nil))
                        (handler-case
                          (etypecase body
@@ -162,7 +160,7 @@ before passing to Hunchentoot."
                              (write-sequence
                                (flex:string-to-octets body
                                                       :start start :end end
-                                                      :external-format *hunchentoot-default-external-format*)
+                                                      :external-format hunchentoot:*hunchentoot-default-external-format*)
                                out))
                            ((vector (unsigned-byte 8))
                             (write-sequence body out :start start :end end)))
@@ -178,16 +176,16 @@ before passing to Hunchentoot."
                    (pathname
                      (hunchentoot:handle-static-file body (getf headers :content-type)))
                    (list
-                     (let ((out (send-headers)))
+                     (let ((out (hunchentoot:send-headers)))
                        (dolist (chunk body)
                          (write-sequence (flex:string-to-octets chunk
-                                                                :external-format *hunchentoot-default-external-format*)
+                                                                :external-format hunchentoot:*hunchentoot-default-external-format*)
                                          out))))
                    ((vector (unsigned-byte 8))
                     ;; I'm not convinced with this header should be send automatically or not
                     ;; and not sure how to handle same way in other method so comment out
                     ;;(setf (content-length*) (length body))
-                    (let ((out (send-headers)))
+                    (let ((out (hunchentoot:send-headers)))
                       (write-sequence body out)
                       (finish-output out))))
                  (type-error (e)
@@ -201,24 +199,24 @@ before passing to Hunchentoot."
   "Convert Request from server into a plist
 before passing to Clack application."
   (destructuring-bind (server-name &optional (server-port "80"))
-      (split-sequence #\: (host req) :from-end t)
+      (split-sequence #\: (hunchentoot:host req) :from-end t)
     (list
-     :request-method (request-method* req)
+     :request-method (hunchentoot:request-method* req)
      :script-name ""
-     :path-info (script-name* req)
+     :path-info (hunchentoot:script-name* req)
      :server-name server-name
      :server-port (parse-integer server-port :junk-allowed t)
-     :server-protocol (server-protocol* req)
-     :request-uri (request-uri* req)
+     :server-protocol (hunchentoot:server-protocol* req)
+     :request-uri (hunchentoot:request-uri* req)
      :url-scheme (if ssl "https" "http")
-     :remote-addr (remote-addr* req)
-     :remote-port (remote-port* req)
+     :remote-addr (hunchentoot:remote-addr* req)
+     :remote-port (hunchentoot:remote-port* req)
      ;; Request params
-     :query-string (query-string* req)
-     :raw-body (raw-post-data :request req :want-stream t)
-     :content-length (when-let (content-length (header-in* :content-length req))
+     :query-string (hunchentoot:query-string* req)
+     :raw-body (hunchentoot:raw-post-data :request req :want-stream t)
+     :content-length (when-let (content-length (hunchentoot:header-in* :content-length req))
                        (parse-integer content-length :junk-allowed t))
-     :content-type (header-in* :content-type req)
+     :content-type (hunchentoot:header-in* :content-type req)
      :clack.streaming t
      :clack.io (make-instance 'client
                               :socket *client-socket*
