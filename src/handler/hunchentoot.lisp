@@ -131,69 +131,68 @@
 (defun handle-response (res)
   "Convert Response from Clack application into a string
 before passing to Hunchentoot."
-  (let ((no-body '#:no-body))
-    (flet ((handle-normal-response (res)
-             (destructuring-bind (status headers &optional (body no-body)) res
-               (setf (hunchentoot:return-code*) status)
-               (loop for (k v) on headers by #'cddr
-                     if (eq k :set-cookie)
-                       do (rplacd (last (hunchentoot:headers-out*))
-                                  (list (cons k v)))
-                     else if (eq k :content-type) do
-                       (setf (hunchentoot:content-type*) v)
-                     else if (eq k :content-length) do
-                       (setf (hunchentoot:content-length*) v)
-                     else if (hunchentoot:header-out k) do
-                       (setf (hunchentoot:header-out k)
-                             (format nil "~A, ~A" (hunchentoot:header-out k) v))
-                     else
-                       do (setf (hunchentoot:header-out k) v))
+  (flet ((handle-normal-response (res)
+           (destructuring-bind (status headers &optional (body nil no-body-p)) res
+             (setf (hunchentoot:return-code*) status)
+             (loop for (k v) on headers by #'cddr
+                   if (eq k :set-cookie)
+                     do (rplacd (last (hunchentoot:headers-out*))
+                                (list (cons k v)))
+                   else if (eq k :content-type) do
+                     (setf (hunchentoot:content-type*) v)
+                   else if (eq k :content-length) do
+                     (setf (hunchentoot:content-length*) v)
+                   else if (hunchentoot:header-out k) do
+                     (setf (hunchentoot:header-out k)
+                           (format nil "~A, ~A" (hunchentoot:header-out k) v))
+                   else
+                     do (setf (hunchentoot:header-out k) v))
 
-               (when (eq body no-body)
-                 (return-from handle-normal-response
+             (when no-body-p
+               (return-from handle-normal-response
+                 (let ((out (hunchentoot:send-headers)))
+                   (lambda (body &key (start 0) (end (length body)) (close nil))
+                     (handler-case
+                       (etypecase body
+                         (null)
+                         (string
+                           (write-sequence
+                             (flex:string-to-octets body
+                                                    :start start :end end
+                                                    :external-format hunchentoot:*hunchentoot-default-external-format*)
+                             out))
+                         ((vector (unsigned-byte 8))
+                          (write-sequence body out :start start :end end)))
+                       (type-error (e)
+                         (format *error-output* "Error when writing to socket: ~a~%" e)))
+                     (if close
+                         (finish-output out)
+                         (force-output out))))))
+
+             (handler-case
+               (etypecase body
+                 (null) ;; nothing to response
+                 (pathname
+                   (hunchentoot:handle-static-file body (getf headers :content-type)))
+                 (list
                    (let ((out (hunchentoot:send-headers)))
-                     (lambda (body &key (start 0) (end (length body)) (close nil))
-                       (handler-case
-                         (etypecase body
-                           (null)
-                           (string
-                             (write-sequence
-                               (flex:string-to-octets body
-                                                      :start start :end end
-                                                      :external-format hunchentoot:*hunchentoot-default-external-format*)
-                               out))
-                           ((vector (unsigned-byte 8))
-                            (write-sequence body out :start start :end end)))
-                         (type-error (e)
-                           (format *error-output* "Error when writing to socket: ~a~%" e)))
-                       (if close
-                           (finish-output out)
-                           (force-output out))))))
-
-               (handler-case
-                 (etypecase body
-                   (null) ;; nothing to response
-                   (pathname
-                     (hunchentoot:handle-static-file body (getf headers :content-type)))
-                   (list
-                     (let ((out (hunchentoot:send-headers)))
-                       (dolist (chunk body)
-                         (write-sequence (flex:string-to-octets chunk
-                                                                :external-format hunchentoot:*hunchentoot-default-external-format*)
-                                         out))))
-                   ((vector (unsigned-byte 8))
-                    ;; I'm not convinced with this header should be send automatically or not
-                    ;; and not sure how to handle same way in other method so comment out
-                    ;;(setf (content-length*) (length body))
-                    (let ((out (hunchentoot:send-headers)))
-                      (write-sequence body out)
-                      (finish-output out))))
-                 (type-error (e)
-                   (format *error-output* "Error when writing to socket: ~a~%" e))))))
-      (etypecase res
-        (list (handle-normal-response res))
-        (function (funcall res #'handle-normal-response)))
-      (values))))
+                     (dolist (chunk body)
+                       (write-sequence (flex:string-to-octets chunk
+                                                              :external-format hunchentoot:*hunchentoot-default-external-format*)
+                                       out))))
+                 ((vector (unsigned-byte 8))
+                  ;; I'm not convinced with this header should be send automatically or not
+                  ;; and not sure how to handle same way in other method so comment out
+                  ;;(setf (content-length*) (length body))
+                  (let ((out (hunchentoot:send-headers)))
+                    (write-sequence body out)
+                    (finish-output out))))
+               (type-error (e)
+                 (format *error-output* "Error when writing to socket: ~a~%" e))))))
+    (etypecase res
+      (list (handle-normal-response res))
+      (function (funcall res #'handle-normal-response)))
+    (values)))
 
 (defun handle-request (req &key ssl)
   "Convert Request from server into a plist
