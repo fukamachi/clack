@@ -48,7 +48,7 @@
           :accessor acceptor-debug)))
 
 #-hunchentoot-no-ssl
-(defclass clack-ssl-acceptor (clack-acceptor ssl-acceptor) ())
+(defclass clack-ssl-acceptor (clack-acceptor hunchentoot:ssl-acceptor) ())
 
 (defgeneric acceptor-handle-request (acceptor req)
   (:method ((acceptor clack-acceptor) req)
