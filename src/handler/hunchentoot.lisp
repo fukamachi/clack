@@ -57,7 +57,7 @@
   (:method  ((acceptor clack-ssl-acceptor) req)
     (handle-request req :ssl t)))
 
-(defmethod acceptor-dispatch-request ((acceptor clack-acceptor) req)
+(defmethod hunchentoot:acceptor-dispatch-request ((acceptor clack-acceptor) req)
   (let ((app (acceptor-app acceptor))
         (env (acceptor-handle-request acceptor req))
         (hunchentoot:*catch-errors-p* nil))
