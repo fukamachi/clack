@@ -62,7 +62,7 @@
            :reuseaddress t
            :backlog (listen-backlog acceptor)
            :element-type '(unsigned-byte 8)))
-    (setf (acceptor-process (toot:taskmaster acceptor)) (bt:current-thread))
+    (setf (acceptor-process (toot:taskmaster acceptor)) (bt2:current-thread))
     (unwind-protect
          (accept-connections acceptor)
       (toot:stop-acceptor acceptor))))

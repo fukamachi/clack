@@ -23,9 +23,9 @@
                   (swank-interface "127.0.0.1") swank-port
                 &allow-other-keys)
   (let ((handler-package (find-handler server))
-        (bt:*default-special-bindings* `((*standard-output* . ,*standard-output*)
-                                         (*error-output* . ,*error-output*)
-                                         ,@bt:*default-special-bindings*)))
+        (bt2:*default-special-bindings* `((*standard-output* . ,*standard-output*)
+                                          (*error-output* . ,*error-output*)
+                                          ,@bt2:*default-special-bindings*)))
     (flet ((run-server ()
              (when swank-port
                (swank:create-server :interface swank-interface :port swank-port :dont-close t))
@@ -42,20 +42,20 @@
         :server server
         :swank-port swank-port
         :acceptor (if use-thread
-                      (bt:make-thread #'run-server
-                                      :name (format nil "clack-handler-~(~A~)" server)
-                                      :initial-bindings
-                                      `((bt:*default-special-bindings* . ',bt:*default-special-bindings*)
-                                        ,@bt:*default-special-bindings*))
+                      (bt2:make-thread #'run-server
+                                       :name (format nil "clack-handler-~(~A~)" server)
+                                       :initial-bindings
+                                       `((bt2:*default-special-bindings* . ',bt2:*default-special-bindings*)
+                                         ,@bt2:*default-special-bindings*))
                       (run-server))))))
 
 (defun stop (handler)
   (let ((acceptor (handler-acceptor handler))
         (swank-port (handler-swank-port handler)))
-    (if (bt:threadp acceptor)
+    (if (bt2:threadp acceptor)
         (progn
-          (when (bt:thread-alive-p acceptor)
-            (bt:destroy-thread acceptor))
+          (when (bt2:thread-alive-p acceptor)
+            (bt2:destroy-thread acceptor))
           (sleep 0.5))
         (let ((package (find-handler (handler-server handler))))
           (funcall (intern #.(string '#:stop) package) acceptor)))

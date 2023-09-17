@@ -28,7 +28,7 @@
    (read-callback :initarg :read-callback
                   :initform nil
                   :accessor client-read-callback)
-   (write-lock :initform (bt:make-lock)
+   (write-lock :initform (bt2:make-lock)
                :reader client-write-lock)))
 
 (defun initialize ()
@@ -123,7 +123,7 @@
             (hunchentoot:start acceptor)
             #-lispworks
             (when threadedp
-              (bt:join-thread (hunchentoot::acceptor-process taskmaster)))
+              (bt2:join-thread (hunchentoot::acceptor-process taskmaster)))
             #+lispworks
             (loop (sleep (expt 2 32))))
         (hunchentoot:stop acceptor)))))
@@ -235,7 +235,7 @@ before passing to Clack application."
   (setf (client-read-callback client) callback))
 
 (defmethod clack.socket:write-sequence-to-socket ((client client) data &key callback)
-  (bt:with-lock-held ((client-write-lock client))
+  (bt2:with-lock-held ((client-write-lock client))
     (let ((stream (client-stream client)))
       (write-sequence data stream)
       (force-output stream)))
@@ -243,11 +243,11 @@ before passing to Clack application."
     (funcall callback)))
 
 (defmethod clack.socket:close-socket ((client client))
-  (bt:with-lock-held ((client-write-lock client))
+  (bt2:with-lock-held ((client-write-lock client))
     (finish-output (client-stream client))))
 
 (defmethod clack.socket:flush-socket-buffer ((client client) &key callback)
-  (bt:with-lock-held ((client-write-lock client))
+  (bt2:with-lock-held ((client-write-lock client))
     (force-output (client-stream client)))
   (when callback
     (funcall callback)))
