@@ -123,7 +123,11 @@
             (hunchentoot:start acceptor)
             #-lispworks
             (when threadedp
-              (bt2:join-thread (hunchentoot::acceptor-process taskmaster)))
+              (let ((thread (hunchentoot::acceptor-process taskmaster)))
+                (bt2:join-thread
+                  (if (typep thread 'bt2:thread)
+                      thread
+                      (bt2::ensure-thread-wrapper thread)))))
             #+lispworks
             (loop (sleep (expt 2 32))))
         (hunchentoot:stop acceptor)))))
