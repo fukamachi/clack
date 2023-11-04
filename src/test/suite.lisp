@@ -225,9 +225,7 @@ you would call like this: `(run-server-tests :foo)'."
                               `("REQUEST-METHOD::GET"
                                 "PATH-INFO:\"/foo/\""
                                 "QUERY-STRING:\"ediweitz=weitzedi\""
-                                ,(if (eq *clack-test-handler* :fcgi)
-                                     "SERVER-NAME:\"localhost\"" ;; probably the name from Nginx conf
-                                   "SERVER-NAME:\"127.0.0.1\"")
+                                "SERVER-NAME:\"127.0.0.1\""
                                 ,(format nil "SERVER-PORT:~D" *clack-test-access-port*)))))))
 
   (testing-app "validate env (must be integer)"
@@ -405,9 +403,7 @@ you would call like this: `(run-server-tests :foo)'."
                                (:content-length . nil))
                     :content chunk)
         (ok (eql status 200))
-        (if (eq *clack-test-handler* :fcgi)
-            (skip "Skipped because FCGI handler always adds :CONTENT-TYPE")
-            (ok (null (get-header headers :client-content-length))))
+        (ok (null (get-header headers :client-content-length)))
         (ok (equal (length body) len)))))
 
   (testing-app "multi headers (request)"
@@ -434,13 +430,8 @@ you would call like this: `(run-server-tests :foo)'."
         (multiple-value-bind (body status)
             (dex:get (localhost)
                      :headers `(("X-Foo" . ,chunk)))
-          (if (eq :fcgi *clack-test-handler*)
-              (progn
-                (ok (eql status 400))
-                (ok (ppcre:scan "400 Request Header Or Cookie Too Large" body)))
-              (progn
-                (ok (eql status 200))
-                (ok (equal body chunk))))))))
+          (ok (eql status 200))
+          (ok (equal body chunk))))))
 
   (testing-app "request -> input seekable"
       (lambda (env)
@@ -545,7 +536,6 @@ you would call like this: `(run-server-tests :foo)'."
             (funcall writer "" :close t))))
     (if (find *clack-test-handler* '(:hunchentoot
                                      :toot
-                                     :fcgi
                                      :wookie
                                      :woo))
         (multiple-value-bind (body status)
