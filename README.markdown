@@ -59,7 +59,6 @@ When you execute `ros install clack`, it copies `clackup` script to `$HOME/.rosw
 ## Server
 
 * [Hunchentoot](http://weitz.de/hunchentoot/)
-* [FastCGI](http://www.fastcgi.com/)
 * [Wookie](http://wookie.beeets.com/)
 * [Toot](https://github.com/gigamonkey/toot)
 * [Woo](https://github.com/fukamachi/woo)
