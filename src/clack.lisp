@@ -1,20 +1,17 @@
-(in-package :cl-user)
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (unless (find-package :clack)
-    (defpackage clack
-      (:use :cl)
-      (:import-from :clack.handler
-                    :run
-                    :stop)
-      (:import-from :clack.util
-                    :find-handler)
-      (:import-from :lack
-                    :builder)
-      (:import-from :alexandria
-                    :delete-from-plist)
-      (:export :clackup
-               :eval-file
-               :stop))))
+(defpackage clack
+  (:use :cl)
+  (:import-from :clack.handler
+                :run
+                :stop)
+  (:import-from :clack.util
+                :find-handler)
+  (:import-from :lack
+                :builder)
+  (:import-from :alexandria
+                :delete-from-plist)
+  (:export :clackup
+           :eval-file
+           :stop))
 (in-package :clack)
 
 (defvar *app-file-cache*
@@ -69,25 +66,26 @@
        (,main))))
 
 (defun clackup (app &rest args
-                &key (server :hunchentoot)
-                  (address "127.0.0.1")
-                  (port 5000)
-                  swank-interface
-                  swank-port
-                  (debug t)
-                  silent
-                  (use-thread #+thread-support t #-thread-support nil)
-                  (use-default-middlewares t)
-                &allow-other-keys)
+                    &key (server :hunchentoot)
+                         (address "127.0.0.1")
+                         (port 5000)
+                         swank-interface
+                         swank-port
+                         (debug t)
+                         silent
+                         (use-thread #+thread-support t #-thread-support nil)
+                         (use-default-middlewares t)
+                    &allow-other-keys)
   (declare (ignore swank-interface swank-port))
   #-thread-support
   (when use-thread
     (error ":use-thread is T though there's no thread support."))
   (flet ((buildapp (app)
-           (let ((app (typecase app
-                        ((or pathname string)
-                         (eval-file app))
-                        (otherwise app))))
+           (let* ((*features* (cons :clackup *features*))
+                  (app (typecase app
+                         ((or pathname string)
+                          (eval-file app))
+                         (otherwise app))))
              (builder
               (if use-default-middlewares
                   :backtrace
