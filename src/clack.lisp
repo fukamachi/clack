@@ -21,6 +21,7 @@
   (make-hash-table :test 'equal))
 
 (defun %load-file (file)
+  (format t "~&Loading file ~A~%" file)
   (with-open-file (in file)
     (let ((*package* *package*)
           (*readtable* *readtable*)
@@ -30,7 +31,8 @@
             with eof = '#:eof
             for form = (read in nil eof)
             until (eq form eof)
-            do (setf results (multiple-value-list (eval form)))
+            do (format t "~&Eval ~S~%" form)
+               (setf results (multiple-value-list (eval form)))
             finally
                (return (apply #'values results))))))
 
@@ -81,10 +83,12 @@
   (when use-thread
     (error ":use-thread is T though there's no thread support."))
   (flet ((buildapp (app)
+           (format t "~&About to start building app: ~S.~%" app)
            (let ((app (typecase app
                         ((or pathname string)
                          (eval-file app))
                         (otherwise app))))
+             (format t "~&Wrapping with builder~%")
              (builder
               (if use-default-middlewares
                   :backtrace
@@ -92,10 +96,12 @@
               app))))
     (let ((app (buildapp app)))
       ;; Ensure the handler to be loaded.
+      (format t "~&Looking for ~A handler~%" server)
       (find-handler server)
       (when (and (not use-thread)
                  (not silent))
         (format t "~&~:(~A~) server is going to start.~%Listening on ~A:~A.~%" server address port))
+      (format t "~&Running ~A server~%" server)
       (with-handle-interrupt (lambda ()
                                (format *error-output* "Interrupted"))
         (prog1
