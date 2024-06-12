@@ -22,6 +22,7 @@
                                          (*error-output* . ,*error-output*)
                                          ,@bt:*default-special-bindings*)))
     (flet ((run-server ()
+             (format *error-output* "~&Running handler: ~A~%" handler-package)
              (apply (intern #.(string '#:run) handler-package)
                     app
                     :allow-other-keys t

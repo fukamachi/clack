@@ -135,7 +135,8 @@ Options:
     (help)
     (uiop:quit -1))
 
-  (ql:quickload :clack :silent t)
+  (warn "Loading Clack from ~A" (ql:where-is-system :clack))
+  (ql:quickload :clack :verbose t)
 
   (multiple-value-bind (app-file key-args opt-args)
       (parse-args args)
