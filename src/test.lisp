@@ -18,6 +18,7 @@
            :*clack-test-access-port*
            :*clackup-additional-args*
            :*enable-debug*
+           :*use-https*
            :*random-port*
            :localhost
            :testing-app))
@@ -37,6 +38,7 @@
 Use if you want to set another port. The default is `*clack-test-port*`.")
 
 (defvar *enable-debug* t)
+(defvar *use-https* nil)
 
 (defvar *random-port* t)
 
@@ -75,7 +77,8 @@ Use if you want to set another port. The default is `*clack-test-port*`.")
           ((not (char= (aref path 0) #\/))
            (concatenate 'string "/" path))
           (t path)))
-  (format nil "http://127.0.0.1:~D~A"
+  (format nil "http~@[~*s~]://127.0.0.1:~D~A"
+          *use-https*
           port path))
 
 (defun %testing-app (app client)
