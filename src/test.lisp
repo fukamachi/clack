@@ -61,6 +61,7 @@ Use if you want to set another port. The default is `*clack-test-port*`.")
                   (usocket:socket-close socket)
                   t)
     #+sbcl (sb-bsd-sockets:interrupted-error () nil)
+    (usocket:socket-error () nil)
     (usocket:connection-refused-error () nil)
     (usocket:connection-reset-error () nil)))
 
